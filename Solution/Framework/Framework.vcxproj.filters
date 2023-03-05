@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="FW_Assert.h" />
+    <ClInclude Include="FW_CircularArray.h" />
+    <ClInclude Include="FW_FileParser.h" />
+    <ClInclude Include="FW_FileProcessor.h" />
+    <ClInclude Include="FW_FileSystem.h" />
+    <ClInclude Include="FW_GrowingArray.h" />
+    <ClInclude Include="FW_Hashing.h" />
+    <ClInclude Include="FW_Hashmap.h" />
+    <ClInclude Include="FW_Includes.h" />
+    <ClInclude Include="FW_Logger.h" />
+    <ClInclude Include="FW_Math.h" />
+    <ClInclude Include="FW_Matrix22.h" />
+    <ClInclude Include="FW_Murmur.h" />
+    <ClInclude Include="FW_Rect.h" />
+    <ClInclude Include="FW_String.h" />
+    <ClInclude Include="FW_Threading.h" />
+    <ClInclude Include="FW_Vector2.h" />
+    <ClInclude Include="FW_Vector3.h" />
+    <ClInclude Include="FW_XMLParser.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FW_FileParser.cpp" />
+    <ClCompile Include="FW_FileProcessor.cpp" />
+    <ClCompile Include="FW_FileSystem.cpp" />
+    <ClCompile Include="FW_Logger.cpp" />
+    <ClCompile Include="FW_Murmur.cpp" />
+    <ClCompile Include="FW_XMLParser.cpp" />
+  </ItemGroup>
+</Project>

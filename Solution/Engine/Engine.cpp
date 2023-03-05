@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Engine.h"
+#include "Window.h"
 
 namespace Slush
 {
@@ -16,5 +17,23 @@ namespace Slush
 	void Engine::Shutdown()
 	{
 		FW_SAFE_DELETE(ourInstance);
+	}
+
+	void Engine::Run()
+	{
+		while (myWindow->PumpEvents())
+		{
+			// Do things
+		}
+	}
+
+	Engine::Engine()
+	{
+		myWindow = new Window(800, 600);
+	}
+
+	Engine::~Engine()
+	{
+		FW_SAFE_DELETE(myWindow);
 	}
 }

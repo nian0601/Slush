@@ -18,7 +18,12 @@ namespace Slush
 
 		void Present();
 
+		void Close() { myShouldBeOpen = false; }
+
+		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
+
 	private:
-		sf::RenderWindow* myRenderWindow;
+		sf::RenderWindow* myRenderWindow = nullptr;
+		bool myShouldBeOpen = true;
 	};
 }

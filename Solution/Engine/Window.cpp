@@ -28,6 +28,9 @@ namespace Slush
 
 	bool Window::PumpEvents()
 	{
+		if (!myShouldBeOpen)
+			return false;
+
 		sf::Event event;
 		while (myRenderWindow->pollEvent(event))
 		{

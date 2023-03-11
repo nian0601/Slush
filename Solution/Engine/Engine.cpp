@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 #include "Window.h"
+#include "Input.h"
 
 namespace Slush
 {
@@ -26,6 +27,12 @@ namespace Slush
 		float z = 0.f;
 		while (myWindow->PumpEvents())
 		{
+			myInput->UpdateKeyboard();
+			myInput->UpdateMouse(*myWindow->GetRenderWindow());
+
+			if (myInput->WasKeyPressed(Input::ESC))
+				myWindow->Close();
+
 			// Do things
 			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
@@ -51,10 +58,12 @@ namespace Slush
 	Engine::Engine()
 	{
 		myWindow = new Window(1280, 720);
+		myInput = new Input();
 	}
 
 	Engine::~Engine()
 	{
+		FW_SAFE_DELETE(myInput);
 		FW_SAFE_DELETE(myWindow);
 	}
 }

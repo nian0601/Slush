@@ -28,6 +28,7 @@
     <ClInclude Include="imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
@@ -51,6 +52,7 @@
     <ClCompile Include="imgui\imgui-SFML.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

@@ -3,6 +3,7 @@
 namespace Slush
 {
 	class Window;
+	class Input;
 
 	class Engine
 	{
@@ -12,11 +13,14 @@ namespace Slush
 
 		void Run();
 
+		const Input& GetInput() const { return *myInput; }
+
 	private:
 		Engine();
 		~Engine();
 		static Engine* ourInstance;
 
 		Window* myWindow;
+		Input* myInput;
 	};
 }

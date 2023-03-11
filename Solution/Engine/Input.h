@@ -64,13 +64,13 @@ namespace Slush
 		void UpdateMouse(sf::RenderWindow& aRenderWindow);
 		void UpdateKeyboard();
 
-		bool WasKeyPressed(KeyCode aKey) { return myKeyStates[aKey] == KEYSTATE_PRESSED; }
-		bool WasKeyReleased(KeyCode aKey) { return myKeyStates[aKey] == KEYSTATE_RELEASED; }
-		bool IsKeyDown(KeyCode aKey) { return myKeyStates[aKey] == KEYSTATE_DOWN; }
+		bool WasKeyPressed(KeyCode aKey) const { return myKeyStates[aKey] == KEYSTATE_PRESSED; }
+		bool WasKeyReleased(KeyCode aKey) const { return myKeyStates[aKey] == KEYSTATE_RELEASED; }
+		bool IsKeyDown(KeyCode aKey)const { return myKeyStates[aKey] == KEYSTATE_DOWN; }
 
-		bool WasMousePressed(MouseButton aMouseButton) { return myMouseStates[aMouseButton] == KEYSTATE_PRESSED; }
-		bool WasMouseReleased(MouseButton aMouseButton) { return myMouseStates[aMouseButton] == KEYSTATE_RELEASED; }
-		bool IsMouseDown(MouseButton aMouseButton) { return myMouseStates[aMouseButton] == KEYSTATE_DOWN; }
+		bool WasMousePressed(MouseButton aMouseButton) const { return myMouseStates[aMouseButton] == KEYSTATE_PRESSED; }
+		bool WasMouseReleased(MouseButton aMouseButton) const { return myMouseStates[aMouseButton] == KEYSTATE_RELEASED; }
+		bool IsMouseDown(MouseButton aMouseButton) const { return myMouseStates[aMouseButton] == KEYSTATE_DOWN; }
 
 		const Vector2i& GetMousePosition() const { return myMousePosition; }
 		const Vector2f& GetMousePositionf() const { return myMousePositionf; }

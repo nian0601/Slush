@@ -16,6 +16,8 @@ namespace Slush
 
 		const Input& GetInput() const { return *myInput; }
 
+		Window& GetWindow() { return *myWindow; }
+
 	private:
 		Engine();
 		~Engine();

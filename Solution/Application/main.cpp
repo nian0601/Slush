@@ -1,6 +1,8 @@
 #include "Engine.h"
 #include "IApp.h"
 #include "imgui/imgui.h"
+#include "Input.h"
+#include "Window.h"
 
 class App : public Slush::IApp
 {
@@ -16,6 +18,10 @@ public:
 
 	void Update() override
 	{
+		Slush::Engine& engine = Slush::Engine::GetInstance();
+
+		if (engine.GetInput().WasKeyPressed(Slush::Input::ESC))
+			engine.GetWindow().Close();
 	}
 
 	void Render() override

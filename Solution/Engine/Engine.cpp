@@ -32,9 +32,6 @@ namespace Slush
 			myInput->UpdateKeyboard();
 			myInput->UpdateMouse(*myWindow->GetRenderWindow());
 
-			if (myInput->WasKeyPressed(Input::ESC))
-				myWindow->Close();
-
 			anApp.Update();
 			anApp.Render();
 

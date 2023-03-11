@@ -21,15 +21,36 @@ namespace Slush
 
 	void Engine::Run()
 	{
+		float x = 0.f;
+		float y = 0.f;
+		float z = 0.f;
 		while (myWindow->PumpEvents())
 		{
 			// Do things
+			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
+			ImGui::ShowDemoWindow();
+
+			if (ImGui::Begin("X Window"))
+				ImGui::DragFloat("X", &x);
+			ImGui::End();
+
+			if (ImGui::Begin("Y Window"))
+				ImGui::DragFloat("Y", &y);
+			ImGui::End();
+
+			if (ImGui::Begin("Z Window"))
+				ImGui::DragFloat("Z", &z);
+			ImGui::End();
+
+			myWindow->RenderImGUI();
+			myWindow->Present();
 		}
 	}
 
 	Engine::Engine()
 	{
-		myWindow = new Window(800, 600);
+		myWindow = new Window(1280, 720);
 	}
 
 	Engine::~Engine()

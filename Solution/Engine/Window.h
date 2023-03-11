@@ -14,6 +14,9 @@ namespace Slush
 		~Window();
 
 		bool PumpEvents();
+		void RenderImGUI();
+
+		void Present();
 
 	private:
 		sf::RenderWindow* myRenderWindow;

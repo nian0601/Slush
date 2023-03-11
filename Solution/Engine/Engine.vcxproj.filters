@@ -29,6 +29,7 @@
       <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="Input.h" />
+    <ClInclude Include="Time.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
@@ -53,6 +54,7 @@
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

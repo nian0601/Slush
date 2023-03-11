@@ -3,6 +3,7 @@
 #include "Engine.h"
 #include "Window.h"
 #include "Input.h"
+#include "Time.h"
 
 namespace Slush
 {
@@ -27,6 +28,7 @@ namespace Slush
 		float z = 0.f;
 		while (myWindow->PumpEvents())
 		{
+			Time::Update();
 			myInput->UpdateKeyboard();
 			myInput->UpdateMouse(*myWindow->GetRenderWindow());
 
@@ -59,6 +61,7 @@ namespace Slush
 	{
 		myWindow = new Window(1280, 720);
 		myInput = new Input();
+		Time::Init();
 	}
 
 	Engine::~Engine()

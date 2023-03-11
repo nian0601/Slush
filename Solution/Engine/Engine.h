@@ -4,6 +4,7 @@ namespace Slush
 {
 	class Window;
 	class Input;
+	class IApp;
 
 	class Engine
 	{
@@ -11,7 +12,7 @@ namespace Slush
 		static Engine& GetInstance();
 		static void Shutdown();
 
-		void Run();
+		void Run(IApp& anApp);
 
 		const Input& GetInput() const { return *myInput; }
 

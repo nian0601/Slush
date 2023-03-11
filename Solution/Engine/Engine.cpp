@@ -4,6 +4,7 @@
 #include "Window.h"
 #include "Input.h"
 #include "Time.h"
+#include "IApp.h"
 
 namespace Slush
 {
@@ -21,11 +22,10 @@ namespace Slush
 		FW_SAFE_DELETE(ourInstance);
 	}
 
-	void Engine::Run()
+	void Engine::Run(IApp& anApp)
 	{
-		float x = 0.f;
-		float y = 0.f;
-		float z = 0.f;
+		anApp.Initialize();
+
 		while (myWindow->PumpEvents())
 		{
 			Time::Update();
@@ -35,26 +35,16 @@ namespace Slush
 			if (myInput->WasKeyPressed(Input::ESC))
 				myWindow->Close();
 
-			// Do things
-			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+			anApp.Update();
+			anApp.Render();
 
-			ImGui::ShowDemoWindow();
-
-			if (ImGui::Begin("X Window"))
-				ImGui::DragFloat("X", &x);
-			ImGui::End();
-
-			if (ImGui::Begin("Y Window"))
-				ImGui::DragFloat("Y", &y);
-			ImGui::End();
-
-			if (ImGui::Begin("Z Window"))
-				ImGui::DragFloat("Z", &z);
-			ImGui::End();
+			anApp.RenderImGUI();
 
 			myWindow->RenderImGUI();
 			myWindow->Present();
 		}
+
+		anApp.Shutdown();
 	}
 
 	Engine::Engine()

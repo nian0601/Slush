@@ -15,7 +15,6 @@ namespace Slush
 
 		ImGui::SFML::Init(*myRenderWindow);
 		
-
 		ImGuiIO& imguiIO = ImGui::GetIO();
 		imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		imguiIO.ConfigWindowsMoveFromTitleBarOnly = true;

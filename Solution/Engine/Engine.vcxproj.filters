@@ -28,8 +28,13 @@
     <ClInclude Include="imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Time.h" />
+    <ClInclude Include="Input.h">
+      <Filter>Services</Filter>
+    </ClInclude>
+    <ClInclude Include="Time.h">
+      <Filter>Services</Filter>
+    </ClInclude>
+    <ClInclude Include="IApp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
@@ -53,12 +58,19 @@
     <ClCompile Include="imgui\imgui-SFML.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Time.cpp" />
+    <ClCompile Include="Input.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="Time.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
       <UniqueIdentifier>{cde591da-8c23-46a8-b7d3-cac91c69415a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services">
+      <UniqueIdentifier>{e7fc608e-b1ee-4748-bcd0-6cf4bce8ddfa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

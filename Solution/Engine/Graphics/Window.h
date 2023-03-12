@@ -17,6 +17,7 @@ namespace Slush
 
 		bool PumpEvents();
 		void RenderImGUI();
+		void RenderOffscreenBufferToImGUI();
 
 		void Present();
 

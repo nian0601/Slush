@@ -55,6 +55,15 @@ namespace Slush
 		ImGui::SFML::Render(*myRenderWindow);
 	}
 
+	void Window::RenderOffscreenBufferToImGUI()
+	{
+		float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		float height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
+
+		ImTextureID textureID = myOffscreenBuffer->getTexture().getNativeHandle();
+		ImGui::Image(textureID, { width, height }, { 0, 1 }, { 1, 0 });
+	}
+
 	void Window::Present()
 	{
 		myRenderWindow->display();

@@ -56,10 +56,6 @@ public:
 
 		ImGui::ShowDemoWindow();
 
-		if (ImGui::Begin("Z Window"))
-			ImGui::DragFloat("Z", &z);
-		ImGui::End();
-
 		if (ImGui::Begin("Game View"))
 		{
 			Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -78,11 +74,13 @@ private:
 
 int main()
 {
-	App app;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
+	engine.Initialize();
+
+	App app;
 	engine.Run(app);
-	engine.Shutdown();
+
+	engine.Destroy();
 	
 	return 0;
 }

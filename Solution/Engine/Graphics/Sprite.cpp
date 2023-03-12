@@ -29,6 +29,8 @@ namespace Slush
 		myShape->setSize({ w, h });
 		myShape->setOrigin({ w * 0.5f, h * 0.5f });
 		myShape->setFillColor(GetSFMLColor(0xFF00FF88));
+
+		SLUSH_INFO("Sprite created");
 	}
 
 	Sprite::~Sprite()

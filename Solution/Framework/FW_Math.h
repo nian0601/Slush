@@ -159,3 +159,12 @@ inline int FW_RandomColor()
 
 	return color;
 }
+
+inline Vector3f FW_ARGB_To_Vector(unsigned int aColor)
+{
+	short red = (aColor & 0x00FF0000) >> 16;
+	short green = (aColor & 0x0000FF00) >> 8;
+	short blue = (aColor & 0x000000FF) >> 0;
+
+	return Vector3f(red / 255.f, green / 255.f, blue / 255.f);
+}

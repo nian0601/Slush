@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
-#include "Window.h"
+#include "Graphics/Window.h"
+#include "Core/Log.h"
+#include "Core/Engine.h"
+
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
@@ -23,6 +26,9 @@ namespace Slush
 		ImGuiIO& imguiIO = ImGui::GetIO();
 		imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		imguiIO.ConfigWindowsMoveFromTitleBarOnly = true;
+
+		SLUSH_INFO("Window Created");
+
 	}
 
 	Window::~Window()
@@ -52,6 +58,24 @@ namespace Slush
 
 	void Window::RenderImGUI()
 	{
+		if (ImGui::Begin("Log"))
+		{
+			const FW_GrowingArray<Logger::LogEntry>& entries = Engine::GetInstance().GetLogger().GetEntries();
+			ImGui::BeginGroup();
+			for (const Logger::LogEntry& entry : entries)
+			{
+				Vector3f color = Logger::GetSeverityColorVec(entry.mySeverity);
+				ImVec4 imColor;
+				imColor.x = color.x;
+				imColor.y = color.y;
+				imColor.z = color.z;
+				imColor.w = 1.f;
+				ImGui::TextColored(imColor, entry.myMessage.GetBuffer());
+			}
+			ImGui::EndGroup();
+		}
+		ImGui::End();
+
 		ImGui::SFML::Render(*myRenderWindow);
 	}
 

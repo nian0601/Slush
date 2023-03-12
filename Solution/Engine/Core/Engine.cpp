@@ -4,6 +4,7 @@
 #include "Core/Input.h"
 #include "Core/Time.h"
 #include "Core/IApp.h"
+#include "Core/Log.h"
 
 #include "Graphics/Window.h"
 
@@ -18,9 +19,25 @@ namespace Slush
 		return *ourInstance;
 	}
 
+	void Engine::Destroy()
+	{
+		ourInstance->Shutdown();
+		FW_SAFE_DELETE(ourInstance);
+	}
+
+	void Engine::Initialize()
+	{
+		myLogger = new Logger();
+		myWindow = new Window(1280, 720);
+		myInput = new Input();
+		Time::Init();
+	}
+
 	void Engine::Shutdown()
 	{
-		FW_SAFE_DELETE(ourInstance);
+		FW_SAFE_DELETE(myInput);
+		FW_SAFE_DELETE(myWindow);
+		FW_SAFE_DELETE(myLogger);
 	}
 
 	void Engine::Run(IApp& anApp)
@@ -43,18 +60,5 @@ namespace Slush
 		}
 
 		anApp.Shutdown();
-	}
-
-	Engine::Engine()
-	{
-		myWindow = new Window(1280, 720);
-		myInput = new Input();
-		Time::Init();
-	}
-
-	Engine::~Engine()
-	{
-		FW_SAFE_DELETE(myInput);
-		FW_SAFE_DELETE(myWindow);
 	}
 }

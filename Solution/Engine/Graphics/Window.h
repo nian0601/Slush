@@ -25,6 +25,7 @@ namespace Slush
 
 		void StartOffscreenBuffer();
 		void EndOffscreenBuffer();
+		void SetShouldRenderOffscreenBufferToScreen(bool aState) { myShouldRenderOffscreenBufferToScreen = aState; }
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
 		sf::RenderTexture* GetOffscreenBuffer() const { return myOffscreenBuffer; }
@@ -32,6 +33,13 @@ namespace Slush
 		sf::RenderTarget* GetActiveRenderTarget() const { return myActiveRenderTarget; }
 
 	private:
+		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
+
+		int myWidth;
+		int myHeight;
+		float myAspectRatio;
+		bool myShouldRenderOffscreenBufferToScreen = false;
+
 		sf::RenderWindow* myRenderWindow = nullptr;
 		bool myShouldBeOpen = true;
 

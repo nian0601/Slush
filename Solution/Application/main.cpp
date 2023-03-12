@@ -14,6 +14,7 @@ class App : public Slush::IApp
 public:
 	void Initialize() override
 	{
+		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
 	}
 
 	void Shutdown() override
@@ -26,6 +27,12 @@ public:
 		const Slush::Input& input = engine.GetInput();
 		if (input.WasKeyPressed(Slush::Input::ESC))
 			engine.GetWindow().Close();
+
+		if (input.WasKeyPressed(Slush::Input::HYPHEN))
+		{
+			myRenderImGUI = !myRenderImGUI;
+			engine.GetWindow().SetShouldRenderOffscreenBufferToScreen(!myRenderImGUI);
+		}
 
 		float delta = Slush::Time::GetDelta();
 
@@ -46,12 +53,18 @@ public:
 		engine.GetWindow().StartOffscreenBuffer();
 
 		mySprite.Render(x, y);
+		mySprite.Render(1700.f, 200.f);
+		mySprite.Render(1700.f, 800.f);
+		mySprite.Render(200.f, 800.f);
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
 
 	void RenderImGUI() override
 	{
+		if (!myRenderImGUI)
+			return;
+
 		ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
 		ImGui::ShowDemoWindow();
@@ -65,6 +78,7 @@ public:
 	}
 
 private:
+	bool myRenderImGUI = true;
 	Slush::Sprite mySprite;
 
 	float x = 200.f;

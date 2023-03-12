@@ -96,6 +96,7 @@ namespace Slush
 		case SPACE: return sf::Keyboard::Space;
 		case ESC: return sf::Keyboard::Escape;
 		case DEL: return sf::Keyboard::Delete;
+		case HYPHEN: return sf::Keyboard::Hyphen;
 		case _1: return sf::Keyboard::Num1;
 		case _2: return sf::Keyboard::Num2;
 		case _3: return sf::Keyboard::Num3;

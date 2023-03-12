@@ -26,6 +26,7 @@ namespace Slush
 			SPACE,
 			ESC,
 			DEL,
+			HYPHEN,
 			_1,
 			_2,
 			_3,

@@ -1,10 +1,11 @@
 #include "stdafx.h"
 
-#include "Engine.h"
-#include "Window.h"
-#include "Input.h"
-#include "Time.h"
-#include "IApp.h"
+#include "Core/Engine.h"
+#include "Core/Input.h"
+#include "Core/Time.h"
+#include "Core/IApp.h"
+
+#include "Graphics/Window.h"
 
 namespace Slush
 {

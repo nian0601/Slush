@@ -4,10 +4,9 @@
 #include "Core/IApp.h"
 #include "Core/Engine.h"
 #include "Core/Input.h"
+#include "Core/Time.h"
 #include "Graphics/Window.h"
 #include "Graphics/Sprite.h"
-
-#include <SFML/Graphics/RenderTexture.hpp>
 
 class App : public Slush::IApp
 {
@@ -24,9 +23,21 @@ public:
 	void Update() override
 	{
 		Slush::Engine& engine = Slush::Engine::GetInstance();
-
-		if (engine.GetInput().WasKeyPressed(Slush::Input::ESC))
+		const Slush::Input& input = engine.GetInput();
+		if (input.WasKeyPressed(Slush::Input::ESC))
 			engine.GetWindow().Close();
+
+		float delta = Slush::Time::GetDelta();
+
+		float speed = 100.f * delta;
+		if (input.IsKeyDown(Slush::Input::W))
+			y -= speed;
+		if (input.IsKeyDown(Slush::Input::S))
+			y += speed;
+		if (input.IsKeyDown(Slush::Input::A))
+			x -= speed;
+		if (input.IsKeyDown(Slush::Input::D))
+			x += speed;
 	}
 
 	void Render() override
@@ -34,7 +45,7 @@ public:
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		engine.GetWindow().StartOffscreenBuffer();
 
-		mySprite.Render(200, 200);
+		mySprite.Render(x, y);
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
@@ -45,14 +56,6 @@ public:
 
 		ImGui::ShowDemoWindow();
 
-		if (ImGui::Begin("X Window"))
-			ImGui::DragFloat("X", &x);
-		ImGui::End();
-
-		if (ImGui::Begin("Y Window"))
-			ImGui::DragFloat("Y", &y);
-		ImGui::End();
-
 		if (ImGui::Begin("Z Window"))
 			ImGui::DragFloat("Z", &z);
 		ImGui::End();
@@ -60,20 +63,17 @@ public:
 		if (ImGui::Begin("Game View"))
 		{
 			Slush::Engine& engine = Slush::Engine::GetInstance();
-			float width = ImGui::GetWindowContentRegionWidth();
-			float height = (9.f / 16.f) * width;
-			ImGui::Image(engine.GetWindow().GetOffscreenBuffer()->getTexture(), { width, height });
+			engine.GetWindow().RenderOffscreenBufferToImGUI();
 		}
 		ImGui::End();
-		
 	}
 
 private:
-	float x = 0.f;
-	float y = 2.f;
-	float z = 0.f;
-
 	Slush::Sprite mySprite;
+
+	float x = 200.f;
+	float y = 200.f;
+	float z = 0.f;
 };
 
 int main()

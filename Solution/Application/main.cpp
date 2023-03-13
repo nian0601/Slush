@@ -5,9 +5,12 @@
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Core/Time.h"
+
 #include "Graphics/Window.h"
 #include "Graphics/Sprite.h"
 #include "Graphics/Texture.h"
+#include "Graphics/Font.h"
+#include "Graphics/Text.h"
 
 class App : public Slush::IApp
 {
@@ -18,6 +21,10 @@ public:
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
 		myTexture.Load("Data/cleric.PNG");
 		mySprite.SetTexture(myTexture);
+
+		myFont.Load("Data/OpenSans-Regular.ttf");
+		myText.SetFont(myFont);
+		myText.SetText("This is some kewl text");
 	}
 
 	void Shutdown() override
@@ -60,6 +67,8 @@ public:
 		mySprite.Render(1700.f, 800.f);
 		mySprite.Render(200.f, 800.f);
 
+		myText.Render(980.f, 560.f);
+
 		engine.GetWindow().EndOffscreenBuffer();
 	}
 
@@ -84,6 +93,9 @@ private:
 	bool myRenderImGUI = true;
 	Slush::Sprite mySprite;
 	Slush::Texture myTexture;
+
+	Slush::Text myText;
+	Slush::Font myFont;
 
 	float x = 200.f;
 	float y = 200.f;

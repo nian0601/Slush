@@ -38,6 +38,8 @@
     <ClInclude Include="Core\IApp.h" />
     <ClInclude Include="Core\Log.h" />
     <ClInclude Include="Graphics\Texture.h" />
+    <ClInclude Include="Graphics\Font.h" />
+    <ClInclude Include="Graphics\Text.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -70,6 +72,8 @@
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
+    <ClCompile Include="Graphics\Font.cpp" />
+    <ClCompile Include="Graphics\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

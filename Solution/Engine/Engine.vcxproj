@@ -154,6 +154,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Graphics\Window.h" />
+    <ClInclude Include="Graphics\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Engine.cpp" />
@@ -190,6 +191,7 @@
     </ClCompile>
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Graphics\Window.cpp" />
+    <ClCompile Include="Graphics\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.vcxproj">

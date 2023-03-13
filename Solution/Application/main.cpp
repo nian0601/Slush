@@ -7,6 +7,7 @@
 #include "Core/Time.h"
 #include "Graphics/Window.h"
 #include "Graphics/Sprite.h"
+#include "Graphics/Texture.h"
 
 class App : public Slush::IApp
 {
@@ -15,6 +16,8 @@ public:
 	void Initialize() override
 	{
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
+		myTexture.Load("Data/cleric.PNG");
+		mySprite.SetTexture(myTexture);
 	}
 
 	void Shutdown() override
@@ -80,6 +83,7 @@ public:
 private:
 	bool myRenderImGUI = true;
 	Slush::Sprite mySprite;
+	Slush::Texture myTexture;
 
 	float x = 200.f;
 	float y = 200.f;

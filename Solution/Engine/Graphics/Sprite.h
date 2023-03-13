@@ -7,12 +7,14 @@ namespace sf
 
 namespace Slush
 {
+	class Texture;
 	class Sprite
 	{
 	public:
 		Sprite();
 		~Sprite();
 
+		void SetTexture(const Texture& aTexture);
 		void Render(float x, float y);
 
 	private:

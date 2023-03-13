@@ -37,6 +37,7 @@
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\IApp.h" />
     <ClInclude Include="Core\Log.h" />
+    <ClInclude Include="Graphics\Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -68,6 +69,7 @@
     <ClCompile Include="Graphics\Sprite.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\Log.cpp" />
+    <ClCompile Include="Graphics\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

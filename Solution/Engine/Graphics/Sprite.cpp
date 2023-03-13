@@ -3,6 +3,7 @@
 #include "Core/Engine.h"
 
 #include "Graphics/Sprite.h"
+#include "Graphics/Texture.h"
 #include "Graphics/Window.h"
 
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -36,6 +37,14 @@ namespace Slush
 	Sprite::~Sprite()
 	{
 		FW_SAFE_DELETE(myShape);
+	}
+
+	void Sprite::SetTexture(const Texture& aTexture)
+	{
+		if (const sf::Texture* sfmlTexture = aTexture.GetSFMLTexture())
+			myShape->setTexture(sfmlTexture);
+		else
+			SLUSH_ERROR("Sprite: Invalid texture passed to SetTexture");
 	}
 
 	void Sprite::Render(float x, float y)

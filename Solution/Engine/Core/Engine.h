@@ -1,4 +1,5 @@
 #pragma once
+#include "FW_String.h"
 
 namespace Slush
 {
@@ -23,6 +24,8 @@ namespace Slush
 
 		Window& GetWindow() { return *myWindow; }
 
+		const FW_String& GetDataFolder() const { return myDataFolder; }
+
 	private:
 		Engine() {};
 		~Engine() {};
@@ -31,5 +34,7 @@ namespace Slush
 		Window* myWindow;
 		Input* myInput;
 		Logger* myLogger;
+
+		FW_String myDataFolder;
 	};
 }

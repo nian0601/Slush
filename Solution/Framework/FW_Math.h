@@ -160,6 +160,18 @@ inline int FW_RandomColor()
 	return color;
 }
 
+inline int FW_Float_To_ARGB(float a, float r, float g, float b)
+{
+	int color = 0;
+
+	color |= unsigned char(FW_Clamp(a, 0.f, 0.999f) * 255.99f) << 24;
+	color |= unsigned char(FW_Clamp(r, 0.f, 0.999f) * 255.99f) << 16;
+	color |= unsigned char(FW_Clamp(g, 0.f, 0.999f) * 255.99f) << 8;
+	color |= unsigned char(FW_Clamp(b, 0.f, 0.999f) * 255.99f) << 0;
+
+	return color;
+}
+
 inline Vector3f FW_ARGB_To_Vector(unsigned int aColor)
 {
 	short red = (aColor & 0x00FF0000) >> 16;

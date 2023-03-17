@@ -21,6 +21,7 @@ public:
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
 		myTexture.Load("Data/cleric.PNG");
 		mySprite.SetTexture(myTexture);
+		mySprite.SetSize(300.f, 300.f);
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 		myText.SetFont(myFont);

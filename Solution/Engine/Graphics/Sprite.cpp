@@ -29,7 +29,6 @@ namespace Slush
 		float h = 150.f;
 		myShape->setSize({ w, h });
 		myShape->setOrigin({ w * 0.5f, h * 0.5f });
-		myShape->setFillColor(GetSFMLColor(0xFF00FF88));
 
 		SLUSH_INFO("Sprite created");
 	}
@@ -47,25 +46,26 @@ namespace Slush
 			SLUSH_ERROR("Sprite: Invalid texture passed to SetTexture");
 	}
 
+	void Sprite::SetColor(int argb)
+	{
+		myShape->setFillColor(GetSFMLColor(argb));
+	}
+
+	void Sprite::SetColor(float a, float r, float g, float b)
+	{
+		SetColor(FW_Float_To_ARGB(a, r, g, b));
+	}
+
+	void Sprite::SetSize(float aWidth, float aHeight)
+	{
+		myShape->setSize({ aWidth, aHeight });
+		myShape->setOrigin({ aWidth * 0.5f, aHeight * 0.5f });
+	}
+
 	void Sprite::Render(float x, float y)
 	{
 		myShape->setPosition({ x, y });
 		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myShape);
-
-		//sf::RectangleShape& rect = SFML_Renderer::ourRectangleShape;
-		//rect.setOrigin({ aRect.myExtents.x * 0.5f, aRect.myExtents.y * 0.5f });
-		//rect.setPosition(GetCameraAdjustedPosition(aRect.myCenterPos));
-		//rect.setRotation(FW_RadiansToDegrees(aRotationInRadians));
-		//if (aRect.myExtents != SFML_Renderer::ourCurrentRectangleSize)
-		//{
-		//	SFML_Renderer::ourCurrentRectangleSize = aRect.myExtents;
-		//	rect.setSize({ aRect.myExtents.x, aRect.myExtents.y });
-		//}
-		//
-		//rect.setFillColor(SFML_Renderer::GetSFMLColor(aColor));
-		//rect.setTexture(nullptr);
-		//
-		//SFML_Renderer::ourOffscreenBuffer->draw(rect);
 	}
 
 }

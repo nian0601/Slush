@@ -15,6 +15,10 @@ namespace Slush
 		~Sprite();
 
 		void SetTexture(const Texture& aTexture);
+		void SetColor(int argb);
+		void SetColor(float a, float r, float g, float b);
+		void SetSize(float aWidth, float aHeight);
+
 		void Render(float x, float y);
 
 	private:

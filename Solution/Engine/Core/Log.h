@@ -2,7 +2,10 @@
 
 #include "FW_String.h"
 #include "FW_GrowingArray.h"
+#include "FW_Vector3.h"
+#include "FW_Math.h"
 #include "Core/Engine.h"
+
 
 namespace Slush
 {

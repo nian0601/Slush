@@ -5,6 +5,12 @@
 
 namespace Slush
 {
+
+	Texture::Texture(const char* anAssetName)
+		: myAssetName(anAssetName)
+	{
+	}
+
 	Texture::~Texture()
 	{
 		FW_SAFE_DELETE(mySFMLTexture);
@@ -12,11 +18,13 @@ namespace Slush
 
 	void Texture::Load(const char* aFilePath)
 	{
-		myFilePath = Engine::GetInstance().GetDataFolder();
-		myFilePath += aFilePath;
+		myFilePath = aFilePath;
+		
+		myAbsoluteFilePath = Engine::GetInstance().GetDataFolder();
+		myAbsoluteFilePath += aFilePath;
 
 		mySFMLTexture = new sf::Texture();
-		if (!mySFMLTexture->loadFromFile(myFilePath.GetBuffer()))
+		if (!mySFMLTexture->loadFromFile(myAbsoluteFilePath.GetBuffer()))
 		{
 			SLUSH_ERROR("Texture: Failed to load %s", aFilePath);
 			FW_SAFE_DELETE(mySFMLTexture);

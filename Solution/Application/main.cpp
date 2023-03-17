@@ -5,6 +5,7 @@
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Core/Time.h"
+#include "Core/AssetStorage.h"
 
 #include "Graphics/Window.h"
 #include "Graphics/Sprite.h"
@@ -19,8 +20,12 @@ public:
 	void Initialize() override
 	{
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
-		myTexture.Load("Data/cleric.PNG");
-		mySprite.SetTexture(myTexture);
+		myTextures.GetAsset("cleric");
+		myTextures.Load("cleric", "Data/cleric.png");
+		myTextures.Load("eclipse", "Data/eclipse.png");
+		myTextures.Load("spawn_point", "Data/spawn_point.png");
+
+		mySprite.SetTexture(*myTextures.GetAsset("cleric"));
 		mySprite.SetSize(300.f, 300.f);
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
@@ -88,15 +93,33 @@ public:
 			engine.GetWindow().RenderOffscreenBufferToImGUI();
 		}
 		ImGui::End();
+
+		if (ImGui::Begin("Asset: Textures"))
+		{
+			const FW_GrowingArray<Slush::Texture*> textures = myTextures.GetAllAssets();
+			for (Slush::Texture* texture : textures)
+			{
+				if (ImGui::CollapsingHeader(texture->GetAssetName().GetBuffer()))
+				{
+					ImGui::Text("File: %s", texture->GetFilePath().GetBuffer());
+					ImGui::Text("Width: %i, Height: %i", texture->GetSize().x, texture->GetSize().y);
+					ImGui::Image(*texture->GetSFMLTexture(), { 100.f, 100.f });
+				}
+			}
+
+		}
+		ImGui::End();
+
 	}
 
 private:
 	bool myRenderImGUI = true;
 	Slush::Sprite mySprite;
-	Slush::Texture myTexture;
 
 	Slush::Text myText;
 	Slush::Font myFont;
+
+	Slush::AssetStorage<Slush::Texture> myTextures;
 
 	float x = 200.f;
 	float y = 200.f;

@@ -5,32 +5,20 @@
 #include "Graphics/Sprite.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Window.h"
+#include "Graphics/SFMLHelpers.h"
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 namespace Slush
 {
-	sf::Color GetSFMLColor(int aHexColor)
-	{
-		return{
-			unsigned char((aHexColor >> 16) & 255),
-			unsigned char((aHexColor >> 8) & 255),
-			unsigned char((aHexColor >> 0) & 255),
-			unsigned char((aHexColor >> 24) & 255)
-		};
-	}
-
 	Sprite::Sprite()
 	{
 		myShape = new sf::RectangleShape();
 
 		float w = 150.f;
 		float h = 150.f;
-		myShape->setSize({ w, h });
-		myShape->setOrigin({ w * 0.5f, h * 0.5f });
-
-		SLUSH_INFO("Sprite created");
+		SetSize(h, w);
 	}
 
 	Sprite::~Sprite()
@@ -48,7 +36,8 @@ namespace Slush
 
 	void Sprite::SetColor(int argb)
 	{
-		myShape->setFillColor(GetSFMLColor(argb));
+		myColor = argb;
+		myShape->setFillColor(SFMLHelpers::GetColor(argb));
 	}
 
 	void Sprite::SetColor(float a, float r, float g, float b)
@@ -58,14 +47,31 @@ namespace Slush
 
 	void Sprite::SetSize(float aWidth, float aHeight)
 	{
+		mySize = { aWidth, aHeight };
 		myShape->setSize({ aWidth, aHeight });
-		myShape->setOrigin({ aWidth * 0.5f, aHeight * 0.5f });
+		//myShape->setOrigin({ aWidth * 0.5f, aHeight * 0.5f });
+	}
+
+	void Sprite::SetPosition(float x, float y)
+	{
+		myPosition = { x, y };
+		myShape->setPosition({ x, y });
+	}
+
+	void Sprite::SetRotation(float aRadians)
+	{
+		myRotation = aRadians;
+		myShape->setRotation(FW_RadiansToDegrees(aRadians));
+	}
+
+	void Sprite::Render()
+	{
+		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myShape);
 	}
 
 	void Sprite::Render(float x, float y)
 	{
-		myShape->setPosition({ x, y });
+		SetPosition(x, y);
 		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myShape);
 	}
-
 }

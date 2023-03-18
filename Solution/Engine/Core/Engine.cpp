@@ -46,7 +46,7 @@ namespace Slush
 	void Engine::Initialize()
 	{
 		myLogger = new Logger();
-		myWindow = new Window(1280, 720);
+		myWindow = new Window(1920, 1080);
 		myInput = new Input();
 		Time::Init();
 

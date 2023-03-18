@@ -129,7 +129,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BossCard.cpp" />
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="HeroCard.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="RoomCard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
@@ -138,6 +142,12 @@
     <ProjectReference Include="..\Framework\Framework.vcxproj">
       <Project>{75346b2e-9a01-46bf-bdb5-62f020920c84}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BossCard.h" />
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="HeroCard.h" />
+    <ClInclude Include="RoomCard.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

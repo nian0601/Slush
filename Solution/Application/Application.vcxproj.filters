@@ -2,5 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="HeroCard.cpp" />
+    <ClCompile Include="BossCard.cpp" />
+    <ClCompile Include="RoomCard.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Card.h" />
+    <ClInclude Include="HeroCard.h" />
+    <ClInclude Include="BossCard.h" />
+    <ClInclude Include="RoomCard.h" />
   </ItemGroup>
 </Project>

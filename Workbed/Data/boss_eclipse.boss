@@ -1,0 +1,5 @@
+#version 1.0
+#texture eclipse
+#title Eclipse - Charrer Of Souls
+#description For the rest of the game, when you destroy a Room in your dungeon, the uncovered Room gains +3 until the end of turn.
+#xp 600

@@ -1,0 +1,7 @@
+#version 1.0
+#texture cleric
+#title Cleric - Ordinary Hero
+#description ~~ Flavor Text ~~
+#health 4
+#wound 2
+#soul 6

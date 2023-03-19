@@ -10,6 +10,7 @@
 
 #include <windows.h>
 #include <string>
+#include <FW_FileSystem.h>
 
 namespace Slush
 {
@@ -58,8 +59,10 @@ namespace Slush
 		assetPath.erase(assetPath.rfind("\\"), std::string::npos);
 		ReplaceAllOccurancesInString(assetPath, "\\", "/");
 		assetPath.append("/");
-		//assetPath.append(aFilePath);
 		myDataFolder = assetPath.c_str();
+
+		// TODO: Make File-handling a part of engine instead to simplify filepath-handling?
+		FW_FileSystem::SetDataFolder(myDataFolder.GetBuffer());
 	}
 
 	void Engine::Shutdown()

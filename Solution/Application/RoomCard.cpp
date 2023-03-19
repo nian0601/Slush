@@ -4,22 +4,19 @@
 #include <FW_Math.h>
 #include <Graphics/Text.h>
 #include <Graphics/Sprite.h>
+#include <FW_FileParser.h>
 
-RoomCard::RoomCard(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont, int aDamageValue, TreasureType aTreasureType)
-	: Card(aTitle, aDescription, aImageTexture, aFont)
-	, myDamageValue(aDamageValue)
-	, myTreasureType(aTreasureType)
+RoomCard::RoomCard(const Slush::Font* aFont)
+	: Card(aFont)
 {
-	myDamageString += myDamageValue;
-
 	myDamageText = new Slush::Text();
 	myDamageText->SetFont(*aFont);
-	myDamageText->SetText(myDamageString.GetBuffer());
+	myDamageText->SetText("-");
 	myDamageText->SetColor(0xFFFFFFFF);
 
 	myTreasureSprite = new Slush::Sprite();
 	myTreasureSprite->SetSize(25.f, 25.f);
-	myTreasureSprite->SetColor(GetTreasureColor(myTreasureType));
+	myTreasureSprite->SetColor(0xFFFFFFFF);
 	myTreasureSprite->SetRotation(FW_DegreesToRadians(45.f));
 }
 
@@ -27,6 +24,32 @@ RoomCard::~RoomCard()
 {
 	FW_SAFE_DELETE(myDamageText);
 	FW_SAFE_DELETE(myTreasureSprite);
+}
+
+void RoomCard::OnLoadField(const FW_String& aFieldName, const FW_String& aFieldData, FW_FileParser& aFileParser)
+{
+	if (aFieldName == "#damage")
+	{
+		myDamageValue = aFileParser.GetInt(aFieldData);
+
+		myDamageString.Clear();
+		myDamageString += myDamageValue;
+
+		myDamageText->SetText(myDamageString);
+	}
+	else if (aFieldName == "#treasure")
+	{
+		if (aFieldData == "CLERIC")
+			myTreasureType = CLERIC;
+		else if (aFieldData == "FIGHTER")
+			myTreasureType = FIGHTER;
+		else if (aFieldData == "MAGE")
+			myTreasureType = MAGE;
+		else if (aFieldData == "THIEF")
+			myTreasureType = THIEF;
+
+		myTreasureSprite->SetColor(GetTreasureColor(myTreasureType));
+	}
 }
 
 void RoomCard::OnSetPosition()

@@ -10,10 +10,11 @@ namespace Slush
 class HeroCard : public Card
 {
 public:
-	HeroCard(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont, int aHealthValue, int aWoundValue, int aSoulValue);
+	HeroCard(const Slush::Font* aFont);
 	~HeroCard();
 
 protected:
+	void OnLoadField(const FW_String& aFieldName, const FW_String& aFieldData, FW_FileParser& aFileParser) override;
 	void OnSetPosition() override;
 	void OnRenderCardDetails() override;
 

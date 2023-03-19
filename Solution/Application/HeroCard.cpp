@@ -3,31 +3,27 @@
 #include <Graphics/Text.h>
 #include <Graphics/Sprite.h>
 #include <FW_Includes.h>
+#include <FW_FileParser.h>
 
-HeroCard::HeroCard(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont, int aHealthValue, int aWoundValue, int aSoulValue)
-	: Card(aTitle, aDescription, aImageTexture, aFont)
-	, myHealthValue(aHealthValue)
-	, myWoundValue(aWoundValue)
-	, mySoulValue(aSoulValue)
+HeroCard::HeroCard(const Slush::Font* aFont)
+	: Card(aFont)
 {
-	myHealthString += myHealthValue;
-	myWoundString += myWoundValue;
-	mySoulString += mySoulValue;
-
 	myHealthText = new Slush::Text();
 	myHealthText->SetFont(*aFont);
 	myHealthText->SetColor(0xFFFF0000);
-	myHealthText->SetText(myHealthString.GetBuffer());
+	myHealthText->SetText("-");
 
 	mySoulText = new Slush::Text();
 	mySoulText->SetFont(*aFont);
 	mySoulText->SetColor(0xFF00FF00);
-	mySoulText->SetText(mySoulString.GetBuffer());
+	mySoulText->SetText("-");
+	mySoulText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::CENTER);
 
 	myWoundText = new Slush::Text();
 	myWoundText->SetFont(*aFont);
 	myWoundText->SetColor(0xFF0000FF);
-	myWoundText->SetText(myWoundString.GetBuffer());
+	myWoundText->SetText("-");
+	myWoundText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::RIGHT);
 }
 
 HeroCard::~HeroCard()
@@ -35,6 +31,37 @@ HeroCard::~HeroCard()
 	FW_SAFE_DELETE(myHealthText);
 	FW_SAFE_DELETE(mySoulText);
 	FW_SAFE_DELETE(myWoundText);
+}
+
+void HeroCard::OnLoadField(const FW_String& aFieldName, const FW_String& aFieldData, FW_FileParser& aFileParser)
+{
+	if (aFieldName == "#health")
+	{
+		myHealthValue = aFileParser.GetInt(aFieldData);
+
+		myHealthString.Clear();
+		myHealthString += myHealthValue;
+
+		myHealthText->SetText(myHealthString);
+	}
+	else if (aFieldName == "#soul")
+	{
+		mySoulValue = aFileParser.GetInt(aFieldData);
+
+		mySoulString.Clear();
+		mySoulString += mySoulValue;
+
+		mySoulText->SetText(mySoulString);
+	}
+	else if (aFieldName == "#wound")
+	{
+		myWoundValue = aFileParser.GetInt(aFieldData);
+
+		myWoundString.Clear();
+		myWoundString += myHealthValue;
+
+		myWoundText->SetText(myWoundString);
+	}
 }
 
 void HeroCard::OnSetPosition()

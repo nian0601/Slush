@@ -49,6 +49,18 @@ void FW_FileParser::TrimBeginAndEnd(FW_String& aLine) const
 		aLine = aLine.SubStr(begin, end);
 }
 
+FW_String FW_FileParser::TakeFirstWord(FW_String& aLine) const
+{
+	int begin = 0;
+	int end = aLine.Find(" ", begin);
+	if (end == -1)
+		return aLine;
+
+	FW_String word = aLine.SubStr(begin, end - 1);
+	aLine = aLine.SubStr(end+1, aLine.Length());
+	return word;
+}
+
 void FW_FileParser::SplitLineOnSpace(const FW_String& aLine, FW_GrowingArray<FW_String>& outWords) const
 {
 	outWords.RemoveAll();

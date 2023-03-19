@@ -4,6 +4,8 @@
 #include <FW_Vector2.h>
 #include <FW_Rect.h>
 
+class FW_FileParser;
+
 namespace Slush
 {
 	class Texture;
@@ -11,6 +13,9 @@ namespace Slush
 
 	class Text;
 	class Font;
+
+	template<typename T>
+	class AssetStorage;
 }
 
 enum TreasureType
@@ -37,8 +42,10 @@ inline int GetTreasureColor(TreasureType aTreasureType)
 class Card
 {
 public:
-	Card(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont);
+	Card(const Slush::Font* aFont);
 	virtual ~Card();
+
+	void Load(const char* aFilePath, const Slush::AssetStorage<Slush::Texture>& someTextureStorage);
 
 	void Render();
 
@@ -48,6 +55,7 @@ public:
 	void SetPosition(int aX, int aY);
 
 protected:
+	virtual void OnLoadField(const FW_String& aFieldName, const FW_String& aFieldData, FW_FileParser& aFileParser) { aFieldName; aFieldData; aFileParser; }
 	virtual void OnSetPosition() {};
 	virtual void OnRenderCardDetails() {};
 

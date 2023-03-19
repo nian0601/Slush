@@ -33,32 +33,17 @@ public:
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
-		myHeroCard = new HeroCard(
-			"Cleric - Ordinary Hero", 
-			"~~ Flavor Text ~~", 
-			myTextures.GetAsset("cleric"), 
-			&myFont, 
-			4, 
-			2, 
-			6);
+		myHeroCard = new HeroCard(&myFont);
+		myHeroCard->Load("Data/hero_cleric.hero", myTextures);
 		myHeroCard->SetPosition(200, 500);
 
-		myRoomCard = new RoomCard(
-			"Spawn Point - Monster Room", 
-			"Once per turn, if a Hero\ndies in this room, draw two\nRoom cards.", 
-			myTextures.GetAsset("spawn_point"), 
-			&myFont, 
-			5, 
-			TreasureType::MAGE);
+		myRoomCard = new RoomCard(&myFont);
+		myRoomCard->Load("Data/room_spawnpoint.room", myTextures);
 		myRoomCard->SetPosition(600, 500);
 
-		myBossCard = new BossCard(
-			"Eclipse - Charrer Of Souls", 
-			"For the rest of the game, when you\ndestroy a Room in your dungeon,\nthe uncovered Room gains +3 until\nthe end of turn.", 
-			myTextures.GetAsset("eclipse"), 
-			&myFont, 
-			600);
-		myBossCard->SetPosition(1000, 500);
+		myBossCard = new BossCard(&myFont);
+		myBossCard->Load("Data/boss_eclipse.boss", myTextures);
+		myBossCard->SetPosition(1000, 500);		
 	}
 
 	void Shutdown() override

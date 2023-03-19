@@ -11,10 +11,11 @@ namespace Slush
 class RoomCard : public Card
 {
 public:
-	RoomCard(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont, int aDamageValue, TreasureType aTreasureType);
+	RoomCard(const Slush::Font* aFont);
 	~RoomCard();
 
 protected:
+	void OnLoadField(const FW_String& aFieldName, const FW_String& aFieldData, FW_FileParser& aFileParser) override;
 	void OnSetPosition() override;
 	void OnRenderCardDetails() override;
 

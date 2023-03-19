@@ -13,6 +13,8 @@ public:
 
 	void TrimBeginAndEnd(FW_String& aLine) const;
 
+	FW_String TakeFirstWord(FW_String& aLine) const;
+
 	void SplitLineOnSpace(const FW_String& aLine, FW_GrowingArray<FW_String>& outWords) const;
 	void SplitLine(const FW_String& aLine, const char* aSeperator, FW_GrowingArray<FW_String>& outWords) const;
 

@@ -24,7 +24,52 @@ namespace Slush
 
 	void Text::SetText(const char* aText)
 	{
-		myText->setString(aText);
+		FW_GrowingArray<FW_String> words;
+		FW_String tempText = aText;
+
+		int begin = 0;
+		int end = tempText.Find(" ", begin);
+
+		while (end != -1)
+		{
+			words.Add(tempText.SubStr(begin, end - 1));
+
+			begin = end + 1;
+			end = tempText.Find(" ", begin);
+		}
+
+		words.Add(tempText.SubStr(begin, tempText.Length()));
+
+		myString.Clear();
+		tempText.Clear();
+		for (const FW_String& word : words)
+		{
+			myText->setString(sf::String(tempText.GetBuffer()) + sf::String(word.GetBuffer()));
+
+			float width = myText->getGlobalBounds().width;
+			if (width > myMaxWidth)
+			{
+				myString += tempText;
+				myString += '\n';
+
+				tempText.Clear();
+				myText->setString("");
+			}
+			else if(!tempText.Empty())
+			{
+				tempText += " ";
+			}
+
+			tempText += word;
+		}
+
+		myString += tempText;
+		myText->setString(myString.GetBuffer());
+	}
+
+	void Text::SetText(const FW_String& aString)
+	{
+		SetText(aString.GetBuffer());
 	}
 
 	void Text::SetFont(const Font& aFont)
@@ -91,6 +136,14 @@ namespace Slush
 			myVerticalAlignment = anAlignment;
 			SetPosition(myPosition.x, myPosition.y);
 		}
+	}
+
+	void Text::SetMaxWidth(float aWidth)
+	{
+		myMaxWidth = aWidth;
+
+		if(!myString.Empty())
+			SetText(myString.GetBuffer());
 	}
 
 	void Text::Render(float x, float y)

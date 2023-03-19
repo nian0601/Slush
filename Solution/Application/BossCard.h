@@ -10,10 +10,11 @@ namespace Slush
 class BossCard : public Card
 {
 public:
-	BossCard(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont, int aXPAmount);
+	BossCard(const Slush::Font* aFont);
 	~BossCard();
 
 protected:
+	void OnLoadField(const FW_String& aFieldName, const FW_String& aFieldData, FW_FileParser& aFileParser) override;
 	void OnSetPosition() override;
 	void OnRenderCardDetails() override;
 

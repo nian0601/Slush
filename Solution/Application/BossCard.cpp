@@ -3,23 +3,34 @@
 #include <Graphics/Text.h>
 #include <Graphics/Sprite.h>
 #include <FW_Includes.h>
+#include <FW_FileParser.h>
 
-BossCard::BossCard(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont, int aXPAmount)
-	: Card(aTitle, aDescription, aImageTexture, aFont)
-	, myXPAmount(aXPAmount)
+BossCard::BossCard(const Slush::Font* aFont)
+	: Card(aFont)
 {
-	myXPString += myXPAmount;
-	myXPString += " XP";
-
 	myXPText = new Slush::Text();
 	myXPText->SetFont(*aFont);
-	myXPText->SetText(myXPString.GetBuffer());
+	myXPText->SetText("-");
 	myXPText->SetColor(0xFFFFFFFF);
 }
 
 BossCard::~BossCard()
 {
 	FW_SAFE_DELETE(myXPText);
+}
+
+void BossCard::OnLoadField(const FW_String& aFieldName, const FW_String& aFieldData, FW_FileParser& aFileParser)
+{
+	if (aFieldName == "#xp")
+	{
+		myXPAmount = aFileParser.GetInt(aFieldData);
+
+		myXPString.Clear();
+		myXPString += myXPAmount;
+		myXPString += " XP";
+
+		myXPText->SetText(myXPString);
+	}
 }
 
 void BossCard::OnSetPosition()

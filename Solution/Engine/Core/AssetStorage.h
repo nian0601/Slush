@@ -12,7 +12,7 @@ namespace Slush
 		~AssetStorage();
 
 		void Load(const char* aName, const char* aFilePath);
-		const AssetType* GetAsset(const char* aName);
+		const AssetType* GetAsset(const char* aName) const;
 
 		const FW_GrowingArray<AssetType*>& GetAllAssets() const { return myAssets; }
 	private:
@@ -46,7 +46,7 @@ namespace Slush
 	}
 
 	template<typename AssetType>
-	const AssetType* AssetStorage<AssetType>::GetAsset(const char* aName)
+	const AssetType* AssetStorage<AssetType>::GetAsset(const char* aName) const
 	{
 		if (const AssetType* const* asset = myAssetMap.GetIfExists(aName))
 			return *asset;

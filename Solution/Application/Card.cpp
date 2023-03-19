@@ -2,11 +2,12 @@
 
 #include <Graphics/Sprite.h>
 #include <Graphics/Text.h>
-#include <FW_Includes.h>
 
-Card::Card(const char* aTitle, const char* aDescription, const Slush::Texture* aImageTexture, const Slush::Font* aFont)
-	: myTitle(aTitle)
-	, myDescription(aDescription)
+#include <FW_Includes.h>
+#include <FW_FileParser.h>
+#include <Core/AssetStorage.h>
+
+Card::Card(const Slush::Font* aFont)
 {
 	myScale = 3.f;
 
@@ -23,7 +24,6 @@ Card::Card(const char* aTitle, const char* aDescription, const Slush::Texture* a
 	myImageBackground->SetSize(90.f * myScale, 60.f * myScale);
 
 	myImage = new Slush::Sprite();
-	myImage->SetTexture(*aImageTexture);
 	myImage->SetSize(90.f * myScale, 60.f * myScale);
 
 	myDescriptionBackground = new Slush::Sprite();
@@ -31,18 +31,20 @@ Card::Card(const char* aTitle, const char* aDescription, const Slush::Texture* a
 	myDescriptionBackground->SetSize(90.f * myScale, 35.f * myScale);
 
 	myTitleText = new Slush::Text();
-	myTitleText->SetText(aTitle);
+	myTitleText->SetText("Unknown");
 	myTitleText->SetFont(*aFont);
 	myTitleText->SetColor(0xFF000000);
 	myTitleText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::CENTER);
 	myTitleText->SetVerticalAlignment(Slush::Text::VerticalAlignment::CENTER);
+	myTitleText->SetMaxWidth(myTitleBackground->GetSize().x);
 
 	myDescriptionText = new Slush::Text();
-	myDescriptionText->SetText(aDescription);
+	myDescriptionText->SetText("Unknown");
 	myDescriptionText->SetFont(*aFont);
 	myDescriptionText->SetColor(0xFF000000);
 	myDescriptionText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::CENTER);
 	myDescriptionText->SetVerticalAlignment(Slush::Text::VerticalAlignment::CENTER);
+	myDescriptionText->SetMaxWidth(myDescriptionBackground->GetSize().x);
 
 	SetPosition(0, 0);
 }
@@ -56,6 +58,43 @@ Card::~Card()
 	FW_SAFE_DELETE(myDescriptionBackground);
 	FW_SAFE_DELETE(myTitleText);
 	FW_SAFE_DELETE(myDescriptionText);
+}
+
+void Card::Load(const char* aFilePath, const Slush::AssetStorage<Slush::Texture>& someTextureStorage)
+{
+	FW_FileParser parser(aFilePath);
+
+	FW_String line;
+	FW_String fieldName;
+	while (parser.ReadLine(line))
+	{
+		parser.TrimBeginAndEnd(line);
+		fieldName = parser.TakeFirstWord(line);
+
+		if (fieldName == "#version")
+		{
+
+		}
+		else if (fieldName == "#texture")
+		{
+			if(const Slush::Texture* texture = someTextureStorage.GetAsset(line.GetBuffer()))
+				myImage->SetTexture(*texture);
+		}
+		else if (fieldName == "#title")
+		{
+			myTitle = line;
+			myTitleText->SetText(myTitle);
+		}
+		else if (fieldName == "#description")
+		{
+			myDescription = line;
+			myDescriptionText->SetText(myDescription);
+		}
+		else
+		{
+			OnLoadField(fieldName, line, parser);
+		}
+	}
 }
 
 void Card::Render()

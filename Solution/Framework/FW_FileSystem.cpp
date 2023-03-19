@@ -8,7 +8,6 @@ namespace FW_FileSystem
 	void SetDataFolder(const char* aFolderName)
 	{
 		ourDataFolderPath = aFolderName;
-		ourDataFolderPath += "/Data/";
 	}
 
 	void GetRealFilePath(const FW_String& aFilePath, FW_String& aFilePathOut)

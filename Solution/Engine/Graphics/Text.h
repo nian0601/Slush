@@ -1,5 +1,7 @@
 #pragma once
+#include <float.h>
 
+class FW_String;
 namespace sf
 {
 	class Text;
@@ -29,6 +31,7 @@ namespace Slush
 		~Text();
 
 		void SetText(const char* aText);
+		void SetText(const FW_String& aString);
 		void SetFont(const Font& aFont);
 
 		void SetColor(int argb);
@@ -37,6 +40,8 @@ namespace Slush
 		void SetPosition(float x, float y);
 		void SetHorizontalAlignment(HorizontalAlignment anAlignment);
 		void SetVerticalAlignment(VerticalAlignment anAlignment);
+		void SetMaxWidth(float aWidth);
+
 
 		void Render();
 		void Render(float x, float y);
@@ -45,6 +50,7 @@ namespace Slush
 		sf::Text* myText;
 		FW_String myString;
 		Vector2f myPosition;
+		float myMaxWidth = FLT_MAX;
 		HorizontalAlignment myHorizontalAlignment = HorizontalAlignment::LEFT;
 		VerticalAlignment myVerticalAlignment = VerticalAlignment::TOP;
 	};

@@ -20,7 +20,7 @@ public:
 	~FW_String();
 	FW_String(const FW_String &aString);
 	FW_String(const char* aString);
-	FW_String(const char aString);
+	explicit FW_String(const char aString);
 
 	FW_String& operator+=(const FW_String &aString);
 	FW_String& operator+=(const float aFloat);
@@ -48,12 +48,14 @@ public:
 	char* GetRawBuffer();
 
 	int Length() const;
+	int MaxSize() const;
 	bool Empty() const;
 
 	const char& operator[](const int aIndex) const;
 	char& operator[](const int aIndex);
 
 	void Resize(int aNewSize);
+	void UpdateStringFromImGUI(int aStringLenght);
 	unsigned int GetHash() const;
 
 	void Clear();
@@ -430,6 +432,11 @@ inline int FW_String::Length() const
 	return myCurrentSize - 1;
 }
 
+inline int FW_String::MaxSize() const
+{
+	return myMaxSize;
+}
+
 inline bool FW_String::Empty() const
 {
 	return myCurrentSize == 0;
@@ -457,20 +464,29 @@ inline char& FW_String::operator[](const int aIndex)
 inline void FW_String::Resize(int aNewSize)
 {
 #ifdef FW_STRING_ASSERTS
-	FW_ASSERT(aNewSize > 0, "Can't make String smaller than 1.");
+	FW_ASSERT(aNewSize >= 0, "Can't make String smaller than 1.");
 #endif
+
 	myMaxSize = aNewSize + 1;
 	char* newData = new char[myMaxSize];
+
 	//memcpy(newData, myData, sizeof(char) * myCurrentSize);
+
 	for (int i = 0; i < myCurrentSize; ++i)
-	{
 		newData[i] = myData[i];
-	}
 
 	newData[myCurrentSize] = NullTermination;
 
 	delete[] myData;
 	myData = newData;
+}
+
+inline void FW_String::UpdateStringFromImGUI(int aStringLenght)
+{
+	if (aStringLenght >= myMaxSize)
+		Resize(aStringLenght * 2);
+
+	myCurrentSize = aStringLenght;
 }
 
 inline unsigned int FW_String::GetHash() const
@@ -492,6 +508,13 @@ inline void FW_String::RemoveOne()
 		return;
 
 	myCurrentSize -= 1;
+
+	if (myData[myCurrentSize] != NullTermination)
+	{
+		myData[myCurrentSize] = NullTermination;
+	}
+	
+	UpdateHash();
 }
 
 inline void FW_String::UpdateHash()

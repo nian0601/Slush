@@ -9,6 +9,8 @@
 
 #include "imgui-SFML_export.h"
 
+#include <FW_String.h>
+
 namespace sf
 {
     class Event;
@@ -55,7 +57,15 @@ namespace ImGui
         IMGUI_SFML_API void SetDPadYAxis(sf::Joystick::Axis dPadYAxis, bool inverted = false);
         IMGUI_SFML_API void SetLStickXAxis(sf::Joystick::Axis lStickXAxis, bool inverted = false);
         IMGUI_SFML_API void SetLStickYAxis(sf::Joystick::Axis lStickYAxis, bool inverted = false);
+
+
     }
+
+	// ImGui::InputText() with FW_String
+	// Because text input needs dynamic resizing, we need to setup a callback to grow the capacity
+	IMGUI_API bool InputText(const char* label, FW_String* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
+	IMGUI_API bool InputTextMultiline(const char* label, FW_String* str, const ImVec2& size = ImVec2(0, 0), ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
+	IMGUI_API bool InputTextWithHint(const char* label, const char* hint, FW_String* str, ImGuiInputTextFlags flags = 0, ImGuiInputTextCallback callback = NULL, void* user_data = NULL);
 
     // custom ImGui widgets for SFML stuff
 

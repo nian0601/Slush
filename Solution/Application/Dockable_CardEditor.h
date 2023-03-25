@@ -1,6 +1,7 @@
 #pragma once
 
 #include <FW_String.h>
+#include <FW_FileSystem.h>
 
 #include "Card.h"
 
@@ -11,12 +12,19 @@ public:
 	void BuildUI();
 
 private:
+	void SaveCard();
+	void LoadCard(const FW_String& aFilePath);
+
+	FW_FileSystem::FileInfo myCardsDirectoryInfo;
+	FW_String myCardsFilePath;
+
 	enum CardType
 	{
 		NONE,
 		ROOM,
 		BOSS,
 		HERO,
+		SPELL,
 	};
 
 	int myCardType = NONE;

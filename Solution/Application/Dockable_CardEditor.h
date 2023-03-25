@@ -5,11 +5,16 @@
 
 #include "Card.h"
 
+namespace Slush
+{
+	class Texture;
+}
+
 class Dockable_CardEditor
 {
 public:
 	Dockable_CardEditor();
-	void BuildUI();
+	void BuildUI(const Slush::AssetStorage<Slush::Texture>& someTextures);
 
 private:
 	void SaveCard();

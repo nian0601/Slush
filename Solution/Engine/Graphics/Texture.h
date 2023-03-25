@@ -15,7 +15,7 @@ namespace Slush
 		Texture(const char* anAssetName);
 		~Texture();
 
-		void Load(const char* aFilePath);
+		void Load(const char* aFilePath, bool aIsAbsolutePath = false);
 
 		const sf::Texture* GetSFMLTexture() const { return mySFMLTexture; }
 		const Vector2i& GetSize() const { return mySize; }

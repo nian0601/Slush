@@ -16,11 +16,13 @@ namespace Slush
 		FW_SAFE_DELETE(mySFMLTexture);
 	}
 
-	void Texture::Load(const char* aFilePath)
+	void Texture::Load(const char* aFilePath, bool aIsAbsolutePath /*= false*/)
 	{
 		myFilePath = aFilePath;
 		
-		myAbsoluteFilePath = Engine::GetInstance().GetDataFolder();
+		if (!aIsAbsolutePath)
+			myAbsoluteFilePath = Engine::GetInstance().GetDataFolder();
+
 		myAbsoluteFilePath += aFilePath;
 
 		mySFMLTexture = new sf::Texture();

@@ -29,9 +29,15 @@ public:
 	void Initialize() override
 	{
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
-		myTextures.Load("cleric", "Data/Textures/cleric.png");
-		myTextures.Load("eclipse", "Data/Textures/eclipse.png");
-		myTextures.Load("spawn_point", "Data//Textures/spawn_point.png");
+
+		FW_String texturesPath;
+		FW_FileSystem::GetRealFilePath("Data/Textures", texturesPath);
+
+		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
+		FW_FileSystem::GetAllFilesFromDirectory(texturesPath.GetBuffer(), textureInfos);
+
+		for (const FW_FileSystem::FileInfo& info : textureInfos)
+			myTextures.Load(info.myFileNameNoExtention.GetBuffer(), info.myFilePath.GetBuffer(), true);
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
@@ -116,7 +122,7 @@ public:
 		}
 		ImGui::End();
 
-		myCardEditor.BuildUI();
+		myCardEditor.BuildUI(myTextures);
 
 	}
 

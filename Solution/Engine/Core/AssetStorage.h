@@ -11,7 +11,7 @@ namespace Slush
 	public:
 		~AssetStorage();
 
-		void Load(const char* aName, const char* aFilePath);
+		void Load(const char* aName, const char* aFilePath, bool aIsAbsolutePath = false);
 		const AssetType* GetAsset(const char* aName) const;
 
 		const FW_GrowingArray<AssetType*>& GetAllAssets() const { return myAssets; }
@@ -28,7 +28,7 @@ namespace Slush
 	}
 
 	template<typename AssetType>
-	void AssetStorage<AssetType>::Load(const char* aName, const char* aFilePath)
+	void AssetStorage<AssetType>::Load(const char* aName, const char* aFilePath, bool aIsAbsolutePath /*= false*/)
 	{
 		if (myAssetMap.KeyExists(aName))
 		{
@@ -37,7 +37,7 @@ namespace Slush
 		}
 
 		AssetType* asset = new AssetType(aName);
-		asset->Load(aFilePath);
+		asset->Load(aFilePath, aIsAbsolutePath);
 
 		myAssets.Add(asset);
 		myAssetMap[aName] = asset;

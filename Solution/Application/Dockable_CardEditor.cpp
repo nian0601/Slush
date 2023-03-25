@@ -6,6 +6,8 @@
 
 #include <Core/Engine.h>
 #include "FW_FileProcessor.h"
+#include <Core/AssetStorage.h>
+#include <Graphics/Texture.h>
 
 Dockable_CardEditor::Dockable_CardEditor()
 	: myFileName("")
@@ -17,7 +19,7 @@ Dockable_CardEditor::Dockable_CardEditor()
 	myCardsFilePath += "Data/Cards";
 }
 
-void Dockable_CardEditor::BuildUI()
+void Dockable_CardEditor::BuildUI(const Slush::AssetStorage<Slush::Texture>& someTextures)
 {
 	if (ImGui::Begin("Card Editor"))
 	{
@@ -56,6 +58,27 @@ void Dockable_CardEditor::BuildUI()
 			ImGui::InputText("Title", &myTitle);
 			ImGui::InputText("Description", &myDescription);
 			ImGui::InputText("Texture", &myTextureName);
+			ImGui::SameLine();
+			if (ImGui::Button("..."))
+				ImGui::OpenPopup("select_texture_popup");
+
+			if (ImGui::BeginPopup("select_texture_popup"))
+			{
+				ImGui::Text("Textures");
+				ImGui::Separator();
+
+				const FW_GrowingArray<Slush::Texture*> textures = someTextures.GetAllAssets();
+				for (const Slush::Texture* texture : textures)
+				{
+					if (ImGui::Selectable(texture->GetAssetName().GetBuffer()))
+					{
+						myTextureName = texture->GetAssetName();
+						break;
+					}
+				}
+
+				ImGui::EndPopup();
+			}
 
 			ImGui::Separator();
 

@@ -3,6 +3,7 @@
 #include "Graphics/Window.h"
 #include "Core/Log.h"
 #include "Core/Engine.h"
+#include "Core/Time.h"
 
 
 #include <SFML/Graphics.hpp>
@@ -60,7 +61,7 @@ namespace Slush
 			}
 		}
 
-		ImGui::SFML::Update(*myRenderWindow , 1.f / 60.f);
+		ImGui::SFML::Update(*myRenderWindow , Time::GetDelta());
 
 		return true;
 	}

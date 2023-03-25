@@ -79,8 +79,14 @@ namespace Slush
 		while (myWindow->PumpEvents())
 		{
 			Time::Update();
-			myInput->UpdateKeyboard();
-			myInput->UpdateMouse(*myWindow->GetRenderWindow());
+
+			ImGuiIO& imguiIO = ImGui::GetIO();
+
+			if(!imguiIO.WantCaptureKeyboard)
+				myInput->UpdateKeyboard();
+
+			if (!imguiIO.WantCaptureMouse)
+				myInput->UpdateMouse(*myWindow->GetRenderWindow());
 
 			anApp.Update();
 			anApp.Render();

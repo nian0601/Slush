@@ -1,6 +1,6 @@
 #version 1.0
-#texture spawn_point
 #title Spawn Point - Monster Room
 #description Once per turn, if a Hero dies in this room, draw two Room cards.
+#texture spawn_point
 #damage 5
 #treasure MAGE

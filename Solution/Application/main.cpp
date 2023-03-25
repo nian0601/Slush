@@ -29,22 +29,22 @@ public:
 	void Initialize() override
 	{
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
-		myTextures.Load("cleric", "Data/cleric.png");
-		myTextures.Load("eclipse", "Data/eclipse.png");
-		myTextures.Load("spawn_point", "Data/spawn_point.png");
+		myTextures.Load("cleric", "Data/Textures/cleric.png");
+		myTextures.Load("eclipse", "Data/Textures/eclipse.png");
+		myTextures.Load("spawn_point", "Data//Textures/spawn_point.png");
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
 		myHeroCard = new HeroCard(&myFont);
-		myHeroCard->Load("Data/hero_cleric.hero", myTextures);
+		myHeroCard->Load("Data/Cards/hero_cleric.hero", myTextures);
 		myHeroCard->SetPosition(200, 500);
 
 		myRoomCard = new RoomCard(&myFont);
-		myRoomCard->Load("Data/room_spawnpoint.room", myTextures);
+		myRoomCard->Load("Data/Cards/room_spawnpoint.room", myTextures);
 		myRoomCard->SetPosition(600, 500);
 
 		myBossCard = new BossCard(&myFont);
-		myBossCard->Load("Data/boss_eclipse.boss", myTextures);
+		myBossCard->Load("Data/Cards/boss_eclipse.boss", myTextures);
 		myBossCard->SetPosition(1000, 500);		
 	}
 

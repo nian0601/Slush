@@ -1,6 +1,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
 
+#include <FW_Includes.h>
+
 #include "Core/IApp.h"
 #include "Core/Engine.h"
 #include "Core/Input.h"
@@ -17,8 +19,8 @@
 #include "HeroCard.h"
 #include "RoomCard.h"
 #include "BossCard.h"
-#include <FW_Includes.h>
 
+#include "Dockable_CardEditor.h"
 
 class App : public Slush::IApp
 {
@@ -114,6 +116,8 @@ public:
 		}
 		ImGui::End();
 
+		myCardEditor.BuildUI();
+
 	}
 
 private:
@@ -125,10 +129,15 @@ private:
 	HeroCard* myHeroCard;
 	RoomCard* myRoomCard;
 	BossCard* myBossCard;
+
+	Dockable_CardEditor myCardEditor;
 };
 
+#include <FW_UnitTestSuite.h>
 int main()
 {
+	FW_UnitTestSuite::RunTests();
+
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.Initialize();
 

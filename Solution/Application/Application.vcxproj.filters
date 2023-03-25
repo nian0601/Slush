@@ -6,11 +6,13 @@
     <ClCompile Include="HeroCard.cpp" />
     <ClCompile Include="BossCard.cpp" />
     <ClCompile Include="RoomCard.cpp" />
+    <ClCompile Include="Dockable_CardEditor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Card.h" />
     <ClInclude Include="HeroCard.h" />
     <ClInclude Include="BossCard.h" />
     <ClInclude Include="RoomCard.h" />
+    <ClInclude Include="Dockable_CardEditor.h" />
   </ItemGroup>
 </Project>

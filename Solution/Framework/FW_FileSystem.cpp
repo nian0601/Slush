@@ -2,6 +2,8 @@
 
 #include "FW_Assert.h"
 
+#include <windows.h>
+
 namespace FW_FileSystem
 {
 	static FW_String ourDataFolderPath = "";
@@ -19,8 +21,7 @@ namespace FW_FileSystem
 	{
 		FW_ASSERT(strlen(aDirectory) + 3 < MAX_PATH, "Path to directory is too long");
 
-		FW_String directory = ourDataFolderPath;
-		directory += aDirectory;
+		FW_String directory = aDirectory;
 		directory += "/*";
 
 		WIN32_FIND_DATA data;
@@ -68,6 +69,13 @@ namespace FW_FileSystem
 		aNameOut = aFilePath.SubStr(findIndex + 1, aFilePath.Length());
 	}
 
+	void GetFileNameNoExtention(const FW_String& aFilePath, FW_String& aNameOut)
+	{
+		FW_String filename;
+		GetFileName(aFilePath, filename);
+		RemoveFileExtention(filename, aNameOut);
+	}
+
 	void RemoveFileName(const FW_String& aFilePath, FW_String& aFilePathOut)
 	{
 		int findIndex = aFilePath.RFind("/");
@@ -105,27 +113,33 @@ namespace FW_FileSystem
 		return true;
 	}
 
+	bool UpdateFileInfo(FileInfo& aFileInfo)
+	{
+		FileInfo newInfo;
+		GetFileInfo(aFileInfo.myFilePath, newInfo);
+
+		FILETIME oldTime;
+		oldTime.dwLowDateTime = aFileInfo.myLastTimeModifiedLowbit;
+		oldTime.dwHighDateTime = aFileInfo.myLastTimeModifiedHighbit;
+
+		FILETIME newTime;
+		newTime.dwLowDateTime = newInfo.myLastTimeModifiedLowbit;
+		newTime.dwHighDateTime = newInfo.myLastTimeModifiedHighbit;
+
+		aFileInfo.myLastTimeModifiedLowbit = newInfo.myLastTimeModifiedLowbit;
+		aFileInfo.myLastTimeModifiedHighbit = newInfo.myLastTimeModifiedHighbit;
+
+		return CompareFileTime(&oldTime, &newTime) != 0;
+	}
+		
 	bool UpdateFileInfo(FW_GrowingArray<FileInfo>& someFiles)
 	{
 		bool somethingChanged = false;
 		FileInfo newInfo;
 		for (FileInfo& oldInfo : someFiles)
 		{
-			GetFileInfo(oldInfo.myFilePath, newInfo);
-
-			FILETIME oldTime;
-			oldTime.dwLowDateTime = oldInfo.myLastTimeModifiedLowbit;
-			oldTime.dwHighDateTime = oldInfo.myLastTimeModifiedHighbit;
-
-			FILETIME newTime;
-			newTime.dwLowDateTime = newInfo.myLastTimeModifiedLowbit;
-			newTime.dwHighDateTime = newInfo.myLastTimeModifiedHighbit;
-
-			if (CompareFileTime(&oldTime, &newTime) != 0)
+			if (UpdateFileInfo(oldInfo))
 				somethingChanged = true;
-
-			oldInfo.myLastTimeModifiedLowbit = newInfo.myLastTimeModifiedLowbit;
-			oldInfo.myLastTimeModifiedHighbit = newInfo.myLastTimeModifiedHighbit;
 		}
 
 		return somethingChanged;

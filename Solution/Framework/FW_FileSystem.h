@@ -2,7 +2,6 @@
 
 #include "FW_GrowingArray.h"
 #include "FW_String.h"
-#include <windows.h>
 
 namespace FW_FileSystem
 {
@@ -33,11 +32,13 @@ namespace FW_FileSystem
 
 	bool GetAllFilesFromDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);
 	void GetFileName(const FW_String& aFilePath, FW_String& aNameOut);
+	void GetFileNameNoExtention(const FW_String& aFilePath, FW_String& aNameOut);
 	void RemoveFileName(const FW_String& aFilePath, FW_String& aFilePathOut);
 	void GetFileExtention(const FW_String& aFilePath, FW_String& aExtentionOut);
 	void RemoveFileExtention(const FW_String& aFilePath, FW_String& aNameOut);
 	bool GetFileInfo(const FW_String& aFilePath, FileInfo& aFileInfoOut);
 
+	bool UpdateFileInfo(FileInfo& aFileInfo);
 	bool UpdateFileInfo(FW_GrowingArray<FileInfo>& someFiles);
 
 	void ReadEntireFile(const FW_String& aFilePath, FileContent& aFileContentOut);

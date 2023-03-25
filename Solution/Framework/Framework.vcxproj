@@ -140,6 +140,7 @@
     <ClInclude Include="FW_Rect.h" />
     <ClInclude Include="FW_String.h" />
     <ClInclude Include="FW_Threading.h" />
+    <ClInclude Include="FW_UnitTestSuite.h" />
     <ClInclude Include="FW_Vector2.h" />
     <ClInclude Include="FW_Vector3.h" />
     <ClInclude Include="FW_XMLParser.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="FW_FileSystem.cpp" />
     <ClCompile Include="FW_Logger.cpp" />
     <ClCompile Include="FW_Murmur.cpp" />
+    <ClCompile Include="FW_UnitTestSuite.cpp" />
     <ClCompile Include="FW_XMLParser.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

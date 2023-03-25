@@ -20,6 +20,7 @@
     <ClInclude Include="FW_Vector2.h" />
     <ClInclude Include="FW_Vector3.h" />
     <ClInclude Include="FW_XMLParser.h" />
+    <ClInclude Include="FW_UnitTestSuite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FW_FileParser.cpp" />
@@ -28,5 +29,6 @@
     <ClCompile Include="FW_Logger.cpp" />
     <ClCompile Include="FW_Murmur.cpp" />
     <ClCompile Include="FW_XMLParser.cpp" />
+    <ClCompile Include="FW_UnitTestSuite.cpp" />
   </ItemGroup>
 </Project>

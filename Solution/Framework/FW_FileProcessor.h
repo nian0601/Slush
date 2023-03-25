@@ -5,7 +5,8 @@
 
 #include "FW_Assert.h"
 
-#define USING_RAM_STORAGE 0
+#define USING_RAM_STORAGE 1
+#define USE_BINARY_FILE_PROCESSING 0
 
 class FW_String;
 class FW_FileProcessor
@@ -21,12 +22,15 @@ public:
 	FW_FileProcessor(const char* aFile, int someFlags);
 	~FW_FileProcessor();
 
-	template <typename T>
-	void Process(T& someData);
-
+	void ReadRestOfLine(FW_String& aString);
 	void Process(FW_String& aString);
 	void Process(const FW_String& aString);
+	void Process(float&& aValue);
+	void Process(float& aValue);
+	void Process(int&& aValue);
+	void Process(int& aValue);
 
+	void AddNewline();
 	bool IsWriting() const { return (myFlags & WRITE) > 0; }
 	bool IsReading() const { return (myFlags & READ) > 0; }
 
@@ -34,47 +38,19 @@ public:
 
 private:
 	bool IsOpen() const { return myStatus == 0; }
+
+#if USE_BINARY_FILE_PROCESSING
+	void ProcessRawData(void* someData, int aDataSize);
+#endif
+
 	FILE* myFile;
 	int myFlags;
 	int myStatus;
 	const char* myFilePath; // Just for debugging
 
+#if USING_RAM_STORAGE && USE_BINARY_FILE_PROCESSING
 	unsigned char* myData;
 	int myDataSize;
 	int myCursorPosition;
+#endif
 };
-
-template <typename T>
-void FW_FileProcessor::Process(T& someData)
-{
-	FW_ASSERT(IsOpen() == true && "Tried to process an unopened file");
-	
-	if (IsWriting())
-	{
-#if USING_RAM_STORAGE
-		memcpy(&myData[myCursorPosition], &someData, sizeof(someData));
-		myCursorPosition += sizeof(someData);
-#else
-		fwrite(&someData, sizeof(someData), 1, myFile);
-		if (ferror(myFile))
-		{
-			perror("Error writing generic data");
-			FW_ASSERT_ALWAYS("Something went wrong");
-		}
-#endif
-	}
-	else if (IsReading())
-	{
-#if USING_RAM_STORAGE
-		memcpy(&someData, &myData[myCursorPosition], sizeof(someData));
-		myCursorPosition += sizeof(someData);
-#else
-		fread(&someData, sizeof(someData), 1, myFile);
-		if (ferror(myFile))
-		{
-			perror("Error reading generic data");
-			FW_ASSERT_ALWAYS("Something went wrong");
-		}
-#endif
-	}
-}

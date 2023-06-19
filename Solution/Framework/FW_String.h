@@ -7,8 +7,8 @@
 #include <string.h>
 #include "FW_Assert.h"
 
-#define FW_STRING_START_SIZE 127
-#define FW_STRING_MAX_NUMBER_CHARACTERS 128
+#define FW_STRING_START_SIZE 255
+#define FW_STRING_MAX_NUMBER_CHARACTERS 256
 
 #define FW_STRING_ASSERTS 1
 

@@ -30,14 +30,11 @@ public:
 	{
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
 
-		FW_String texturesPath;
-		FW_FileSystem::GetAbsoluteFilePath("Data/Textures", texturesPath);
-
 		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
-		FW_FileSystem::GetAllFilesFromDirectory(texturesPath.GetBuffer(), textureInfos);
+		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/Textures", textureInfos);
 
 		for (const FW_FileSystem::FileInfo& info : textureInfos)
-			myTextures.Load(info.myFileNameNoExtention.GetBuffer(), info.myFilePath.GetBuffer(), true);
+			myTextures.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 

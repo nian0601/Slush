@@ -29,7 +29,7 @@ void Dockable_CardEditor::BuildUI(const Slush::AssetStorage<Slush::Texture>& som
 		if (ImGui::BeginPopup("load_card_popup"))
 		{
 			FW_GrowingArray<FW_FileSystem::FileInfo> cardFiles;
-			FW_FileSystem::GetAllFilesFromDirectory(myCardsFilePath.GetBuffer(), cardFiles);
+			FW_FileSystem::GetAllFilesFromAbsoluteDirectory(myCardsFilePath.GetBuffer(), cardFiles);
 
 			ImGui::Text("Cards");
 			ImGui::Separator();
@@ -38,7 +38,7 @@ void Dockable_CardEditor::BuildUI(const Slush::AssetStorage<Slush::Texture>& som
 			{
 				if (ImGui::Selectable(cardInfo.myFileNameNoExtention.GetBuffer()))
 				{
-					LoadCard(cardInfo.myFilePath);
+					LoadCard(cardInfo.myAbsoluteFilePath);
 					break;
 				}
 			}

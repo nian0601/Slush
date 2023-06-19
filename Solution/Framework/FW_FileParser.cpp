@@ -6,7 +6,7 @@ FW_FileParser::FW_FileParser(const char* aFile)
 	: myFilePath(aFile)
 {
 	FW_String realFilePath;
-	FW_FileSystem::GetRealFilePath(aFile, realFilePath);
+	FW_FileSystem::GetAbsoluteFilePath(aFile, realFilePath);
 
 	int result = fopen_s(&myFile, realFilePath.GetBuffer(), "r");
 	FW_ASSERT(result == 0, "Failed to open file");

@@ -12,12 +12,61 @@ namespace FW_FileSystem
 		ourDataFolderPath = aFolderName;
 	}
 
-	void GetRealFilePath(const FW_String& aFilePath, FW_String& aFilePathOut)
+	void GetAbsoluteFilePath(const FW_String& aFilePath, FW_String& aFilePathOut)
 	{
 		aFilePathOut = ourDataFolderPath + aFilePath;
 	}
 
-	bool GetAllFilesFromDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths)
+	bool GetAllFilesFromRelativeDirectory(const char* aRelativeDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths)
+	{
+		FW_ASSERT(strlen(aRelativeDirectory) + 3 < MAX_PATH, "Path to directory is too long");
+
+		FW_String absolutDirectory = ourDataFolderPath;
+		absolutDirectory += aRelativeDirectory;
+		absolutDirectory += "/*";
+
+		
+		WIN32_FIND_DATA data;
+		HANDLE filehandle = FindFirstFile(absolutDirectory.GetBuffer(), &data);
+
+		if (filehandle == INVALID_HANDLE_VALUE)
+			return false;
+
+		do
+		{
+			FW_String name = data.cFileName;
+			if (name == "." || name == "..")
+				continue;
+
+			FW_String relativePath = aRelativeDirectory;
+			relativePath += "/";
+			relativePath += name;
+
+			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			{
+				GetAllFilesFromRelativeDirectory(relativePath.GetBuffer(), someOutFilePaths);
+			}
+			else
+			{
+				FileInfo& info = someOutFilePaths.Add();
+				info.myFileName = name;
+				info.myRelativeFilePath = relativePath;
+				GetAbsoluteFilePath(relativePath, info.myAbsoluteFilePath);
+				info.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
+				info.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
+
+				RemoveFileExtention(name, info.myFileNameNoExtention);
+			}
+		} while (FindNextFile(filehandle, &data) != 0);
+
+		if (GetLastError() != ERROR_NO_MORE_FILES)
+			FW_ASSERT_ALWAYS("Something went wrong...");
+
+		FindClose(filehandle);
+		return true;
+	}
+
+	bool GetAllFilesFromAbsoluteDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths)
 	{
 		FW_ASSERT(strlen(aDirectory) + 3 < MAX_PATH, "Path to directory is too long");
 
@@ -42,13 +91,13 @@ namespace FW_FileSystem
 
 			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				GetAllFilesFromDirectory(fullPath.GetBuffer(), someOutFilePaths);
+				GetAllFilesFromAbsoluteDirectory(fullPath.GetBuffer(), someOutFilePaths);
 			}
 			else
 			{
 				FileInfo& info = someOutFilePaths.Add();
 				info.myFileName = name;
-				info.myFilePath = fullPath;
+				info.myAbsoluteFilePath = fullPath;
 				info.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
 				info.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
 
@@ -105,7 +154,7 @@ namespace FW_FileSystem
 			return false;
 
 		aFileInfoOut.myFileName = data.cFileName;
-		aFileInfoOut.myFilePath = aFilePath;
+		aFileInfoOut.myAbsoluteFilePath = aFilePath;
 		aFileInfoOut.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
 		aFileInfoOut.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
 
@@ -116,7 +165,7 @@ namespace FW_FileSystem
 	bool UpdateFileInfo(FileInfo& aFileInfo)
 	{
 		FileInfo newInfo;
-		GetFileInfo(aFileInfo.myFilePath, newInfo);
+		GetFileInfo(aFileInfo.myAbsoluteFilePath, newInfo);
 
 		FILETIME oldTime;
 		oldTime.dwLowDateTime = aFileInfo.myLastTimeModifiedLowbit;

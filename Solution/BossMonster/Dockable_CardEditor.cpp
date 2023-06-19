@@ -66,10 +66,19 @@ void Dockable_CardEditor::BuildUI(const Slush::AssetStorage<Slush::Texture>& som
 			{
 				ImGui::Text("Textures");
 				ImGui::Separator();
+				
+				//if(!ImGui::IsAnyItemActive())
+				//	ImGui::SetKeyboardFocusHere();
+
+				static ImGuiTextFilter textureFilter;
+				textureFilter.Draw("Search");
 
 				const FW_GrowingArray<Slush::Texture*> textures = someTextures.GetAllAssets();
 				for (const Slush::Texture* texture : textures)
 				{
+					if(!textureFilter.PassFilter(texture->GetAssetName().GetBuffer()))
+						continue;
+
 					if (ImGui::Selectable(texture->GetAssetName().GetBuffer()))
 					{
 						myTextureName = texture->GetAssetName();

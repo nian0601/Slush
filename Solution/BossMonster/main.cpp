@@ -31,7 +31,7 @@ public:
 		Slush::Engine::GetInstance().GetWindow().SetShouldRenderOffscreenBufferToScreen(false);
 
 		FW_String texturesPath;
-		FW_FileSystem::GetRealFilePath("Data/Textures", texturesPath);
+		FW_FileSystem::GetAbsoluteFilePath("Data/Textures", texturesPath);
 
 		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
 		FW_FileSystem::GetAllFilesFromDirectory(texturesPath.GetBuffer(), textureInfos);
@@ -103,6 +103,10 @@ public:
 		{
 			Slush::Engine& engine = Slush::Engine::GetInstance();
 			engine.GetWindow().RenderOffscreenBufferToImGUI();
+
+			ImGuiIO& imguiIO = ImGui::GetIO();
+			imguiIO.WantCaptureKeyboard = false;
+			imguiIO.WantCaptureMouse = false;
 		}
 		ImGui::End();
 

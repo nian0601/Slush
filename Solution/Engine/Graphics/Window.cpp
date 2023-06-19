@@ -29,6 +29,11 @@ namespace Slush
 		
 		ImGuiIO& imguiIO = ImGui::GetIO();
 		imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+		// Having this enabled makes it tricky/impossible to have Keyboard-input for the gameview :/
+		// An option could be to have this be togglable somehow maybe?
+		//imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+
 		imguiIO.ConfigWindowsMoveFromTitleBarOnly = true;
 
 		SLUSH_INFO("Window Created");

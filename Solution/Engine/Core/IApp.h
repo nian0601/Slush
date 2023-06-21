@@ -10,6 +10,5 @@ namespace Slush
 
 		virtual void Update() {};
 		virtual void Render() {};
-		virtual void RenderImGUI() {};
 	};
 }

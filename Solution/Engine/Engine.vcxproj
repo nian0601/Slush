@@ -139,6 +139,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Core\AssetStorage.h" />
+    <ClInclude Include="Core\Dockables\Dockable.h" />
+    <ClInclude Include="Core\Dockables\GameViewDockable.h" />
+    <ClInclude Include="Core\Dockables\LogDockable.h" />
+    <ClInclude Include="Core\Dockables\TextureViewerDockable.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\IApp.h" />
     <ClInclude Include="Core\Log.h" />
@@ -161,6 +165,10 @@
     <ClInclude Include="Graphics\Texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Dockables\Dockable.cpp" />
+    <ClCompile Include="Core\Dockables\GameViewDockable.cpp" />
+    <ClCompile Include="Core\Dockables\LogDockable.cpp" />
+    <ClCompile Include="Core\Dockables\TextureViewerDockable.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Graphics\Font.cpp" />

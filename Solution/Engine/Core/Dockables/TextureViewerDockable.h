@@ -1,0 +1,25 @@
+#pragma once
+
+#include <FW_String.h>
+#include <FW_FileSystem.h>
+
+#include "Dockable.h"
+
+#include "Core/AssetStorage.h"
+#include "Graphics/Texture.h"
+
+namespace Slush
+{
+	class TextureViewerDockable : public Slush::Dockable
+	{
+	public:
+		TextureViewerDockable(const Slush::AssetStorage<Slush::Texture>& aTextureStorage);
+		const char* GetName() const override { return "Texture Viewwer"; }
+
+	protected:
+		void OnBuildUI() override;
+
+	private:
+		const Slush::AssetStorage<Slush::Texture>& myTextureStorage;
+	};
+}

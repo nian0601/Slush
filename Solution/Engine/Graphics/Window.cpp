@@ -4,6 +4,7 @@
 #include "Core/Log.h"
 #include "Core/Engine.h"
 #include "Core/Time.h"
+#include "Core/Dockables/Dockable.h"
 
 
 #include <SFML/Graphics.hpp>
@@ -43,6 +44,7 @@ namespace Slush
 	{
 		FW_SAFE_DELETE(myOffscreenBuffer);
 		FW_SAFE_DELETE(myRenderWindow);
+		myDockables.DeleteAll();
 	}
 
 	bool Window::PumpEvents()
@@ -66,34 +68,10 @@ namespace Slush
 			}
 		}
 
-		ImGui::SFML::Update(*myRenderWindow , Time::GetDelta());
+		if (myShowEditorUI)
+			ImGui::SFML::Update(*myRenderWindow , Time::GetDelta());
 
 		return true;
-	}
-
-	void Window::RenderImGUI()
-	{
-		if (!myShouldRenderOffscreenBufferToScreen)
-		{
-			if (ImGui::Begin("Log"))
-			{
-				const FW_GrowingArray<Logger::LogEntry>& entries = Engine::GetInstance().GetLogger().GetEntries();
-				ImGui::BeginGroup();
-				for (const Logger::LogEntry& entry : entries)
-				{
-					Vector3f color = Logger::GetSeverityColorVec(entry.mySeverity);
-					ImVec4 imColor;
-					imColor.x = color.x;
-					imColor.y = color.y;
-					imColor.z = color.z;
-					imColor.w = 1.f;
-					ImGui::TextColored(imColor, entry.myMessage.GetBuffer());
-				}
-				ImGui::EndGroup();
-			}
-			ImGui::End();
-		}
-		ImGui::SFML::Render(*myRenderWindow);
 	}
 
 	void Window::RenderOffscreenBufferToImGUI()
@@ -109,8 +87,21 @@ namespace Slush
 
 	void Window::Present()
 	{
-		if (myShouldRenderOffscreenBufferToScreen)
+		if (myShowEditorUI)
 		{
+			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+			ImGui::ShowDemoWindow();
+
+			for (Dockable* dockable : myDockables)
+				dockable->Update();
+
+			ImGui::SFML::Render(*myRenderWindow);
+		}
+		else
+		{
+			// If we're not in 'ShowEditorUI'-mode, then we need to render the OffScreenBuffer that contains the Gamerender
+			// to the screen using a rectshape.
+			// While in 'ShowEditorUI'-mode this will instead happen through the 'GameViewDockable'.
 			Vector2f adjustedSize = GetSizeThatRespectsAspectRatio(myWidth, myHeight);
 
 			sf::RectangleShape rect;
@@ -139,6 +130,12 @@ namespace Slush
 	{
 		myOffscreenBuffer->display();
 		myActiveRenderTarget = myRenderWindow;
+	}
+
+	void Window::AddDockable(Dockable* aDockable)
+	{
+		aDockable->myDockableID = myNextDockableID++;
+		myDockables.Add(aDockable);
 	}
 
 	Vector2f Window::GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const

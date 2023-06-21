@@ -3,6 +3,8 @@
 #include <FW_String.h>
 #include <FW_FileSystem.h>
 
+#include "Core/Dockables/Dockable.h"
+
 #include "Card.h"
 
 namespace Slush
@@ -10,11 +12,15 @@ namespace Slush
 	class Texture;
 }
 
-class Dockable_CardEditor
+class CardEditorDockable : public Slush::Dockable
 {
 public:
-	Dockable_CardEditor();
-	void BuildUI(const Slush::AssetStorage<Slush::Texture>& someTextures);
+	CardEditorDockable(const Slush::AssetStorage<Slush::Texture>& someTextures);
+
+	const char* GetName() const override { return "Card Editor"; }
+
+protected:
+	void OnBuildUI() override;
 
 private:
 	void SaveCard();
@@ -22,6 +28,7 @@ private:
 
 	FW_FileSystem::FileInfo myCardsDirectoryInfo;
 	FW_String myCardsFilePath;
+	const Slush::AssetStorage<Slush::Texture>& myCardTextures;
 
 	enum CardType
 	{

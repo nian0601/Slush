@@ -91,9 +91,12 @@ namespace Slush
 			anApp.Update();
 			anApp.Render();
 
-			anApp.RenderImGUI();
+			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
+				myWindow->ToggleEditorUI();
 
-			myWindow->RenderImGUI();
+			if (myInput->WasKeyPressed(Slush::Input::ESC))
+				myWindow->Close();
+
 			myWindow->Present();
 		}
 

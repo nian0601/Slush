@@ -9,6 +9,7 @@ namespace sf
 
 namespace Slush
 {
+	class Dockable;
 	class Window
 	{
 	public:
@@ -16,7 +17,6 @@ namespace Slush
 		~Window();
 
 		bool PumpEvents();
-		void RenderImGUI();
 		void RenderOffscreenBufferToImGUI();
 
 		void Present();
@@ -25,7 +25,10 @@ namespace Slush
 
 		void StartOffscreenBuffer();
 		void EndOffscreenBuffer();
-		void SetShouldRenderOffscreenBufferToScreen(bool aState) { myShouldRenderOffscreenBufferToScreen = aState; }
+
+		void ToggleEditorUI() { myShowEditorUI = !myShowEditorUI; }
+
+		void AddDockable(Dockable* aDockable);
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
 		sf::RenderTexture* GetOffscreenBuffer() const { return myOffscreenBuffer; }
@@ -35,13 +38,16 @@ namespace Slush
 	private:
 		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
 
-		int myWidth;
-		int myHeight;
-		float myAspectRatio;
-		bool myShouldRenderOffscreenBufferToScreen = false;
+		int myWidth = 1920;
+		int myHeight = 1080;
+		float myAspectRatio = 16.f / 9.f;
+		bool myShowEditorUI = true;
 
 		sf::RenderWindow* myRenderWindow = nullptr;
 		bool myShouldBeOpen = true;
+
+		FW_GrowingArray<Dockable*> myDockables;
+		int myNextDockableID = 0;
 
 		sf::RenderTarget* myActiveRenderTarget = nullptr;
 		sf::RenderTexture* myOffscreenBuffer = nullptr;

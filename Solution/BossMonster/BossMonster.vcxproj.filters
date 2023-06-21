@@ -3,16 +3,16 @@
   <ItemGroup>
     <ClCompile Include="BossCard.cpp" />
     <ClCompile Include="Card.cpp" />
-    <ClCompile Include="Dockable_CardEditor.cpp" />
     <ClCompile Include="HeroCard.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RoomCard.cpp" />
+    <ClCompile Include="CardEditorDockable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BossCard.h" />
     <ClInclude Include="Card.h" />
-    <ClInclude Include="Dockable_CardEditor.h" />
     <ClInclude Include="HeroCard.h" />
     <ClInclude Include="RoomCard.h" />
+    <ClInclude Include="CardEditorDockable.h" />
   </ItemGroup>
 </Project>

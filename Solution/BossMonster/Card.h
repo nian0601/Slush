@@ -9,7 +9,7 @@ class FW_FileParser;
 namespace Slush
 {
 	class Texture;
-	class Sprite;
+	class RectSprite;
 
 	class Text;
 	class Font;
@@ -49,9 +49,6 @@ public:
 
 	void Render();
 
-	//Vector2i GetCardSize() const { return ToInt(myBackgroundRect.myExtents); }
-	//const Rectf& GetCardRect() const { return myBackgroundRect; }
-
 	void SetPosition(int aX, int aY);
 
 protected:
@@ -59,11 +56,11 @@ protected:
 	virtual void OnSetPosition() {};
 	virtual void OnRenderCardDetails() {};
 
-	Slush::Sprite* myBackground;
-	Slush::Sprite* myTitleBackground;
-	Slush::Sprite* myImageBackground;
-	Slush::Sprite* myImage;
-	Slush::Sprite* myDescriptionBackground;
+	Slush::RectSprite* myBackground;
+	Slush::RectSprite* myTitleBackground;
+	Slush::RectSprite* myImageBackground;
+	Slush::RectSprite* myImage;
+	Slush::RectSprite* myDescriptionBackground;
 
 	Slush::Text* myTitleText;
 	Slush::Text* myDescriptionText;

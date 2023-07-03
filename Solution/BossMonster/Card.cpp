@@ -1,6 +1,6 @@
 #include "Card.h"
 
-#include <Graphics/Sprite.h>
+#include <Graphics/RectSprite.h>
 #include <Graphics/Text.h>
 
 #include <FW_Includes.h>
@@ -11,22 +11,22 @@ Card::Card(const Slush::Font* aFont)
 {
 	myScale = 3.f;
 
-	myBackground = new Slush::Sprite();
+	myBackground = new Slush::RectSprite();
 	myBackground->SetColor(0xFF222222);
 	myBackground->SetSize(100.f * myScale, 150.f * myScale);
 
-	myTitleBackground = new Slush::Sprite();
+	myTitleBackground = new Slush::RectSprite();
 	myTitleBackground->SetColor(0xFFAAAAAA);
 	myTitleBackground->SetSize(90.f * myScale, 20.f * myScale);
 
-	myImageBackground = new Slush::Sprite();
+	myImageBackground = new Slush::RectSprite();
 	myImageBackground->SetColor(0xFFAAAAAA);
 	myImageBackground->SetSize(90.f * myScale, 60.f * myScale);
 
-	myImage = new Slush::Sprite();
+	myImage = new Slush::RectSprite();
 	myImage->SetSize(90.f * myScale, 60.f * myScale);
 
-	myDescriptionBackground = new Slush::Sprite();
+	myDescriptionBackground = new Slush::RectSprite();
 	myDescriptionBackground->SetColor(0xFFAAAAAA);
 	myDescriptionBackground->SetSize(90.f * myScale, 35.f * myScale);
 

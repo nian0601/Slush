@@ -5,7 +5,7 @@
 namespace Slush
 {
 	class Text;
-	class Sprite;
+	class RectSprite;
 }
 
 class RoomCard : public Card
@@ -25,5 +25,5 @@ private:
 	Slush::Text* myDamageText;
 
 	TreasureType myTreasureType;
-	Slush::Sprite* myTreasureSprite;
+	Slush::RectSprite* myTreasureSprite;
 };

@@ -33,7 +33,6 @@
       <Filter>Services</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Window.h" />
-    <ClInclude Include="Graphics\Sprite.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\IApp.h" />
     <ClInclude Include="Core\Log.h" />
@@ -46,6 +45,8 @@
     <ClInclude Include="Core\Dockables\GameViewDockable.h" />
     <ClInclude Include="Core\Dockables\TextureViewerDockable.h" />
     <ClInclude Include="Core\Dockables\LogDockable.h" />
+    <ClInclude Include="Graphics\RectSprite.h" />
+    <ClInclude Include="Graphics\BaseSprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -74,7 +75,6 @@
       <Filter>Services</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Window.cpp" />
-    <ClCompile Include="Graphics\Sprite.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
@@ -85,6 +85,8 @@
     <ClCompile Include="Core\Dockables\GameViewDockable.cpp" />
     <ClCompile Include="Core\Dockables\TextureViewerDockable.cpp" />
     <ClCompile Include="Core\Dockables\LogDockable.cpp" />
+    <ClCompile Include="Graphics\RectSprite.cpp" />
+    <ClCompile Include="Graphics\BaseSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

@@ -1,7 +1,7 @@
 #include "HeroCard.h"
 
 #include <Graphics/Text.h>
-#include <Graphics/Sprite.h>
+#include <Graphics/RectSprite.h>
 #include <FW_Includes.h>
 #include <FW_FileParser.h>
 

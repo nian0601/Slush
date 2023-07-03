@@ -3,7 +3,7 @@
 #include <FW_Includes.h>
 #include <FW_Math.h>
 #include <Graphics/Text.h>
-#include <Graphics/Sprite.h>
+#include <Graphics/RectSprite.h>
 #include <FW_FileParser.h>
 
 RoomCard::RoomCard(const Slush::Font* aFont)
@@ -14,7 +14,7 @@ RoomCard::RoomCard(const Slush::Font* aFont)
 	myDamageText->SetText("-");
 	myDamageText->SetColor(0xFFFFFFFF);
 
-	myTreasureSprite = new Slush::Sprite();
+	myTreasureSprite = new Slush::RectSprite();
 	myTreasureSprite->SetSize(25.f, 25.f);
 	myTreasureSprite->SetColor(0xFFFFFFFF);
 	myTreasureSprite->SetRotation(FW_DegreesToRadians(45.f));

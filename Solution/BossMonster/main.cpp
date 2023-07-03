@@ -10,10 +10,8 @@
 #include "Core/AssetStorage.h"
 
 #include "Graphics/Window.h"
-#include "Graphics/Sprite.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Font.h"
-#include "Graphics/Text.h"
 
 #include "Card.h"
 #include "HeroCard.h"

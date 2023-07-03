@@ -30,15 +30,29 @@ namespace Slush
 			SLUSH_ERROR("Sprite: Invalid texture passed to SetTexture");
 	}
 
-	void BaseSprite::SetColor(int argb)
+	void BaseSprite::SetFillColor(int argb)
 	{
-		myColor = argb;
 		myShape->setFillColor(SFMLHelpers::GetColor(argb));
 	}
 
-	void BaseSprite::SetColor(float a, float r, float g, float b)
+	void BaseSprite::SetFillColor(float a, float r, float g, float b)
 	{
-		SetColor(FW_Float_To_ARGB(a, r, g, b));
+		SetFillColor(FW_Float_To_ARGB(a, r, g, b));
+	}
+
+	void BaseSprite::SetOutlineColor(int argb)
+	{
+		myShape->setOutlineColor(SFMLHelpers::GetColor(argb));
+	}
+
+	void BaseSprite::SetOutlineColor(float a, float r, float g, float b)
+	{
+		SetOutlineColor(FW_Float_To_ARGB(a, r, g, b));
+	}
+
+	void BaseSprite::SetOutlineThickness(float aThickness)
+	{
+		myShape->setOutlineThickness(aThickness);
 	}
 
 	void BaseSprite::SetPosition(float x, float y)

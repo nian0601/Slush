@@ -12,22 +12,22 @@ Card::Card(const Slush::Font* aFont)
 	myScale = 3.f;
 
 	myBackground = new Slush::RectSprite();
-	myBackground->SetColor(0xFF222222);
+	myBackground->SetFillColor(0xFF222222);
 	myBackground->SetSize(100.f * myScale, 150.f * myScale);
 
 	myTitleBackground = new Slush::RectSprite();
-	myTitleBackground->SetColor(0xFFAAAAAA);
+	myTitleBackground->SetFillColor(0xFFAAAAAA);
 	myTitleBackground->SetSize(90.f * myScale, 20.f * myScale);
 
 	myImageBackground = new Slush::RectSprite();
-	myImageBackground->SetColor(0xFFAAAAAA);
+	myImageBackground->SetFillColor(0xFFAAAAAA);
 	myImageBackground->SetSize(90.f * myScale, 60.f * myScale);
 
 	myImage = new Slush::RectSprite();
 	myImage->SetSize(90.f * myScale, 60.f * myScale);
 
 	myDescriptionBackground = new Slush::RectSprite();
-	myDescriptionBackground->SetColor(0xFFAAAAAA);
+	myDescriptionBackground->SetFillColor(0xFFAAAAAA);
 	myDescriptionBackground->SetSize(90.f * myScale, 35.f * myScale);
 
 	myTitleText = new Slush::Text();

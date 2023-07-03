@@ -16,7 +16,7 @@ RoomCard::RoomCard(const Slush::Font* aFont)
 
 	myTreasureSprite = new Slush::RectSprite();
 	myTreasureSprite->SetSize(25.f, 25.f);
-	myTreasureSprite->SetColor(0xFFFFFFFF);
+	myTreasureSprite->SetFillColor(0xFFFFFFFF);
 	myTreasureSprite->SetRotation(FW_DegreesToRadians(45.f));
 }
 
@@ -48,7 +48,7 @@ void RoomCard::OnLoadField(const FW_String& aFieldName, const FW_String& aFieldD
 		else if (aFieldData == "THIEF")
 			myTreasureType = THIEF;
 
-		myTreasureSprite->SetColor(GetTreasureColor(myTreasureType));
+		myTreasureSprite->SetFillColor(GetTreasureColor(myTreasureType));
 	}
 }
 

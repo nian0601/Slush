@@ -14,12 +14,15 @@ namespace Slush
 		virtual ~BaseSprite();
 
 		void SetTexture(const Texture& aTexture);
-		void SetColor(int argb);
-		void SetColor(float a, float r, float g, float b);
 		void SetPosition(float x, float y);
 		void SetRotation(float aRadians);
 
-		int GetColor() const { return myColor; }
+		void SetFillColor(int argb);
+		void SetFillColor(float a, float r, float g, float b);
+		void SetOutlineColor(int argb);
+		void SetOutlineColor(float a, float r, float g, float b);
+		void SetOutlineThickness(float aThickness);
+
 		const Vector2f& GetPosition() const { return myPosition; }
 		float GetRotation() const { return myRotation; }
 
@@ -32,7 +35,6 @@ namespace Slush
 		sf::Shape* myShape;
 		Vector2f mySize;
 		Vector2f myPosition;
-		int myColor;
-		float myRotation;
+		float myRotation = 0.f;
 	};
 }

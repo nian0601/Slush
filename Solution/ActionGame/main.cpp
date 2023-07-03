@@ -16,6 +16,8 @@
 #include "Graphics/Window.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Font.h"
+#include "Graphics/CircleSprite.h"
+#include "Graphics/RectSprite.h"
 
 class App : public Slush::IApp
 {
@@ -35,16 +37,30 @@ public:
 		window.AddDockable(new Slush::GameViewDockable());
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
+
+		myCircle = new Slush::CircleSprite();
+		myCircle->SetFillColor(0xFFFF0000);
+		myCircle->SetOutlineColor(0xFF440000);
+
+		myRect = new Slush::RectSprite();
+		myRect->SetFillColor(0xFF00FF00);
+		myRect->SetOutlineColor(0xFF004400);
 	}
 
 	void Shutdown() override
 	{
+		FW_SAFE_DELETE(myCircle);
+		FW_SAFE_DELETE(myRect);
 	}
 
 	void Update() override
 	{
 		float delta = Slush::Time::GetDelta();
-		delta;
+		myTimer += delta * 10;
+		myThickness = -8.f + (sin(myTimer) - 1.f) * 5.f;
+
+		myCircle->SetOutlineThickness(myThickness);
+		myRect->SetOutlineThickness(myThickness);
 	}
 
 	void Render() override
@@ -52,6 +68,8 @@ public:
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		engine.GetWindow().StartOffscreenBuffer();
 
+		myCircle->Render(400.f, 400.f);
+		myRect->Render(700.f, 400.f);
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
@@ -59,6 +77,10 @@ public:
 private:
 	Slush::Font myFont;
 	Slush::AssetStorage<Slush::Texture> myTextures;
+	Slush::CircleSprite* myCircle;
+	Slush::RectSprite* myRect;
+	float myThickness = 0.f;
+	float myTimer = 0.f;
 };
 
 #include <FW_UnitTestSuite.h>

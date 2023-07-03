@@ -47,6 +47,7 @@
     <ClInclude Include="Core\Dockables\LogDockable.h" />
     <ClInclude Include="Graphics\RectSprite.h" />
     <ClInclude Include="Graphics\BaseSprite.h" />
+    <ClInclude Include="Graphics\CircleSprite.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -87,6 +88,7 @@
     <ClCompile Include="Core\Dockables\LogDockable.cpp" />
     <ClCompile Include="Graphics\RectSprite.cpp" />
     <ClCompile Include="Graphics\BaseSprite.cpp" />
+    <ClCompile Include="Graphics\CircleSprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

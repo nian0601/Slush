@@ -146,6 +146,7 @@
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\IApp.h" />
     <ClInclude Include="Core\Log.h" />
+    <ClInclude Include="Graphics\CircleSprite.h" />
     <ClInclude Include="Graphics\Font.h" />
     <ClInclude Include="Graphics\RectSprite.h" />
     <ClInclude Include="Graphics\Text.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="Core\Dockables\TextureViewerDockable.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\Log.cpp" />
+    <ClCompile Include="Graphics\CircleSprite.cpp" />
     <ClCompile Include="Graphics\Font.cpp" />
     <ClCompile Include="Graphics\RectSprite.cpp" />
     <ClCompile Include="Graphics\Text.cpp" />

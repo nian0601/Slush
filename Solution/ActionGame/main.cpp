@@ -19,6 +19,8 @@
 #include "Graphics/CircleSprite.h"
 #include "Graphics/RectSprite.h"
 
+#include "Graphics/Animation/Animation.h"
+
 class App : public Slush::IApp
 {
 
@@ -41,14 +43,31 @@ public:
 		myCircle = new Slush::CircleSprite();
 		myCircle->SetFillColor(0xFFFF0000);
 		myCircle->SetOutlineColor(0xFF440000);
+		myCircle->SetOutlineThickness(1.f);
 
 		myRect = new Slush::RectSprite();
 		myRect->SetFillColor(0xFF00FF00);
 		myRect->SetOutlineColor(0xFF004400);
+
+		myAnimation = new Slush::Animation(*myCircle);
+		Slush::AnimationClip clip1;
+		clip1.myStartTime = 0.2f;
+		clip1.myEndTime = 0.6f;
+		clip1.myStartValue = -1.0f;
+		clip1.myEndValue = -10.f;
+		myAnimation->AddClip(clip1);
+
+		Slush::AnimationClip clip2;
+		clip2.myStartTime = clip1.myEndTime + 0.2f;
+		clip2.myEndTime = clip2.myStartTime + 0.6f;
+		clip2.myStartValue = -10.f;
+		clip2.myEndValue = -1.f;
+		myAnimation->AddClip(clip2);
 	}
 
 	void Shutdown() override
 	{
+		FW_SAFE_DELETE(myAnimation);
 		FW_SAFE_DELETE(myCircle);
 		FW_SAFE_DELETE(myRect);
 	}
@@ -59,8 +78,14 @@ public:
 		myTimer += delta * 10;
 		myThickness = -8.f + (sin(myTimer) - 1.f) * 5.f;
 
-		myCircle->SetOutlineThickness(myThickness);
+		//myCircle->SetOutlineThickness(myThickness);
 		myRect->SetOutlineThickness(myThickness);
+
+		myAnimation->Update();
+
+		Slush::Engine& engine = Slush::Engine::GetInstance();
+		if (engine.GetInput().WasKeyPressed(Slush::Input::A))
+			myAnimation->Restart();
 	}
 
 	void Render() override
@@ -79,6 +104,7 @@ private:
 	Slush::AssetStorage<Slush::Texture> myTextures;
 	Slush::CircleSprite* myCircle;
 	Slush::RectSprite* myRect;
+	Slush::Animation* myAnimation;
 	float myThickness = 0.f;
 	float myTimer = 0.f;
 };

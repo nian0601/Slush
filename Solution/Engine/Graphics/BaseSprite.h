@@ -25,6 +25,7 @@ namespace Slush
 
 		const Vector2f& GetPosition() const { return myPosition; }
 		float GetRotation() const { return myRotation; }
+		float GetOutlineThickness() const;
 
 		void Render();
 		void Render(float x, float y);

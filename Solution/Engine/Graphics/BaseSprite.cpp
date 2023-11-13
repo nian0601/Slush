@@ -67,6 +67,11 @@ namespace Slush
 		myShape->setRotation(FW_RadiansToDegrees(aRadians));
 	}
 
+	float BaseSprite::GetOutlineThickness() const
+	{
+		return myShape->getOutlineThickness();
+	}
+
 	void BaseSprite::Render()
 	{
 		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myShape);

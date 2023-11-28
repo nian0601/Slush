@@ -35,11 +35,6 @@ public:
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
-		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.AddDockable(new Slush::GameViewDockable());
-		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
-		window.AddDockable(new Slush::LogDockable());
-
 		myCircle = new Slush::CircleSprite();
 		myCircle->SetFillColor(0xFFFF0000);
 		myCircle->SetOutlineColor(0xFF440000);
@@ -48,44 +43,51 @@ public:
 		myRect = new Slush::RectSprite();
 		myRect->SetFillColor(0xFF00FF00);
 		myRect->SetOutlineColor(0xFF004400);
+		myRect->SetOutlineThickness(1.f);
 
-		myAnimation = new Slush::Animation(*myCircle);
-		Slush::AnimationClip clip1;
-		clip1.myStartTime = 0.2f;
-		clip1.myEndTime = 0.6f;
-		clip1.myStartValue = -1.0f;
-		clip1.myEndValue = -10.f;
-		myAnimation->AddClip(clip1);
+		myCircleAnimation = new Slush::Animation(*myCircle);
+		myCircleAnimation->myOutlineTrack
+			.Wait(0.2f)
+			.Linear(0.4f, -1.f, -10.f)
+			.Wait(0.2f)
+			.Linear(0.4f, -10.f, 4.f)
+			.Linear(0.2f, 4, -1.f);
+		myCircleAnimation->myScaleTrack
+			.Wait(0.2f)
+			.Linear(0.6f, 1.f, 1.2f)
+			.Wait(0.2f)
+			.Linear(0.4f, 1.2f, 1.f);
 
-		Slush::AnimationClip clip2;
-		clip2.myStartTime = clip1.myEndTime + 0.2f;
-		clip2.myEndTime = clip2.myStartTime + 0.6f;
-		clip2.myStartValue = -10.f;
-		clip2.myEndValue = -1.f;
-		myAnimation->AddClip(clip2);
+		myRectAnimation = new Slush::Animation(*myRect);
+		myRectAnimation->myOutlineTrack
+			.Wait(0.2f)
+			.Linear(0.4f, -1.f, -10.f)
+			.Wait(0.2f)
+			.Linear(0.4f, -10.f, -1.f);
+		myRectAnimation->Restart();
+
+		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+		window.AddDockable(new Slush::GameViewDockable());
+		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
+		window.AddDockable(new Slush::LogDockable());
 	}
 
 	void Shutdown() override
 	{
-		FW_SAFE_DELETE(myAnimation);
+		FW_SAFE_DELETE(myCircleAnimation);
+		FW_SAFE_DELETE(myRectAnimation);
 		FW_SAFE_DELETE(myCircle);
 		FW_SAFE_DELETE(myRect);
 	}
 
 	void Update() override
 	{
-		float delta = Slush::Time::GetDelta();
-		myTimer += delta * 10;
-		myThickness = -8.f + (sin(myTimer) - 1.f) * 5.f;
-
-		//myCircle->SetOutlineThickness(myThickness);
-		myRect->SetOutlineThickness(myThickness);
-
-		myAnimation->Update();
+		myCircleAnimation->Update();
+		myRectAnimation->Update();
 
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		if (engine.GetInput().WasKeyPressed(Slush::Input::A))
-			myAnimation->Restart();
+			myCircleAnimation->Restart();
 	}
 
 	void Render() override
@@ -102,11 +104,11 @@ public:
 private:
 	Slush::Font myFont;
 	Slush::AssetStorage<Slush::Texture> myTextures;
+
 	Slush::CircleSprite* myCircle;
 	Slush::RectSprite* myRect;
-	Slush::Animation* myAnimation;
-	float myThickness = 0.f;
-	float myTimer = 0.f;
+	Slush::Animation* myCircleAnimation;
+	Slush::Animation* myRectAnimation;
 };
 
 #include <FW_UnitTestSuite.h>

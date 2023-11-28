@@ -67,6 +67,15 @@ namespace Slush
 		myShape->setRotation(FW_RadiansToDegrees(aRadians));
 	}
 
+	void BaseSprite::SetScale(float aScale)
+	{
+		if (myScale != aScale)
+		{
+			myShape->setScale({ aScale, aScale });
+			myScale = aScale;
+		}
+	}
+
 	float BaseSprite::GetOutlineThickness() const
 	{
 		return myShape->getOutlineThickness();

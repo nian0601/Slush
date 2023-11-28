@@ -16,6 +16,7 @@ namespace Slush
 		void SetTexture(const Texture& aTexture);
 		void SetPosition(float x, float y);
 		void SetRotation(float aRadians);
+		void SetScale(float aScale);
 
 		void SetFillColor(int argb);
 		void SetFillColor(float a, float r, float g, float b);
@@ -24,6 +25,7 @@ namespace Slush
 		void SetOutlineThickness(float aThickness);
 
 		const Vector2f& GetPosition() const { return myPosition; }
+		float GetScale() const { return myScale; }
 		float GetRotation() const { return myRotation; }
 		float GetOutlineThickness() const;
 
@@ -37,5 +39,6 @@ namespace Slush
 		Vector2f mySize;
 		Vector2f myPosition;
 		float myRotation = 0.f;
+		float myScale = 1.f;
 	};
 }

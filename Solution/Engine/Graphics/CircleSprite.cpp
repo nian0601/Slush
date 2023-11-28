@@ -22,5 +22,6 @@ namespace Slush
 	{
 		myRadius = aRadius;
 		static_cast<sf::CircleShape*>(myShape)->setRadius(aRadius);
+		myShape->setOrigin({ myRadius, myRadius });
 	}
 }

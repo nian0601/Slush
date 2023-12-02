@@ -6,11 +6,33 @@
 
 namespace Slush
 {
+	void AnimationRuntime::TrackData::Reset()
+	{
+		myIsActive = false;
+		myValue = 0.f;
+		myCurrentClip = 0;
+	}
+
+	void AnimationRuntime::Restart()
+	{
+		myState = Running;
+		myElapsedTime = 0.f;
+
+		myOutlineData.Reset();
+		myOutlineData.myValue = 1.f;
+		myScaleData.Reset();
+		myScaleData.myValue = 1.f;
+		myPositionData.Reset();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 
 	float Interpolator::GetValue(float aProgress)
 	{
 		if (myType == Linear)
 			return FW_Lerp(myStartValue, myEndValue, aProgress);
+		else if (myType == Constant)
+			return myStartValue;
 
 		return 0.f;
 	}
@@ -22,6 +44,13 @@ namespace Slush
 		myEndValue = aEnd;
 	}
 
+	void Interpolator::MakeConstant(float aValue)
+	{
+		myType = Constant;
+		myStartValue = aValue;
+		myEndValue = aValue;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 
 	void AnimationClip::SetStartTimeAndDuration(float aStartTime, float aDuration)
@@ -30,125 +59,116 @@ namespace Slush
 		myEndTime = myStartTime + aDuration;
 	}
 
-	float AnimationClip::Update(float anElapsedTime)
+	AnimationClip::State AnimationClip::Update(float anElapsedTime, float& outValue)
 	{
-		if (myState == Waiting && anElapsedTime >= myStartTime)
-			myState = Running;
+		if (anElapsedTime < myStartTime)
+			return State::NotStarted;
 
-		if (myState == Running)
+		if (anElapsedTime >= myEndTime)
 		{
-			float progress = FW_UnLerp(myStartTime, myEndTime, anElapsedTime);
-			float value = myInterpolator.GetValue(progress);
+			if (!myIsWaitingClip)
+				outValue = myInterpolator.GetValue(1.f);
 
-			if (anElapsedTime >= myEndTime)
-				myState = Finished;
-			else
-				return value;
+			return State::Finished;
 		}
 
-		if (myState == Finished)
-			return myInterpolator.GetValue(1.f);
+		if (!myIsWaitingClip)
+		{
+			float progress = FW_UnLerp(myStartTime, myEndTime, anElapsedTime);
+			outValue = myInterpolator.GetValue(progress);
+		}
 
-		return FLT_MAX;
+		return State::Running;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 
-	AnimationTrack::AnimationTrack(Animation& anParentAnimation, TrackType aTrackType)
-		: myParentAnimation(anParentAnimation)
-		, myTrackType(aTrackType)
-	{
-	}
-
 	AnimationTrack& AnimationTrack::Linear(float aDuration, float aStart, float aEnd)
 	{
-		AnimationClip& clip = myClips.Add();
-		clip.SetStartTimeAndDuration(myEndTime, aDuration);
+		AnimationClip& clip = AddClip(aDuration);
 		clip.myInterpolator.MakeLinear(aStart, aEnd);
 
-		myEndTime += aDuration;
-		myParentAnimation.myTotalTime = FW_Max(myParentAnimation.myTotalTime, myEndTime);
-		
+		return *this;
+	}
+
+	AnimationTrack& AnimationTrack::Constant(float aDuration, float aValue)
+	{
+		AnimationClip& clip = AddClip(aDuration);
+		clip.myInterpolator.MakeConstant(aValue);
+
 		return *this;
 	}
 
 	AnimationTrack& AnimationTrack::Wait(float aDuration)
 	{
-		myEndTime += aDuration;
-		myParentAnimation.myTotalTime = FW_Max(myParentAnimation.myTotalTime, myEndTime);
+		AnimationClip& clip = AddClip(aDuration);
+		clip.MakeWaitingClip();
 
 		return *this;
 	}
 
-	void AnimationTrack::Update(float anElapsedTime, BaseSprite& aSprite)
+	bool AnimationTrack::Update(float anElapsedTime, AnimationRuntime::TrackData& aTrackData)
 	{
-		for (AnimationClip& clip : myClips)
+		if (aTrackData.myCurrentClip >= myClips.Count())
 		{
-			float animValue = clip.Update(anElapsedTime);
-			if (animValue < FLT_MAX)
-				ApplyAnimation(animValue, aSprite);
+			aTrackData.myIsActive = false;
+			return false;
 		}
+
+		AnimationClip::State state = myClips[aTrackData.myCurrentClip].Update(anElapsedTime, aTrackData.myValue);
+		if (state == AnimationClip::State::Finished)
+			++aTrackData.myCurrentClip;
+
+		aTrackData.myIsActive = state != AnimationClip::State::NotStarted;
+		return true;
 	}
 
-	void AnimationTrack::Reset()
+	Slush::AnimationClip& AnimationTrack::AddClip(float aDuration)
 	{
-		const float elaspedTime = 0.f;
-		for (AnimationClip& clip : myClips)
-		{
-			clip.myState = AnimationClip::Waiting;
-			clip.Update(elaspedTime);
-		}
-	}
+		AnimationClip& clip = myClips.Add();
+		clip.SetStartTimeAndDuration(myEndTime, aDuration);
 
-	void AnimationTrack::ApplyAnimation(float aValue, BaseSprite& aSprite)
-	{
-		switch (myTrackType)
-		{
-		case TrackType::Outline:
-			aSprite.SetOutlineThickness(aValue);
-			break;
-		case TrackType::Scale:
-			aSprite.SetScale(aValue);
-			break;
-		default:
-			break;
-		}
+		myEndTime += aDuration;
+
+		return clip;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 	Animation::Animation(BaseSprite& aSprite)
 		: mySprite(aSprite)
-		, myOutlineTrack(*this, AnimationTrack::Outline)
-		, myScaleTrack(*this, AnimationTrack::Scale)
 	{
 	}
 
-	void Animation::Update()
+	void Animation::Update(AnimationRuntime& aRuntimeData)
 	{
-		if (myState == Waiting || myState == Finished)
+		if (aRuntimeData.myState == AnimationRuntime::Waiting || aRuntimeData.myState == AnimationRuntime::Finished)
 			return;
 
-		myElapsedTime += Time::GetDelta();
+		aRuntimeData.myElapsedTime += Time::GetDelta();
 
-		if (myElapsedTime >= myTotalTime)
-		{
-			myElapsedTime = myTotalTime;
-			myState = Finished;
-		}
+		bool anyTrackActive = false;
+		anyTrackActive |= myOutlineTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myOutlineData);
+		anyTrackActive |= myScaleTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myScaleData);
+		anyTrackActive |= myPositionTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myPositionData);
 
-		myOutlineTrack.Update(myElapsedTime, mySprite);
-		myScaleTrack.Update(myElapsedTime, mySprite);
+		if (!anyTrackActive)
+			aRuntimeData.myState = AnimationRuntime::Finished;
 
-		if (myState == Finished && myIsLooping)
-			Restart();
+		ApplyAnimation(aRuntimeData);
+
+		if (aRuntimeData.myState == AnimationRuntime::Finished && myIsLooping)
+			aRuntimeData.Restart();
 	}
 
-	void Animation::Restart()
+	void Animation::ApplyAnimation(AnimationRuntime& aRuntimeData)
 	{
-		myState = Running;
-		myElapsedTime = 0.f;
+		if (aRuntimeData.myOutlineData.myIsActive)
+			mySprite.SetOutlineThickness(aRuntimeData.myOutlineData.myValue);
 
-		myOutlineTrack.Reset();
-		myScaleTrack.Reset();
+		if (aRuntimeData.myScaleData.myIsActive)
+			mySprite.SetScale(aRuntimeData.myScaleData.myValue);
+
+		if (aRuntimeData.myPositionData.myIsActive)
+			aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, aRuntimeData.myPositionData.myValue);
 	}
 }

@@ -46,17 +46,14 @@ public:
 		myRect->SetOutlineThickness(1.f);
 
 		myCircleAnimation = new Slush::Animation(*myCircle);
-		myCircleAnimation->myOutlineTrack
-			.Wait(0.2f)
-			.Linear(0.4f, -1.f, -10.f)
-			.Wait(0.2f)
-			.Linear(0.4f, -10.f, 4.f)
-			.Linear(0.2f, 4, -1.f);
 		myCircleAnimation->myScaleTrack
+			.Linear(0.2f, 1.f, 0.1f)
+			.Wait(0.1f)
+			.Linear(0.2f, 0.1f, 1.f);
+		myCircleAnimation->myPositionTrack
 			.Wait(0.2f)
-			.Linear(0.6f, 1.f, 1.2f)
-			.Wait(0.2f)
-			.Linear(0.4f, 1.2f, 1.f);
+			.Constant(1.2f, 1.f);
+		myCircleAnimation->MakeOneShot();
 
 		myRectAnimation = new Slush::Animation(*myRect);
 		myRectAnimation->myOutlineTrack
@@ -64,7 +61,14 @@ public:
 			.Linear(0.4f, -1.f, -10.f)
 			.Wait(0.2f)
 			.Linear(0.4f, -10.f, -1.f);
-		myRectAnimation->Restart();
+		myRectRuntime.Restart();
+
+		myCirclePosition = { 400.f, 400.f };
+		myRectPosition = { 700.f, 400.f };
+
+		myCircleRuntime.myStartPosition = myCirclePosition;
+		myCircleRuntime.myEndPosition = myCirclePosition + Vector2f(200.f, 0.f);
+		myCircleRuntime.myCurrentPosition = myCirclePosition;
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
@@ -82,12 +86,23 @@ public:
 
 	void Update() override
 	{
-		myCircleAnimation->Update();
-		myRectAnimation->Update();
+		myCircleAnimation->Update(myCircleRuntime);
+		myRectAnimation->Update(myRectRuntime);
 
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		if (engine.GetInput().WasKeyPressed(Slush::Input::A))
-			myCircleAnimation->Restart();
+		{
+			myCircleRuntime.myStartPosition = myCircleRuntime.myCurrentPosition;
+			myCircleRuntime.myEndPosition = engine.GetInput().GetMousePositionf();
+			myCircleRuntime.Restart();
+		}
+
+		if (engine.GetInput().IsMouseDown(Slush::Input::LEFTMB))
+		{
+			myCircleRuntime.myStartPosition = myCircleRuntime.myCurrentPosition;
+			myCircleRuntime.myEndPosition = engine.GetInput().GetMousePositionf();
+			myCircleRuntime.Restart();
+		}
 	}
 
 	void Render() override
@@ -95,8 +110,8 @@ public:
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		engine.GetWindow().StartOffscreenBuffer();
 
-		myCircle->Render(400.f, 400.f);
-		myRect->Render(700.f, 400.f);
+		myCircle->Render(myCircleRuntime.myCurrentPosition.x, myCircleRuntime.myCurrentPosition.y);
+		myRect->Render(myRectPosition.x, myRectPosition.y);
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
@@ -109,6 +124,12 @@ private:
 	Slush::RectSprite* myRect;
 	Slush::Animation* myCircleAnimation;
 	Slush::Animation* myRectAnimation;
+
+	Slush::AnimationRuntime myCircleRuntime;
+	Slush::AnimationRuntime myRectRuntime;
+
+	Vector2f myCirclePosition;
+	Vector2f myRectPosition;
 };
 
 #include <FW_UnitTestSuite.h>

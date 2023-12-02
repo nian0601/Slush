@@ -6,17 +6,53 @@ namespace Slush
 
 	class Animation;
 
+	struct AnimationRuntime
+	{
+		enum State
+		{
+			Waiting,
+			Running,
+			Finished,
+		};
+
+		struct TrackData
+		{
+			void Reset();
+
+			bool myIsActive = false;
+			float myValue = FLT_MAX;
+			int myCurrentClip = 0;
+		};
+
+		void Restart();
+
+		State myState = Waiting;
+		float myElapsedTime = 0.f;
+
+		TrackData myOutlineData;
+		TrackData myScaleData;
+		TrackData myPositionData;
+
+		Vector2f myStartPosition;
+		Vector2f myEndPosition;
+		Vector2f myCurrentPosition;
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+
 	struct Interpolator
 	{
 		float GetValue(float aProgress);
 
 		void MakeLinear(float aStart, float aEnd);
+		void MakeConstant(float aValue);
 
 	private:
 		enum Type
 		{
 			None,
 			Linear,
+			Constant,
 		};
 		Type myType = None;
 		float myStartValue = 0.f;
@@ -27,54 +63,41 @@ namespace Slush
 
 	class AnimationClip
 	{
-		friend class AnimationTrack;
 	public: 
-
-		void SetStartTimeAndDuration(float aStartTime, float aDuration);
-
-		float Update(float anElapsedTime);
-
-		Interpolator myInterpolator;
-
-	protected:
 		enum State
 		{
-			Waiting,
+			NotStarted,
 			Running,
 			Finished,
 		};
 
-		State myState = Waiting;
+		void SetStartTimeAndDuration(float aStartTime, float aDuration);
+		void MakeWaitingClip() { myIsWaitingClip = true; }
+
+		State Update(float anElapsedTime, float& outValue);
+
+		Interpolator myInterpolator;
+
+	protected:
 		float myStartTime = FLT_MAX;
 		float myEndTime = FLT_MAX;
-		float myValue = 0.f;
+		bool myIsWaitingClip = false;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
 
-	class Animation;
 	class AnimationTrack
 	{
 	public:
-		enum TrackType
-		{
-			Outline,
-			Scale,
-		};
-
-		AnimationTrack(Animation& anParentAnimation, TrackType aTrackType);
-
 		AnimationTrack& Linear(float aDuration, float aStart, float aEnd);
+		AnimationTrack& Constant(float aDuration, float aValue);
 		AnimationTrack& Wait(float aDuration);
 
-		void Update(float anElapsedTime, BaseSprite& aSprite);
-		void Reset();
+		bool Update(float anElapsedTime, AnimationRuntime::TrackData& aTrackData);
 
 	private:
-		void ApplyAnimation(float aValue, BaseSprite& aSprite);
+		AnimationClip& AddClip(float aDuration);
 
-		Animation& myParentAnimation;
-		TrackType myTrackType;
 		FW_GrowingArray<AnimationClip> myClips;
 		float myEndTime = 0.f;
 	};
@@ -82,30 +105,20 @@ namespace Slush
 	//////////////////////////////////////////////////////////////////////////
 	class Animation
 	{
-		friend class AnimationTrack;
 	public:
 		Animation(BaseSprite& aSprite);
 
-		void Update();
-		void Restart();
+		void Update(AnimationRuntime& aRuntimeData);
 
 		void MakeOneShot() { myIsLooping = false; }
 
 		AnimationTrack myOutlineTrack;
 		AnimationTrack myScaleTrack;
+		AnimationTrack myPositionTrack;
 
 	private:
-		enum State
-		{
-			Waiting,
-			Running,
-			Finished,
-		};
+		void ApplyAnimation(AnimationRuntime& aRuntimeData);
 
-		State myState = Waiting;
-
-		float myElapsedTime = 0.f;
-		float myTotalTime = 0.f;
 		bool myIsLooping = true;
 
 		BaseSprite& mySprite;

@@ -116,6 +116,11 @@ inline float FW_Lerp(float aStart, float aEnd, float aAlpha)
 	return (aStart + (aEnd - aStart) * aAlpha);
 }
 
+inline Vector2f FW_Lerp(Vector2f aStart, Vector2f aEnd, float aAlpha)
+{
+	return (aStart + (aEnd - aStart) * aAlpha);
+}
+
 inline float FW_UnLerp(float aStart, float aEnd, float aValue)
 {
 	return (aValue - aStart) / (aEnd - aStart);

@@ -26,6 +26,7 @@ namespace Slush
 
 		const FW_String& GetDataFolder() const { return myDataFolder; }
 
+		bool myByPassImGUIInputRestriction = false;
 	private:
 		Engine() {};
 		~Engine() {};

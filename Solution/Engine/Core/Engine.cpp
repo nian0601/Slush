@@ -85,7 +85,7 @@ namespace Slush
 			if(!imguiIO.WantCaptureKeyboard)
 				myInput->UpdateKeyboard();
 
-			if (!imguiIO.WantCaptureMouse)
+			if (!imguiIO.WantCaptureMouse || myByPassImGUIInputRestriction)
 				myInput->UpdateMouse(*myWindow->GetRenderWindow());
 
 			anApp.Update();

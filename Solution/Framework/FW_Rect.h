@@ -37,8 +37,6 @@ FW_Rect<T> MakeRectFromCenter(const FW_Vector2<T>& aCenter, const FW_Vector2<T>&
 	return rect;
 }
 
-
-
 template <typename T>
 FW_Rect<T> MakeRectFromPoints(const FW_Vector2<T>& aPoint1, const FW_Vector2<T>& aPoint2)
 {
@@ -86,6 +84,12 @@ void SetRectPosition(FW_Rect<T>& aRect, const FW_Vector2<T>& aNewPosition)
 	aRect.myCenterPos = aNewPosition;
 	aRect.myTopLeft = aRect.myCenterPos - aRect.myExtents / static_cast<T>(2.f);
 	aRect.myBottomRight = aRect.myCenterPos + aRect.myExtents / static_cast<T>(2.f);
+}
+
+template <typename T>
+void SetRectSize(FW_Rect<T>& aRect, const FW_Vector2<T>& aNewSize)
+{
+	aRect = MakeRectFromTopLeft(aRect.myTopLeft, aNewSize);
 }
 
 template <typename T>

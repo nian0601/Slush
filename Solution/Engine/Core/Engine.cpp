@@ -86,7 +86,10 @@ namespace Slush
 				myInput->UpdateKeyboard();
 
 			if (!imguiIO.WantCaptureMouse || myByPassImGUIInputRestriction)
+			{
 				myInput->UpdateMouse(*myWindow->GetRenderWindow());
+				myInput->RemapMousePosition(myWindow->GetWindowRect(), myWindow->GetGameViewRect());
+			}
 
 			anApp.Update();
 			anApp.Render();

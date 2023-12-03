@@ -35,11 +35,14 @@ namespace Slush
 
 		sf::RenderTarget* GetActiveRenderTarget() const { return myActiveRenderTarget; }
 
+		Rectf GetWindowRect() const { return myWindowRect; }
+		Rectf GetGameViewRect() const { return myGameViewRect; }
+
 	private:
 		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
 
-		int myWidth = 1920;
-		int myHeight = 1080;
+		Rectf myWindowRect;
+		Rectf myGameViewRect;
 		float myAspectRatio = 16.f / 9.f;
 		bool myShowEditorUI = true;
 

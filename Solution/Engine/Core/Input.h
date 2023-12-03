@@ -73,6 +73,7 @@ namespace Slush
 		bool WasMouseReleased(MouseButton aMouseButton) const { return myMouseStates[aMouseButton] == KEYSTATE_RELEASED; }
 		bool IsMouseDown(MouseButton aMouseButton) const { return myMouseStates[aMouseButton] == KEYSTATE_DOWN; }
 
+		void RemapMousePosition(const Rectf& aWindowRect, const Rectf& aGameViewRect);
 		const Vector2i& GetMousePosition() const { return myMousePosition; }
 		const Vector2f& GetMousePositionf() const { return myMousePositionf; }
 

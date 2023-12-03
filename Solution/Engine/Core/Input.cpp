@@ -62,6 +62,18 @@ namespace Slush
 		}
 	}
 
+	void Input::RemapMousePosition(const Rectf& aWindowRect, const Rectf& aGameViewRect)
+	{
+		float gameViewX = FW_UnLerp(aGameViewRect.myTopLeft.x, aGameViewRect.myBottomRight.x, myMousePositionf.x);
+		float gameViewY = FW_UnLerp(aGameViewRect.myTopLeft.y, aGameViewRect.myBottomRight.y, myMousePositionf.y);
+
+		myMousePositionf.x = FW_Lerp(aWindowRect.myTopLeft.x, aWindowRect.myBottomRight.x, gameViewX);;
+		myMousePositionf.y = FW_Lerp(aWindowRect.myTopLeft.y, aWindowRect.myBottomRight.y, gameViewY);;
+
+		myMousePosition.x = static_cast<int>(myMousePositionf.x + 0.5f);
+		myMousePosition.y = static_cast<int>(myMousePositionf.y + 0.5f);
+	}
+
 	void Input::UpdateState(State& aState)
 	{
 		switch (aState)

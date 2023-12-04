@@ -1,32 +1,12 @@
 #include "stdafx.h"
 
 #include "Graphics/Animation/Animation.h"
+#include "Graphics/Animation/AnimationRuntime.h"
 #include "Graphics/BaseSprite.h"
 #include "Core/Time.h"
 
 namespace Slush
 {
-	void AnimationRuntime::TrackData::Reset()
-	{
-		myIsActive = false;
-		myValue = 0.f;
-		myCurrentClip = 0;
-	}
-
-	void AnimationRuntime::Restart()
-	{
-		myState = Running;
-		myElapsedTime = 0.f;
-
-		myOutlineData.Reset();
-		myOutlineData.myValue = 1.f;
-		myScaleData.Reset();
-		myScaleData.myValue = 1.f;
-		myPositionData.Reset();
-	}
-
-	//////////////////////////////////////////////////////////////////////////
-
 	float Interpolator::GetValue(float aProgress)
 	{
 		if (myType == Linear)
@@ -107,7 +87,7 @@ namespace Slush
 		return *this;
 	}
 
-	bool AnimationTrack::Update(float anElapsedTime, AnimationRuntime::TrackData& aTrackData)
+	bool AnimationTrack::Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData)
 	{
 		if (aTrackData.myCurrentClip >= myClips.Count())
 		{

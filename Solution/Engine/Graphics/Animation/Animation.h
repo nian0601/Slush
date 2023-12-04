@@ -1,42 +1,13 @@
 #pragma once
+#include <FW_GrowingArray.h>
 
 namespace Slush
 {
+	class Animation;
 	class BaseSprite;
 
-	class Animation;
-
-	struct AnimationRuntime
-	{
-		enum State
-		{
-			Waiting,
-			Running,
-			Finished,
-		};
-
-		struct TrackData
-		{
-			void Reset();
-
-			bool myIsActive = false;
-			float myValue = FLT_MAX;
-			int myCurrentClip = 0;
-		};
-
-		void Restart();
-
-		State myState = Waiting;
-		float myElapsedTime = 0.f;
-
-		TrackData myOutlineData;
-		TrackData myScaleData;
-		TrackData myPositionData;
-
-		Vector2f myStartPosition;
-		Vector2f myEndPosition;
-		Vector2f myCurrentPosition;
-	};
+	struct AnimationRuntime;
+	struct AnimationRuntimeTrackData;
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -93,7 +64,7 @@ namespace Slush
 		AnimationTrack& Constant(float aDuration, float aValue);
 		AnimationTrack& Wait(float aDuration);
 
-		bool Update(float anElapsedTime, AnimationRuntime::TrackData& aTrackData);
+		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData);
 
 	private:
 		AnimationClip& AddClip(float aDuration);

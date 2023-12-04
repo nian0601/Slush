@@ -49,6 +49,7 @@
     <ClInclude Include="Graphics\BaseSprite.h" />
     <ClInclude Include="Graphics\CircleSprite.h" />
     <ClInclude Include="Graphics\Animation\Animation.h" />
+    <ClInclude Include="Graphics\Animation\AnimationRuntime.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -91,6 +92,7 @@
     <ClCompile Include="Graphics\BaseSprite.cpp" />
     <ClCompile Include="Graphics\CircleSprite.cpp" />
     <ClCompile Include="Graphics\Animation\Animation.cpp" />
+    <ClCompile Include="Graphics\Animation\AnimationRuntime.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

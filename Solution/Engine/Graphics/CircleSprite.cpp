@@ -15,7 +15,7 @@ namespace Slush
 	CircleSprite::CircleSprite()
 		: BaseSprite(new sf::CircleShape())
 	{
-		SetRadius(100.f);
+		SetRadius(20.f);
 	}
 
 	void CircleSprite::SetRadius(float aRadius)

@@ -12,6 +12,7 @@ namespace Slush
 class Entity
 {
 public:
+	Entity();
 	~Entity();
 
 	void Update();
@@ -22,4 +23,6 @@ public:
 	Slush::AnimationRuntime myAnimationRuntime;
 
 	Vector2f myPosition;
+	Vector2f myDirection;
+	float mySpeed;
 };

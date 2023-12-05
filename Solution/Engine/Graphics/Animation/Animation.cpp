@@ -121,7 +121,7 @@ namespace Slush
 
 	void Animation::Update(AnimationRuntime& aRuntimeData)
 	{
-		if (aRuntimeData.myState == AnimationRuntime::Waiting || aRuntimeData.myState == AnimationRuntime::Finished)
+		if (aRuntimeData.myState != AnimationClip::Running)
 			return;
 
 		aRuntimeData.myElapsedTime += Time::GetDelta();
@@ -137,7 +137,7 @@ namespace Slush
 		ApplyAnimation(aRuntimeData);
 
 		if (aRuntimeData.myState == AnimationRuntime::Finished && myIsLooping)
-			aRuntimeData.Restart();
+			aRuntimeData.Start();
 	}
 
 	void Animation::ApplyAnimation(AnimationRuntime& aRuntimeData)

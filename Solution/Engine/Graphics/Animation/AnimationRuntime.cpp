@@ -11,7 +11,7 @@ namespace Slush
 		myCurrentClip = 0;
 	}
 
-	void AnimationRuntime::Restart()
+	void AnimationRuntime::Start()
 	{
 		myState = Running;
 		myElapsedTime = 0.f;

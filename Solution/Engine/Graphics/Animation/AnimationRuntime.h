@@ -17,14 +17,14 @@ namespace Slush
 	{
 		enum State
 		{
-			Waiting,
+			NotStarted,
 			Running,
 			Finished,
 		};
 
-		void Restart();
+		void Start();
 
-		State myState = Waiting;
+		State myState = NotStarted;
 		float myElapsedTime = 0.f;
 
 		AnimationRuntimeTrackData myOutlineData;

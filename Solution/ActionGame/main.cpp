@@ -39,24 +39,6 @@ public:
 
 		myCircleEntity = new Entity();
 		myCircleEntity->myPosition = { 400.f, 400.f };
-		myCircleEntity->mySprite = new Slush::CircleSprite();
-		myCircleEntity->mySprite->SetFillColor(0xFFFF0000);
-		myCircleEntity->mySprite->SetOutlineColor(0xFF440000);
-		myCircleEntity->mySprite->SetOutlineThickness(1.f);
-
-		myCircleEntity->myAnimation = new Slush::Animation(*myCircleEntity->mySprite);
-		myCircleEntity->myAnimation->myScaleTrack
-			.Linear(0.1f, 1.f, 0.1f)
-			.Wait(0.1f)
-			.Linear(0.2f, 0.1f, 1.f);
-		myCircleEntity->myAnimation->myPositionTrack
-			.Wait(0.2f)
-			.Linear(0.15f, 0.f, 1.f);
-		myCircleEntity->myAnimation->MakeOneShot();
-
-		myCircleEntity->myAnimationRuntime.myStartPosition = myCircleEntity->myPosition;
-		myCircleEntity->myAnimationRuntime.myEndPosition = myCircleEntity->myPosition + Vector2f(200.f, 0.f);
-		myCircleEntity->myAnimationRuntime.myCurrentPosition = myCircleEntity->myPosition;
 
 		myRect = new Slush::RectSprite();
 		myRect->SetFillColor(0xFF00FF00);
@@ -69,7 +51,7 @@ public:
 			.Linear(0.4f, -1.f, -10.f)
 			.Wait(0.2f)
 			.Linear(0.4f, -10.f, -1.f);
-		myRectRuntime.Restart();
+		myRectRuntime.Start();
 
 		myRectPosition = { 700.f, 400.f };
 
@@ -92,14 +74,6 @@ public:
 		myRectAnimation->Update(myRectRuntime);
 
 		myCircleEntity->Update();
-
-		Slush::Engine& engine = Slush::Engine::GetInstance();
-		if (engine.GetInput().IsMouseDown(Slush::Input::LEFTMB))
-		{
-			myCircleEntity->myAnimationRuntime.myStartPosition = myCircleEntity->myAnimationRuntime.myCurrentPosition;
-			myCircleEntity->myAnimationRuntime.myEndPosition = engine.GetInput().GetMousePositionf();
-			myCircleEntity->myAnimationRuntime.Restart();
-		}
 	}
 
 	void Render() override

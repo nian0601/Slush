@@ -7,6 +7,7 @@
 #include <Core\Input.h>
 #include <Core\Time.h>
 #include <Graphics\CircleSprite.h>
+#include "ProjectileManager.h"
 
 Entity::Entity()
 {
@@ -33,7 +34,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myAnimation);
 }
 
-void Entity::Update()
+void Entity::Update(ProjectileManager& aProjectileManager)
 {
 	if (myAnimationRuntime.myState != Slush::AnimationRuntime::Running)
 	{
@@ -61,6 +62,11 @@ void Entity::Update()
 		else
 		{
 			myPosition += myDirection * mySpeed * Slush::Time::GetDelta();
+		}
+
+		if (input.WasKeyPressed(Slush::Input::V))
+		{
+			aProjectileManager.AddProjectile(myPosition, myDirection);
 		}
 	}
 

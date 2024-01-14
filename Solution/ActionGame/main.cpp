@@ -22,6 +22,7 @@
 #include "Graphics/Animation/Animation.h"
 
 #include "Entity.h"
+#include "ProjectileManager.h"
 
 class App : public Slush::IApp
 {
@@ -37,8 +38,8 @@ public:
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
-		myCircleEntity = new Entity();
-		myCircleEntity->myPosition = { 400.f, 400.f };
+		myPlayer = new Entity();
+		myPlayer->myPosition = { 400.f, 400.f };
 
 		myRect = new Slush::RectSprite();
 		myRect->SetFillColor(0xFF00FF00);
@@ -66,14 +67,15 @@ public:
 		FW_SAFE_DELETE(myRectAnimation);
 		FW_SAFE_DELETE(myRect);
 
-		FW_SAFE_DELETE(myCircleEntity);
+		FW_SAFE_DELETE(myPlayer);
 	}
 
 	void Update() override
 	{
 		myRectAnimation->Update(myRectRuntime);
 
-		myCircleEntity->Update();
+		myPlayer->Update(myProjectileManager);
+		myProjectileManager.Update();
 	}
 
 	void Render() override
@@ -81,8 +83,9 @@ public:
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		engine.GetWindow().StartOffscreenBuffer();
 
-		myCircleEntity->Render();
+		myPlayer->Render();
 		myRect->Render(myRectPosition.x, myRectPosition.y);
+		myProjectileManager.Render();
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
@@ -96,7 +99,9 @@ private:
 	Slush::AnimationRuntime myRectRuntime;
 	Vector2f myRectPosition;
 
-	Entity* myCircleEntity;
+	Entity* myPlayer;
+
+	ProjectileManager myProjectileManager;
 };
 
 #include <FW_UnitTestSuite.h>

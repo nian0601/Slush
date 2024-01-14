@@ -3,8 +3,10 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="ProjectileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="ProjectileManager.h" />
   </ItemGroup>
 </Project>

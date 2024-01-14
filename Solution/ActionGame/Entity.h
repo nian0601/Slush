@@ -9,13 +9,15 @@ namespace Slush
 	class Animation;
 }
 
+class ProjectileManager;
+
 class Entity
 {
 public:
 	Entity();
 	~Entity();
 
-	void Update();
+	void Update(ProjectileManager& aProjectileManager);
 	void Render();
 
 	Slush::BaseSprite* mySprite = nullptr;

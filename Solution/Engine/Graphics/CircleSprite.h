@@ -8,6 +8,7 @@ namespace Slush
 	{
 	public:
 		CircleSprite();
+		CircleSprite(float aRadius);
 
 		void SetRadius(float aRadius);
 		float GetRadius() const { return myRadius; }

@@ -1,5 +1,6 @@
 #pragma once
 #include <FW_GrowingArray.h>
+#include <float.h>
 
 namespace Slush
 {
@@ -74,12 +75,11 @@ namespace Slush
 	};
 
 	//////////////////////////////////////////////////////////////////////////
+
 	class Animation
 	{
 	public:
-		Animation(BaseSprite& aSprite);
-
-		void Update(AnimationRuntime& aRuntimeData);
+		void Update(AnimationRuntime& aRuntimeData, BaseSprite& aSprite);
 
 		void MakeOneShot() { myIsLooping = false; }
 
@@ -88,10 +88,8 @@ namespace Slush
 		AnimationTrack myPositionTrack;
 
 	private:
-		void ApplyAnimation(AnimationRuntime& aRuntimeData);
+		void ApplyAnimation(AnimationRuntime& aRuntimeData, BaseSprite& aSprite);
 
 		bool myIsLooping = true;
-
-		BaseSprite& mySprite;
 	};
 }

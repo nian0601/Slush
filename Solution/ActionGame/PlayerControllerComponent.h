@@ -1,0 +1,17 @@
+#pragma once
+
+#include "Component.h"
+
+#include <FW_Vector2.h>
+
+class PlayerControllerComponent : public Component
+{
+public:
+	using Component::Component;
+
+	void Update();
+
+private:
+	Vector2f myDirection;
+	float mySpeed = 400.f;
+};

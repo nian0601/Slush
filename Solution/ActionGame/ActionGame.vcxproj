@@ -134,13 +134,24 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimationComponent.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NPCControllerComponent.cpp" />
+    <ClCompile Include="PlayerControllerComponent.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
+    <ClCompile Include="ProjectileShootingComponent.cpp" />
+    <ClCompile Include="SpriteComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimationComponent.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="NPCControllerComponent.h" />
+    <ClInclude Include="PlayerControllerComponent.h" />
     <ClInclude Include="ProjectileManager.h" />
+    <ClInclude Include="ProjectileShootingComponent.h" />
+    <ClInclude Include="SpriteComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

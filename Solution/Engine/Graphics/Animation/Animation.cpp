@@ -114,12 +114,7 @@ namespace Slush
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	Animation::Animation(BaseSprite& aSprite)
-		: mySprite(aSprite)
-	{
-	}
-
-	void Animation::Update(AnimationRuntime& aRuntimeData)
+	void Animation::Update(AnimationRuntime& aRuntimeData, BaseSprite& aSprite)
 	{
 		if (aRuntimeData.myState != AnimationClip::Running)
 			return;
@@ -134,19 +129,19 @@ namespace Slush
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
 
-		ApplyAnimation(aRuntimeData);
+		ApplyAnimation(aRuntimeData, aSprite);
 
 		if (aRuntimeData.myState == AnimationRuntime::Finished && myIsLooping)
 			aRuntimeData.Start();
 	}
 
-	void Animation::ApplyAnimation(AnimationRuntime& aRuntimeData)
+	void Animation::ApplyAnimation(AnimationRuntime& aRuntimeData, BaseSprite& aSprite)
 	{
 		if (aRuntimeData.myOutlineData.myIsActive)
-			mySprite.SetOutlineThickness(aRuntimeData.myOutlineData.myValue);
+			aSprite.SetOutlineThickness(aRuntimeData.myOutlineData.myValue);
 
 		if (aRuntimeData.myScaleData.myIsActive)
-			mySprite.SetScale(aRuntimeData.myScaleData.myValue);
+			aSprite.SetScale(aRuntimeData.myScaleData.myValue);
 
 		if (aRuntimeData.myPositionData.myIsActive)
 			aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, aRuntimeData.myPositionData.myValue);

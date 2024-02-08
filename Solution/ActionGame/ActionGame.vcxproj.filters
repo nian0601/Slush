@@ -4,9 +4,47 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
+    <ClCompile Include="SpriteComponent.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationComponent.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectileShootingComponent.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerControllerComponent.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="NPCControllerComponent.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
     <ClInclude Include="ProjectileManager.h" />
+    <ClInclude Include="SpriteComponent.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationComponent.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectileShootingComponent.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerControllerComponent.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="NPCControllerComponent.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{a0341475-0741-4fb2-bfe3-6dee0e2b977e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

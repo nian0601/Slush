@@ -1,5 +1,6 @@
 #pragma once
 #include "FW_Vector2.h"
+#include "FW_Rect.h"
 
 namespace sf
 {

@@ -23,6 +23,11 @@
 
 #include "Entity.h"
 #include "ProjectileManager.h"
+#include "SpriteComponent.h"
+#include "AnimationComponent.h"
+#include "ProjectileShootingComponent.h"
+#include "PlayerControllerComponent.h"
+#include "NPCControllerComponent.h"
 
 class App : public Slush::IApp
 {
@@ -38,11 +43,23 @@ public:
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
-		myPlayer = new Entity(true);
+		myPlayer = new Entity();
 		myPlayer->myPosition = { 400.f, 400.f };
+		myPlayer->mySpriteComponent = new SpriteComponent(*myPlayer);
+		myPlayer->mySpriteComponent->MakeCircle(20.f, 0xFFFF0000);
+		myPlayer->myAnimationComponent = new AnimationComponent(*myPlayer);
+		myPlayer->myProjectileShootingComponent = new ProjectileShootingComponent(*myPlayer, myProjectileManager);
+		myPlayer->myProjectileShootingComponent->SetCooldown(0.1f);
+		myPlayer->myPlayerControllerComponent = new PlayerControllerComponent(*myPlayer);
 
-		myEnemy = new Entity(false);
+		myEnemy = new Entity();
 		myEnemy->myPosition = { 1200.f, 800.f };
+		myEnemy->mySpriteComponent = new SpriteComponent(*myEnemy);
+		myEnemy->mySpriteComponent->MakeCircle(20.f, 0xFF0000FF);
+		myEnemy->myProjectileShootingComponent = new ProjectileShootingComponent(*myEnemy, myProjectileManager);
+		myEnemy->myProjectileShootingComponent->SetCooldown(1.f);
+		myEnemy->myNPCControllerComponent = new NPCControllerComponent(*myEnemy);
+		myEnemy->myNPCControllerComponent->SetTarget(*myPlayer);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
@@ -58,8 +75,8 @@ public:
 
 	void Update() override
 	{
-		myPlayer->UpdateAsPlayer(myProjectileManager);
-		myEnemy->UpdateAsEnemy(*myPlayer, myProjectileManager);
+		myPlayer->Update();
+		myEnemy->Update();
 		myProjectileManager.Update();
 	}
 

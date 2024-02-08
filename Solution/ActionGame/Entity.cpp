@@ -9,23 +9,35 @@
 #include <Graphics\CircleSprite.h>
 #include "ProjectileManager.h"
 
-Entity::Entity()
+Entity::Entity(bool aIsPlayer)
+	: myIsPlayer(aIsPlayer)
 {
-	mySpeed = 200.f;
 	mySprite = new Slush::CircleSprite();
-	mySprite->SetFillColor(0xFFFF0000);
-	mySprite->SetOutlineColor(0xFF440000);
-	mySprite->SetOutlineThickness(1.f);
 
-	myAnimation = new Slush::Animation(*mySprite);
-	myAnimation->MakeOneShot();
-	myAnimation->myScaleTrack
-		.Linear(0.1f, 1.f, 0.2f)
-		.Wait(0.1f)
-		.Linear(0.1f, 0.2f, 1.f);
-	myAnimation->myPositionTrack
-		.Wait(0.1f)
-		.Linear(0.25f, 0.f, 1.f);
+	if (myIsPlayer)
+	{
+		mySprite->SetFillColor(0xFFFF0000);
+		mySprite->SetOutlineColor(0xFF440000);
+		mySprite->SetOutlineThickness(1.f);
+
+		myAnimation = new Slush::Animation(*mySprite);
+		myAnimation->MakeOneShot();
+		myAnimation->myScaleTrack
+			.Linear(0.1f, 1.f, 0.2f)
+			.Wait(0.1f)
+			.Linear(0.1f, 0.2f, 1.f);
+		myAnimation->myPositionTrack
+			.Wait(0.1f)
+			.Linear(0.25f, 0.f, 1.f);
+	}
+	else
+	{
+		mySprite->SetFillColor(0xFF0000FF);
+		mySprite->SetOutlineColor(0xFF440000);
+		mySprite->SetOutlineThickness(1.f);
+
+		myShootingCooldown = Slush::Time::ConvertGameTimeToTimeUnit(1.f);
+	}
 }
 
 Entity::~Entity()
@@ -34,7 +46,15 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myAnimation);
 }
 
-void Entity::Update(ProjectileManager& aProjectileManager)
+void Entity::UpdateAsEnemy(Entity& aPlayerEntity, ProjectileManager& aProjectileManager)
+{
+	Vector2f toPlayer = aPlayerEntity.myPosition - myPosition;
+	float distance = Length(toPlayer);
+	if (distance < 800.f)
+		TryShoot(GetNormalized(toPlayer), aProjectileManager);
+}
+
+void Entity::UpdateAsPlayer(ProjectileManager& aProjectileManager)
 {
 	if (myAnimationRuntime.myState != Slush::AnimationRuntime::Running)
 	{
@@ -64,9 +84,12 @@ void Entity::Update(ProjectileManager& aProjectileManager)
 			myPosition += myDirection * mySpeed * Slush::Time::GetDelta();
 		}
 
-		if (input.WasKeyPressed(Slush::Input::V))
+		
+		if (input.WasMousePressed(Slush::Input::LEFTMB))
 		{
-			aProjectileManager.AddProjectile(myPosition, myDirection);
+			Vector2f toCursor = input.GetMousePositionf() - myPosition;
+			TryShoot(GetNormalized(toCursor), aProjectileManager);
+			//TryShoot(myDirection, aProjectileManager);
 		}
 	}
 
@@ -78,4 +101,13 @@ void Entity::Update(ProjectileManager& aProjectileManager)
 void Entity::Render()
 {
 	mySprite->Render(myPosition.x, myPosition.y);
+}
+
+void Entity::TryShoot(const Vector2f& aDirection, ProjectileManager& aProjectileManager)
+{
+	if (Slush::Time::GetCurrentExactTime() < myShootingReadyTimestamp)
+		return;
+
+	myShootingReadyTimestamp = Slush::Time::GetCurrentExactTime() + myShootingCooldown;
+	aProjectileManager.AddProjectile(myPosition, aDirection);
 }

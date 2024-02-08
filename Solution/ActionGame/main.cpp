@@ -38,23 +38,11 @@ public:
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
-		myPlayer = new Entity();
+		myPlayer = new Entity(true);
 		myPlayer->myPosition = { 400.f, 400.f };
 
-		myRect = new Slush::RectSprite();
-		myRect->SetFillColor(0xFF00FF00);
-		myRect->SetOutlineColor(0xFF004400);
-		myRect->SetOutlineThickness(1.f);
-
-		myRectAnimation = new Slush::Animation(*myRect);
-		myRectAnimation->myOutlineTrack
-			.Wait(0.2f)
-			.Linear(0.4f, -1.f, -10.f)
-			.Wait(0.2f)
-			.Linear(0.4f, -10.f, -1.f);
-		myRectRuntime.Start();
-
-		myRectPosition = { 700.f, 400.f };
+		myEnemy = new Entity(false);
+		myEnemy->myPosition = { 1200.f, 800.f };
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
@@ -64,17 +52,14 @@ public:
 
 	void Shutdown() override
 	{
-		FW_SAFE_DELETE(myRectAnimation);
-		FW_SAFE_DELETE(myRect);
-
 		FW_SAFE_DELETE(myPlayer);
+		FW_SAFE_DELETE(myEnemy);
 	}
 
 	void Update() override
 	{
-		myRectAnimation->Update(myRectRuntime);
-
-		myPlayer->Update(myProjectileManager);
+		myPlayer->UpdateAsPlayer(myProjectileManager);
+		myEnemy->UpdateAsEnemy(*myPlayer, myProjectileManager);
 		myProjectileManager.Update();
 	}
 
@@ -84,7 +69,7 @@ public:
 		engine.GetWindow().StartOffscreenBuffer();
 
 		myPlayer->Render();
-		myRect->Render(myRectPosition.x, myRectPosition.y);
+		myEnemy->Render();
 		myProjectileManager.Render();
 
 		engine.GetWindow().EndOffscreenBuffer();
@@ -94,12 +79,8 @@ private:
 	Slush::Font myFont;
 	Slush::AssetStorage<Slush::Texture> myTextures;
 
-	Slush::RectSprite* myRect;
-	Slush::Animation* myRectAnimation;
-	Slush::AnimationRuntime myRectRuntime;
-	Vector2f myRectPosition;
-
 	Entity* myPlayer;
+	Entity* myEnemy;
 
 	ProjectileManager myProjectileManager;
 };

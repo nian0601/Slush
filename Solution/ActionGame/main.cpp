@@ -28,6 +28,7 @@
 #include "ProjectileShootingComponent.h"
 #include "PlayerControllerComponent.h"
 #include "NPCControllerComponent.h"
+#include "CollisionComponent.h"
 
 class App : public Slush::IApp
 {
@@ -44,6 +45,7 @@ public:
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
 		myPlayer = new Entity();
+		myPlayer->myType = Entity::PLAYER;
 		myPlayer->myPosition = { 400.f, 400.f };
 		myPlayer->mySpriteComponent = new SpriteComponent(*myPlayer);
 		myPlayer->mySpriteComponent->MakeCircle(20.f, 0xFFFF0000);
@@ -51,8 +53,11 @@ public:
 		myPlayer->myProjectileShootingComponent = new ProjectileShootingComponent(*myPlayer, myProjectileManager);
 		myPlayer->myProjectileShootingComponent->SetCooldown(0.1f);
 		myPlayer->myPlayerControllerComponent = new PlayerControllerComponent(*myPlayer);
+		myPlayer->myCollisionComponent = new CollisionComponent(*myPlayer);
+		myPlayer->myCollisionComponent->SetSize(20.f);
 
 		myEnemy = new Entity();
+		myEnemy->myType = Entity::NPC;
 		myEnemy->myPosition = { 1200.f, 800.f };
 		myEnemy->mySpriteComponent = new SpriteComponent(*myEnemy);
 		myEnemy->mySpriteComponent->MakeCircle(20.f, 0xFF0000FF);
@@ -60,6 +65,8 @@ public:
 		myEnemy->myProjectileShootingComponent->SetCooldown(1.f);
 		myEnemy->myNPCControllerComponent = new NPCControllerComponent(*myEnemy);
 		myEnemy->myNPCControllerComponent->SetTarget(*myPlayer);
+		myEnemy->myCollisionComponent = new CollisionComponent(*myEnemy);
+		myEnemy->myCollisionComponent->SetSize(20.f);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
@@ -78,6 +85,8 @@ public:
 		myPlayer->Update();
 		myEnemy->Update();
 		myProjectileManager.Update();
+		myProjectileManager.CheckCollisionsWithEntity(*myPlayer);
+		myProjectileManager.CheckCollisionsWithEntity(*myEnemy);
 	}
 
 	void Render() override

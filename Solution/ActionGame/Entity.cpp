@@ -15,6 +15,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myProjectileShootingComponent);
 	FW_SAFE_DELETE(myPlayerControllerComponent);
 	FW_SAFE_DELETE(myNPCControllerComponent);
+	FW_SAFE_DELETE(myCollisionComponent);
 }
 
 void Entity::Update()

@@ -7,10 +7,17 @@ class AnimationComponent;
 class ProjectileShootingComponent;
 class PlayerControllerComponent;
 class NPCControllerComponent;
+class CollisionComponent;
 
 class Entity
 {
 public:
+	enum Type
+	{
+		PLAYER,
+		NPC,
+	};
+
 	~Entity();
 
 	void Update();
@@ -21,6 +28,8 @@ public:
 	ProjectileShootingComponent* myProjectileShootingComponent = nullptr;
 	PlayerControllerComponent* myPlayerControllerComponent = nullptr;
 	NPCControllerComponent* myNPCControllerComponent = nullptr;
+	CollisionComponent* myCollisionComponent = nullptr;
 
 	Vector2f myPosition;
+	Type myType;
 };

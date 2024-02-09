@@ -19,6 +19,9 @@
     <ClCompile Include="NPCControllerComponent.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="CollisionComponent.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
@@ -39,6 +42,9 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="NPCControllerComponent.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionComponent.h">
       <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>

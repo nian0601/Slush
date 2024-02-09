@@ -14,7 +14,7 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 		return;
 
 	myShootingReadyTimestamp = Slush::Time::GetCurrentExactTime() + myShootingCooldown;
-	myProjectileManager.AddProjectile(myEntity.myPosition, aDirection);
+	myProjectileManager.AddProjectile(myEntity.myPosition, aDirection, myEntity.myType);
 }
 
 void ProjectileShootingComponent::SetCooldown(float aCooldownInSeconds)

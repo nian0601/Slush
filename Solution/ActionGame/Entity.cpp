@@ -7,6 +7,8 @@
 #include "ProjectileShootingComponent.h"
 #include "PlayerControllerComponent.h"
 #include "NPCControllerComponent.h"
+#include "CollisionComponent.h"
+#include "HealthComponent.h"
 
 Entity::~Entity()
 {
@@ -16,6 +18,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myPlayerControllerComponent);
 	FW_SAFE_DELETE(myNPCControllerComponent);
 	FW_SAFE_DELETE(myCollisionComponent);
+	FW_SAFE_DELETE(myHealthComponent);
 }
 
 void Entity::Update()
@@ -34,4 +37,7 @@ void Entity::Render()
 {
 	if (mySpriteComponent)
 		mySpriteComponent->Render();
+
+	if (myHealthComponent)
+		myHealthComponent->Render();
 }

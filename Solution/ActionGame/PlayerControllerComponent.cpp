@@ -6,6 +6,7 @@
 
 #include <Core\Engine.h>
 #include <Core\Input.h>
+#include "HealthComponent.h"
 
 void PlayerControllerComponent::Update()
 {

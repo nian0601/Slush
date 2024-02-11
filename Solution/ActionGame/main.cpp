@@ -29,6 +29,7 @@
 #include "PlayerControllerComponent.h"
 #include "NPCControllerComponent.h"
 #include "CollisionComponent.h"
+#include "HealthComponent.h"
 
 class App : public Slush::IApp
 {
@@ -55,6 +56,8 @@ public:
 		myPlayer->myPlayerControllerComponent = new PlayerControllerComponent(*myPlayer);
 		myPlayer->myCollisionComponent = new CollisionComponent(*myPlayer);
 		myPlayer->myCollisionComponent->SetSize(20.f);
+		myPlayer->myHealthComponent = new HealthComponent(*myPlayer);
+		myPlayer->myHealthComponent->SetMaxHealth(3);
 
 		myEnemy = new Entity();
 		myEnemy->myType = Entity::NPC;
@@ -87,6 +90,15 @@ public:
 		myProjectileManager.Update();
 		myProjectileManager.CheckCollisionsWithEntity(*myPlayer);
 		myProjectileManager.CheckCollisionsWithEntity(*myEnemy);
+
+		if (HealthComponent* health = myPlayer->myHealthComponent)
+		{
+			if (health->IsDead())
+			{
+				health->SetMaxHealth(3);
+				myPlayer->myPosition = { 400.f, 400.f };
+			}
+		}
 	}
 
 	void Render() override

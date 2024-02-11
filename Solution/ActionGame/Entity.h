@@ -8,6 +8,7 @@ class ProjectileShootingComponent;
 class PlayerControllerComponent;
 class NPCControllerComponent;
 class CollisionComponent;
+class HealthComponent;
 
 class Entity
 {
@@ -29,6 +30,7 @@ public:
 	PlayerControllerComponent* myPlayerControllerComponent = nullptr;
 	NPCControllerComponent* myNPCControllerComponent = nullptr;
 	CollisionComponent* myCollisionComponent = nullptr;
+	HealthComponent* myHealthComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType;

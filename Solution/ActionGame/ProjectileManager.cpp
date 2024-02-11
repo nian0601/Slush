@@ -3,6 +3,7 @@
 #include <Graphics\CircleSprite.h>
 #include <FW_Includes.h>
 #include "CollisionComponent.h"
+#include "HealthComponent.h"
 
 ProjectileManager::~ProjectileManager()
 {
@@ -65,6 +66,10 @@ void ProjectileManager::CheckCollisionsWithEntity(Entity& anEntity)
 		if (collision)
 		{
 			myProjectiles.DeleteCyclicAtIndex(i);
+
+			if (HealthComponent* health = anEntity.myHealthComponent)
+				health->DealDamage(1);
+				
 		}
 		else
 		{

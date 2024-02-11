@@ -31,6 +31,8 @@
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 
+#include "NPCWave.h"
+
 class App : public Slush::IApp
 {
 
@@ -59,17 +61,7 @@ public:
 		myPlayer->myHealthComponent = new HealthComponent(*myPlayer);
 		myPlayer->myHealthComponent->SetMaxHealth(3);
 
-		myEnemy = new Entity();
-		myEnemy->myType = Entity::NPC;
-		myEnemy->myPosition = { 1200.f, 800.f };
-		myEnemy->mySpriteComponent = new SpriteComponent(*myEnemy);
-		myEnemy->mySpriteComponent->MakeCircle(20.f, 0xFF0000FF);
-		myEnemy->myProjectileShootingComponent = new ProjectileShootingComponent(*myEnemy, myProjectileManager);
-		myEnemy->myProjectileShootingComponent->SetCooldown(1.f);
-		myEnemy->myNPCControllerComponent = new NPCControllerComponent(*myEnemy);
-		myEnemy->myNPCControllerComponent->SetTarget(*myPlayer);
-		myEnemy->myCollisionComponent = new CollisionComponent(*myEnemy);
-		myEnemy->myCollisionComponent->SetSize(20.f);
+		myNPCWave = new NPCWave(*myPlayer, myProjectileManager);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
@@ -80,16 +72,15 @@ public:
 	void Shutdown() override
 	{
 		FW_SAFE_DELETE(myPlayer);
-		FW_SAFE_DELETE(myEnemy);
+		FW_SAFE_DELETE(myNPCWave);
 	}
 
 	void Update() override
 	{
 		myPlayer->Update();
-		myEnemy->Update();
+		myNPCWave->Update();
 		myProjectileManager.Update();
 		myProjectileManager.CheckCollisionsWithEntity(*myPlayer);
-		myProjectileManager.CheckCollisionsWithEntity(*myEnemy);
 
 		if (HealthComponent* health = myPlayer->myHealthComponent)
 		{
@@ -107,7 +98,7 @@ public:
 		engine.GetWindow().StartOffscreenBuffer();
 
 		myPlayer->Render();
-		myEnemy->Render();
+		myNPCWave->Render();
 		myProjectileManager.Render();
 
 		engine.GetWindow().EndOffscreenBuffer();
@@ -118,7 +109,8 @@ private:
 	Slush::AssetStorage<Slush::Texture> myTextures;
 
 	Entity* myPlayer;
-	Entity* myEnemy;
+
+	NPCWave* myNPCWave;
 
 	ProjectileManager myProjectileManager;
 };

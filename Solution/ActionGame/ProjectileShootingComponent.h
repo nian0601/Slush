@@ -13,6 +13,7 @@ public:
 
 	void TryShoot(const Vector2f& aDirection);
 	void SetCooldown(float aCooldownInSeconds);
+	void TriggerCooldown();
 
 private:
 	Slush::Time::TimeUnit myShootingReadyTimestamp = 0;

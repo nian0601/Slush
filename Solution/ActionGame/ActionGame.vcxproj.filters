@@ -25,6 +25,7 @@
     <ClCompile Include="HealthComponent.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="NPCWave.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
@@ -53,6 +54,7 @@
     <ClInclude Include="HealthComponent.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="NPCWave.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

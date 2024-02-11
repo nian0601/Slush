@@ -140,6 +140,7 @@
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NPCControllerComponent.cpp" />
+    <ClCompile Include="NPCWave.cpp" />
     <ClCompile Include="PlayerControllerComponent.cpp" />
     <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="ProjectileShootingComponent.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="NPCControllerComponent.h" />
+    <ClInclude Include="NPCWave.h" />
     <ClInclude Include="PlayerControllerComponent.h" />
     <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="ProjectileShootingComponent.h" />

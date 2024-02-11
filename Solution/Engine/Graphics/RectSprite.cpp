@@ -23,6 +23,19 @@ namespace Slush
 	void RectSprite::SetSize(float aWidth, float aHeight)
 	{
 		mySize = { aWidth, aHeight };
-		static_cast<sf::RectangleShape*>(myShape)->setSize({ aWidth, aHeight });
+		static_cast<sf::RectangleShape*>(myShape)->setSize({ mySize.x, mySize.y });
 	}
+
+	void RectSprite::SetWidth(float aWidth)
+	{
+		mySize.x = aWidth;
+		static_cast<sf::RectangleShape*>(myShape)->setSize({ mySize.x, mySize.y });
+	}
+
+	void RectSprite::SetHeight(float aHeight)
+	{
+		mySize.y = aHeight;
+		static_cast<sf::RectangleShape*>(myShape)->setSize({ mySize.x, mySize.y });
+	}
+
 }

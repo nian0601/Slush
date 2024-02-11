@@ -10,6 +10,8 @@ namespace Slush
 		RectSprite();
 
 		void SetSize(float aWidth, float aHeight);
+		void SetWidth(float aWidth);
+		void SetHeight(float aHeight);
 		const Vector2f& GetSize() const { return mySize; }
 		
 	private:

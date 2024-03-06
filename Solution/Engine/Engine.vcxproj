@@ -163,6 +163,8 @@
     <ClInclude Include="Core\Input.h" />
     <ClInclude Include="Graphics\BaseSprite.h" />
     <ClInclude Include="Graphics\SFMLHelpers.h" />
+    <ClInclude Include="Physics\PhysicsShapes.h" />
+    <ClInclude Include="Physics\PhysicsWorld.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Graphics\Window.h" />
@@ -208,6 +210,8 @@
     <ClCompile Include="Core\Input.cpp" />
     <ClCompile Include="Graphics\BaseSprite.cpp" />
     <ClCompile Include="Graphics\SFMLHelpers.cpp" />
+    <ClCompile Include="Physics\PhysicsShapes.cpp" />
+    <ClCompile Include="Physics\PhysicsWorld.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

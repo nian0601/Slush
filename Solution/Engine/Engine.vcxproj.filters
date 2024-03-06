@@ -50,6 +50,8 @@
     <ClInclude Include="Graphics\CircleSprite.h" />
     <ClInclude Include="Graphics\Animation\Animation.h" />
     <ClInclude Include="Graphics\Animation\AnimationRuntime.h" />
+    <ClInclude Include="Physics\PhysicsShapes.h" />
+    <ClInclude Include="Physics\PhysicsWorld.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -93,6 +95,8 @@
     <ClCompile Include="Graphics\CircleSprite.cpp" />
     <ClCompile Include="Graphics\Animation\Animation.cpp" />
     <ClCompile Include="Graphics\Animation\AnimationRuntime.cpp" />
+    <ClCompile Include="Physics\PhysicsShapes.cpp" />
+    <ClCompile Include="Physics\PhysicsWorld.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

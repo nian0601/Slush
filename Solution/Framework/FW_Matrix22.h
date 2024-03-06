@@ -2,6 +2,8 @@
 
 #include "FW_Vector2.h"
 
+#pragma warning (push)
+#pragma warning (disable:4201) //warning C4201: nonstandard extension used: nameless struct/union
 struct FW_Matrix22
 {
 	union
@@ -69,3 +71,4 @@ struct FW_Matrix22
 		);
 	}
 };
+#pragma warning (pop)

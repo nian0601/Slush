@@ -11,6 +11,7 @@ public:
 	NPCWave(Entity& aPlayerEntity, ProjectileManager& aProjectileManager);
 	~NPCWave();
 
+	void PrePhysicsUpdate();
 	void Update();
 	void Render();
 

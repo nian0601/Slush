@@ -20,6 +20,12 @@ NPCWave::~NPCWave()
 	myNPCs.DeleteAll();
 }
 
+void NPCWave::PrePhysicsUpdate()
+{
+	for (int i = 0; i < myNPCs.Count(); ++i)
+		myNPCs[i]->PrePhysicsUpdate();
+}
+
 void NPCWave::Update()
 {
 	for (int i = 0; i < myNPCs.Count();)

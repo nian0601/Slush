@@ -9,6 +9,7 @@ class PlayerControllerComponent;
 class NPCControllerComponent;
 class CollisionComponent;
 class HealthComponent;
+class PhysicsComponent;
 
 class Entity
 {
@@ -21,6 +22,7 @@ public:
 
 	~Entity();
 
+	void PrePhysicsUpdate();
 	void Update();
 	void Render();
 
@@ -31,6 +33,7 @@ public:
 	NPCControllerComponent* myNPCControllerComponent = nullptr;
 	CollisionComponent* myCollisionComponent = nullptr;
 	HealthComponent* myHealthComponent = nullptr;
+	PhysicsComponent* myPhysicsComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType;

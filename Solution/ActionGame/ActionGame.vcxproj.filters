@@ -26,6 +26,9 @@
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="NPCWave.cpp" />
+    <ClCompile Include="PhysicsComponent.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entity.h" />
@@ -55,6 +58,9 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="NPCWave.h" />
+    <ClInclude Include="PhysicsComponent.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

@@ -7,6 +7,8 @@
 #include <Core\Engine.h>
 #include <Core\Input.h>
 #include "HealthComponent.h"
+#include <Physics\PhysicsWorld.h>
+#include "PhysicsComponent.h"
 
 void PlayerControllerComponent::Update()
 {
@@ -27,7 +29,8 @@ void PlayerControllerComponent::Update()
 
 		Normalize(myDirection);
 
-		myEntity.myPosition += myDirection * mySpeed * Slush::Time::GetDelta();
+		if (myEntity.myPhysicsComponent)
+			myEntity.myPhysicsComponent->myObject->myVelocity = myDirection * mySpeed;
 
 		if (myEntity.myAnimationComponent && input.WasKeyPressed(Slush::Input::SPACE))
 			myEntity.myAnimationComponent->PlayDash(myEntity.myPosition + myDirection * 500.f);

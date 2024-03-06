@@ -9,6 +9,7 @@
 #include "NPCControllerComponent.h"
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
+#include "PhysicsComponent.h"
 
 Entity::~Entity()
 {
@@ -19,15 +20,22 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myNPCControllerComponent);
 	FW_SAFE_DELETE(myCollisionComponent);
 	FW_SAFE_DELETE(myHealthComponent);
+	FW_SAFE_DELETE(myPhysicsComponent);
 }
 
-void Entity::Update()
+void Entity::PrePhysicsUpdate()
 {
 	if (myNPCControllerComponent)
 		myNPCControllerComponent->Update();
 
 	if (myPlayerControllerComponent)
 		myPlayerControllerComponent->Update();
+}
+
+void Entity::Update()
+{
+	if (myPhysicsComponent)
+		myPhysicsComponent->Update();
 
 	if (myAnimationComponent)
 		myAnimationComponent->Update();

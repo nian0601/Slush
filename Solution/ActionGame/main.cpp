@@ -31,7 +31,11 @@
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
 
+#include "Physics/PhysicsWorld.h"
+#include "Physics/PhysicsShapes.h"
+
 #include "NPCWave.h"
+#include "PhysicsComponent.h"
 
 class App : public Slush::IApp
 {
@@ -60,6 +64,14 @@ public:
 		myPlayer->myCollisionComponent->SetSize(20.f);
 		myPlayer->myHealthComponent = new HealthComponent(*myPlayer);
 		myPlayer->myHealthComponent->SetMaxHealth(3);
+		myPlayer->myPhysicsComponent = new PhysicsComponent(*myPlayer);
+		Slush::PhysicsObject* phys = new Slush::PhysicsObject(new Slush::CircleShape(20.f));
+		phys->SetMass(0.1f);
+		phys->SetPosition(myPlayer->myPosition);
+		myPhysicsWorld.AddObject(phys);
+		myPlayer->myPhysicsComponent->myObject = phys;
+
+
 
 		myNPCWave = new NPCWave(*myPlayer, myProjectileManager);
 
@@ -67,16 +79,30 @@ public:
 		window.AddDockable(new Slush::GameViewDockable());
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
+
+		Vector2f rectSize = { 1000.f, 100.f };
+		myStaticShape = new Slush::RectSprite();
+		myStaticShape->SetSize(rectSize.x, rectSize.y);
+		myStaticObject = new Slush::PhysicsObject(new Slush::AABBShape(rectSize));
+		myPhysicsWorld.AddObject(myStaticObject);
+		myStaticObject->MakeStatic();
+		myStaticObject->SetPosition({ 500.f, 800.f });
 	}
 
 	void Shutdown() override
 	{
 		FW_SAFE_DELETE(myPlayer);
 		FW_SAFE_DELETE(myNPCWave);
+		FW_SAFE_DELETE(myStaticShape);
 	}
 
 	void Update() override
 	{
+		myPlayer->PrePhysicsUpdate();
+		myNPCWave->PrePhysicsUpdate();
+
+		myPhysicsWorld.TickLimited(Slush::Time::GetDelta());
+
 		myPlayer->Update();
 		myNPCWave->Update();
 		myProjectileManager.Update();
@@ -88,6 +114,8 @@ public:
 			{
 				health->SetMaxHealth(3);
 				myPlayer->myPosition = { 400.f, 400.f };
+				if (myPlayer->myPhysicsComponent)
+					myPlayer->myPhysicsComponent->myObject->SetPosition(myPlayer->myPosition);
 			}
 		}
 	}
@@ -101,6 +129,8 @@ public:
 		myNPCWave->Render();
 		myProjectileManager.Render();
 
+		myStaticShape->Render(myStaticObject->myPosition.x - 500.f, myStaticObject->myPosition.y - 50.f);
+
 		engine.GetWindow().EndOffscreenBuffer();
 	}
 
@@ -113,6 +143,10 @@ private:
 	NPCWave* myNPCWave;
 
 	ProjectileManager myProjectileManager;
+
+	Slush::PhysicsWorld myPhysicsWorld;
+	Slush::PhysicsObject* myStaticObject;
+	Slush::RectSprite* myStaticShape;
 };
 
 #include <FW_UnitTestSuite.h>

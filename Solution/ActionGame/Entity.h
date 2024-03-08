@@ -2,6 +2,8 @@
 
 #include <FW_Vector2.h>
 
+#include "EntityHandle.h"
+
 class SpriteComponent;
 class AnimationComponent;
 class ProjectileShootingComponent;
@@ -37,4 +39,6 @@ public:
 
 	Vector2f myPosition;
 	Type myType;
+	bool myIsMarkedForRemoval = false;
+	EntityHandle myHandle;
 };

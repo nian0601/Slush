@@ -22,6 +22,8 @@
 #include "Graphics/Animation/Animation.h"
 
 #include "Entity.h"
+#include "EntityManager.h"
+
 #include "ProjectileManager.h"
 #include "SpriteComponent.h"
 #include "AnimationComponent.h"
@@ -30,12 +32,12 @@
 #include "NPCControllerComponent.h"
 #include "CollisionComponent.h"
 #include "HealthComponent.h"
+#include "PhysicsComponent.h"
 
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsShapes.h"
 
 #include "NPCWave.h"
-#include "PhysicsComponent.h"
 
 class App : public Slush::IApp
 {
@@ -51,29 +53,7 @@ public:
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
-		myPlayer = new Entity();
-		myPlayer->myType = Entity::PLAYER;
-		myPlayer->myPosition = { 400.f, 400.f };
-		myPlayer->mySpriteComponent = new SpriteComponent(*myPlayer);
-		myPlayer->mySpriteComponent->MakeCircle(20.f, 0xFFFF0000);
-		myPlayer->myAnimationComponent = new AnimationComponent(*myPlayer);
-		myPlayer->myProjectileShootingComponent = new ProjectileShootingComponent(*myPlayer, myProjectileManager);
-		myPlayer->myProjectileShootingComponent->SetCooldown(0.1f);
-		myPlayer->myPlayerControllerComponent = new PlayerControllerComponent(*myPlayer);
-		myPlayer->myCollisionComponent = new CollisionComponent(*myPlayer);
-		myPlayer->myCollisionComponent->SetSize(20.f);
-		myPlayer->myHealthComponent = new HealthComponent(*myPlayer);
-		myPlayer->myHealthComponent->SetMaxHealth(3);
-		myPlayer->myPhysicsComponent = new PhysicsComponent(*myPlayer);
-		Slush::PhysicsObject* phys = new Slush::PhysicsObject(new Slush::CircleShape(20.f));
-		phys->SetMass(0.1f);
-		phys->SetPosition(myPlayer->myPosition);
-		myPhysicsWorld.AddObject(phys);
-		myPlayer->myPhysicsComponent->myObject = phys;
-
-
-
-		myNPCWave = new NPCWave(*myPlayer, myProjectileManager);
+		myNPCWave = new NPCWave(myEntityManager, myProjectileManager);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
@@ -91,33 +71,26 @@ public:
 
 	void Shutdown() override
 	{
-		FW_SAFE_DELETE(myPlayer);
 		FW_SAFE_DELETE(myNPCWave);
 		FW_SAFE_DELETE(myStaticShape);
 	}
 
 	void Update() override
 	{
-		myPlayer->PrePhysicsUpdate();
-		myNPCWave->PrePhysicsUpdate();
+		if (!myPlayer.IsValid())
+			CreatePlayer();
+
+		myEntityManager.PrePhysicsUpdate();
 
 		myPhysicsWorld.TickLimited(Slush::Time::GetDelta());
 
-		myPlayer->Update();
 		myNPCWave->Update();
-		myProjectileManager.Update();
-		myProjectileManager.CheckCollisionsWithEntity(*myPlayer);
+		myEntityManager.Update();
 
-		if (HealthComponent* health = myPlayer->myHealthComponent)
-		{
-			if (health->IsDead())
-			{
-				health->SetMaxHealth(3);
-				myPlayer->myPosition = { 400.f, 400.f };
-				if (myPlayer->myPhysicsComponent)
-					myPlayer->myPhysicsComponent->myObject->SetPosition(myPlayer->myPosition);
-			}
-		}
+		myProjectileManager.Update();
+		myProjectileManager.CheckCollisionsWithEntity(*myPlayer.Get());
+
+		myEntityManager.EndFrame();
 	}
 
 	void Render() override
@@ -125,20 +98,47 @@ public:
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		engine.GetWindow().StartOffscreenBuffer();
 
-		myPlayer->Render();
-		myNPCWave->Render();
 		myProjectileManager.Render();
+
+		myEntityManager.Render();
 
 		myStaticShape->Render(myStaticObject->myPosition.x - 500.f, myStaticObject->myPosition.y - 50.f);
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
 
+	void CreatePlayer()
+	{
+		Entity* player = myEntityManager.CreateEntity();
+		player->myType = Entity::PLAYER;
+		player->myPosition = { 400.f, 400.f };
+		player->mySpriteComponent = new SpriteComponent(*player);
+		player->mySpriteComponent->MakeCircle(20.f, 0xFFFF0000);
+		player->myAnimationComponent = new AnimationComponent(*player);
+		player->myProjectileShootingComponent = new ProjectileShootingComponent(*player, myProjectileManager);
+		player->myProjectileShootingComponent->SetCooldown(0.1f);
+		player->myPlayerControllerComponent = new PlayerControllerComponent(*player);
+		player->myCollisionComponent = new CollisionComponent(*player);
+		player->myCollisionComponent->SetSize(20.f);
+		player->myHealthComponent = new HealthComponent(*player);
+		player->myHealthComponent->SetMaxHealth(3);
+		player->myPhysicsComponent = new PhysicsComponent(*player);
+		Slush::PhysicsObject* phys = new Slush::PhysicsObject(new Slush::CircleShape(20.f));
+		phys->SetMass(0.1f);
+		phys->SetPosition(player->myPosition);
+		myPhysicsWorld.AddObject(phys);
+		player->myPhysicsComponent->myObject = phys;
+		myPlayer = player->myHandle;
+
+		myNPCWave->SetPlayerHandle(myPlayer);
+	}
+
 private:
 	Slush::Font myFont;
 	Slush::AssetStorage<Slush::Texture> myTextures;
 
-	Entity* myPlayer;
+	EntityHandle myPlayer;
+	EntityManager myEntityManager;
 
 	NPCWave* myNPCWave;
 

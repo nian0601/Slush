@@ -2,29 +2,32 @@
 #include <FW_GrowingArray.h>
 #include <FW_Vector2.h>
 
+#include "EntityHandle.h"
+
 class Entity;
+class EntityManager;
 class ProjectileManager;
 
 class NPCWave
 {
 public:
-	NPCWave(Entity& aPlayerEntity, ProjectileManager& aProjectileManager);
-	~NPCWave();
+	NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager);
 
-	void PrePhysicsUpdate();
 	void Update();
-	void Render();
 
 	void StartWave(int aNumberOfNPCs);
+	void SetPlayerHandle(const EntityHandle& aHandle);
 
 private:
 	void CreateNPC(const Vector2f& aPosition);
 	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);
 
-	Entity& myPlayerEntity;
+	EntityHandle myPlayerHandle;
 	ProjectileManager& myProjectileManager;
+	EntityManager& myEntityManager;
 
-	FW_GrowingArray<Entity*> myNPCs;
+	FW_GrowingArray<EntityHandle> myNPCs;
+
 	float myPlayerClearanceRadius = 350.f;
 	float myNPCClearanceRadius = 100.f;
 };

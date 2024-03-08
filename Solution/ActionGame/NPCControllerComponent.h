@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "EntityHandle.h"
 
 class NPCControllerComponent : public Component
 {
@@ -9,9 +10,9 @@ public:
 
 	void Update();
 
-	void SetTarget(Entity& anEntity) { myTarget = &anEntity; }
+	void SetTarget(EntityHandle& anEntity) { myTargetHandle = anEntity; }
 
 private:
-	Entity* myTarget = nullptr;
+	EntityHandle myTargetHandle;
 	float myMaxDistance = 800.f;
 };

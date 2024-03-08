@@ -8,53 +8,35 @@
 #include "ProjectileShootingComponent.h"
 #include "NPCControllerComponent.h"
 #include "CollisionComponent.h"
+#include "EntityManager.h"
 
-NPCWave::NPCWave(Entity& aPlayerEntity, ProjectileManager& aProjectileManager)
-	: myPlayerEntity(aPlayerEntity)
+NPCWave::NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager)
+	: myEntityManager(aEntityManager)
 	, myProjectileManager(aProjectileManager)
 {
-}
-
-NPCWave::~NPCWave()
-{
-	myNPCs.DeleteAll();
-}
-
-void NPCWave::PrePhysicsUpdate()
-{
-	for (int i = 0; i < myNPCs.Count(); ++i)
-		myNPCs[i]->PrePhysicsUpdate();
 }
 
 void NPCWave::Update()
 {
 	for (int i = 0; i < myNPCs.Count();)
 	{
-		myNPCs[i]->Update();
-		myProjectileManager.CheckCollisionsWithEntity(*myNPCs[i]);
-
-		if (HealthComponent* health = myNPCs[i]->myHealthComponent)
+		if (!myNPCs[i].IsValid())
 		{
-			if (health->IsDead())
-			{
-				myNPCs.DeleteCyclicAtIndex(i);
-				continue;
-			}
+			myNPCs.RemoveCyclicAtIndex(i);
 		}
+		else
+		{
+			myProjectileManager.CheckCollisionsWithEntity(*myNPCs[i].Get());
 
-		++i;
+			++i;
+			continue;
+		}
 	}
 
 	if (myNPCs.IsEmpty())
 	{
 		StartWave(FW_RandInt(2, 5));
 	}
-}
-
-void NPCWave::Render()
-{
-	for (Entity* npc : myNPCs)
-		npc->Render();
 }
 
 void NPCWave::StartWave(int aNumberOfNPCs)
@@ -65,12 +47,12 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 	while (myNPCs.Count() < aNumberOfNPCs && iterations <= iterationLimit)
 	{
 		Vector2f position = FW_RandomVector2f() * spawnArea;
-		if(IsTooClose(myPlayerEntity.myPosition, position, myPlayerClearanceRadius))
+		if(IsTooClose(myPlayerHandle.Get()->myPosition, position, myPlayerClearanceRadius))
 			continue;
 
-		for (Entity* npc : myNPCs)
+		for (const EntityHandle& npc : myNPCs)
 		{
-			if (IsTooClose(npc->myPosition, position, myNPCClearanceRadius))
+			if (IsTooClose(npc.Get()->myPosition, position, myNPCClearanceRadius))
 				continue;
 		}
 
@@ -78,9 +60,17 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 	}
 }
 
+void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
+{
+	myPlayerHandle = aHandle;
+
+	for (const EntityHandle& npc : myNPCs)
+		npc.Get()->myNPCControllerComponent->SetTarget(myPlayerHandle);
+}
+
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
-	Entity* entity = new Entity();
+	Entity* entity = myEntityManager.CreateEntity();
 	entity->myType = Entity::NPC;
 	entity->myPosition = aPosition;
 	entity->mySpriteComponent = new SpriteComponent(*entity);
@@ -89,12 +79,12 @@ void NPCWave::CreateNPC(const Vector2f& aPosition)
 	entity->myProjectileShootingComponent->SetCooldown(1.f);
 	entity->myProjectileShootingComponent->TriggerCooldown();
 	entity->myNPCControllerComponent = new NPCControllerComponent(*entity);
-	entity->myNPCControllerComponent->SetTarget(myPlayerEntity);
+	entity->myNPCControllerComponent->SetTarget(myPlayerHandle);
 	entity->myCollisionComponent = new CollisionComponent(*entity);
 	entity->myCollisionComponent->SetSize(20.f);
 	entity->myHealthComponent = new HealthComponent(*entity);
 	entity->myHealthComponent->SetMaxHealth(5);
-	myNPCs.Add(entity);
+	myNPCs.Add(entity->myHandle);
 }
 
 bool NPCWave::IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance)

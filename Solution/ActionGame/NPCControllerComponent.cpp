@@ -4,15 +4,20 @@
 #include "ProjectileShootingComponent.h"
 
 #include <FW_Assert.h>
+#include <Core\Log.h>
 
 void NPCControllerComponent::Update()
 {
-	FW_ASSERT(myTarget != nullptr, "NPCController requires a target");
+	if (!myTargetHandle.IsValid())
+	{
+		SLUSH_WARNING("NPCController is missing a target");
+		return;
+	}
 
 	if (!myEntity.myProjectileShootingComponent)
 		return;
 
-	Vector2f toTarget = myTarget->myPosition - myEntity.myPosition;
+	Vector2f toTarget = myTargetHandle.Get()->myPosition - myEntity.myPosition;
 	float distance = Length(toTarget);
 	if (distance < myMaxDistance)
 		myEntity.myProjectileShootingComponent->TryShoot(GetNormalized(toTarget));

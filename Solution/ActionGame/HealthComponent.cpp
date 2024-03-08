@@ -54,5 +54,8 @@ void HealthComponent::DealDamage(int aDamageAmount)
 	width *= percent;
 
 	myForeground->SetWidth(width);
+
+	if (IsDead())
+		myEntity.myIsMarkedForRemoval = true;
 }
 

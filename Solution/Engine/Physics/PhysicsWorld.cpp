@@ -17,6 +17,7 @@ namespace Slush
 	PhysicsObject::~PhysicsObject()
 	{
 		delete myShape;
+		myShape = nullptr;
 	}
 
 	void PhysicsObject::IntegrateForces(float aDelta)
@@ -120,7 +121,7 @@ namespace Slush
 	void PhysicsWorld::Tick()
 	{
 		Manifold tempManifold;
-		myContacts.RemoveAll();
+		
 
 		for (int i = 0; i < myObjects.Count(); ++i)
 		{
@@ -144,7 +145,7 @@ namespace Slush
 		for (PhysicsObject* object : myObjects)
 			object->IntegrateForces(myFixedDeltaTime);
 
-		const int maxNumIterations = 30;
+		const int maxNumIterations = 10;
 		for (int i = 0; i < maxNumIterations; ++i)
 		{
 			for (const Manifold& manifold : myContacts)
@@ -169,6 +170,8 @@ namespace Slush
 
 	void PhysicsWorld::TickLimited(float aDeltaTime)
 	{
+		myContacts.RemoveAll();
+
 		static float accumulator = 0.f;
 
 		accumulator += aDeltaTime;

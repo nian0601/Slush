@@ -21,6 +21,7 @@
     <ClInclude Include="FW_Vector3.h" />
     <ClInclude Include="FW_XMLParser.h" />
     <ClInclude Include="FW_UnitTestSuite.h" />
+    <ClInclude Include="FW_Any.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FW_FileParser.cpp" />

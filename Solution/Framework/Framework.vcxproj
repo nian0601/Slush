@@ -124,6 +124,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="FW_Any.h" />
     <ClInclude Include="FW_Assert.h" />
     <ClInclude Include="FW_CircularArray.h" />
     <ClInclude Include="FW_FileParser.h" />

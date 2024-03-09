@@ -24,6 +24,7 @@ namespace Slush
 	{
 		mySize = { aWidth, aHeight };
 		static_cast<sf::RectangleShape*>(myShape)->setSize({ mySize.x, mySize.y });
+		myShape->setOrigin({ mySize.x * 0.5f, mySize.y * 0.5f });
 	}
 
 	void RectSprite::SetWidth(float aWidth)

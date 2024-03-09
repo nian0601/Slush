@@ -3,6 +3,7 @@
 #include <FW_GrowingArray.h>
 #include <FW_Vector2.h>
 #include <FW_Matrix22.h>
+#include <FW_Any.h>
 
 #include "PhysicsShapes.h"
 
@@ -65,9 +66,7 @@ namespace Slush
 		float myPreviousOrientation = 0.f;
 		bool mySensorFlag = false;
 
-
-		// Replace with some more generic UserData?
-		//FW_EntityID myEntityID = InvalidEntity;
+		FW_Any myUserData;
 	};
 
 	struct Manifold

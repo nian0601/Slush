@@ -14,7 +14,7 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 		return;
 
 	TriggerCooldown();
-	myProjectileManager.AddProjectile(myEntity.myPosition, aDirection, myEntity.myType);
+	myProjectileManager.AddProjectile(myEntity.myPosition + aDirection * 25.f, aDirection, myEntity.myType);
 }
 
 void ProjectileShootingComponent::SetCooldown(float aCooldownInSeconds)

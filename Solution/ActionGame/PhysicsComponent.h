@@ -6,15 +6,21 @@
 
 namespace Slush
 {
+	class PhysicsWorld;
+
 	struct PhysicsObject;
 }
 
 class PhysicsComponent : public Component
 {
 public:
-	using Component::Component;
+	PhysicsComponent(Entity& aEntity, Slush::PhysicsWorld& aPhysicsWorld);
+	~PhysicsComponent();
 
 	void Update();
 
 	Slush::PhysicsObject* myObject;
+
+private:
+	Slush::PhysicsWorld& myPhysicsWorld;
 };

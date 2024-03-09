@@ -5,6 +5,8 @@
 
 #include <FW_Assert.h>
 #include <Core\Log.h>
+#include "PhysicsComponent.h"
+#include <Physics\PhysicsWorld.h>
 
 void NPCControllerComponent::Update()
 {
@@ -13,6 +15,9 @@ void NPCControllerComponent::Update()
 		SLUSH_WARNING("NPCController is missing a target");
 		return;
 	}
+
+	if (PhysicsComponent* phys = myEntity.myPhysicsComponent)
+		phys->myObject->myVelocity = Vector2f(0.f, 0.f);
 
 	if (!myEntity.myProjectileShootingComponent)
 		return;

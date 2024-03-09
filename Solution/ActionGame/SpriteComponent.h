@@ -14,6 +14,7 @@ public:
 	~SpriteComponent();
 
 	void MakeCircle(float aRadius, int aColor);
+	void MakeRect(float aWidth, float aHeight, int aColor);
 
 	void Render();
 

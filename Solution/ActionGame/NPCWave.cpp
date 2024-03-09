@@ -7,12 +7,14 @@
 #include "SpriteComponent.h"
 #include "ProjectileShootingComponent.h"
 #include "NPCControllerComponent.h"
-#include "CollisionComponent.h"
 #include "EntityManager.h"
+#include "PhysicsComponent.h"
+#include <Physics\PhysicsWorld.h>
 
-NPCWave::NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager)
+NPCWave::NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)
 	, myProjectileManager(aProjectileManager)
+	, myPhysicsWorld(aPhysicsWorld)
 {
 }
 
@@ -26,8 +28,6 @@ void NPCWave::Update()
 		}
 		else
 		{
-			myProjectileManager.CheckCollisionsWithEntity(*myNPCs[i].Get());
-
 			++i;
 			continue;
 		}
@@ -71,6 +71,8 @@ void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
 	Entity* entity = myEntityManager.CreateEntity();
+	myNPCs.Add(entity->myHandle);
+
 	entity->myType = Entity::NPC;
 	entity->myPosition = aPosition;
 	entity->mySpriteComponent = new SpriteComponent(*entity);
@@ -80,11 +82,13 @@ void NPCWave::CreateNPC(const Vector2f& aPosition)
 	entity->myProjectileShootingComponent->TriggerCooldown();
 	entity->myNPCControllerComponent = new NPCControllerComponent(*entity);
 	entity->myNPCControllerComponent->SetTarget(myPlayerHandle);
-	entity->myCollisionComponent = new CollisionComponent(*entity);
-	entity->myCollisionComponent->SetSize(20.f);
 	entity->myHealthComponent = new HealthComponent(*entity);
 	entity->myHealthComponent->SetMaxHealth(5);
-	myNPCs.Add(entity->myHandle);
+	entity->myPhysicsComponent = new PhysicsComponent(*entity, myPhysicsWorld);
+	entity->myPhysicsComponent->myObject = new Slush::PhysicsObject(new Slush::CircleShape(20.f));
+	entity->myPhysicsComponent->myObject->SetPosition(entity->myPosition);
+	entity->myPhysicsComponent->myObject->myUserData.Set(entity->myPhysicsComponent);
+	myPhysicsWorld.AddObject(entity->myPhysicsComponent->myObject);
 }
 
 bool NPCWave::IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance)

@@ -8,10 +8,15 @@ class Entity;
 class EntityManager;
 class ProjectileManager;
 
+namespace Slush
+{
+	class PhysicsWorld;
+}
+
 class NPCWave
 {
 public:
-	NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager);
+	NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager, Slush::PhysicsWorld& aPhysicsWorld);
 
 	void Update();
 
@@ -25,6 +30,7 @@ private:
 	EntityHandle myPlayerHandle;
 	ProjectileManager& myProjectileManager;
 	EntityManager& myEntityManager;
+	Slush::PhysicsWorld& myPhysicsWorld;
 
 	FW_GrowingArray<EntityHandle> myNPCs;
 

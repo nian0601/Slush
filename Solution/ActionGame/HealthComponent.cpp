@@ -26,12 +26,16 @@ HealthComponent::~HealthComponent()
 void HealthComponent::Render()
 {
 	Vector2f centeredPosition = myEntity.myPosition;
-	centeredPosition.x -= myTotalWidth * 0.5f;
-	centeredPosition.y -= myTotalHeight;
 	centeredPosition.y -= 40.f;
 
 	myBackground->Render(centeredPosition.x, centeredPosition.y);
-	myForeground->Render(centeredPosition.x + myPadding, centeredPosition.y + myPadding);
+	myForeground->Render(centeredPosition.x, centeredPosition.y);
+}
+
+void HealthComponent::OnCollision(Entity& aOtherEntity)
+{
+	if (aOtherEntity.myType != Entity::ENVIRONMENT)
+		DealDamage(1);
 }
 
 void HealthComponent::SetMaxHealth(int aHealth)

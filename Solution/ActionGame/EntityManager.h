@@ -24,4 +24,6 @@ private:
 
 	FW_GrowingArray<EntityHandle::ProxyObject*> myProxyStorage;
 	FW_GrowingArray<Entity*> myEntities;
+
+	FW_GrowingArray<Entity*> myAddQueue;
 };

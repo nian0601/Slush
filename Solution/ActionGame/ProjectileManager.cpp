@@ -2,96 +2,33 @@
 #include <Core\Time.h>
 #include <Graphics\CircleSprite.h>
 #include <FW_Includes.h>
-#include "CollisionComponent.h"
 #include "HealthComponent.h"
+#include "EntityManager.h"
+#include "SpriteComponent.h"
+#include "PhysicsComponent.h"
+#include <Physics\PhysicsWorld.h>
+#include "RemoveOnCollisionComponent.h"
 
-ProjectileManager::~ProjectileManager()
+ProjectileManager::ProjectileManager(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
+	: myEntityManager(aEntityManager)
+	, myPhysicsWorld(aPhysicsWorld)
 {
-	myProjectiles.DeleteAll();
-}
-
-void ProjectileManager::Update()
-{
-	float delta = Slush::Time::GetDelta();
-	for (int i = 0; i < myProjectiles.Count();)
-	{
-		if (!myProjectiles[i]->Update(delta))
-			myProjectiles.DeleteCyclicAtIndex(i);
-		else
-			++i;
-	}
-}
-
-void ProjectileManager::Render()
-{
-	for (Projectile* proj : myProjectiles)
-		proj->Render();
 }
 
 void ProjectileManager::AddProjectile(const Vector2f& aStartPosition, const Vector2f& aDirection, Entity::Type aProjectileOwner)
 {
 	const float speed = 1000.f;
+	Entity* projectile = myEntityManager.CreateEntity();
 
-	Projectile* projectile = new Projectile();
+	projectile->myType = aProjectileOwner;
 	projectile->myPosition = aStartPosition;
-	projectile->myVelocity = aDirection * speed;
-	projectile->myExpireTime = Slush::Time::GetCurrentExactTime() + Slush::Time::ConvertGameTimeToTimeUnit(2.f);
-	projectile->mySprite = new Slush::CircleSprite(projectile->myRadius);
-
-	if (aProjectileOwner == Entity::Type::PLAYER)
-		projectile->mySprite->SetFillColor(0xFFFF2222);
-	else if (aProjectileOwner == Entity::Type::NPC)
-		projectile->mySprite->SetFillColor(0xFF2222FF);
-
-	projectile->myOwner = aProjectileOwner;
-
-	myProjectiles.Add(projectile);
-}
-
-void ProjectileManager::CheckCollisionsWithEntity(Entity& anEntity)
-{
-	CollisionComponent* entityCollision = anEntity.myCollisionComponent;
-	if (!entityCollision)
-		return;
-
-	for (int i = 0; i < myProjectiles.Count();)
-	{
-		if (anEntity.myType == myProjectiles[i]->myOwner)
-		{
-			++i;
-			continue;
-		}
-
-		bool collision = entityCollision->CollidesWithCircle(myProjectiles[i]->myPosition, myProjectiles[i]->myRadius);
-		if (collision)
-		{
-			myProjectiles.DeleteCyclicAtIndex(i);
-
-			if (HealthComponent* health = anEntity.myHealthComponent)
-				health->DealDamage(1);
-				
-		}
-		else
-		{
-			++i;
-		}
-	}
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-ProjectileManager::Projectile::~Projectile()
-{
-	FW_SAFE_DELETE(mySprite);
-}
-
-bool ProjectileManager::Projectile::Update(float aDeltaTime)
-{
-	myPosition += myVelocity * aDeltaTime;
-	return myExpireTime >= Slush::Time::GetCurrentExactTime();
-}
-
-void ProjectileManager::Projectile::Render()
-{
-	mySprite->Render(myPosition.x, myPosition.y);
+	projectile->mySpriteComponent = new SpriteComponent(*projectile);
+	projectile->mySpriteComponent->MakeCircle(5.f, 0xFFFF0000);
+	projectile->myPhysicsComponent = new PhysicsComponent(*projectile, myPhysicsWorld);
+	projectile->myPhysicsComponent->myObject = new Slush::PhysicsObject(new Slush::CircleShape(5.f));
+	projectile->myPhysicsComponent->myObject->SetPosition(projectile->myPosition);
+	projectile->myPhysicsComponent->myObject->myVelocity = aDirection * speed;
+	projectile->myPhysicsComponent->myObject->myUserData.Set(projectile->myPhysicsComponent);
+	projectile->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*projectile);
+	myPhysicsWorld.AddObject(projectile->myPhysicsComponent->myObject);
 }

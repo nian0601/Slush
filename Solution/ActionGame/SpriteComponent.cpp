@@ -5,6 +5,7 @@
 #include <Graphics/CircleSprite.h>
 
 #include <FW_Includes.h>
+#include <Graphics/RectSprite.h>
 
 SpriteComponent::~SpriteComponent()
 {
@@ -20,6 +21,16 @@ void SpriteComponent::MakeCircle(float aRadius, int aColor)
 	circle->SetOutlineColor(0xFF440000);
 	circle->SetOutlineThickness(1.f);
 	mySprite = circle;
+}
+
+void SpriteComponent::MakeRect(float aWidth, float aHeight, int aColor)
+{
+	Slush::RectSprite* rect = new Slush::RectSprite();
+	rect->SetSize(aWidth, aHeight);
+	rect->SetFillColor(aColor);
+	rect->SetOutlineColor(0xFF440000);
+	rect->SetOutlineThickness(1.f);
+	mySprite = rect;
 }
 
 void SpriteComponent::Render()

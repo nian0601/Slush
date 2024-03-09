@@ -17,7 +17,7 @@ Entity* EntityManager::CreateEntity()
 
 	entity->myHandle = EntityHandle(proxy);
 
-	myEntities.Add(entity);
+	myAddQueue.Add(entity);
 	
 	return entity;
 }
@@ -64,6 +64,11 @@ void EntityManager::EndFrame()
 
 		FW_ASSERT(removedProxy, "Didnt find EntityProxy for an Entity that is marked for removal");
 	}
+
+	for (Entity* entity : myAddQueue)
+		myEntities.Add(entity);
+
+	myAddQueue.RemoveAll();
 
 	CleanupProxyStorage();
 }

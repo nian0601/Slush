@@ -9,34 +9,18 @@
 namespace Slush
 {
 	class BaseSprite;
+	class PhysicsWorld;
 }
 
+class EntityManager;
 class ProjectileManager
 {
 public:
-	~ProjectileManager();
+	ProjectileManager(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld);
 
-	void Update();
-	void Render();
 	void AddProjectile(const Vector2f& aStartPosition, const Vector2f& aDirection, Entity::Type aProjectileOwner);
 
-	void CheckCollisionsWithEntity(Entity& anEntity);
-
 private:
-	struct Projectile
-	{
-		~Projectile();
-
-		bool Update(float aDeltaTime);
-		void Render();
-
-		Vector2f myPosition;
-		Vector2f myVelocity;
-		float myRadius = 5.f;
-		Slush::Time::TimeUnit myExpireTime;
-		Slush::BaseSprite* mySprite = nullptr;
-		Entity::Type myOwner;
-	};
-
-	FW_GrowingArray<Projectile*> myProjectiles;
+	EntityManager& myEntityManager;
+	Slush::PhysicsWorld& myPhysicsWorld;
 };

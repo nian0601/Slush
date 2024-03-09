@@ -7,9 +7,9 @@
 #include "ProjectileShootingComponent.h"
 #include "PlayerControllerComponent.h"
 #include "NPCControllerComponent.h"
-#include "CollisionComponent.h"
 #include "HealthComponent.h"
 #include "PhysicsComponent.h"
+#include "RemoveOnCollisionComponent.h"
 
 Entity::~Entity()
 {
@@ -18,9 +18,9 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myProjectileShootingComponent);
 	FW_SAFE_DELETE(myPlayerControllerComponent);
 	FW_SAFE_DELETE(myNPCControllerComponent);
-	FW_SAFE_DELETE(myCollisionComponent);
 	FW_SAFE_DELETE(myHealthComponent);
 	FW_SAFE_DELETE(myPhysicsComponent);
+	FW_SAFE_DELETE(myRemoveOnCollisionComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -48,4 +48,13 @@ void Entity::Render()
 
 	if (myHealthComponent)
 		myHealthComponent->Render();
+}
+
+void Entity::OnCollision(Entity& aOtherEntity)
+{
+	if (myHealthComponent)
+		myHealthComponent->OnCollision(aOtherEntity);
+
+	if (myRemoveOnCollisionComponent)
+		myRemoveOnCollisionComponent->OnCollision(aOtherEntity);
 }

@@ -10,6 +10,5 @@ public:
 	{}
 	virtual ~Component() {}
 
-protected:
 	Entity& myEntity;
 };

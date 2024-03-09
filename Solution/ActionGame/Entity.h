@@ -9,15 +9,16 @@ class AnimationComponent;
 class ProjectileShootingComponent;
 class PlayerControllerComponent;
 class NPCControllerComponent;
-class CollisionComponent;
 class HealthComponent;
 class PhysicsComponent;
+class RemoveOnCollisionComponent;
 
 class Entity
 {
 public:
 	enum Type
 	{
+		ENVIRONMENT,
 		PLAYER,
 		NPC,
 	};
@@ -28,17 +29,19 @@ public:
 	void Update();
 	void Render();
 
+	void OnCollision(Entity& aOtherEntity);
+
 	SpriteComponent* mySpriteComponent = nullptr;
 	AnimationComponent* myAnimationComponent = nullptr;
 	ProjectileShootingComponent* myProjectileShootingComponent = nullptr;
 	PlayerControllerComponent* myPlayerControllerComponent = nullptr;
 	NPCControllerComponent* myNPCControllerComponent = nullptr;
-	CollisionComponent* myCollisionComponent = nullptr;
 	HealthComponent* myHealthComponent = nullptr;
 	PhysicsComponent* myPhysicsComponent = nullptr;
+	RemoveOnCollisionComponent* myRemoveOnCollisionComponent = nullptr;
 
 	Vector2f myPosition;
-	Type myType;
+	Type myType = ENVIRONMENT;
 	bool myIsMarkedForRemoval = false;
 	EntityHandle myHandle;
 };

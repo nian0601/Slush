@@ -18,29 +18,22 @@
 #include "Graphics/Font.h"
 #include "Graphics/CircleSprite.h"
 #include "Graphics/RectSprite.h"
-
 #include "Graphics/Animation/Animation.h"
-
-#include "Entity.h"
-#include "EntityManager.h"
-
-#include "ProjectileManager.h"
-#include "SpriteComponent.h"
-#include "AnimationComponent.h"
-#include "ProjectileShootingComponent.h"
-#include "PlayerControllerComponent.h"
-#include "NPCControllerComponent.h"
-#include "HealthComponent.h"
-#include "PhysicsComponent.h"
 
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsShapes.h"
 
+#include "Entity.h"
+#include "EntityManager.h"
+#include "EntityPrefab.h"
+
+#include "ProjectileManager.h"
+
 #include "NPCWave.h"
+#include "PhysicsComponent.h"
 
 class App : public Slush::IApp
 {
-
 public:
 	void Initialize() override
 	{
@@ -52,8 +45,8 @@ public:
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
-		myEntityManager = new EntityManager();
 		myPhysicsWorld = new Slush::PhysicsWorld();
+		myEntityManager = new EntityManager();
 
 		myProjectileManager = new ProjectileManager(*myEntityManager, *myPhysicsWorld);
 		myNPCWave = new NPCWave(*myEntityManager, *myProjectileManager, *myPhysicsWorld);
@@ -64,16 +57,17 @@ public:
 		window.AddDockable(new Slush::LogDockable());
 
 		Vector2f rectSize = { 1000.f, 100.f };
-		Entity* wall = myEntityManager->CreateEntity();
-		wall->myPosition = { 500.f, 800.f };
-		wall->mySpriteComponent = new SpriteComponent(*wall);
-		wall->mySpriteComponent->MakeRect(rectSize.x, rectSize.y, 0xFFFFFF00);
-		wall->myPhysicsComponent = new PhysicsComponent(*wall, *myPhysicsWorld);
-		wall->myPhysicsComponent->myObject = new Slush::PhysicsObject(new Slush::AABBShape(rectSize));
-		wall->myPhysicsComponent->myObject->SetPosition(wall->myPosition);
-		wall->myPhysicsComponent->myObject->MakeStatic();
-		wall->myPhysicsComponent->myObject->myUserData.Set(wall->myPhysicsComponent);
-		myPhysicsWorld->AddObject(wall->myPhysicsComponent->myObject);
+		Vector2f position = { 500.f, 800.f };
+
+		EntityPrefab wallPrefab;
+		wallPrefab.myEntityType = Entity::ENVIRONMENT;
+		wallPrefab.mySprite.myEnabled = true;
+		wallPrefab.mySprite.mySize = rectSize;
+		wallPrefab.mySprite.myColor = 0xFFFFFF00;
+		wallPrefab.myPhysics.myEnabled = true;
+		wallPrefab.myPhysics.myStatic = true;
+		wallPrefab.myPhysics.myMatchSprite = true;
+		myEntityManager->CreateEntity(position, wallPrefab, *myPhysicsWorld, *myProjectileManager);
 	}
 
 	void Shutdown() override
@@ -135,25 +129,24 @@ public:
 
 	void CreatePlayer()
 	{
-		Entity* player = myEntityManager->CreateEntity();
+		EntityPrefab playerPrefab;
+		playerPrefab.myEntityType = Entity::PLAYER;
+		playerPrefab.mySprite.myEnabled = true;
+		playerPrefab.mySprite.myRadius = 20.f;
+		playerPrefab.mySprite.myColor = 0xFFFF0000;
+		playerPrefab.myAnimation.myEnabled = true;
+		playerPrefab.myProjectileShooting.myEnabled = true;
+		playerPrefab.myProjectileShooting.myCooldown = 0.1f;
+		playerPrefab.myPlayerController.myEnabled = true;
+		playerPrefab.myHealth.myEnabled = true;
+		playerPrefab.myHealth.myMaxHealth = 3;
+		playerPrefab.myPhysics.myEnabled = true;
+		playerPrefab.myPhysics.myMatchSprite = true;
+
+		Vector2f position = { 400.f, 400.f };
+		Entity* player = myEntityManager->CreateEntity(position, playerPrefab, *myPhysicsWorld, *myProjectileManager);
 		myPlayer = player->myHandle;
 		myNPCWave->SetPlayerHandle(myPlayer);
-
-		player->myType = Entity::PLAYER;
-		player->myPosition = { 400.f, 400.f };
-		player->mySpriteComponent = new SpriteComponent(*player);
-		player->mySpriteComponent->MakeCircle(20.f, 0xFFFF0000);
-		player->myAnimationComponent = new AnimationComponent(*player);
-		player->myProjectileShootingComponent = new ProjectileShootingComponent(*player, *myProjectileManager);
-		player->myProjectileShootingComponent->SetCooldown(0.1f);
-		player->myPlayerControllerComponent = new PlayerControllerComponent(*player);
-		player->myHealthComponent = new HealthComponent(*player);
-		player->myHealthComponent->SetMaxHealth(3);
-		player->myPhysicsComponent = new PhysicsComponent(*player, *myPhysicsWorld);
-		player->myPhysicsComponent->myObject = new Slush::PhysicsObject(new Slush::CircleShape(20.f));
-		player->myPhysicsComponent->myObject->SetPosition(player->myPosition);
-		player->myPhysicsComponent->myObject->myUserData.Set(player->myPhysicsComponent);
-		myPhysicsWorld->AddObject(player->myPhysicsComponent->myObject);
 	}
 
 private:

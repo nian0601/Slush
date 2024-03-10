@@ -154,6 +154,7 @@
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityHandle.h" />
     <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="EntityPrefab.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="NPCControllerComponent.h" />
     <ClInclude Include="NPCWave.h" />

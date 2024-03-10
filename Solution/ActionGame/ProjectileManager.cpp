@@ -1,13 +1,10 @@
 #include "ProjectileManager.h"
-#include <Core\Time.h>
-#include <Graphics\CircleSprite.h>
-#include <FW_Includes.h>
-#include "HealthComponent.h"
+
 #include "EntityManager.h"
-#include "SpriteComponent.h"
+#include "EntityPrefab.h"
+
 #include "PhysicsComponent.h"
 #include <Physics\PhysicsWorld.h>
-#include "RemoveOnCollisionComponent.h"
 
 ProjectileManager::ProjectileManager(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)
@@ -17,18 +14,17 @@ ProjectileManager::ProjectileManager(EntityManager& aEntityManager, Slush::Physi
 
 void ProjectileManager::AddProjectile(const Vector2f& aStartPosition, const Vector2f& aDirection, Entity::Type aProjectileOwner)
 {
-	const float speed = 1000.f;
-	Entity* projectile = myEntityManager.CreateEntity();
+	EntityPrefab prefab;
+	prefab.myEntityType = aProjectileOwner;
+	prefab.mySprite.myEnabled = true;
+	prefab.mySprite.myRadius = 5.f;
+	prefab.mySprite.myColor = 0xFFFF0000;
+	prefab.myPhysics.myEnabled = true;
+	prefab.myPhysics.myMatchSprite = true;
+	prefab.myRemoveOnCollision.myEnabled = true;
 
-	projectile->myType = aProjectileOwner;
-	projectile->myPosition = aStartPosition;
-	projectile->mySpriteComponent = new SpriteComponent(*projectile);
-	projectile->mySpriteComponent->MakeCircle(5.f, 0xFFFF0000);
-	projectile->myPhysicsComponent = new PhysicsComponent(*projectile, myPhysicsWorld);
-	projectile->myPhysicsComponent->myObject = new Slush::PhysicsObject(new Slush::CircleShape(5.f));
-	projectile->myPhysicsComponent->myObject->SetPosition(projectile->myPosition);
+	Entity* projectile = myEntityManager.CreateEntity(aStartPosition, prefab, myPhysicsWorld, *this);
+
+	const float speed = 1000.f;
 	projectile->myPhysicsComponent->myObject->myVelocity = aDirection * speed;
-	projectile->myPhysicsComponent->myObject->myUserData.Set(projectile->myPhysicsComponent);
-	projectile->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*projectile);
-	myPhysicsWorld.AddObject(projectile->myPhysicsComponent->myObject);
 }

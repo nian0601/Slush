@@ -1,15 +1,12 @@
 #include "NPCWave.h"
 
 #include "Entity.h"
-#include "HealthComponent.h"
-#include <FW_Math.h>
-#include "ProjectileManager.h"
-#include "SpriteComponent.h"
-#include "ProjectileShootingComponent.h"
-#include "NPCControllerComponent.h"
 #include "EntityManager.h"
-#include "PhysicsComponent.h"
-#include <Physics\PhysicsWorld.h>
+#include "EntityPrefab.h"
+#include "NPCControllerComponent.h"
+#include "ProjectileShootingComponent.h"
+
+#include <FW_Math.h>
 
 NPCWave::NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)
@@ -70,25 +67,24 @@ void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
 
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
-	Entity* entity = myEntityManager.CreateEntity();
-	myNPCs.Add(entity->myHandle);
+	EntityPrefab prefab;
+	prefab.myEntityType = Entity::NPC;
+	prefab.mySprite.myEnabled = true;
+	prefab.mySprite.myRadius = 20.f;
+	prefab.mySprite.myColor = 0xFF0000FF;
+	prefab.myAnimation.myEnabled = true;
+	prefab.myProjectileShooting.myEnabled = true;
+	prefab.myProjectileShooting.myCooldown = 1.f;
+	prefab.myNPCController.myEnabled = true;
+	prefab.myHealth.myEnabled = true;
+	prefab.myHealth.myMaxHealth = 5;
+	prefab.myPhysics.myEnabled = true;
+	prefab.myPhysics.myMatchSprite = true;
 
-	entity->myType = Entity::NPC;
-	entity->myPosition = aPosition;
-	entity->mySpriteComponent = new SpriteComponent(*entity);
-	entity->mySpriteComponent->MakeCircle(20.f, 0xFF0000FF);
-	entity->myProjectileShootingComponent = new ProjectileShootingComponent(*entity, myProjectileManager);
-	entity->myProjectileShootingComponent->SetCooldown(1.f);
-	entity->myProjectileShootingComponent->TriggerCooldown();
-	entity->myNPCControllerComponent = new NPCControllerComponent(*entity);
-	entity->myNPCControllerComponent->SetTarget(myPlayerHandle);
-	entity->myHealthComponent = new HealthComponent(*entity);
-	entity->myHealthComponent->SetMaxHealth(5);
-	entity->myPhysicsComponent = new PhysicsComponent(*entity, myPhysicsWorld);
-	entity->myPhysicsComponent->myObject = new Slush::PhysicsObject(new Slush::CircleShape(20.f));
-	entity->myPhysicsComponent->myObject->SetPosition(entity->myPosition);
-	entity->myPhysicsComponent->myObject->myUserData.Set(entity->myPhysicsComponent);
-	myPhysicsWorld.AddObject(entity->myPhysicsComponent->myObject);
+	Entity* npc = myEntityManager.CreateEntity(aPosition, prefab, myPhysicsWorld, myProjectileManager);
+	npc->myProjectileShootingComponent->TriggerCooldown();
+	npc->myNPCControllerComponent->SetTarget(myPlayerHandle);
+	myNPCs.Add(npc->myHandle);
 }
 
 bool NPCWave::IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance)

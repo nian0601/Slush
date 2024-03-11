@@ -11,12 +11,13 @@ namespace Slush
 	public:
 		~AssetStorage();
 
+		AssetType& CreateNewAsset(const char* aName);
 		void Load(const char* aName, const char* aFilePath, bool aIsAbsolutePath = false);
 		const AssetType* GetAsset(const char* aName) const;
 
 		const FW_GrowingArray<AssetType*>& GetAllAssets() const { return myAssets; }
 	private:
-		FW_Hashmap<FW_String, const AssetType*> myAssetMap;
+		FW_Hashmap<FW_String, AssetType*> myAssetMap;
 		FW_GrowingArray<AssetType*> myAssets;
 	};
 
@@ -25,6 +26,25 @@ namespace Slush
 	{
 		myAssetMap.Clear();
 		myAssets.DeleteAll();
+	}
+
+	template<typename AssetType>
+	AssetType& AssetStorage<AssetType>::CreateNewAsset(const char* aName)
+	{
+		if (myAssetMap.KeyExists(aName))
+		{
+			SLUSH_WARNING("AssetStorage: '%s' already exists, returning existing one instead of creating a new Asset", aName);
+			return *myAssetMap[aName];
+		}
+
+		AssetType* asset = new AssetType(aName);
+
+		myAssets.Add(asset);
+		myAssetMap[aName] = asset;
+
+		SLUSH_INFO("AssetStorage: Created '%s' as new asset", aName);
+
+		return *asset;
 	}
 
 	template<typename AssetType>

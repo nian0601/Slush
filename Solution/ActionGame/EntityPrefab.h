@@ -1,9 +1,14 @@
 #pragma once
 
 #include "Entity.h"
+#include <FW_String.h>
+
 class EntityPrefab
 {
 public:
+	EntityPrefab(const char* aName);
+
+	FW_String myName;
 	Entity::Type myEntityType;
 
 	struct Sprite

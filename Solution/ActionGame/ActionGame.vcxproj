@@ -137,6 +137,7 @@
     <ClCompile Include="AnimationComponent.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
+    <ClCompile Include="EntityPrefab.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NPCControllerComponent.cpp" />

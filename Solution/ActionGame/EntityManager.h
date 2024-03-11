@@ -4,6 +4,7 @@
 
 #include "EntityHandle.h"
 #include <FW_Vector2.h>
+#include <Core\AssetStorage.h>
 
 class Entity;
 class EntityPrefab;
@@ -17,10 +18,12 @@ namespace Slush
 class EntityManager
 {
 public:
+	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage);
 	~EntityManager();
 
 	Entity* CreateEntity();
 	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld, ProjectileManager& aProjectileManager);
+	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName, Slush::PhysicsWorld& aPhysicsWorld, ProjectileManager& aProjectileManager);
 
 	void PrePhysicsUpdate();
 
@@ -36,4 +39,6 @@ private:
 	FW_GrowingArray<Entity*> myEntities;
 
 	FW_GrowingArray<Entity*> myAddQueue;
+
+	Slush::AssetStorage<EntityPrefab>& myPrefabStorage;
 };

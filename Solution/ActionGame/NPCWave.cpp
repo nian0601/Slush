@@ -67,21 +67,7 @@ void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
 
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
-	EntityPrefab prefab;
-	prefab.myEntityType = Entity::NPC;
-	prefab.mySprite.myEnabled = true;
-	prefab.mySprite.myRadius = 20.f;
-	prefab.mySprite.myColor = 0xFF0000FF;
-	prefab.myAnimation.myEnabled = true;
-	prefab.myProjectileShooting.myEnabled = true;
-	prefab.myProjectileShooting.myCooldown = 1.f;
-	prefab.myNPCController.myEnabled = true;
-	prefab.myHealth.myEnabled = true;
-	prefab.myHealth.myMaxHealth = 5;
-	prefab.myPhysics.myEnabled = true;
-	prefab.myPhysics.myMatchSprite = true;
-
-	Entity* npc = myEntityManager.CreateEntity(aPosition, prefab, myPhysicsWorld, myProjectileManager);
+	Entity* npc = myEntityManager.CreateEntity(aPosition, "NPC", myPhysicsWorld, myProjectileManager);
 	npc->myProjectileShootingComponent->TriggerCooldown();
 	npc->myNPCControllerComponent->SetTarget(myPlayerHandle);
 	myNPCs.Add(npc->myHandle);

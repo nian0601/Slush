@@ -44,9 +44,10 @@ public:
 			myTextures.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
+		CreatePrefabs();
 
 		myPhysicsWorld = new Slush::PhysicsWorld();
-		myEntityManager = new EntityManager();
+		myEntityManager = new EntityManager(myEntityPrefabs);
 
 		myProjectileManager = new ProjectileManager(*myEntityManager, *myPhysicsWorld);
 		myNPCWave = new NPCWave(*myEntityManager, *myProjectileManager, *myPhysicsWorld);
@@ -56,18 +57,7 @@ public:
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
 
-		Vector2f rectSize = { 1000.f, 100.f };
-		Vector2f position = { 500.f, 800.f };
-
-		EntityPrefab wallPrefab;
-		wallPrefab.myEntityType = Entity::ENVIRONMENT;
-		wallPrefab.mySprite.myEnabled = true;
-		wallPrefab.mySprite.mySize = rectSize;
-		wallPrefab.mySprite.myColor = 0xFFFFFF00;
-		wallPrefab.myPhysics.myEnabled = true;
-		wallPrefab.myPhysics.myStatic = true;
-		wallPrefab.myPhysics.myMatchSprite = true;
-		myEntityManager->CreateEntity(position, wallPrefab, *myPhysicsWorld, *myProjectileManager);
+		myEntityManager->CreateEntity({ 500.f, 800.f }, "Wall", *myPhysicsWorld, *myProjectileManager);
 	}
 
 	void Shutdown() override
@@ -129,7 +119,14 @@ public:
 
 	void CreatePlayer()
 	{
-		EntityPrefab playerPrefab;
+		Entity* player = myEntityManager->CreateEntity({ 400.f, 400.f }, "Player", *myPhysicsWorld, *myProjectileManager);
+		myPlayer = player->myHandle;
+		myNPCWave->SetPlayerHandle(myPlayer);
+	}
+
+	void CreatePrefabs()
+	{
+		EntityPrefab& playerPrefab = myEntityPrefabs.CreateNewAsset("Player");
 		playerPrefab.myEntityType = Entity::PLAYER;
 		playerPrefab.mySprite.myEnabled = true;
 		playerPrefab.mySprite.myRadius = 20.f;
@@ -143,15 +140,52 @@ public:
 		playerPrefab.myPhysics.myEnabled = true;
 		playerPrefab.myPhysics.myMatchSprite = true;
 
-		Vector2f position = { 400.f, 400.f };
-		Entity* player = myEntityManager->CreateEntity(position, playerPrefab, *myPhysicsWorld, *myProjectileManager);
-		myPlayer = player->myHandle;
-		myNPCWave->SetPlayerHandle(myPlayer);
+		EntityPrefab& npcPrefab = myEntityPrefabs.CreateNewAsset("NPC");
+		npcPrefab.myEntityType = Entity::NPC;
+		npcPrefab.mySprite.myEnabled = true;
+		npcPrefab.mySprite.myRadius = 20.f;
+		npcPrefab.mySprite.myColor = 0xFF0000FF;
+		npcPrefab.myAnimation.myEnabled = true;
+		npcPrefab.myProjectileShooting.myEnabled = true;
+		npcPrefab.myProjectileShooting.myCooldown = 1.f;
+		npcPrefab.myNPCController.myEnabled = true;
+		npcPrefab.myHealth.myEnabled = true;
+		npcPrefab.myHealth.myMaxHealth = 5;
+		npcPrefab.myPhysics.myEnabled = true;
+		npcPrefab.myPhysics.myMatchSprite = true;
+
+		EntityPrefab& npcProjectilePrefab = myEntityPrefabs.CreateNewAsset("NPCProjectile");
+		npcProjectilePrefab.myEntityType = Entity::NPC;
+		npcProjectilePrefab.mySprite.myEnabled = true;
+		npcProjectilePrefab.mySprite.myRadius = 5.f;
+		npcProjectilePrefab.mySprite.myColor = 0xFFFF0000;
+		npcProjectilePrefab.myPhysics.myEnabled = true;
+		npcProjectilePrefab.myPhysics.myMatchSprite = true;
+		npcProjectilePrefab.myRemoveOnCollision.myEnabled = true;
+
+		EntityPrefab& playerProjectilePrefab = myEntityPrefabs.CreateNewAsset("PlayerProjectile");
+		playerProjectilePrefab.myEntityType = Entity::PLAYER;
+		playerProjectilePrefab.mySprite.myEnabled = true;
+		playerProjectilePrefab.mySprite.myRadius = 5.f;
+		playerProjectilePrefab.mySprite.myColor = 0xFFFF0000;
+		playerProjectilePrefab.myPhysics.myEnabled = true;
+		playerProjectilePrefab.myPhysics.myMatchSprite = true;
+		playerProjectilePrefab.myRemoveOnCollision.myEnabled = true;
+
+		EntityPrefab& wallPrefab = myEntityPrefabs.CreateNewAsset("Wall");
+		wallPrefab.myEntityType = Entity::ENVIRONMENT;
+		wallPrefab.mySprite.myEnabled = true;
+		wallPrefab.mySprite.mySize = { 1000.f, 100.f };
+		wallPrefab.mySprite.myColor = 0xFFFFFF00;
+		wallPrefab.myPhysics.myEnabled = true;
+		wallPrefab.myPhysics.myStatic = true;
+		wallPrefab.myPhysics.myMatchSprite = true;
 	}
 
 private:
 	Slush::Font myFont;
 	Slush::AssetStorage<Slush::Texture> myTextures;
+	Slush::AssetStorage<EntityPrefab> myEntityPrefabs;
 
 	EntityHandle myPlayer;
 	EntityManager* myEntityManager;

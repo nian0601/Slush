@@ -12,6 +12,11 @@
 #include <Core\Log.h>
 #include "RemoveOnCollisionComponent.h"
 
+EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
+	: myPrefabStorage(aPrefabStorage)
+{
+}
+
 EntityManager::~EntityManager()
 {
 	myProxyStorage.DeleteAll();
@@ -116,6 +121,15 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 		entity->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*entity);
 
 	return entity;
+}
+
+Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPrefabName, Slush::PhysicsWorld& aPhysicsWorld, ProjectileManager& aProjectileManager)
+{
+	if (const EntityPrefab* prefab = myPrefabStorage.GetAsset(aPrefabName))
+		return CreateEntity(aPosition, *prefab, aPhysicsWorld, aProjectileManager);
+	
+	SLUSH_ERROR("Found no EntityPrefab called %s, creating a empty entity", aPrefabName);
+	return CreateEntity();
 }
 
 void EntityManager::PrePhysicsUpdate()

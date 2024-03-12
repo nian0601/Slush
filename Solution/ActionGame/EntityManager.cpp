@@ -47,10 +47,10 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 	if (aPrefab.mySprite.myEnabled)
 	{
 		entity->mySpriteComponent = new SpriteComponent(*entity);
-		if (aPrefab.mySprite.myRadius > 0.f)
-			entity->mySpriteComponent->MakeCircle(aPrefab.mySprite.myRadius, aPrefab.mySprite.myColor);
-		else
+		if (aPrefab.mySprite.mySize.x > 0.f)
 			entity->mySpriteComponent->MakeRect(aPrefab.mySprite.mySize.x, aPrefab.mySprite.mySize.y, aPrefab.mySprite.myColor);
+		else
+			entity->mySpriteComponent->MakeCircle(aPrefab.mySprite.myRadius, aPrefab.mySprite.myColor);
 	}
 
 	if (aPrefab.myAnimation.myEnabled)

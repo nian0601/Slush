@@ -177,11 +177,24 @@ inline int FW_Float_To_ARGB(float a, float r, float g, float b)
 	return color;
 }
 
-inline Vector3f FW_ARGB_To_Vector(unsigned int aColor)
+inline void FW_ARGB_To_RGBAFloat(int aARGB, float aFloatArray[4])
 {
-	short red = (aColor & 0x00FF0000) >> 16;
-	short green = (aColor & 0x0000FF00) >> 8;
-	short blue = (aColor & 0x000000FF) >> 0;
+	short alpha = (aARGB & 0xFF000000) >> 24;
+	short red = (aARGB & 0x00FF0000) >> 16;
+	short green = (aARGB & 0x0000FF00) >> 8;
+	short blue = (aARGB & 0x000000FF) >> 0;
+
+	aFloatArray[0] = red / 255.f;
+	aFloatArray[1] = green / 255.f;
+	aFloatArray[2] = blue / 255.f;
+	aFloatArray[3] = alpha / 255.f;
+}
+
+inline Vector3f FW_ARGB_To_Vector(unsigned int aARGB)
+{
+	short red = (aARGB & 0x00FF0000) >> 16;
+	short green = (aARGB & 0x0000FF00) >> 8;
+	short blue = (aARGB & 0x000000FF) >> 0;
 
 	return Vector3f(red / 255.f, green / 255.f, blue / 255.f);
 }

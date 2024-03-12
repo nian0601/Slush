@@ -37,6 +37,9 @@
     <ClCompile Include="EntityPrefab.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="EntityPrefabDockable.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ProjectileManager.h" />
@@ -78,6 +81,9 @@
       <Filter>Entities\Components</Filter>
     </ClInclude>
     <ClInclude Include="EntityPrefab.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityPrefabDockable.h">
       <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>

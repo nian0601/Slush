@@ -138,6 +138,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
     <ClCompile Include="EntityPrefab.cpp" />
+    <ClCompile Include="EntityPrefabDockable.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NPCControllerComponent.cpp" />
@@ -156,6 +157,7 @@
     <ClInclude Include="EntityHandle.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="EntityPrefab.h" />
+    <ClInclude Include="EntityPrefabDockable.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="NPCControllerComponent.h" />
     <ClInclude Include="NPCWave.h" />

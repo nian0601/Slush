@@ -31,6 +31,7 @@
 
 #include "NPCWave.h"
 #include "PhysicsComponent.h"
+#include "EntityPrefabDockable.h"
 
 class App : public Slush::IApp
 {
@@ -56,6 +57,7 @@ public:
 		window.AddDockable(new Slush::GameViewDockable());
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
+		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
 
 		myEntityManager->CreateEntity({ 500.f, 800.f }, "Wall", *myPhysicsWorld, *myProjectileManager);
 	}
@@ -131,6 +133,7 @@ public:
 		playerPrefab.mySprite.myEnabled = true;
 		playerPrefab.mySprite.myRadius = 20.f;
 		playerPrefab.mySprite.myColor = 0xFFFF0000;
+		FW_ARGB_To_RGBAFloat(playerPrefab.mySprite.myColor, playerPrefab.mySprite.myFloatColor);
 		playerPrefab.myAnimation.myEnabled = true;
 		playerPrefab.myProjectileShooting.myEnabled = true;
 		playerPrefab.myProjectileShooting.myCooldown = 0.1f;
@@ -145,6 +148,7 @@ public:
 		npcPrefab.mySprite.myEnabled = true;
 		npcPrefab.mySprite.myRadius = 20.f;
 		npcPrefab.mySprite.myColor = 0xFF0000FF;
+		FW_ARGB_To_RGBAFloat(npcPrefab.mySprite.myColor, npcPrefab.mySprite.myFloatColor);
 		npcPrefab.myAnimation.myEnabled = true;
 		npcPrefab.myProjectileShooting.myEnabled = true;
 		npcPrefab.myProjectileShooting.myCooldown = 1.f;
@@ -159,6 +163,7 @@ public:
 		npcProjectilePrefab.mySprite.myEnabled = true;
 		npcProjectilePrefab.mySprite.myRadius = 5.f;
 		npcProjectilePrefab.mySprite.myColor = 0xFFFF0000;
+		FW_ARGB_To_RGBAFloat(npcProjectilePrefab.mySprite.myColor, npcProjectilePrefab.mySprite.myFloatColor);
 		npcProjectilePrefab.myPhysics.myEnabled = true;
 		npcProjectilePrefab.myPhysics.myMatchSprite = true;
 		npcProjectilePrefab.myRemoveOnCollision.myEnabled = true;
@@ -168,6 +173,7 @@ public:
 		playerProjectilePrefab.mySprite.myEnabled = true;
 		playerProjectilePrefab.mySprite.myRadius = 5.f;
 		playerProjectilePrefab.mySprite.myColor = 0xFFFF0000;
+		FW_ARGB_To_RGBAFloat(playerProjectilePrefab.mySprite.myColor, playerProjectilePrefab.mySprite.myFloatColor);
 		playerProjectilePrefab.myPhysics.myEnabled = true;
 		playerProjectilePrefab.myPhysics.myMatchSprite = true;
 		playerProjectilePrefab.myRemoveOnCollision.myEnabled = true;
@@ -177,6 +183,7 @@ public:
 		wallPrefab.mySprite.myEnabled = true;
 		wallPrefab.mySprite.mySize = { 1000.f, 100.f };
 		wallPrefab.mySprite.myColor = 0xFFFFFF00;
+		FW_ARGB_To_RGBAFloat(wallPrefab.mySprite.myColor, wallPrefab.mySprite.myFloatColor);
 		wallPrefab.myPhysics.myEnabled = true;
 		wallPrefab.myPhysics.myStatic = true;
 		wallPrefab.myPhysics.myMatchSprite = true;

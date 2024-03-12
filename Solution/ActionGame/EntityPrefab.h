@@ -8,15 +8,20 @@ class EntityPrefab
 public:
 	EntityPrefab(const char* aName);
 
+	void BuildUI();
+	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel);
+
 	FW_String myName;
 	Entity::Type myEntityType;
 
 	struct Sprite
 	{
 		bool myEnabled = false;
-		float myRadius = 0.f;
+		float myRadius = 10.f;
 		Vector2f mySize;
-		int myColor = 0;
+		int myColor = 0xFFFF3399;
+
+		float myFloatColor[4] = { 1.f, 51.f / 255.f, 153.f / 255.f, 1.f };
 	} mySprite;
 
 	struct Animation
@@ -51,7 +56,7 @@ public:
 		bool myEnabled = false;
 		bool myStatic = false;
 		bool myMatchSprite = true;
-		float myRadius = 0.f;
+		float myRadius = 10.f;
 		Vector2f mySize;
 	} myPhysics;
 

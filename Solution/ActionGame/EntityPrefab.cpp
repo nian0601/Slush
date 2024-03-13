@@ -108,6 +108,9 @@ void EntityPrefab::LoadEmptyComponent(FW_FileParser& aParser)
 
 void EntityPrefab::BuildUI()
 {
+	const char* entityTypeNames[] = { "Environment", "Player", "NPC" };
+	ImGui::Combo("Entity Type", &myEntityType, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
+
 	if (BaseComponentUI(mySprite.myEnabled, "Sprite", "Add Sprite"))
 	{
 		ImGui::ColorEdit4("Color", mySprite.myFloatColor);

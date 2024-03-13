@@ -41,7 +41,7 @@ Entity* EntityManager::CreateEntity()
 Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld, ProjectileManager& aProjectileManager)
 {
 	Entity* entity = CreateEntity();
-	entity->myType = aPrefab.myEntityType;
+	entity->myType = static_cast<Entity::Type>(aPrefab.myEntityType);
 	entity->myPosition = aPosition;
 
 	if (aPrefab.mySprite.myEnabled)

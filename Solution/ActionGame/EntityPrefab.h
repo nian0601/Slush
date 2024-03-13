@@ -18,7 +18,7 @@ public:
 	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel);
 
 	FW_String myName;
-	Entity::Type myEntityType;
+	int myEntityType;
 
 	struct Sprite
 	{

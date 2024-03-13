@@ -21,7 +21,8 @@ void EntityPrefabDockable::OnBuildUI()
 
 	if (ImGui::Button("Save All"))
 	{
-
+		for (EntityPrefab* prefab : prefabs)
+			prefab->SaveToDisk();
 	}
 
 	if (ImGui::BeginPopup("New Prefab"))

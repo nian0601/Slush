@@ -128,65 +128,11 @@ public:
 
 	void CreatePrefabs()
 	{
-		EntityPrefab& playerPrefab = myEntityPrefabs.CreateNewAsset("Player");
-		playerPrefab.myEntityType = Entity::PLAYER;
-		playerPrefab.mySprite.myEnabled = true;
-		playerPrefab.mySprite.myRadius = 20.f;
-		playerPrefab.mySprite.myColor = 0xFFFF0000;
-		FW_ARGB_To_RGBAFloat(playerPrefab.mySprite.myColor, playerPrefab.mySprite.myFloatColor);
-		playerPrefab.myAnimation.myEnabled = true;
-		playerPrefab.myProjectileShooting.myEnabled = true;
-		playerPrefab.myProjectileShooting.myCooldown = 0.1f;
-		playerPrefab.myPlayerController.myEnabled = true;
-		playerPrefab.myHealth.myEnabled = true;
-		playerPrefab.myHealth.myMaxHealth = 3;
-		playerPrefab.myPhysics.myEnabled = true;
-		playerPrefab.myPhysics.myMatchSprite = true;
-
-		EntityPrefab& npcPrefab = myEntityPrefabs.CreateNewAsset("NPC");
-		npcPrefab.myEntityType = Entity::NPC;
-		npcPrefab.mySprite.myEnabled = true;
-		npcPrefab.mySprite.myRadius = 20.f;
-		npcPrefab.mySprite.myColor = 0xFF0000FF;
-		FW_ARGB_To_RGBAFloat(npcPrefab.mySprite.myColor, npcPrefab.mySprite.myFloatColor);
-		npcPrefab.myAnimation.myEnabled = true;
-		npcPrefab.myProjectileShooting.myEnabled = true;
-		npcPrefab.myProjectileShooting.myCooldown = 1.f;
-		npcPrefab.myNPCController.myEnabled = true;
-		npcPrefab.myHealth.myEnabled = true;
-		npcPrefab.myHealth.myMaxHealth = 5;
-		npcPrefab.myPhysics.myEnabled = true;
-		npcPrefab.myPhysics.myMatchSprite = true;
-
-		EntityPrefab& npcProjectilePrefab = myEntityPrefabs.CreateNewAsset("NPCProjectile");
-		npcProjectilePrefab.myEntityType = Entity::NPC;
-		npcProjectilePrefab.mySprite.myEnabled = true;
-		npcProjectilePrefab.mySprite.myRadius = 5.f;
-		npcProjectilePrefab.mySprite.myColor = 0xFFFF0000;
-		FW_ARGB_To_RGBAFloat(npcProjectilePrefab.mySprite.myColor, npcProjectilePrefab.mySprite.myFloatColor);
-		npcProjectilePrefab.myPhysics.myEnabled = true;
-		npcProjectilePrefab.myPhysics.myMatchSprite = true;
-		npcProjectilePrefab.myRemoveOnCollision.myEnabled = true;
-
-		EntityPrefab& playerProjectilePrefab = myEntityPrefabs.CreateNewAsset("PlayerProjectile");
-		playerProjectilePrefab.myEntityType = Entity::PLAYER;
-		playerProjectilePrefab.mySprite.myEnabled = true;
-		playerProjectilePrefab.mySprite.myRadius = 5.f;
-		playerProjectilePrefab.mySprite.myColor = 0xFFFF0000;
-		FW_ARGB_To_RGBAFloat(playerProjectilePrefab.mySprite.myColor, playerProjectilePrefab.mySprite.myFloatColor);
-		playerProjectilePrefab.myPhysics.myEnabled = true;
-		playerProjectilePrefab.myPhysics.myMatchSprite = true;
-		playerProjectilePrefab.myRemoveOnCollision.myEnabled = true;
-
-		EntityPrefab& wallPrefab = myEntityPrefabs.CreateNewAsset("Wall");
-		wallPrefab.myEntityType = Entity::ENVIRONMENT;
-		wallPrefab.mySprite.myEnabled = true;
-		wallPrefab.mySprite.mySize = { 1000.f, 100.f };
-		wallPrefab.mySprite.myColor = 0xFFFFFF00;
-		FW_ARGB_To_RGBAFloat(wallPrefab.mySprite.myColor, wallPrefab.mySprite.myFloatColor);
-		wallPrefab.myPhysics.myEnabled = true;
-		wallPrefab.myPhysics.myStatic = true;
-		wallPrefab.myPhysics.myMatchSprite = true;
+		FW_GrowingArray<FW_FileSystem::FileInfo> prefabInfos;
+		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/EntityPrefabs", prefabInfos);
+		
+		for (const FW_FileSystem::FileInfo& info : prefabInfos)
+			myEntityPrefabs.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
 	}
 
 private:

@@ -1,0 +1,15 @@
+#entitytype 1 
+#sprite 
+radius 5.000000 
+size 0.000000 0.000000 
+color -65536 
+floatColor 1.000000 0.000000 0.000000 1.000000 
+#end 
+#physics 
+isStatic 0 
+matchsprite 1 
+radius 10.000000 
+size 0.000000 0.000000 
+#end 
+#removeoncollision 
+#end 

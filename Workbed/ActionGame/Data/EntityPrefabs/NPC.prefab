@@ -1,0 +1,23 @@
+#entitytype 2 
+#sprite 
+radius 20.000000 
+size 0.000000 0.000000 
+color -16776961 
+floatColor 0.000000 0.000000 1.000000 1.000000 
+#end 
+#animation 
+#end 
+#projectileshooting 
+cooldown 1.000000 
+#end 
+#npccontroller 
+#end 
+#health 
+maxhealth 5 
+#end 
+#physics 
+isStatic 0 
+matchsprite 1 
+radius 10.000000 
+size 0.000000 0.000000 
+#end 

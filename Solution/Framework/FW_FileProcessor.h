@@ -29,6 +29,8 @@ public:
 	void Process(float& aValue);
 	void Process(int&& aValue);
 	void Process(int& aValue);
+	void Process(bool&& aValue);
+	void Process(bool& aValue);
 
 	void AddNewline();
 	bool IsWriting() const { return (myFlags & WRITE) > 0; }

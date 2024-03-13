@@ -211,4 +211,24 @@ namespace FW_FileSystem
 		aFileContentOut.myContents = string;
 		aFileContentOut.myFileSize = fileSize;
 	}
+
+	void TrimBeginAndEnd(FW_String& aLine)
+	{
+		if (aLine.Empty() == true)
+			return;
+
+		int begin = 0;
+		while (aLine[begin] == ' ' || aLine[begin] == '\t' || aLine[begin] == '\n')
+			++begin;
+
+		int end = aLine.Length();
+		if (end > begin)
+		{
+			while (aLine[end] == ' ' || aLine[end] == '\t' || aLine[end] == '\n')
+				--end;
+		}
+
+		if (begin != 0 || end != aLine.Length())
+			aLine = aLine.SubStr(begin, end);
+	}
 }

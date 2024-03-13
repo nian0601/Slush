@@ -40,6 +40,8 @@ namespace FW_UnitTestSuite
 		int intWrite = 321;
 		FW_String stringWrite = "Apa_123";
 		FW_String stringWrite2 = "This is a long string";
+		bool boolWrite = false;
+		bool boolWrite2 = true;
 
 		{
 			FW_FileProcessor processor(assetPath.c_str(), FW_FileProcessor::WRITE);
@@ -54,6 +56,10 @@ namespace FW_UnitTestSuite
 			processor.AddNewline();
 
 			processor.Process(stringWrite2);
+			processor.AddNewline();
+
+			processor.Process(boolWrite);
+			processor.Process(boolWrite2);
 		}
 
 
@@ -62,6 +68,8 @@ namespace FW_UnitTestSuite
 		int intRead = 0;
 		FW_String stringRead;
 		FW_String stringRead2;
+		bool boolRead = true;
+		bool boolRead2 = false;
 
 		{
 			FW_FileProcessor processor(assetPath.c_str(), FW_FileProcessor::READ);
@@ -71,6 +79,8 @@ namespace FW_UnitTestSuite
 			processor.Process(intRead);
 			processor.Process(stringRead);
 			processor.ReadRestOfLine(stringRead2);
+			processor.Process(boolRead);
+			processor.Process(boolRead2);
 		}
 
 		FW_ASSERT(floatWrite == floatRead);
@@ -78,6 +88,8 @@ namespace FW_UnitTestSuite
 		FW_ASSERT(intWrite == intRead);
 		FW_ASSERT(stringWrite == stringRead);
 		FW_ASSERT(stringWrite2 == stringRead2);
+		FW_ASSERT(boolWrite == boolRead);
+		FW_ASSERT(boolWrite2 == boolRead2);
 	}
 
 	void RunTests()

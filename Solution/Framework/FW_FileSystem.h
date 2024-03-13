@@ -44,4 +44,6 @@ namespace FW_FileSystem
 	bool UpdateFileInfo(FW_GrowingArray<FileInfo>& someFiles);
 
 	void ReadEntireFile(const FW_String& aFilePath, FileContent& aFileContentOut);
+
+	void TrimBeginAndEnd(FW_String& aLine);
 }

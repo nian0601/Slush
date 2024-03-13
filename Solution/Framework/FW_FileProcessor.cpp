@@ -66,7 +66,7 @@ void FW_FileProcessor::ReadRestOfLine(FW_String& aString)
 		char stringBuffer[256];
 		fgets(stringBuffer, 256, myFile);
 		aString = stringBuffer;
-		aString.RemoveOne();
+		FW_FileSystem::TrimBeginAndEnd(aString);
 	}
 }
 
@@ -194,6 +194,33 @@ void FW_FileProcessor::Process(int& aValue)
 	else
 		fscanf_s(myFile, "%d ", &aValue);
 #endif
+}
+
+void FW_FileProcessor::Process(bool&& aValue)
+{
+	FW_ASSERT(IsOpen(), "Tried to process an unopened file");
+	FW_ASSERT(IsWriting(), "Tried to read from disc into a const string");
+
+	if (IsWriting())
+	{
+		int value = aValue ? 1 : 0;
+#if USE_BINARY_FILE_PROCESSING
+		ProcessRawData(&value, sizeof(int));
+#else
+		fprintf(myFile, "%d ", value);
+#endif
+	}
+}
+
+void FW_FileProcessor::Process(bool& aValue)
+{
+	FW_ASSERT(IsOpen(), "Tried to process an unopened file");
+
+	int boolAsInt = aValue ? 1 : 0;
+	Process(boolAsInt);
+
+	if (IsReading())
+		aValue = boolAsInt == 1;
 }
 
 void FW_FileProcessor::AddNewline()

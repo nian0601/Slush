@@ -5,11 +5,12 @@
 #include <Core\Time.h>
 #include <FW_Vector2.h>
 
+class EntityPrefab;
 class ProjectileManager;
 class ProjectileShootingComponent : public Component
 {
 public:
-	ProjectileShootingComponent(Entity& anEntity, ProjectileManager& aProjectileManager);
+	ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab, ProjectileManager& aProjectileManager);
 
 	void TryShoot(const Vector2f& aDirection);
 	void SetCooldown(float aCooldownInSeconds);

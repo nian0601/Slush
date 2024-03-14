@@ -10,7 +10,7 @@ namespace Slush
 class SpriteComponent : public Component
 {
 public:
-	using Component::Component;
+	SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~SpriteComponent();
 
 	void MakeCircle(float aRadius, int aColor);

@@ -3,11 +3,52 @@
 #include "Entity.h"
 #include <Physics\PhysicsWorld.h>
 #include <FW_Includes.h>
+#include "EntityPrefab.h"
+#include <Core\Log.h>
 
-PhysicsComponent::PhysicsComponent(Entity& aEntity, Slush::PhysicsWorld& aPhysicsWorld)
-	: Component(aEntity)
+PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld)
+	: Component(aEntity, anEntityPrefab)
 	, myPhysicsWorld(aPhysicsWorld)
 {
+	Slush::PhysicsShape* shape = nullptr;
+	if (anEntityPrefab.myPhysics.myMatchSprite)
+	{
+		if (anEntityPrefab.mySprite.myEnabled)
+		{
+			if (anEntityPrefab.mySprite.myRadius > 0.f)
+				shape = new Slush::CircleShape(anEntityPrefab.mySprite.myRadius);
+			else
+				shape = new Slush::AABBShape(anEntityPrefab.mySprite.mySize);
+		}
+		else
+		{
+			SLUSH_ERROR("Failed to match Physics to Sprite since EntityPrefab doesnt have Sprite enabled, creating a Unit-circle as default");
+			shape = new Slush::CircleShape(1.f);
+		}
+	}
+	else
+	{
+		if (anEntityPrefab.myPhysics.myRadius > 0.f)
+			shape = new Slush::CircleShape(anEntityPrefab.myPhysics.myRadius);
+		else
+			shape = new Slush::AABBShape(anEntityPrefab.myPhysics.mySize);
+	}
+
+	if (shape)
+	{
+
+		myObject = new Slush::PhysicsObject(shape);
+		myObject->SetPosition(myEntity.myPosition);
+		myObject->myUserData.Set<PhysicsComponent* const>(this);
+		aPhysicsWorld.AddObject(myObject);
+
+		if (anEntityPrefab.myPhysics.myStatic)
+			myObject->MakeStatic();
+	}
+	else
+	{
+		SLUSH_ERROR("Failed to create PhysicsShape, wont create PhysicsComponent for the entity");
+	}
 }
 
 PhysicsComponent::~PhysicsComponent()

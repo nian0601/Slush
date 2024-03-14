@@ -1,12 +1,13 @@
 #include "HealthComponent.h"
 
 #include "Entity.h"
+#include "EntityPrefab.h"
 
 #include <Graphics/RectSprite.h>
 #include <FW_Includes.h>
 
-HealthComponent::HealthComponent(Entity& anEntity)
-	: Component(anEntity)
+HealthComponent::HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
+	: Component(anEntity, anEntityPrefab)
 {
 	myBackground = new Slush::RectSprite();
 	myForeground = new Slush::RectSprite();
@@ -15,6 +16,8 @@ HealthComponent::HealthComponent(Entity& anEntity)
 	myBackground->SetFillColor(0xFF222222);
 	myForeground->SetSize(myTotalWidth - myPadding * 2.f, myTotalHeight - myPadding * 2.f);
 	myForeground->SetFillColor(0xFF00FF00);
+
+	SetMaxHealth(anEntityPrefab.myHealth.myMaxHealth);
 }
 
 HealthComponent::~HealthComponent()

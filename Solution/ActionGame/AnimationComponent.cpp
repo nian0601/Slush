@@ -9,8 +9,8 @@
 #include <Core\Log.h>
 #include <FW_Includes.h>
 
-AnimationComponent::AnimationComponent(Entity& anEntity)
-	: Component(anEntity)
+AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
+	: Component(anEntity, anEntityPrefab)
 {
 	myDashAnimation = new Slush::Animation();
 	myDashAnimation->MakeOneShot();

@@ -6,6 +6,16 @@
 
 #include <FW_Includes.h>
 #include <Graphics/RectSprite.h>
+#include "EntityPrefab.h"
+
+SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
+	: Component(anEntity, anEntityPrefab)
+{
+	if (anEntityPrefab.mySprite.mySize.x > 0.f)
+		MakeRect(anEntityPrefab.mySprite.mySize.x, anEntityPrefab.mySprite.mySize.y, anEntityPrefab.mySprite.myColor);
+	else
+		MakeCircle(anEntityPrefab.mySprite.myRadius, anEntityPrefab.mySprite.myColor);
+}
 
 SpriteComponent::~SpriteComponent()
 {

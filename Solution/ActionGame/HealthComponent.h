@@ -7,10 +7,11 @@ namespace Slush
 	class RectSprite;
 }
 
+class EntityPrefab;
 class HealthComponent : public Component
 {
 public:
-	HealthComponent(Entity& anEntity);
+	HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~HealthComponent();
 
 	void Render();

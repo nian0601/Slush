@@ -11,10 +11,11 @@ namespace Slush
 	struct PhysicsObject;
 }
 
+class EntityPrefab;
 class PhysicsComponent : public Component
 {
 public:
-	PhysicsComponent(Entity& aEntity, Slush::PhysicsWorld& aPhysicsWorld);
+	PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld);
 	~PhysicsComponent();
 
 	void Update();

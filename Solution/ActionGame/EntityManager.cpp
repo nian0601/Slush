@@ -45,80 +45,28 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 	entity->myPosition = aPosition;
 
 	if (aPrefab.mySprite.myEnabled)
-	{
-		entity->mySpriteComponent = new SpriteComponent(*entity);
-		if (aPrefab.mySprite.mySize.x > 0.f)
-			entity->mySpriteComponent->MakeRect(aPrefab.mySprite.mySize.x, aPrefab.mySprite.mySize.y, aPrefab.mySprite.myColor);
-		else
-			entity->mySpriteComponent->MakeCircle(aPrefab.mySprite.myRadius, aPrefab.mySprite.myColor);
-	}
+		entity->mySpriteComponent = new SpriteComponent(*entity, aPrefab);
 
 	if (aPrefab.myAnimation.myEnabled)
-		entity->myAnimationComponent = new AnimationComponent(*entity);
+		entity->myAnimationComponent = new AnimationComponent(*entity, aPrefab);
 
 	if (aPrefab.myProjectileShooting.myEnabled)
-	{
-		entity->myProjectileShootingComponent = new ProjectileShootingComponent(*entity, aProjectileManager);
-		entity->myProjectileShootingComponent->SetCooldown(aPrefab.myProjectileShooting.myCooldown);
-	}
+		entity->myProjectileShootingComponent = new ProjectileShootingComponent(*entity, aPrefab, aProjectileManager);
 
 	if (aPrefab.myHealth.myEnabled)
-	{
-		entity->myHealthComponent = new HealthComponent(*entity);
-		entity->myHealthComponent->SetMaxHealth(aPrefab.myHealth.myMaxHealth);
-	}
+		entity->myHealthComponent = new HealthComponent(*entity, aPrefab);
 
 	if (aPrefab.myPlayerController.myEnabled)
-		entity->myPlayerControllerComponent = new PlayerControllerComponent(*entity);
+		entity->myPlayerControllerComponent = new PlayerControllerComponent(*entity, aPrefab);
 
 	if (aPrefab.myNPCController.myEnabled)
-		entity->myNPCControllerComponent = new NPCControllerComponent(*entity);
+		entity->myNPCControllerComponent = new NPCControllerComponent(*entity, aPrefab);
 
 	if (aPrefab.myPhysics.myEnabled)
-	{
-		Slush::PhysicsShape* shape = nullptr;
-		if (aPrefab.myPhysics.myMatchSprite)
-		{
-			if (aPrefab.mySprite.myEnabled)
-			{
-				if (aPrefab.mySprite.myRadius > 0.f)
-					shape = new Slush::CircleShape(aPrefab.mySprite.myRadius);
-				else
-					shape = new Slush::AABBShape(aPrefab.mySprite.mySize);
-			}
-			else
-			{
-				SLUSH_ERROR("Failed to match Physics to Sprite since EntityPrefab doesnt have Sprite enabled, creating a Unit-circle as default");
-				shape = new Slush::CircleShape(1.f);
-			}
-		}
-		else
-		{
-			if (aPrefab.myPhysics.myRadius > 0.f)
-				shape = new Slush::CircleShape(aPrefab.myPhysics.myRadius);
-			else
-				shape = new Slush::AABBShape(aPrefab.myPhysics.mySize);
-		}
-
-		if (shape)
-		{
-			entity->myPhysicsComponent = new PhysicsComponent(*entity, aPhysicsWorld);
-			entity->myPhysicsComponent->myObject = new Slush::PhysicsObject(shape);
-			entity->myPhysicsComponent->myObject->SetPosition(entity->myPosition);
-			entity->myPhysicsComponent->myObject->myUserData.Set(entity->myPhysicsComponent);
-			aPhysicsWorld.AddObject(entity->myPhysicsComponent->myObject);
-
-			if (aPrefab.myPhysics.myStatic)
-				entity->myPhysicsComponent->myObject->MakeStatic();
-		}
-		else
-		{
-			SLUSH_ERROR("Failed to create PhysicsShape, wont create PhysicsComponent for the entity");
-		}
-	}
+		entity->myPhysicsComponent = new PhysicsComponent(*entity, aPrefab, aPhysicsWorld);
 
 	if (aPrefab.myRemoveOnCollision.myEnabled)
-		entity->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*entity);
+		entity->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*entity, aPrefab);
 
 	return entity;
 }

@@ -1,11 +1,13 @@
 #include "ProjectileShootingComponent.h"
 #include "ProjectileManager.h"
 #include "Entity.h"
+#include "EntityPrefab.h"
 
-ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, ProjectileManager& aProjectileManager)
-	: Component(anEntity)
+ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab, ProjectileManager& aProjectileManager)
+	: Component(anEntity, anEntityPrefab)
 	, myProjectileManager(aProjectileManager)
 {
+	SetCooldown(anEntityPrefab.myProjectileShooting.myCooldown);
 }
 
 void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)

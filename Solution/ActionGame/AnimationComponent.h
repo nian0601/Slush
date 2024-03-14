@@ -10,10 +10,11 @@ namespace Slush
 	struct AnimationRuntime;
 }
 
+class EntityPrefab;
 class AnimationComponent : public Component
 {
 public:
-	AnimationComponent(Entity& anEntity);
+	AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~AnimationComponent();
 
 	void Update();

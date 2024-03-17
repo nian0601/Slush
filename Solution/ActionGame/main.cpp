@@ -46,7 +46,7 @@ public:
 		CreatePrefabs();
 
 		myPhysicsWorld = new Slush::PhysicsWorld();
-		myEntityManager = new EntityManager(myEntityPrefabs);
+		myEntityManager = new EntityManager(myEntityPrefabs, *myPhysicsWorld);
 
 		myNPCWave = new NPCWave(*myEntityManager, *myPhysicsWorld);
 
@@ -56,7 +56,7 @@ public:
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
 
-		myEntityManager->CreateEntity({ 500.f, 800.f }, "Wall", *myPhysicsWorld);
+		myEntityManager->CreateEntity({ 500.f, 800.f }, "Wall");
 	}
 
 	void Shutdown() override
@@ -122,7 +122,7 @@ public:
 
 	void CreatePlayer()
 	{
-		Entity* player = myEntityManager->CreateEntity({ 400.f, 400.f }, "Player", *myPhysicsWorld);
+		Entity* player = myEntityManager->CreateEntity({ 400.f, 400.f }, "Player");
 		myPlayer = player->myHandle;
 		myNPCWave->SetPlayerHandle(myPlayer);
 	}

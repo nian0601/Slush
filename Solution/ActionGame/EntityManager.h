@@ -17,12 +17,12 @@ namespace Slush
 class EntityManager
 {
 public:
-	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage);
+	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld);
 	~EntityManager();
 
 	Entity* CreateEntity();
-	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld);
-	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName, Slush::PhysicsWorld& aPhysicsWorld);
+	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab);
+	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName);
 
 	void PrePhysicsUpdate();
 
@@ -40,4 +40,5 @@ private:
 	FW_GrowingArray<Entity*> myAddQueue;
 
 	Slush::AssetStorage<EntityPrefab>& myPrefabStorage;
+	Slush::PhysicsWorld& myPhysicsWorld;
 };

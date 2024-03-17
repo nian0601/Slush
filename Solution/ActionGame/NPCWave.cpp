@@ -69,7 +69,7 @@ void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
 
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
-	Entity* npc = myEntityManager.CreateEntity(aPosition, "NPC", myPhysicsWorld);
+	Entity* npc = myEntityManager.CreateEntity(aPosition, "NPC");
 	npc->myProjectileShootingComponent->TriggerCooldown();
 	npc->myNPCControllerComponent->SetTarget(myPlayerHandle);
 	myNPCs.Add(npc->myHandle);

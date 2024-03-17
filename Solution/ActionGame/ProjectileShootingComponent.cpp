@@ -5,9 +5,8 @@
 #include "PhysicsComponent.h"
 #include <Physics\PhysicsWorld.h>
 
-ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld)
+ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
-	, myPhysicsWorld(aPhysicsWorld)
 {
 	SetCooldown(anEntityPrefab.myProjectileShooting.myCooldown);
 }
@@ -23,7 +22,7 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 	if (myEntity.myType == Entity::NPC)
 		prefab = "NPCProjectile";
 
-	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, prefab, myPhysicsWorld);
+	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, prefab);
 	projectile->myPhysicsComponent->myObject->myVelocity = aDirection * 1000.f;
 }
 

@@ -12,8 +12,9 @@
 #include <Core\Log.h>
 #include "RemoveOnCollisionComponent.h"
 
-EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
+EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
 	: myPrefabStorage(aPrefabStorage)
+	, myPhysicsWorld(aPhysicsWorld)
 {
 }
 
@@ -38,7 +39,7 @@ Entity* EntityManager::CreateEntity()
 	return entity;
 }
 
-Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld)
+Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab)
 {
 	Entity* entity = CreateEntity();
 	entity->myType = static_cast<Entity::Type>(aPrefab.myEntityType);
@@ -51,7 +52,7 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 		entity->myAnimationComponent = new AnimationComponent(*entity, aPrefab);
 
 	if (aPrefab.myProjectileShooting.myEnabled)
-		entity->myProjectileShootingComponent = new ProjectileShootingComponent(*entity, aPrefab, aPhysicsWorld);
+		entity->myProjectileShootingComponent = new ProjectileShootingComponent(*entity, aPrefab);
 
 	if (aPrefab.myHealth.myEnabled)
 		entity->myHealthComponent = new HealthComponent(*entity, aPrefab);
@@ -63,7 +64,7 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 		entity->myNPCControllerComponent = new NPCControllerComponent(*entity, aPrefab);
 
 	if (aPrefab.myPhysics.myEnabled)
-		entity->myPhysicsComponent = new PhysicsComponent(*entity, aPrefab, aPhysicsWorld);
+		entity->myPhysicsComponent = new PhysicsComponent(*entity, aPrefab, myPhysicsWorld);
 
 	if (aPrefab.myRemoveOnCollision.myEnabled)
 		entity->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*entity, aPrefab);
@@ -71,10 +72,10 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 	return entity;
 }
 
-Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPrefabName, Slush::PhysicsWorld& aPhysicsWorld)
+Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPrefabName)
 {
 	if (const EntityPrefab* prefab = myPrefabStorage.GetAsset(aPrefabName))
-		return CreateEntity(aPosition, *prefab, aPhysicsWorld);
+		return CreateEntity(aPosition, *prefab);
 	
 	SLUSH_ERROR("Found no EntityPrefab called %s, creating a empty entity", aPrefabName);
 	return CreateEntity();

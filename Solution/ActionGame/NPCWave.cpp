@@ -61,8 +61,11 @@ void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
 {
 	myPlayerHandle = aHandle;
 
-	for (const EntityHandle& npc : myNPCs)
-		npc.Get()->myNPCControllerComponent->SetTarget(myPlayerHandle);
+	for (const EntityHandle& npcHandle : myNPCs)
+	{
+		if (Entity* npc = npcHandle.Get())
+			npc->myNPCControllerComponent->SetTarget(myPlayerHandle);
+	}
 }
 
 void NPCWave::CreateNPC(const Vector2f& aPosition)

@@ -2,11 +2,15 @@
 
 #include "Entity.h"
 #include "SpriteComponent.h"
+#include "PhysicsComponent.h"
+
+#include <Core\Log.h>
+
+#include <Physics\PhysicsWorld.h>
 
 #include <Graphics\Animation\Animation.h>
 #include <Graphics\Animation\AnimationRuntime.h>
 
-#include <Core\Log.h>
 #include <FW_Includes.h>
 
 AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
@@ -41,7 +45,12 @@ void AnimationComponent::Update()
 
 	myDashAnimation->Update(*myRuntime, myEntity.mySpriteComponent->GetSprite());
 	if (myRuntime->myPositionData.myIsActive)
+	{
 		myEntity.myPosition = myRuntime->myCurrentPosition;
+		if (PhysicsComponent* phys = myEntity.myPhysicsComponent)
+			phys->myObject->SetPosition(myEntity.myPosition);
+	}
+
 }
 
 bool AnimationComponent::AnimationIsPlaying() const

@@ -79,29 +79,7 @@ public:
 
 		myPhysicsWorld->TickLimited(Slush::Time::GetDelta());
 
-		const FW_GrowingArray<Slush::Manifold>& contacts = myPhysicsWorld->GetContacts();
-		for (const Slush::Manifold& contact : contacts)
-		{
-			if (!contact.myObjectA || !contact.myObjectB)
-				continue;
-		
-			PhysicsComponent* physA = contact.myObjectA->myUserData.Get<PhysicsComponent*>();
-			PhysicsComponent* physB = contact.myObjectB->myUserData.Get<PhysicsComponent*>();
-			if (!physA || !physB)
-			{
-				SLUSH_WARNING("PhysContact with Entity without PhysicsComponent");
-				continue;
-			}
-
-			if (physA->myEntity.myType == physB->myEntity.myType)
-			{
-				SLUSH_WARNING("PhysContact between entities of the same type");
-				continue;
-			}
-		
-			physA->myEntity.OnCollision(physB->myEntity);
-			physB->myEntity.OnCollision(physA->myEntity);
-		}
+		UpdatePhysics();
 
 		myNPCWave->Update();
 		myEntityManager->Update();
@@ -117,6 +95,33 @@ public:
 		myEntityManager->Render();
 
 		engine.GetWindow().EndOffscreenBuffer();
+	}
+
+	void UpdatePhysics()
+	{
+		const FW_GrowingArray<Slush::Manifold>& contacts = myPhysicsWorld->GetContacts();
+		for (const Slush::Manifold& contact : contacts)
+		{
+			if (!contact.myObjectA || !contact.myObjectB)
+				continue;
+
+			PhysicsComponent* physA = contact.myObjectA->myUserData.Get<PhysicsComponent*>();
+			PhysicsComponent* physB = contact.myObjectB->myUserData.Get<PhysicsComponent*>();
+			if (!physA || !physB)
+			{
+				SLUSH_WARNING("PhysContact with Entity without PhysicsComponent");
+				continue;
+			}
+
+			if (physA->myEntity.myType == physB->myEntity.myType)
+			{
+				SLUSH_WARNING("PhysContact between entities of the same type");
+				continue;
+			}
+
+			physA->myEntity.OnCollision(physB->myEntity);
+			physB->myEntity.OnCollision(physA->myEntity);
+		}
 	}
 
 	void CreatePlayer()

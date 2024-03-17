@@ -8,7 +8,6 @@
 
 class Entity;
 class EntityPrefab;
-class ProjectileManager;
 
 namespace Slush
 {
@@ -22,8 +21,8 @@ public:
 	~EntityManager();
 
 	Entity* CreateEntity();
-	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld, ProjectileManager& aProjectileManager);
-	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName, Slush::PhysicsWorld& aPhysicsWorld, ProjectileManager& aProjectileManager);
+	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld);
+	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName, Slush::PhysicsWorld& aPhysicsWorld);
 
 	void PrePhysicsUpdate();
 

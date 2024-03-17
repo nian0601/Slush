@@ -27,8 +27,6 @@
 #include "EntityManager.h"
 #include "EntityPrefab.h"
 
-#include "ProjectileManager.h"
-
 #include "NPCWave.h"
 #include "PhysicsComponent.h"
 #include "EntityPrefabDockable.h"
@@ -50,8 +48,7 @@ public:
 		myPhysicsWorld = new Slush::PhysicsWorld();
 		myEntityManager = new EntityManager(myEntityPrefabs);
 
-		myProjectileManager = new ProjectileManager(*myEntityManager, *myPhysicsWorld);
-		myNPCWave = new NPCWave(*myEntityManager, *myProjectileManager, *myPhysicsWorld);
+		myNPCWave = new NPCWave(*myEntityManager, *myPhysicsWorld);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
@@ -59,13 +56,12 @@ public:
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
 
-		myEntityManager->CreateEntity({ 500.f, 800.f }, "Wall", *myPhysicsWorld, *myProjectileManager);
+		myEntityManager->CreateEntity({ 500.f, 800.f }, "Wall", *myPhysicsWorld);
 	}
 
 	void Shutdown() override
 	{
 		FW_SAFE_DELETE(myNPCWave);
-		FW_SAFE_DELETE(myProjectileManager);
 		FW_SAFE_DELETE(myEntityManager);
 		FW_SAFE_DELETE(myPhysicsWorld);
 	}
@@ -126,7 +122,7 @@ public:
 
 	void CreatePlayer()
 	{
-		Entity* player = myEntityManager->CreateEntity({ 400.f, 400.f }, "Player", *myPhysicsWorld, *myProjectileManager);
+		Entity* player = myEntityManager->CreateEntity({ 400.f, 400.f }, "Player", *myPhysicsWorld);
 		myPlayer = player->myHandle;
 		myNPCWave->SetPlayerHandle(myPlayer);
 	}
@@ -150,7 +146,6 @@ private:
 	Slush::PhysicsWorld* myPhysicsWorld;
 
 	NPCWave* myNPCWave;
-	ProjectileManager* myProjectileManager;
 };
 
 #include <FW_UnitTestSuite.h>

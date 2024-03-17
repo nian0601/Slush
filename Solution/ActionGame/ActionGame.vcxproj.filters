@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ProjectileManager.cpp" />
     <ClCompile Include="NPCWave.cpp" />
     <ClCompile Include="HealthComponent.cpp">
       <Filter>Entities\Components</Filter>
@@ -42,7 +41,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ProjectileManager.h" />
     <ClInclude Include="NPCWave.h" />
     <ClInclude Include="HealthComponent.h">
       <Filter>Entities\Components</Filter>

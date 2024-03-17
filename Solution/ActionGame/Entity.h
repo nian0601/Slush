@@ -13,6 +13,8 @@ class HealthComponent;
 class PhysicsComponent;
 class RemoveOnCollisionComponent;
 
+class EntityManager;
+
 class Entity
 {
 public:
@@ -23,6 +25,7 @@ public:
 		NPC,
 	};
 
+	Entity(EntityManager& aEntityManager);
 	~Entity();
 
 	void PrePhysicsUpdate();
@@ -44,4 +47,5 @@ public:
 	Type myType = ENVIRONMENT;
 	bool myIsMarkedForRemoval = false;
 	EntityHandle myHandle;
+	EntityManager& myEntityManager;
 };

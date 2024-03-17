@@ -1,11 +1,13 @@
 #include "ProjectileShootingComponent.h"
-#include "ProjectileManager.h"
 #include "Entity.h"
 #include "EntityPrefab.h"
+#include "EntityManager.h"
+#include "PhysicsComponent.h"
+#include <Physics\PhysicsWorld.h>
 
-ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab, ProjectileManager& aProjectileManager)
+ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld)
 	: Component(anEntity, anEntityPrefab)
-	, myProjectileManager(aProjectileManager)
+	, myPhysicsWorld(aPhysicsWorld)
 {
 	SetCooldown(anEntityPrefab.myProjectileShooting.myCooldown);
 }
@@ -16,7 +18,13 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 		return;
 
 	TriggerCooldown();
-	myProjectileManager.AddProjectile(myEntity.myPosition + aDirection * 35.f, aDirection, myEntity.myType);
+
+	const char* prefab = "PlayerProjectile";
+	if (myEntity.myType == Entity::NPC)
+		prefab = "NPCProjectile";
+
+	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, prefab, myPhysicsWorld);
+	projectile->myPhysicsComponent->myObject->myVelocity = aDirection * 1000.f;
 }
 
 void ProjectileShootingComponent::SetCooldown(float aCooldownInSeconds)

@@ -6,7 +6,6 @@
 
 class Entity;
 class EntityManager;
-class ProjectileManager;
 
 namespace Slush
 {
@@ -16,7 +15,7 @@ namespace Slush
 class NPCWave
 {
 public:
-	NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager, Slush::PhysicsWorld& aPhysicsWorld);
+	NPCWave(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld);
 
 	void Update();
 
@@ -28,7 +27,6 @@ private:
 	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);
 
 	EntityHandle myPlayerHandle;
-	ProjectileManager& myProjectileManager;
 	EntityManager& myEntityManager;
 	Slush::PhysicsWorld& myPhysicsWorld;
 

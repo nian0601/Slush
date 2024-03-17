@@ -8,9 +8,8 @@
 
 #include <FW_Math.h>
 
-NPCWave::NPCWave(EntityManager& aEntityManager, ProjectileManager& aProjectileManager, Slush::PhysicsWorld& aPhysicsWorld)
+NPCWave::NPCWave(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)
-	, myProjectileManager(aProjectileManager)
 	, myPhysicsWorld(aPhysicsWorld)
 {
 }
@@ -70,7 +69,7 @@ void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
 
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
-	Entity* npc = myEntityManager.CreateEntity(aPosition, "NPC", myPhysicsWorld, myProjectileManager);
+	Entity* npc = myEntityManager.CreateEntity(aPosition, "NPC", myPhysicsWorld);
 	npc->myProjectileShootingComponent->TriggerCooldown();
 	npc->myNPCControllerComponent->SetTarget(myPlayerHandle);
 	myNPCs.Add(npc->myHandle);

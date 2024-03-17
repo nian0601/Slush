@@ -1,7 +1,6 @@
 #include "Entity.h"
 
 #include <FW_Includes.h>
-#include "ProjectileManager.h"
 #include "SpriteComponent.h"
 #include "AnimationComponent.h"
 #include "ProjectileShootingComponent.h"
@@ -10,6 +9,11 @@
 #include "HealthComponent.h"
 #include "PhysicsComponent.h"
 #include "RemoveOnCollisionComponent.h"
+
+Entity::Entity(EntityManager& aEntityManager)
+	: myEntityManager(aEntityManager)
+{
+}
 
 Entity::~Entity()
 {

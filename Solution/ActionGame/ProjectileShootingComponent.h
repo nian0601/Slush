@@ -6,11 +6,16 @@
 #include <FW_Vector2.h>
 
 class EntityPrefab;
-class ProjectileManager;
+
+namespace Slush
+{
+	class PhysicsWorld;
+}
+
 class ProjectileShootingComponent : public Component
 {
 public:
-	ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab, ProjectileManager& aProjectileManager);
+	ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld);
 
 	void TryShoot(const Vector2f& aDirection);
 	void SetCooldown(float aCooldownInSeconds);
@@ -20,5 +25,5 @@ private:
 	Slush::Time::TimeUnit myShootingReadyTimestamp = 0;
 	Slush::Time::TimeUnit myShootingCooldown = 0;
 
-	ProjectileManager& myProjectileManager;
+	Slush::PhysicsWorld& myPhysicsWorld;
 };

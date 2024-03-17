@@ -15,10 +15,10 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 	{
 		if (anEntityPrefab.mySprite.myEnabled)
 		{
-			if (anEntityPrefab.mySprite.myRadius > 0.f)
-				shape = new Slush::CircleShape(anEntityPrefab.mySprite.myRadius);
-			else
+			if (anEntityPrefab.mySprite.mySize.x > 0.f)
 				shape = new Slush::AABBShape(anEntityPrefab.mySprite.mySize);
+			else
+				shape = new Slush::CircleShape(anEntityPrefab.mySprite.myRadius);
 		}
 		else
 		{
@@ -28,10 +28,10 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 	}
 	else
 	{
-		if (anEntityPrefab.myPhysics.myRadius > 0.f)
-			shape = new Slush::CircleShape(anEntityPrefab.myPhysics.myRadius);
-		else
+		if (anEntityPrefab.myPhysics.mySize.x > 0.f)
 			shape = new Slush::AABBShape(anEntityPrefab.myPhysics.mySize);
+		else
+			shape = new Slush::CircleShape(anEntityPrefab.myPhysics.myRadius);
 	}
 
 	if (shape)

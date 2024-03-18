@@ -16,14 +16,17 @@ void NPCControllerComponent::Update()
 		return;
 	}
 
-	if (PhysicsComponent* phys = myEntity.myPhysicsComponent)
-		phys->myObject->myVelocity = Vector2f(0.f, 0.f);
-
-	if (!myEntity.myProjectileShootingComponent)
-		return;
-
 	Vector2f toTarget = myTargetHandle.Get()->myPosition - myEntity.myPosition;
-	float distance = Length(toTarget);
-	if (distance < myMaxDistance)
-		myEntity.myProjectileShootingComponent->TryShoot(GetNormalized(toTarget));
+
+	if (PhysicsComponent* phys = myEntity.myPhysicsComponent)
+	{
+		phys->myObject->myVelocity = GetNormalized(toTarget) * 100.f;
+	}
+
+	if (ProjectileShootingComponent* projShooter = myEntity.myProjectileShootingComponent)
+	{
+		float distance = Length(toTarget);
+		if (distance < myMaxDistance)
+			projShooter->TryShoot(GetNormalized(toTarget));
+	}
 }

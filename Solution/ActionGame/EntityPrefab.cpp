@@ -108,7 +108,7 @@ void EntityPrefab::LoadEmptyComponent(FW_FileParser& aParser)
 
 void EntityPrefab::BuildUI()
 {
-	const char* entityTypeNames[] = { "Environment", "Player", "NPC" };
+	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile" };
 	ImGui::Combo("Entity Type", &myEntityType, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
 
 	if (BaseComponentUI(mySprite.myEnabled, "Sprite", "Add Sprite"))

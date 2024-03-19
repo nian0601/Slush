@@ -23,6 +23,8 @@ public:
 		ENVIRONMENT,
 		PLAYER,
 		NPC,
+		PLAYER_PROJECTILE,
+		NPC_PROJECTILE,
 	};
 
 	Entity(EntityManager& aEntityManager);

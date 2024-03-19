@@ -37,7 +37,13 @@ void HealthComponent::Render()
 
 void HealthComponent::OnCollision(Entity& aOtherEntity)
 {
-	if (aOtherEntity.myType != Entity::ENVIRONMENT)
+	Entity::Type otherType = aOtherEntity.myType;
+	if (otherType == Entity::ENVIRONMENT)
+		return;
+
+	if (myEntity.myType == Entity::PLAYER && (otherType == Entity::NPC || otherType == Entity::NPC_PROJECTILE))
+		DealDamage(1);
+	else if (myEntity.myType == Entity::NPC && otherType == Entity::PLAYER_PROJECTILE)
 		DealDamage(1);
 }
 

@@ -109,12 +109,6 @@ public:
 				continue;
 			}
 
-			if (physA->myEntity.myType == physB->myEntity.myType)
-			{
-				SLUSH_WARNING("PhysContact between entities of the same type");
-				continue;
-			}
-
 			physA->myEntity.OnCollision(physB->myEntity);
 			physB->myEntity.OnCollision(physA->myEntity);
 		}

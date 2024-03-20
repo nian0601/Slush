@@ -10,9 +10,6 @@ public:
 
 	void Update();
 
-	void SetTarget(EntityHandle& anEntity) { myTargetHandle = anEntity; }
-
 private:
-	EntityHandle myTargetHandle;
 	float myMaxDistance = 800.f;
 };

@@ -2,21 +2,26 @@
 
 #include "Entity.h"
 #include "ProjectileShootingComponent.h"
-
-#include <FW_Assert.h>
-#include <Core\Log.h>
 #include "PhysicsComponent.h"
+#include "TargetingComponent.h"
+
+#include <Core\Log.h>
 #include <Physics\PhysicsWorld.h>
 
 void NPCControllerComponent::Update()
 {
-	if (!myTargetHandle.IsValid())
+	TargetingComponent* targeting = myEntity.myTargetingComponent;
+	if (!targeting)
 	{
-		SLUSH_WARNING("NPCController is missing a target");
+		SLUSH_ERROR("Entity with 'NPCControllerComponent' is missing a 'TargetingComponent'");
 		return;
 	}
 
-	Vector2f toTarget = myTargetHandle.Get()->myPosition - myEntity.myPosition;
+	EntityHandle target = targeting->GetTarget();
+	if (!target.IsValid())
+		return;
+
+	Vector2f toTarget = target.Get()->myPosition - myEntity.myPosition;
 
 	if (PhysicsComponent* phys = myEntity.myPhysicsComponent)
 	{

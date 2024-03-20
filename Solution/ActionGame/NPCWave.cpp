@@ -37,14 +37,20 @@ void NPCWave::Update()
 
 void NPCWave::StartWave(int aNumberOfNPCs)
 {
+	FW_GrowingArray<EntityHandle> playerHandles;
+	myEntityManager.FindEntitiesOfType(Entity::PLAYER, playerHandles);
+
 	const int iterationLimit = 100;
 	int iterations = 0;
 	Vector2f spawnArea = { 1280.f, 720.f };
 	while (myNPCs.Count() < aNumberOfNPCs && iterations <= iterationLimit)
 	{
 		Vector2f position = FW_RandomVector2f() * spawnArea;
-		if(IsTooClose(myPlayerHandle.Get()->myPosition, position, myPlayerClearanceRadius))
-			continue;
+		for (const EntityHandle& player : playerHandles)
+		{
+			if (IsTooClose(player.Get()->myPosition, position, myPlayerClearanceRadius))
+				continue;
+		}
 
 		for (const EntityHandle& npc : myNPCs)
 		{
@@ -56,24 +62,12 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 	}
 }
 
-void NPCWave::SetPlayerHandle(const EntityHandle& aHandle)
-{
-	myPlayerHandle = aHandle;
-
-	for (const EntityHandle& npcHandle : myNPCs)
-	{
-		if (Entity* npc = npcHandle.Get())
-			npc->myNPCControllerComponent->SetTarget(myPlayerHandle);
-	}
-}
-
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
 	Entity* npc = myEntityManager.CreateEntity(aPosition, "NPC");
 	if (npc->myProjectileShootingComponent)
 		npc->myProjectileShootingComponent->TriggerCooldown();
 
-	npc->myNPCControllerComponent->SetTarget(myPlayerHandle);
 	myNPCs.Add(npc->myHandle);
 }
 

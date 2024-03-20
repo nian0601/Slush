@@ -118,7 +118,6 @@ public:
 	{
 		Entity* player = myEntityManager->CreateEntity({ 400.f, 400.f }, "Player");
 		myPlayer = player->myHandle;
-		myNPCWave->SetPlayerHandle(myPlayer);
 	}
 
 	void CreatePrefabs()

@@ -90,4 +90,13 @@ public:
 
 		bool myEnabled = false;
 	} myRemoveOnCollision;
+
+	struct Targeting
+	{
+		void SaveToDisk(FW_FileProcessor& aProcessor);
+		void LoadFromDisk(FW_FileParser& aParser);
+
+		bool myEnabled = false;
+		Entity::Type myTargetType;
+	} myTargeting;
 };

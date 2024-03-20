@@ -21,3 +21,5 @@ matchsprite 1
 radius 10.000000 
 size 0.000000 0.000000 
 #end 
+#targeting 
+targettype 2 

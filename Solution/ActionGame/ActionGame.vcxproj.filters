@@ -39,6 +39,9 @@
     <ClCompile Include="EntityPrefabDockable.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="TargetingComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -83,6 +86,9 @@
     </ClInclude>
     <ClInclude Include="EntityPrefabDockable.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetingComponent.h">
+      <Filter>Entities\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,7 @@
 #include "HealthComponent.h"
 #include "PhysicsComponent.h"
 #include "RemoveOnCollisionComponent.h"
+#include "TargetingComponent.h"
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
@@ -25,6 +26,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myHealthComponent);
 	FW_SAFE_DELETE(myPhysicsComponent);
 	FW_SAFE_DELETE(myRemoveOnCollisionComponent);
+	FW_SAFE_DELETE(myTargetingComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -43,6 +45,9 @@ void Entity::Update()
 
 	if (myAnimationComponent)
 		myAnimationComponent->Update();
+
+	if (myTargetingComponent)
+		myTargetingComponent->Update();
 }
 
 void Entity::Render()

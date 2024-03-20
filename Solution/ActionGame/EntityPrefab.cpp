@@ -31,6 +31,7 @@ void EntityPrefab::SaveToDisk()
 	myHealth.SaveToDisk(processor);
 	myPhysics.SaveToDisk(processor);
 	myRemoveOnCollision.SaveToDisk(processor);
+	myTargeting.SaveToDisk(processor);
 }
 
 void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
@@ -88,6 +89,11 @@ void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
 		{
 			myRemoveOnCollision.myEnabled = true;
 			LoadEmptyComponent(parser);
+		}
+		else if (fieldName == "#targeting")
+		{
+			myTargeting.myEnabled = true;
+			myTargeting.LoadFromDisk(parser);
 		}
 	}
 }
@@ -162,6 +168,14 @@ void EntityPrefab::BuildUI()
 
 	if (BaseComponentUI(myRemoveOnCollision.myEnabled, "Remove On Collision", "Add Remove On Collision"))
 	{
+		ImGui::TreePop();
+	}
+
+	if (BaseComponentUI(myTargeting.myEnabled, "Targeting", "Add Targeting"))
+	{
+		int type = myTargeting.myTargetType;
+		ImGui::Combo("Target Type", &type, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
+		myTargeting.myTargetType = Entity::Type(type);
 		ImGui::TreePop();
 	}
 }
@@ -429,5 +443,39 @@ void EntityPrefab::RemoveOnCollision::SaveToDisk(FW_FileProcessor& aProcessor)
 
 		aProcessor.Process("#end");
 		aProcessor.AddNewline();
+	}
+}
+
+void EntityPrefab::Targeting::SaveToDisk(FW_FileProcessor& aProcessor)
+{
+	if (myEnabled)
+	{
+		aProcessor.Process("#targeting");
+		aProcessor.AddNewline();
+
+		int entityType = myTargetType;
+		aProcessor.Process("targettype");
+		aProcessor.Process(entityType);
+		aProcessor.AddNewline();
+	}
+}
+
+void EntityPrefab::Targeting::LoadFromDisk(FW_FileParser& aParser)
+{
+	FW_String line;
+	FW_String fieldName;
+	while (aParser.ReadLine(line))
+	{
+		aParser.TrimBeginAndEnd(line);
+		fieldName = aParser.TakeFirstWord(line);
+
+		if (fieldName == "#end")
+			return;
+
+		if (fieldName == "targettype")
+		{
+			int type = aParser.GetInt(aParser.TakeFirstWord(line));
+			myTargetType = Entity::Type(type);
+		}
 	}
 }

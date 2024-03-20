@@ -3,6 +3,7 @@
 #include <FW_GrowingArray.h>
 
 #include "EntityHandle.h"
+#include "Entity.h"
 #include <FW_Vector2.h>
 #include <Core\AssetStorage.h>
 
@@ -23,6 +24,8 @@ public:
 	Entity* CreateEntity();
 	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab);
 	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName);
+
+	void FindEntitiesOfType(Entity::Type aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const;
 
 	void PrePhysicsUpdate();
 

@@ -11,6 +11,7 @@
 #include <Physics\PhysicsWorld.h>
 #include <Core\Log.h>
 #include "RemoveOnCollisionComponent.h"
+#include "TargetingComponent.h"
 
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
 	: myPrefabStorage(aPrefabStorage)
@@ -69,6 +70,9 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 	if (aPrefab.myRemoveOnCollision.myEnabled)
 		entity->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*entity, aPrefab);
 
+	if (aPrefab.myTargeting.myEnabled)
+		entity->myTargetingComponent = new TargetingComponent(*entity, aPrefab);
+
 	return entity;
 }
 
@@ -79,6 +83,15 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPref
 	
 	SLUSH_ERROR("Found no EntityPrefab called %s, creating a empty entity", aPrefabName);
 	return CreateEntity();
+}
+
+void EntityManager::FindEntitiesOfType(Entity::Type aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const
+{
+	for (Entity* entity : myEntities)
+	{
+		if (entity->myType == aType)
+			outEntityHandles.Add(entity->myHandle);
+	}
 }
 
 void EntityManager::PrePhysicsUpdate()

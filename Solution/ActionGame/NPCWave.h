@@ -20,13 +20,11 @@ public:
 	void Update();
 
 	void StartWave(int aNumberOfNPCs);
-	void SetPlayerHandle(const EntityHandle& aHandle);
 
 private:
 	void CreateNPC(const Vector2f& aPosition);
 	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);
 
-	EntityHandle myPlayerHandle;
 	EntityManager& myEntityManager;
 	Slush::PhysicsWorld& myPhysicsWorld;
 

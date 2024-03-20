@@ -36,7 +36,9 @@ public:
 			myProxy->myRefCount--;
 
 		myProxy = aOther.myProxy;
-		myProxy->myRefCount++;
+
+		if (myProxy)
+			myProxy->myRefCount++;
 	}
 
 	EntityHandle& operator=(const EntityHandle& aOther)
@@ -63,6 +65,15 @@ public:
 			return nullptr;
 
 		return myProxy->myObject;
+	}
+
+	void Clear()
+	{
+		if (myProxy)
+		{
+			myProxy->myRefCount--;
+			myProxy = nullptr;
+		}
 	}
 
 	bool operator==(const EntityHandle& aOther)

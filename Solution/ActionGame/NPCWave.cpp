@@ -40,17 +40,35 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 	FW_GrowingArray<EntityHandle> playerHandles;
 	myEntityManager.FindEntitiesOfType(Entity::PLAYER, playerHandles);
 
+	if (playerHandles.IsEmpty())
+	{
+		SLUSH_ERROR("No players found, wont spawn any NPCs.");
+		return;
+	}
+
+	if (playerHandles.Count() > 1)
+		SLUSH_WARNING("More than one Player found, only first one will be used to determine NPC SpawnArea");
+
+	Entity* player = playerHandles[0].Get();
+	if (!player)
+	{
+		SLUSH_ERROR("Invalid Player found, wont spawn any NPCs");
+		return;
+	}
+
 	const int iterationLimit = 100;
 	int iterations = 0;
 	Vector2f spawnArea = { 1280.f, 720.f };
 	while (myNPCs.Count() < aNumberOfNPCs && iterations <= iterationLimit)
 	{
-		Vector2f position = FW_RandomVector2f() * spawnArea;
-		for (const EntityHandle& player : playerHandles)
-		{
-			if (IsTooClose(player.Get()->myPosition, position, myPlayerClearanceRadius))
-				continue;
-		}
+		float randX = FW_RandFloat(-spawnArea.x, spawnArea.x);
+		float randY = FW_RandFloat(-spawnArea.y, spawnArea.y);
+		Vector2f position = player->myPosition;
+		position.x += randX;
+		position.y += randY;
+
+		if (IsTooClose(player->myPosition, position, myPlayerClearanceRadius))
+			continue;
 
 		for (const EntityHandle& npc : myNPCs)
 		{

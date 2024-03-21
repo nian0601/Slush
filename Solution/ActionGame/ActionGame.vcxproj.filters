@@ -42,6 +42,9 @@
     <ClCompile Include="TargetingComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="WeaponComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -88,6 +91,9 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="TargetingComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="WeaponComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
   </ItemGroup>

@@ -32,6 +32,7 @@ void EntityPrefab::SaveToDisk()
 	myPhysics.SaveToDisk(processor);
 	myRemoveOnCollision.SaveToDisk(processor);
 	myTargeting.SaveToDisk(processor);
+	myWeaponComponent.SaveToDisk(processor);
 }
 
 void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
@@ -94,6 +95,11 @@ void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
 		{
 			myTargeting.myEnabled = true;
 			myTargeting.LoadFromDisk(parser);
+		}
+		else if (fieldName == "#weaponcomponent")
+		{
+			myWeaponComponent.myEnabled = true;
+			LoadEmptyComponent(parser);
 		}
 	}
 }
@@ -176,6 +182,11 @@ void EntityPrefab::BuildUI()
 		int type = myTargeting.myTargetType;
 		ImGui::Combo("Target Type", &type, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
 		myTargeting.myTargetType = Entity::Type(type);
+		ImGui::TreePop();
+	}
+
+	if (BaseComponentUI(myWeaponComponent.myEnabled, "Weapon Component", "Add Weapon Component"))
+	{
 		ImGui::TreePop();
 	}
 }
@@ -457,6 +468,9 @@ void EntityPrefab::Targeting::SaveToDisk(FW_FileProcessor& aProcessor)
 		aProcessor.Process("targettype");
 		aProcessor.Process(entityType);
 		aProcessor.AddNewline();
+
+		aProcessor.Process("#end");
+		aProcessor.AddNewline();
 	}
 }
 
@@ -477,5 +491,17 @@ void EntityPrefab::Targeting::LoadFromDisk(FW_FileParser& aParser)
 			int type = aParser.GetInt(aParser.TakeFirstWord(line));
 			myTargetType = Entity::Type(type);
 		}
+	}
+}
+
+void EntityPrefab::WeaponComponent::SaveToDisk(FW_FileProcessor& aProcessor)
+{
+	if (myEnabled)
+	{
+		aProcessor.Process("#weaponcomponent");
+		aProcessor.AddNewline();
+
+		aProcessor.Process("#end");
+		aProcessor.AddNewline();
 	}
 }

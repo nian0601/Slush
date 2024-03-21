@@ -12,6 +12,7 @@
 #include <Core\Log.h>
 #include "RemoveOnCollisionComponent.h"
 #include "TargetingComponent.h"
+#include "WeaponComponent.h"
 
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
 	: myPrefabStorage(aPrefabStorage)
@@ -72,6 +73,9 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 
 	if (aPrefab.myTargeting.myEnabled)
 		entity->myTargetingComponent = new TargetingComponent(*entity, aPrefab);
+
+	if (aPrefab.myWeaponComponent.myEnabled)
+		entity->myWeaponComponent = new WeaponComponent(*entity, aPrefab);
 
 	return entity;
 }

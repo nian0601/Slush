@@ -10,6 +10,7 @@
 #include "PhysicsComponent.h"
 #include "RemoveOnCollisionComponent.h"
 #include "TargetingComponent.h"
+#include "WeaponComponent.h"
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
@@ -27,6 +28,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myPhysicsComponent);
 	FW_SAFE_DELETE(myRemoveOnCollisionComponent);
 	FW_SAFE_DELETE(myTargetingComponent);
+	FW_SAFE_DELETE(myWeaponComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -48,6 +50,9 @@ void Entity::Update()
 
 	if (myTargetingComponent)
 		myTargetingComponent->Update();
+
+	if (myWeaponComponent)
+		myWeaponComponent->Update();
 }
 
 void Entity::Render()

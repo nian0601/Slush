@@ -99,4 +99,12 @@ public:
 		bool myEnabled = false;
 		Entity::Type myTargetType;
 	} myTargeting;
+
+	struct WeaponComponent
+	{
+		void SaveToDisk(FW_FileProcessor& aProcessor);
+		//void LoadFromDisk(FW_FileParser& aParser);
+
+		bool myEnabled = false;
+	} myWeaponComponent;
 };

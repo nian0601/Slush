@@ -13,6 +13,7 @@ class HealthComponent;
 class PhysicsComponent;
 class RemoveOnCollisionComponent;
 class TargetingComponent;
+class WeaponComponent;
 
 class EntityManager;
 
@@ -46,6 +47,7 @@ public:
 	PhysicsComponent* myPhysicsComponent = nullptr;
 	RemoveOnCollisionComponent* myRemoveOnCollisionComponent = nullptr;
 	TargetingComponent* myTargetingComponent = nullptr;
+	WeaponComponent* myWeaponComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;

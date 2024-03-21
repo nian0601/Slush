@@ -149,6 +149,7 @@
     <ClCompile Include="RemoveOnCollisionComponent.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
     <ClCompile Include="TargetingComponent.cpp" />
+    <ClCompile Include="WeaponComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationComponent.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="RemoveOnCollisionComponent.h" />
     <ClInclude Include="SpriteComponent.h" />
     <ClInclude Include="TargetingComponent.h" />
+    <ClInclude Include="WeaponComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

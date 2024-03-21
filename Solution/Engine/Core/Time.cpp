@@ -63,4 +63,25 @@ namespace Slush
 	{
 		return static_cast<TimeUnit>(aGameTime * 1000000.f);
 	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	void Timer::Start(float aDuration)
+	{
+		myExpireTime = Time::GetTime() + Time::ConvertGameTimeToTimeUnit(aDuration);
+	}
+
+	bool Timer::IsStarted() const
+	{
+		return myExpireTime != 0;
+	}
+
+	bool Timer::HasExpired() const
+	{
+		if (myExpireTime == 0)
+			return false;
+
+		return myExpireTime < Time::GetTime();
+	}
+
 }

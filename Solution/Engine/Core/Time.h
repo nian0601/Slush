@@ -24,4 +24,16 @@ namespace Slush
 		static TimeUnit myCurrentTime;
 		static TimeUnit myFrequency;
 	};
+
+	class Timer
+	{
+	public:
+		void Start(float aDuration);
+
+		bool IsStarted() const;
+		bool HasExpired() const;
+
+	private:
+		Time::TimeUnit myExpireTime = 0;
+	};
 }

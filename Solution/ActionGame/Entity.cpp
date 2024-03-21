@@ -11,6 +11,7 @@
 #include "RemoveOnCollisionComponent.h"
 #include "TargetingComponent.h"
 #include "WeaponComponent.h"
+#include "EntityPrefab.h"
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
@@ -71,4 +72,37 @@ void Entity::OnCollision(Entity& aOtherEntity)
 
 	if (myRemoveOnCollisionComponent)
 		myRemoveOnCollisionComponent->OnCollision(aOtherEntity);
+}
+
+void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld)
+{
+	if (aPrefab.mySprite.myEnabled)
+		mySpriteComponent = new SpriteComponent(*this, aPrefab);
+
+	if (aPrefab.myAnimation.myEnabled)
+		myAnimationComponent = new AnimationComponent(*this, aPrefab);
+
+	if (aPrefab.myProjectileShooting.myEnabled)
+		myProjectileShootingComponent = new ProjectileShootingComponent(*this, aPrefab);
+
+	if (aPrefab.myHealth.myEnabled)
+		myHealthComponent = new HealthComponent(*this, aPrefab);
+
+	if (aPrefab.myPlayerController.myEnabled)
+		myPlayerControllerComponent = new PlayerControllerComponent(*this, aPrefab);
+
+	if (aPrefab.myNPCController.myEnabled)
+		myNPCControllerComponent = new NPCControllerComponent(*this, aPrefab);
+
+	if (aPrefab.myPhysics.myEnabled)
+		myPhysicsComponent = new PhysicsComponent(*this, aPrefab, aPhysicsWorld);
+
+	if (aPrefab.myRemoveOnCollision.myEnabled)
+		myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*this, aPrefab);
+
+	if (aPrefab.myTargeting.myEnabled)
+		myTargetingComponent = new TargetingComponent(*this, aPrefab);
+
+	if (aPrefab.myWeaponComponent.myEnabled)
+		myWeaponComponent = new WeaponComponent(*this, aPrefab);
 }

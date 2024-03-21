@@ -26,7 +26,7 @@ EntityManager::~EntityManager()
 	myEntities.DeleteAll();
 }
 
-Entity* EntityManager::CreateEntity()
+Entity* EntityManager::CreateEmptyEntity()
 {
 	EntityHandle::ProxyObject* proxy = new EntityHandle::ProxyObject();
 	myProxyStorage.Add(proxy);
@@ -43,39 +43,10 @@ Entity* EntityManager::CreateEntity()
 
 Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab)
 {
-	Entity* entity = CreateEntity();
+	Entity* entity = CreateEmptyEntity();
 	entity->myType = static_cast<Entity::Type>(aPrefab.myEntityType);
 	entity->myPosition = aPosition;
-
-	if (aPrefab.mySprite.myEnabled)
-		entity->mySpriteComponent = new SpriteComponent(*entity, aPrefab);
-
-	if (aPrefab.myAnimation.myEnabled)
-		entity->myAnimationComponent = new AnimationComponent(*entity, aPrefab);
-
-	if (aPrefab.myProjectileShooting.myEnabled)
-		entity->myProjectileShootingComponent = new ProjectileShootingComponent(*entity, aPrefab);
-
-	if (aPrefab.myHealth.myEnabled)
-		entity->myHealthComponent = new HealthComponent(*entity, aPrefab);
-
-	if (aPrefab.myPlayerController.myEnabled)
-		entity->myPlayerControllerComponent = new PlayerControllerComponent(*entity, aPrefab);
-
-	if (aPrefab.myNPCController.myEnabled)
-		entity->myNPCControllerComponent = new NPCControllerComponent(*entity, aPrefab);
-
-	if (aPrefab.myPhysics.myEnabled)
-		entity->myPhysicsComponent = new PhysicsComponent(*entity, aPrefab, myPhysicsWorld);
-
-	if (aPrefab.myRemoveOnCollision.myEnabled)
-		entity->myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*entity, aPrefab);
-
-	if (aPrefab.myTargeting.myEnabled)
-		entity->myTargetingComponent = new TargetingComponent(*entity, aPrefab);
-
-	if (aPrefab.myWeaponComponent.myEnabled)
-		entity->myWeaponComponent = new WeaponComponent(*entity, aPrefab);
+	entity->CreateComponents(aPrefab, myPhysicsWorld);
 
 	return entity;
 }
@@ -86,7 +57,7 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPref
 		return CreateEntity(aPosition, *prefab);
 	
 	SLUSH_ERROR("Found no EntityPrefab called %s, creating a empty entity", aPrefabName);
-	return CreateEntity();
+	return CreateEmptyEntity();
 }
 
 void EntityManager::FindEntitiesOfType(Entity::Type aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const

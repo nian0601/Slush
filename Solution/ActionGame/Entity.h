@@ -16,10 +16,19 @@ class TargetingComponent;
 class WeaponComponent;
 
 class EntityManager;
+class EntityPrefab;
+
+namespace Slush
+{
+	class PhysicsWorld;
+}
 
 class Entity
 {
+	friend class EntityManager;
 public:
+	~Entity();
+
 	enum Type
 	{
 		ENVIRONMENT,
@@ -28,9 +37,6 @@ public:
 		PLAYER_PROJECTILE,
 		NPC_PROJECTILE,
 	};
-
-	Entity(EntityManager& aEntityManager);
-	~Entity();
 
 	void PrePhysicsUpdate();
 	void Update();
@@ -54,4 +60,9 @@ public:
 	bool myIsMarkedForRemoval = false;
 	EntityHandle myHandle;
 	EntityManager& myEntityManager;
+
+private:
+	Entity(EntityManager& aEntityManager);
+
+	void CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld);
 };

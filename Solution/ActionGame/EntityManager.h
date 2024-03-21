@@ -21,7 +21,7 @@ public:
 	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld);
 	~EntityManager();
 
-	Entity* CreateEntity();
+	Entity* CreateEmptyEntity();
 	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab);
 	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName);
 

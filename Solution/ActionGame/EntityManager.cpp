@@ -60,6 +60,14 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPref
 	return CreateEmptyEntity();
 }
 
+void EntityManager::DeleteAllEntities()
+{
+	for (Entity* entity : myEntities)
+		entity->myHandle.myProxy->myObject = nullptr;
+
+	myEntities.DeleteAll();
+}
+
 void EntityManager::FindEntitiesOfType(Entity::Type aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const
 {
 	for (Entity* entity : myEntities)

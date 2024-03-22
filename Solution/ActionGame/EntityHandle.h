@@ -4,6 +4,7 @@ class Entity;
 
 class EntityHandle
 {
+	friend class EntityManager;
 public:
 	struct ProxyObject
 	{

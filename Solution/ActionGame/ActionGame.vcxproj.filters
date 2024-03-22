@@ -45,6 +45,7 @@
     <ClCompile Include="WeaponComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Level.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -96,6 +97,7 @@
     <ClInclude Include="WeaponComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Level.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

@@ -25,6 +25,8 @@ public:
 	Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab);
 	Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName);
 
+	void DeleteAllEntities();
+
 	void FindEntitiesOfType(Entity::Type aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const;
 
 	void PrePhysicsUpdate();

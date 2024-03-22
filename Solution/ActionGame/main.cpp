@@ -31,9 +31,19 @@
 #include "PhysicsComponent.h"
 #include "EntityPrefabDockable.h"
 
+#include "Level.h"
+
 class App : public Slush::IApp
 {
 public:
+	enum GameState
+	{
+		START_SCREEN,
+		LOADING_LEVEL,
+		PLAYING,
+		GAME_OVER,
+	};
+
 	void Initialize() override
 	{
 		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
@@ -48,28 +58,23 @@ public:
 		myPhysicsWorld = new Slush::PhysicsWorld();
 		myEntityManager = new EntityManager(myEntityPrefabs, *myPhysicsWorld);
 
-		myNPCWave = new NPCWave(*myEntityManager, *myPhysicsWorld);
-
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
-
-		myEntityManager->CreateEntity({ 500.f, 800.f }, "Wall");
 	}
 
 	void Shutdown() override
 	{
-		FW_SAFE_DELETE(myNPCWave);
+		FW_SAFE_DELETE(myLevel);
 		FW_SAFE_DELETE(myEntityManager);
 		FW_SAFE_DELETE(myPhysicsWorld);
 	}
 
 	void Update() override
 	{
-		if (!myPlayer.IsValid())
-			CreatePlayer();
+		UpdateGameState();
 
 		myEntityManager->PrePhysicsUpdate();
 
@@ -77,7 +82,9 @@ public:
 
 		UpdatePhysics();
 
-		myNPCWave->Update();
+		if (myLevel)
+			myLevel->Update();
+
 		myEntityManager->Update();
 
 		myEntityManager->EndFrame();
@@ -114,12 +121,6 @@ public:
 		}
 	}
 
-	void CreatePlayer()
-	{
-		Entity* player = myEntityManager->CreateEntity({ 400.f, 400.f }, "Player");
-		myPlayer = player->myHandle;
-	}
-
 	void CreatePrefabs()
 	{
 		FW_GrowingArray<FW_FileSystem::FileInfo> prefabInfos;
@@ -129,16 +130,44 @@ public:
 			myEntityPrefabs.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
 	}
 
+	void UpdateGameState()
+	{
+		switch (myGameState)
+		{
+		case App::START_SCREEN:
+			if (ImGui::Button("Start Game"))
+				myGameState = LOADING_LEVEL;
+			break;
+		case App::LOADING_LEVEL:
+			myLevel = new Level(*myEntityManager, *myPhysicsWorld);
+			myGameState = PLAYING;
+			break;
+		case App::PLAYING:
+			if (myLevel->IsPlayerDead())
+			{
+				FW_SAFE_DELETE(myLevel);
+				myGameState = GAME_OVER;
+			}
+			break;
+		case App::GAME_OVER:
+			if (ImGui::Button("Restart Game"))
+				myGameState = LOADING_LEVEL;
+			break;
+		default:
+			break;
+		}
+	}
+
 private:
 	Slush::Font myFont;
 	Slush::AssetStorage<Slush::Texture> myTextures;
 	Slush::AssetStorage<EntityPrefab> myEntityPrefabs;
 
-	EntityHandle myPlayer;
 	EntityManager* myEntityManager;
 	Slush::PhysicsWorld* myPhysicsWorld;
 
-	NPCWave* myNPCWave;
+	Level* myLevel;
+	GameState myGameState = START_SCREEN;
 };
 
 #include <FW_UnitTestSuite.h>

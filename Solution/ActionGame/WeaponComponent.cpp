@@ -23,7 +23,7 @@ void WeaponComponent::Weapon::Update(Entity& anEntity)
 {
 	if (!myActivationCooldown.IsStarted() || myActivationCooldown.HasExpired())
 	{
-		myActivationCooldown.Start(0.5f);
+		myActivationCooldown.Start(0.25f);
 
 		TargetingComponent* targeting = anEntity.myTargetingComponent;
 		if (!targeting)

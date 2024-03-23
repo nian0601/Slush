@@ -13,21 +13,29 @@ TargetingComponent::TargetingComponent(Entity& anEntity, const EntityPrefab& anE
 
 void TargetingComponent::Update()
 {
-	if (!myTarget.IsValid())
-	{
-		FW_GrowingArray<EntityHandle> targets;
-		myEntity.myEntityManager.FindEntitiesOfType(myEntityPrefab.myTargeting.myTargetType, targets);
+	myTarget.Clear();
 
+	FW_GrowingArray<EntityHandle> targets;
+	myEntity.myEntityManager.FindEntitiesOfType(myEntityPrefab.myTargeting.myTargetType, targets);
+
+	if (myEntityPrefab.myTargeting.myTargetType == Entity::PLAYER)
+	{
+		if (!targets.IsEmpty())
+			myTarget = targets[0];
+	}
+	else
+	{
 		float bestDist = FLT_MAX;
+		const float maxDist = FW_Square(600.f);
 		for (const EntityHandle& handle : targets)
 		{
 			if (handle.IsValid())
 			{
-				float dist = Length2(myEntity.myPosition - handle.Get()->myPosition);
-				if (dist < bestDist)
+				const float dist = Length2(myEntity.myPosition - handle.Get()->myPosition);
+				if (dist < maxDist && dist < bestDist)
 				{
 					myTarget = handle;
-					dist = bestDist;
+					bestDist = dist;
 				}
 			}
 		}

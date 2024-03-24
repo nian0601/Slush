@@ -14,6 +14,7 @@ class PhysicsComponent;
 class RemoveOnCollisionComponent;
 class TargetingComponent;
 class WeaponComponent;
+class ExperienceComponent;
 
 class EntityManager;
 class EntityPrefab;
@@ -54,6 +55,7 @@ public:
 	RemoveOnCollisionComponent* myRemoveOnCollisionComponent = nullptr;
 	TargetingComponent* myTargetingComponent = nullptr;
 	WeaponComponent* myWeaponComponent = nullptr;
+	ExperienceComponent* myExperienceComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;

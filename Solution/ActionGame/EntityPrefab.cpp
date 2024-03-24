@@ -33,6 +33,7 @@ void EntityPrefab::SaveToDisk()
 	myRemoveOnCollision.SaveToDisk(processor);
 	myTargeting.SaveToDisk(processor);
 	myWeaponComponent.SaveToDisk(processor);
+	myExperience.SaveToDisk(processor);
 }
 
 void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
@@ -99,6 +100,11 @@ void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
 		else if (fieldName == "#weaponcomponent")
 		{
 			myWeaponComponent.myEnabled = true;
+			LoadEmptyComponent(parser);
+		}
+		else if (fieldName == "#experience")
+		{
+			myExperience.myEnabled = true;
 			LoadEmptyComponent(parser);
 		}
 	}
@@ -186,6 +192,11 @@ void EntityPrefab::BuildUI()
 	}
 
 	if (BaseComponentUI(myWeaponComponent.myEnabled, "Weapon Component", "Add Weapon Component"))
+	{
+		ImGui::TreePop();
+	}
+
+	if (BaseComponentUI(myExperience.myEnabled, "Experience Component", "Add Experience Component"))
 	{
 		ImGui::TreePop();
 	}
@@ -499,6 +510,18 @@ void EntityPrefab::WeaponComponent::SaveToDisk(FW_FileProcessor& aProcessor)
 	if (myEnabled)
 	{
 		aProcessor.Process("#weaponcomponent");
+		aProcessor.AddNewline();
+
+		aProcessor.Process("#end");
+		aProcessor.AddNewline();
+	}
+}
+
+void EntityPrefab::Experience::SaveToDisk(FW_FileProcessor& aProcessor)
+{
+	if (myEnabled)
+	{
+		aProcessor.Process("#experience");
 		aProcessor.AddNewline();
 
 		aProcessor.Process("#end");

@@ -3,6 +3,8 @@
 #include "HealthComponent.h"
 #include "NPCWave.h"
 #include <FW_Includes.h>
+#include <Core\Input.h>
+#include "ExperienceComponent.h"
 
 Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)
@@ -23,6 +25,17 @@ Level::~Level()
 void Level::Update()
 {
 	myNPCWave->Update();
+
+	Entity* player = myPlayerHandle.Get();
+	if (!player)
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	const Slush::Input& input = engine.GetInput();
+	if (input.WasKeyReleased(Slush::Input::E))
+	{
+		player->myExperienceComponent->AddExperience(1);
+	}
 }
 
 bool Level::IsPlayerDead() const

@@ -23,6 +23,8 @@ size 0.000000 0.000000
 #end 
 #targeting 
 targettype 2 
-#end
+#end 
 #weaponcomponent 
+#end 
+#experience 
 #end 

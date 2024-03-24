@@ -1,18 +1,8 @@
 #include "EntityManager.h"
 #include "Entity.h"
 #include "EntityPrefab.h"
-#include "SpriteComponent.h"
-#include "AnimationComponent.h"
-#include "ProjectileShootingComponent.h"
-#include "HealthComponent.h"
-#include "PlayerControllerComponent.h"
-#include "NPCControllerComponent.h"
-#include "PhysicsComponent.h"
-#include <Physics\PhysicsWorld.h>
+
 #include <Core\Log.h>
-#include "RemoveOnCollisionComponent.h"
-#include "TargetingComponent.h"
-#include "WeaponComponent.h"
 
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
 	: myPrefabStorage(aPrefabStorage)

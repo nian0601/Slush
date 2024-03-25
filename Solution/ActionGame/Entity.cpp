@@ -13,6 +13,8 @@
 #include "WeaponComponent.h"
 #include "EntityPrefab.h"
 #include "ExperienceComponent.h"
+#include "PickupComponent.h"
+#include "EntityManager.h"
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
@@ -32,6 +34,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myTargetingComponent);
 	FW_SAFE_DELETE(myWeaponComponent);
 	FW_SAFE_DELETE(myExperienceComponent);
+	FW_SAFE_DELETE(myPickupComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -77,6 +80,15 @@ void Entity::OnCollision(Entity& aOtherEntity)
 
 	if (myRemoveOnCollisionComponent)
 		myRemoveOnCollisionComponent->OnCollision(aOtherEntity);
+
+	if (myPickupComponent)
+		myPickupComponent->OnCollision(aOtherEntity);
+}
+
+void Entity::OnDeath()
+{
+	if (myNPCControllerComponent)
+		myEntityManager.CreateEntity(myPosition, "ExpPickup");
 }
 
 void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld)
@@ -113,4 +125,7 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 
 	if (aPrefab.myExperience.myEnabled)
 		myExperienceComponent = new ExperienceComponent(*this, aPrefab);
+
+	if (aPrefab.myPickup.myEnabled)
+		myPickupComponent = new PickupComponent(*this, aPrefab);
 }

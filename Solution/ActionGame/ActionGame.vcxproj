@@ -146,6 +146,7 @@
     <ClCompile Include="NPCControllerComponent.cpp" />
     <ClCompile Include="NPCWave.cpp" />
     <ClCompile Include="PhysicsComponent.cpp" />
+    <ClCompile Include="PickupComponent.cpp" />
     <ClCompile Include="PlayerControllerComponent.cpp" />
     <ClCompile Include="ProjectileShootingComponent.cpp" />
     <ClCompile Include="RemoveOnCollisionComponent.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="NPCControllerComponent.h" />
     <ClInclude Include="NPCWave.h" />
     <ClInclude Include="PhysicsComponent.h" />
+    <ClInclude Include="PickupComponent.h" />
     <ClInclude Include="PlayerControllerComponent.h" />
     <ClInclude Include="ProjectileShootingComponent.h" />
     <ClInclude Include="RemoveOnCollisionComponent.h" />

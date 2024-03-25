@@ -115,4 +115,12 @@ public:
 
 		bool myEnabled = false;
 	} myExperience;
+
+	struct Pickup
+	{
+		void SaveToDisk(FW_FileProcessor& aProcessor);
+		//void LoadFromDisk(FW_FileParser& aParser);
+
+		bool myEnabled = false;
+	} myPickup;
 };

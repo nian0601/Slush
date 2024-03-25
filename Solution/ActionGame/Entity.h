@@ -15,6 +15,7 @@ class RemoveOnCollisionComponent;
 class TargetingComponent;
 class WeaponComponent;
 class ExperienceComponent;
+class PickupComponent;
 
 class EntityManager;
 class EntityPrefab;
@@ -37,6 +38,7 @@ public:
 		NPC,
 		PLAYER_PROJECTILE,
 		NPC_PROJECTILE,
+		PICKUP,
 	};
 
 	void PrePhysicsUpdate();
@@ -44,6 +46,7 @@ public:
 	void Render();
 
 	void OnCollision(Entity& aOtherEntity);
+	void OnDeath();
 
 	SpriteComponent* mySpriteComponent = nullptr;
 	AnimationComponent* myAnimationComponent = nullptr;
@@ -56,6 +59,7 @@ public:
 	TargetingComponent* myTargetingComponent = nullptr;
 	WeaponComponent* myWeaponComponent = nullptr;
 	ExperienceComponent* myExperienceComponent = nullptr;
+	PickupComponent* myPickupComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;

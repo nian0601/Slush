@@ -49,6 +49,9 @@
     <ClCompile Include="ExperienceComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="PickupComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -102,6 +105,9 @@
     </ClInclude>
     <ClInclude Include="Level.h" />
     <ClInclude Include="ExperienceComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="PickupComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
   </ItemGroup>

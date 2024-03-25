@@ -34,6 +34,7 @@ void EntityPrefab::SaveToDisk()
 	myTargeting.SaveToDisk(processor);
 	myWeaponComponent.SaveToDisk(processor);
 	myExperience.SaveToDisk(processor);
+	myPickup.SaveToDisk(processor);
 }
 
 void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
@@ -107,6 +108,11 @@ void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
 			myExperience.myEnabled = true;
 			LoadEmptyComponent(parser);
 		}
+		else if (fieldName == "#pickup")
+		{
+			myPickup.myEnabled = true;
+			LoadEmptyComponent(parser);
+		}
 	}
 }
 
@@ -126,7 +132,7 @@ void EntityPrefab::LoadEmptyComponent(FW_FileParser& aParser)
 
 void EntityPrefab::BuildUI()
 {
-	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile" };
+	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
 	ImGui::Combo("Entity Type", &myEntityType, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
 
 	if (BaseComponentUI(mySprite.myEnabled, "Sprite", "Add Sprite"))
@@ -197,6 +203,11 @@ void EntityPrefab::BuildUI()
 	}
 
 	if (BaseComponentUI(myExperience.myEnabled, "Experience Component", "Add Experience Component"))
+	{
+		ImGui::TreePop();
+	}
+
+	if (BaseComponentUI(myPickup.myEnabled, "Pickup Component", "Add Pickup Component"))
 	{
 		ImGui::TreePop();
 	}
@@ -522,6 +533,18 @@ void EntityPrefab::Experience::SaveToDisk(FW_FileProcessor& aProcessor)
 	if (myEnabled)
 	{
 		aProcessor.Process("#experience");
+		aProcessor.AddNewline();
+
+		aProcessor.Process("#end");
+		aProcessor.AddNewline();
+	}
+}
+
+void EntityPrefab::Pickup::SaveToDisk(FW_FileProcessor& aProcessor)
+{
+	if (myEnabled)
+	{
+		aProcessor.Process("#pickup");
 		aProcessor.AddNewline();
 
 		aProcessor.Process("#end");

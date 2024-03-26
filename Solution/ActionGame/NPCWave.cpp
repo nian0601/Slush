@@ -12,6 +12,7 @@ NPCWave::NPCWave(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWor
 	: myEntityManager(aEntityManager)
 	, myPhysicsWorld(aPhysicsWorld)
 {
+	myWaveTimer.Start(1.f);
 }
 
 void NPCWave::Update()
@@ -29,9 +30,10 @@ void NPCWave::Update()
 		}
 	}
 
-	if (myNPCs.IsEmpty())
+	if (myWaveTimer.HasExpired())
 	{
 		StartWave(FW_RandInt(2, 5));
+		myWaveTimer.Start(5.f);
 	}
 }
 

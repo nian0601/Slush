@@ -3,6 +3,7 @@
 #include <FW_Vector2.h>
 
 #include "EntityHandle.h"
+#include <Core\Time.h>
 
 class Entity;
 class EntityManager;
@@ -27,6 +28,7 @@ private:
 
 	EntityManager& myEntityManager;
 	Slush::PhysicsWorld& myPhysicsWorld;
+	Slush::Timer myWaveTimer;
 
 	FW_GrowingArray<EntityHandle> myNPCs;
 

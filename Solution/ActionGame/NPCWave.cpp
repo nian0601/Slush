@@ -58,6 +58,8 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 		return;
 	}
 
+	++myWaveCounter;
+
 	const int iterationLimit = 100;
 	int iterations = 0;
 	Vector2f spawnArea = { 1280.f, 720.f };
@@ -84,7 +86,11 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 
 void NPCWave::CreateNPC(const Vector2f& aPosition)
 {
-	Entity* npc = myEntityManager.CreateEntity(aPosition, "NPC");
+	const char* npcPrefab = "NPC";
+	if (myWaveCounter > 5 && FW_RandFloat() > 0.5f)
+		npcPrefab = "NPCRanged";
+	
+	Entity* npc = myEntityManager.CreateEntity(aPosition, npcPrefab);
 	if (npc->myProjectileShootingComponent)
 		npc->myProjectileShootingComponent->TriggerCooldown();
 

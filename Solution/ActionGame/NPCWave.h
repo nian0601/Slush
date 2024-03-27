@@ -32,6 +32,7 @@ private:
 
 	FW_GrowingArray<EntityHandle> myNPCs;
 
+	int myWaveCounter = 0;
 	float myPlayerClearanceRadius = 350.f;
 	float myNPCClearanceRadius = 100.f;
 };

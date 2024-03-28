@@ -35,7 +35,7 @@ namespace Slush
 		}
 
 		if (myIsReading)
-			aValue = GetIntField(aFieldName);
+			GetIntField(aFieldName, aValue);
 		else
 			WriteIntField(aFieldName, aValue);
 	}
@@ -49,7 +49,7 @@ namespace Slush
 		}
 
 		if (myIsReading)
-			aValue = GetFloatField(aFieldName);
+			GetFloatField(aFieldName, aValue);
 		else
 			WriteFloatField(aFieldName, aValue);
 	}
@@ -63,7 +63,7 @@ namespace Slush
 		}
 
 		if (myIsReading)
-			aValue = GetBoolField(aFieldName);
+			GetBoolField(aFieldName, aValue);
 		else
 			WriteBoolField(aFieldName, aValue);
 	}
@@ -80,45 +80,54 @@ namespace Slush
 		return Handle();
 	}
 
-	int AssetParser::Handle::GetIntField(const char* aFieldName) const
+	bool AssetParser::Handle::GetIntField(const char* aFieldName, int& aValue) const
 	{
 		if (!IsValid())
 		{
 			SLUSH_ERROR("AssetParser: Tried to read Field '%s' from an invalid Handle", aFieldName);
-			return 0;
+			return false;
 		}
 
 		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
 		if (!field)
 		{
 			SLUSH_ERROR("AssetParser: Didnt find Field '%s'", aFieldName);
-			return 0;
+			return false;
 		}
 
-		return static_cast<int>(atoll((*field)->myRawData.GetBuffer()));
+		aValue = static_cast<int>(atoll((*field)->myRawData.GetBuffer()));
+		return true;
 	}
 
-	float AssetParser::Handle::GetFloatField(const char* aFieldName) const
+	bool AssetParser::Handle::GetFloatField(const char* aFieldName, float& aValue) const
 	{
 		if (!IsValid())
 		{
 			SLUSH_ERROR("AssetParser: Tried to read Field '%s' from an invalid Handle", aFieldName);
-			return 0;
+			return false;
 		}
 
 		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
 		if (!field)
 		{
 			SLUSH_ERROR("AssetParser: Didnt find Field '%s'", aFieldName);
-			return 0;
+			return false;
 		}
 
-		return static_cast<float>(atof((*field)->myRawData.GetBuffer()));
+		aValue = static_cast<float>(atof((*field)->myRawData.GetBuffer()));
+		return true;
 	}
 
-	bool AssetParser::Handle::GetBoolField(const char* aFieldName) const
+	bool AssetParser::Handle::GetBoolField(const char* aFieldName, bool& aValue) const
 	{
-		return GetIntField(aFieldName) == 1;
+		int boolAsInt = 0;
+		if (GetIntField(aFieldName, boolAsInt))
+		{
+			aValue = boolAsInt == 1;
+			return true;
+		}
+		
+		return false;
 	}
 
 	AssetParser::Handle AssetParser::Handle::AddChildElement(const char* aElementName)

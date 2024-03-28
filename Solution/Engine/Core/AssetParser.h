@@ -28,9 +28,9 @@ namespace Slush
 
 		private:
 			Handle GetChildElement(const char* aElementName) const;
-			int GetIntField(const char* aFieldName) const;
-			float GetFloatField(const char* aFieldName) const;
-			bool GetBoolField(const char* aFieldName) const;
+			bool GetIntField(const char* aFieldName, int& aValue) const;
+			bool GetFloatField(const char* aFieldName, float& aValue) const;
+			bool GetBoolField(const char* aFieldName, bool& aValue) const;
 
 			Handle AddChildElement(const char* aElementName);
 			void WriteIntField(const char* aFieldName, int aValue);

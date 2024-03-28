@@ -3,6 +3,24 @@
 #include <FW_Math.h>
 #include <FW_FileSystem.h>
 
+void EntityPrefab::ComponentData::Load(Slush::AssetParser::Handle aComponentHandle)
+{
+	if (!aComponentHandle.IsValid())
+		return;
+
+	myEnabled = true;
+	OnLoad(aComponentHandle);
+}
+
+void EntityPrefab::ComponentData::Save(const char* aComponentName, Slush::AssetParser::Handle aRootHandle)
+{
+	if (!myEnabled)
+		return;
+
+	Slush::AssetParser::Handle componentHandle = aRootHandle.AddChildElement(aComponentName);
+	OnSave(componentHandle);
+}
+
 EntityPrefab::EntityPrefab(const char* aName)
 	: myName(aName)
 {
@@ -10,124 +28,51 @@ EntityPrefab::EntityPrefab(const char* aName)
 
 void EntityPrefab::SaveToDisk()
 {
+	Slush::AssetParser parser;
+	Slush::AssetParser::Handle rootHandle = parser.StartWriting("entityprefab");
+
+	Slush::AssetParser::Handle entityTypeHandle = rootHandle.AddChildElement("entitytype");
+	entityTypeHandle.WriteIntField("type", (int)myEntityType);
+
+	mySprite.Save("sprite", rootHandle);
+	myAnimation.Save("animation", rootHandle);
+	myProjectileShooting.Save("projectileshooting", rootHandle);
+	myPlayerController.Save("playercontroller", rootHandle);
+	myNPCController.Save("npccontroller", rootHandle);
+	myHealth.Save("health", rootHandle);
+	myPhysics.Save("physics", rootHandle);
+	myRemoveOnCollision.Save("removeoncollision", rootHandle);
+	myTargeting.Save("targeting", rootHandle);
+	myWeaponComponent.Save("weaponcomponent", rootHandle);
+	myExperience.Save("experience", rootHandle);
+	myPickup.Save("pickup", rootHandle);
+
 	FW_String filepath = "Data/EntityPrefabs/";
 	filepath += myName;
 	filepath += ".prefab";
-
-	FW_FileSystem::GetAbsoluteFilePath(filepath, filepath);
-
-	FW_FileProcessor processor(filepath.GetBuffer(), FW_FileProcessor::WRITE);
-
-	int entityType = myEntityType;
-	processor.Process("#entitytype");
-	processor.Process(entityType);
-	processor.AddNewline();
-
-	mySprite.SaveToDisk(processor);
-	myAnimation.SaveToDisk(processor);
-	myProjectileShooting.SaveToDisk(processor);
-	myPlayerController.SaveToDisk(processor);
-	myNPCController.SaveToDisk(processor);
-	myHealth.SaveToDisk(processor);
-	myPhysics.SaveToDisk(processor);
-	myRemoveOnCollision.SaveToDisk(processor);
-	myTargeting.SaveToDisk(processor);
-	myWeaponComponent.SaveToDisk(processor);
-	myExperience.SaveToDisk(processor);
-	myPickup.SaveToDisk(processor);
+	parser.FinishWriting(filepath.GetBuffer());
 }
 
 void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
 {
-	FW_FileParser parser(aFilePath);
+	Slush::AssetParser parser;
+	Slush::AssetParser::Handle rootHandle = parser.Load(aFilePath);
 
-	FW_String line;
-	FW_String fieldName;
-	while (parser.ReadLine(line))
-	{
-		parser.TrimBeginAndEnd(line);
-		fieldName = parser.TakeFirstWord(line);
+	Slush::AssetParser::Handle entityTypeHandle = rootHandle.GetChildElement("entitytype");
+	myEntityType = entityTypeHandle.GetIntField("type");
 
-		if (fieldName == "#entitytype")
-		{
-			int type = parser.GetInt(parser.TakeFirstWord(line));
-			myEntityType = Entity::Type(type);
-		}
-		else if (fieldName == "#sprite")
-		{
-			mySprite.myEnabled = true;
-			mySprite.LoadFromDisk(parser);
-		}
-		else if (fieldName == "#animation")
-		{
-			myAnimation.myEnabled = true;
-			LoadEmptyComponent(parser);
-		}
-		else if (fieldName == "#projectileshooting")
-		{
-			myProjectileShooting.myEnabled = true;
-			myProjectileShooting.LoadFromDisk(parser);
-		}
-		else if (fieldName == "#playercontroller")
-		{
-			myPlayerController.myEnabled = true;
-			LoadEmptyComponent(parser);
-		}
-		else if (fieldName == "#npccontroller")
-		{
-			myNPCController.myEnabled = true;
-			LoadEmptyComponent(parser);
-		}
-		else if (fieldName == "#health")
-		{
-			myHealth.myEnabled = true;
-			myHealth.LoadFromDisk(parser);
-		}
-		else if (fieldName == "#physics")
-		{
-			myPhysics.myEnabled = true;
-			myPhysics.LoadFromDisk(parser);
-		}
-		else if (fieldName == "#removeoncollision")
-		{
-			myRemoveOnCollision.myEnabled = true;
-			LoadEmptyComponent(parser);
-		}
-		else if (fieldName == "#targeting")
-		{
-			myTargeting.myEnabled = true;
-			myTargeting.LoadFromDisk(parser);
-		}
-		else if (fieldName == "#weaponcomponent")
-		{
-			myWeaponComponent.myEnabled = true;
-			LoadEmptyComponent(parser);
-		}
-		else if (fieldName == "#experience")
-		{
-			myExperience.myEnabled = true;
-			LoadEmptyComponent(parser);
-		}
-		else if (fieldName == "#pickup")
-		{
-			myPickup.myEnabled = true;
-			LoadEmptyComponent(parser);
-		}
-	}
-}
-
-void EntityPrefab::LoadEmptyComponent(FW_FileParser& aParser)
-{
-	FW_String line;
-	FW_String fieldName;
-	while (aParser.ReadLine(line))
-	{
-		aParser.TrimBeginAndEnd(line);
-		fieldName = aParser.TakeFirstWord(line);
-
-		if (fieldName == "#end")
-			return;
-	}
+	mySprite.Load(rootHandle.GetChildElement("sprite"));
+	myAnimation.Load(rootHandle.GetChildElement("animation"));
+	myProjectileShooting.Load(rootHandle.GetChildElement("projectileshooting"));
+	myPlayerController.Load(rootHandle.GetChildElement("playercontroller"));
+	myNPCController.Load(rootHandle.GetChildElement("npccontroller"));
+	myHealth.Load(rootHandle.GetChildElement("health"));
+	myPhysics.Load(rootHandle.GetChildElement("physics"));
+	myRemoveOnCollision.Load(rootHandle.GetChildElement("removeoncollision"));
+	myTargeting.Load(rootHandle.GetChildElement("targeting"));
+	myWeaponComponent.Load(rootHandle.GetChildElement("weaponcomponent"));
+	myExperience.Load(rootHandle.GetChildElement("experience"));
+	myPickup.Load(rootHandle.GetChildElement("pickup"));
 }
 
 void EntityPrefab::BuildUI()
@@ -233,321 +178,97 @@ bool EntityPrefab::BaseComponentUI(bool& aEnabledFlag, const char* aComponentLab
 	return false;
 }
 
-void EntityPrefab::Sprite::SaveToDisk(FW_FileProcessor& aProcessor)
+void EntityPrefab::Sprite::OnSave(Slush::AssetParser::Handle aComponentHandle)
 {
-	if (myEnabled)
+	aComponentHandle.WriteFloatField("radius", myRadius);
+	aComponentHandle.WriteIntField("color", myColor);
+
+	Slush::AssetParser::Handle sizeHandle = aComponentHandle.AddChildElement("size");
+	sizeHandle.WriteFloatField("width", mySize.x);
+	sizeHandle.WriteFloatField("height", mySize.y);
+
+	Slush::AssetParser::Handle colorHandle = aComponentHandle.AddChildElement("floatColor");
+	colorHandle.WriteFloatField("r", myFloatColor[0]);
+	colorHandle.WriteFloatField("g", myFloatColor[1]);
+	colorHandle.WriteFloatField("b", myFloatColor[2]);
+	colorHandle.WriteFloatField("a", myFloatColor[3]);
+}
+
+void EntityPrefab::Sprite::OnLoad(Slush::AssetParser::Handle aComponentHandle)
+{
+	myRadius = aComponentHandle.GetFloatField("radius");
+	myColor = aComponentHandle.GetIntField("color");
+
+	Slush::AssetParser::Handle sizeHandle = aComponentHandle.GetChildElement("size");
+	if (sizeHandle.IsValid())
 	{
-		aProcessor.Process("#sprite");
-		aProcessor.AddNewline();
+		mySize.x = sizeHandle.GetFloatField("width");
+		mySize.y = sizeHandle.GetFloatField("height");
+	}
 
-		aProcessor.Process("radius");
-		aProcessor.Process(myRadius);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("size");
-		aProcessor.Process(mySize.x);
-		aProcessor.Process(mySize.y);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("color");
-		aProcessor.Process(myColor);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("floatColor");
-		aProcessor.Process(myFloatColor[0]);
-		aProcessor.Process(myFloatColor[1]);
-		aProcessor.Process(myFloatColor[2]);
-		aProcessor.Process(myFloatColor[3]);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
+	Slush::AssetParser::Handle colorHandle = aComponentHandle.GetChildElement("floatColor");
+	if (colorHandle.IsValid())
+	{
+		myFloatColor[0] = colorHandle.GetFloatField("r");
+		myFloatColor[1] = colorHandle.GetFloatField("g");
+		myFloatColor[2] = colorHandle.GetFloatField("b");
+		myFloatColor[3] = colorHandle.GetFloatField("a");
 	}
 }
 
-void EntityPrefab::Sprite::LoadFromDisk(FW_FileParser& aParser)
+void EntityPrefab::ProjectileShooting::OnSave(Slush::AssetParser::Handle aComponentHandle)
 {
-	FW_String line;
-	FW_String fieldName;
-	while (aParser.ReadLine(line))
+	aComponentHandle.WriteFloatField("cooldown", myCooldown);
+}
+
+void EntityPrefab::ProjectileShooting::OnLoad(Slush::AssetParser::Handle aComponentHandle)
+{
+	myCooldown = aComponentHandle.GetFloatField("cooldown");
+}
+
+void EntityPrefab::Health::OnSave(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.WriteIntField("maxhealth", myMaxHealth);
+}
+
+void EntityPrefab::Health::OnLoad(Slush::AssetParser::Handle aComponentHandle)
+{
+	myMaxHealth = aComponentHandle.GetIntField("maxhealth");
+}
+
+void EntityPrefab::Physics::OnSave(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.WriteBoolField("isStatic", myStatic);
+	aComponentHandle.WriteBoolField("matchSprite", myMatchSprite);
+
+	aComponentHandle.WriteFloatField("radius", myRadius);
+
+	Slush::AssetParser::Handle sizeHandle = aComponentHandle.AddChildElement("size");
+	sizeHandle.WriteFloatField("width", mySize.x);
+	sizeHandle.WriteFloatField("height", mySize.y);
+}
+
+void EntityPrefab::Physics::OnLoad(Slush::AssetParser::Handle aComponentHandle)
+{
+	myStatic = aComponentHandle.GetBoolField("isStatic");
+	myMatchSprite = aComponentHandle.GetBoolField("matchSprite");
+
+	myRadius = aComponentHandle.GetFloatField("radius");
+
+	Slush::AssetParser::Handle sizeHandle = aComponentHandle.GetChildElement("size");
+	if (sizeHandle.IsValid())
 	{
-		aParser.TrimBeginAndEnd(line);
-		fieldName = aParser.TakeFirstWord(line);
-
-		if (fieldName == "#end")
-			return;
-
-		if (fieldName == "radius")
-		{
-			myRadius = aParser.GetFloat(aParser.TakeFirstWord(line));
-		}
-		else if (fieldName == "size")
-		{
-			mySize.x = aParser.GetFloat(aParser.TakeFirstWord(line));
-			mySize.y = aParser.GetFloat(aParser.TakeFirstWord(line));
-		}
-		else if (fieldName == "color")
-		{
-			myColor = aParser.GetInt(aParser.TakeFirstWord(line));
-		}
-		else if (fieldName == "floatColor")
-		{
-			myFloatColor[0] = aParser.GetFloat(aParser.TakeFirstWord(line));
-			myFloatColor[1] = aParser.GetFloat(aParser.TakeFirstWord(line));
-			myFloatColor[2] = aParser.GetFloat(aParser.TakeFirstWord(line));
-			myFloatColor[3] = aParser.GetFloat(aParser.TakeFirstWord(line));
-		}
+		mySize.x = sizeHandle.GetFloatField("width");
+		mySize.y = sizeHandle.GetFloatField("height");
 	}
 }
 
-void EntityPrefab::Animation::SaveToDisk(FW_FileProcessor& aProcessor)
+void EntityPrefab::Targeting::OnSave(Slush::AssetParser::Handle aComponentHandle)
 {
-	if (myEnabled)
-	{
-		aProcessor.Process("#animation");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
+	aComponentHandle.WriteIntField("targettype", (int)myTargetType);
 }
 
-void EntityPrefab::ProjectileShooting::SaveToDisk(FW_FileProcessor& aProcessor)
+void EntityPrefab::Targeting::OnLoad(Slush::AssetParser::Handle aComponentHandle)
 {
-	if (myEnabled)
-	{
-		aProcessor.Process("#projectileshooting");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("cooldown");
-		aProcessor.Process(myCooldown);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::ProjectileShooting::LoadFromDisk(FW_FileParser& aParser)
-{
-	FW_String line;
-	FW_String fieldName;
-	while (aParser.ReadLine(line))
-	{
-		aParser.TrimBeginAndEnd(line);
-		fieldName = aParser.TakeFirstWord(line);
-
-		if (fieldName == "#end")
-			return;
-
-		if (fieldName == "cooldown")
-		{
-			myCooldown = aParser.GetFloat(aParser.TakeFirstWord(line));
-		}
-	}
-}
-
-void EntityPrefab::PlayerController::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#playercontroller");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::NPCController::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#npccontroller");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::Health::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#health");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("maxhealth");
-		aProcessor.Process(myMaxHealth);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::Health::LoadFromDisk(FW_FileParser& aParser)
-{
-	FW_String line;
-	FW_String fieldName;
-	while (aParser.ReadLine(line))
-	{
-		aParser.TrimBeginAndEnd(line);
-		fieldName = aParser.TakeFirstWord(line);
-
-		if (fieldName == "#end")
-			return;
-
-		if (fieldName == "maxhealth")
-		{
-			myMaxHealth = aParser.GetInt(aParser.TakeFirstWord(line));
-		}
-	}
-}
-
-void EntityPrefab::Physics::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#physics");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("isStatic");
-		aProcessor.Process(myStatic);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("matchsprite");
-		aProcessor.Process(myMatchSprite);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("radius");
-		aProcessor.Process(myRadius);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("size");
-		aProcessor.Process(mySize.x);
-		aProcessor.Process(mySize.y);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::Physics::LoadFromDisk(FW_FileParser& aParser)
-{
-	FW_String line;
-	FW_String fieldName;
-	while (aParser.ReadLine(line))
-	{
-		aParser.TrimBeginAndEnd(line);
-		fieldName = aParser.TakeFirstWord(line);
-
-		if (fieldName == "#end")
-			return;
-
-		if (fieldName == "isStatic")
-		{
-			myStatic = aParser.GetInt(aParser.TakeFirstWord(line)) == 1;
-		}
-		else if (fieldName == "matchsprite")
-		{
-			myMatchSprite = aParser.GetInt(aParser.TakeFirstWord(line)) == 1;
-		}
-		else if (fieldName == "radius")
-		{
-			myRadius = aParser.GetFloat(aParser.TakeFirstWord(line));
-		}
-		else if (fieldName == "size")
-		{
-			mySize.x = aParser.GetFloat(aParser.TakeFirstWord(line));
-			mySize.y = aParser.GetFloat(aParser.TakeFirstWord(line));
-		}
-	}
-}
-
-void EntityPrefab::RemoveOnCollision::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#removeoncollision");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::Targeting::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#targeting");
-		aProcessor.AddNewline();
-
-		int entityType = myTargetType;
-		aProcessor.Process("targettype");
-		aProcessor.Process(entityType);
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::Targeting::LoadFromDisk(FW_FileParser& aParser)
-{
-	FW_String line;
-	FW_String fieldName;
-	while (aParser.ReadLine(line))
-	{
-		aParser.TrimBeginAndEnd(line);
-		fieldName = aParser.TakeFirstWord(line);
-
-		if (fieldName == "#end")
-			return;
-
-		if (fieldName == "targettype")
-		{
-			int type = aParser.GetInt(aParser.TakeFirstWord(line));
-			myTargetType = Entity::Type(type);
-		}
-	}
-}
-
-void EntityPrefab::WeaponComponent::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#weaponcomponent");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::Experience::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#experience");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
-}
-
-void EntityPrefab::Pickup::SaveToDisk(FW_FileProcessor& aProcessor)
-{
-	if (myEnabled)
-	{
-		aProcessor.Process("#pickup");
-		aProcessor.AddNewline();
-
-		aProcessor.Process("#end");
-		aProcessor.AddNewline();
-	}
+	myTargetType = Entity::Type(aComponentHandle.GetIntField("targettype"));
 }

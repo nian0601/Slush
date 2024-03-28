@@ -4,123 +4,91 @@
 #include <FW_String.h>
 #include <FW_FileProcessor.h>
 #include <FW_FileParser.h>
+#include <Core\AssetParser.h>
 
 class EntityPrefab
 {
+private:
+	struct ComponentData
+	{
+		void Load(Slush::AssetParser::Handle aComponentHandle);
+		void Save(const char* aComponentName, Slush::AssetParser::Handle aRootHandle);
+
+		virtual void OnLoad(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; };
+		virtual void OnSave(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; };
+
+		bool myEnabled = false;
+	};
+
 public:
 	EntityPrefab(const char* aName);
 
 	void SaveToDisk();
 	void Load(const char* aFilePath, bool aIsAbsolutePath);
-	void LoadEmptyComponent(FW_FileParser& aParser);
 
 	void BuildUI();
 	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel);
 
-	FW_String myName;
-	int myEntityType;
-
-	struct Sprite
+	struct Sprite : public ComponentData
 	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		void LoadFromDisk(FW_FileParser& aParser);
+		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
 
-		bool myEnabled = false;
 		float myRadius = 10.f;
 		Vector2f mySize;
 		int myColor = 0xFFFF3399;
 
 		float myFloatColor[4] = { 1.f, 51.f / 255.f, 153.f / 255.f, 1.f };
-	} mySprite;
-
-	struct Animation
-	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-
-		bool myEnabled = false;
-	} myAnimation;
+	};
 	
-	struct ProjectileShooting
+	struct ProjectileShooting : public ComponentData
 	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		void LoadFromDisk(FW_FileParser& aParser);
+		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
 
-		bool myEnabled = false;
 		float myCooldown = 1.f;
-	} myProjectileShooting;
-	
-	struct PlayerController
+	};
+
+	struct Health : public ComponentData
 	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
+		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
 
-		bool myEnabled = false;
-	} myPlayerController;
-
-	struct NPCController
-	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-
-		bool myEnabled = false;
-	} myNPCController;
-
-	struct Health
-	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		void LoadFromDisk(FW_FileParser& aParser);
-
-		bool myEnabled = false;
 		int myMaxHealth = 3;
-	} myHealth;
+	};
 
-	struct Physics
+	struct Physics : public ComponentData
 	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		void LoadFromDisk(FW_FileParser& aParser);
+		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
 
-		bool myEnabled = false;
 		bool myStatic = false;
 		bool myMatchSprite = true;
 		float myRadius = 10.f;
 		Vector2f mySize;
-	} myPhysics;
+	};
 
-	struct RemoveOnCollision
+	struct Targeting : public ComponentData
 	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
+		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
 
-		bool myEnabled = false;
-	} myRemoveOnCollision;
-
-	struct Targeting
-	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		void LoadFromDisk(FW_FileParser& aParser);
-
-		bool myEnabled = false;
 		Entity::Type myTargetType;
-	} myTargeting;
+	};
 
-	struct WeaponComponent
-	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		//void LoadFromDisk(FW_FileParser& aParser);
+	FW_String myName;
+	int myEntityType;
 
-		bool myEnabled = false;
-	} myWeaponComponent;
-
-	struct Experience
-	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		//void LoadFromDisk(FW_FileParser& aParser);
-
-		bool myEnabled = false;
-	} myExperience;
-
-	struct Pickup
-	{
-		void SaveToDisk(FW_FileProcessor& aProcessor);
-		//void LoadFromDisk(FW_FileParser& aParser);
-
-		bool myEnabled = false;
-	} myPickup;
+	Sprite mySprite;
+	ComponentData myAnimation;
+	ProjectileShooting myProjectileShooting;
+	ComponentData myPlayerController;
+	ComponentData myNPCController;
+	Health myHealth;
+	Physics myPhysics;
+	ComponentData myRemoveOnCollision;
+	Targeting myTargeting;
+	ComponentData myWeaponComponent;
+	ComponentData myExperience;
+	ComponentData myPickup;
 };

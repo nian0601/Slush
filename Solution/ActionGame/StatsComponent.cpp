@@ -16,7 +16,7 @@ void StatsComponent::AddCooldownReductionUpgrade()
 
 void StatsComponent::AddDamageUpgrade()
 {
-	myCooldownReduction.Upgrade(myEntityPrefab.myStats.myDamagePerUpgrade);
+	myDamageModifier.Upgrade(myEntityPrefab.myStats.myDamagePerUpgrade);
 }
 
 bool StatsComponent::CanUpgradeCooldownReduction() const

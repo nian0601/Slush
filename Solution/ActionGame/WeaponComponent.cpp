@@ -6,12 +6,16 @@
 #include "PhysicsComponent.h"
 #include <Physics\PhysicsWorld.h>
 #include "StatsComponent.h"
+#include "DamageDealerComponent.h"
 
 WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
 	Weapon& wep = myWeapons.Add();
 	wep.myProjectilePrefab = "PlayerProjectile";
+	wep.myBaseCooldown = myEntityPrefab.myWeaponComponent.myBaseCooldown;
+	wep.myBaseProjectileSpeed = myEntityPrefab.myWeaponComponent.myBaseProjectileSpeed;
+	wep.myBaseDamage = myEntityPrefab.myWeaponComponent.myBaseDamage;
 }
 
 void WeaponComponent::Update()
@@ -24,11 +28,12 @@ void WeaponComponent::Weapon::Update(Entity& anEntity)
 {
 	if (!myActivationCooldown.IsStarted() || myActivationCooldown.HasExpired())
 	{
-		float baseCooldown = 0.5f;
-		if (StatsComponent* stats = anEntity.myStatsComponent)
-			baseCooldown /= stats->GetCooldownReduction();
+		float cooldown = myBaseCooldown;
+		StatsComponent* stats = anEntity.myStatsComponent;
+		if (stats)
+			cooldown /= stats->GetCooldownReduction();
 
-		myActivationCooldown.Start(baseCooldown);
+		myActivationCooldown.Start(cooldown);
 
 		TargetingComponent* targeting = anEntity.myTargetingComponent;
 		if (!targeting)
@@ -44,6 +49,15 @@ void WeaponComponent::Weapon::Update(Entity& anEntity)
 		Vector2f direction = GetNormalized(target.Get()->myPosition - anEntity.myPosition);
 
 		Entity* projectile = anEntity.myEntityManager.CreateEntity(anEntity.myPosition + direction * 35.f, myProjectilePrefab.GetBuffer());
-		projectile->myPhysicsComponent->myObject->myVelocity = direction * 1000.f;
+		projectile->myPhysicsComponent->myObject->myVelocity = direction * myBaseProjectileSpeed;
+
+		if (DamageDealerComponent* projDamage = projectile->myDamageDealerComponent)
+		{
+			int damage = myBaseDamage;
+			if (stats)
+				damage = static_cast<int>(damage * stats->GetDamageModifier());
+
+			projDamage->SetDamage(damage);
+		}
 	}
 }

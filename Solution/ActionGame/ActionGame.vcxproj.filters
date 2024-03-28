@@ -55,6 +55,9 @@
     <ClCompile Include="StatsComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="DamageDealerComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -114,6 +117,9 @@
       <Filter>Entities\Components</Filter>
     </ClInclude>
     <ClInclude Include="StatsComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="DamageDealerComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
   </ItemGroup>

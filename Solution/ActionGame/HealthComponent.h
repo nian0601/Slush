@@ -16,8 +16,6 @@ public:
 
 	void Render();
 
-	void OnCollision(Entity& aOtherEntity);
-
 	void SetMaxHealth(int aHealth);
 	void DealDamage(int aDamageAmount);
 

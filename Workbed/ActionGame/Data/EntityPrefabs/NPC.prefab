@@ -2,7 +2,7 @@ entityprefab
 { 
 	health 
 	{ 
-		maxhealth 5 
+		maxhealth 50 
 	} 
 	physics 
 	{ 
@@ -20,6 +20,10 @@ entityprefab
 	} 
 	npccontroller 
 	{ 
+	} 
+	damagedealer 
+	{ 
+		damage 10 
 	} 
 	targeting 
 	{ 

@@ -17,6 +17,7 @@ class WeaponComponent;
 class ExperienceComponent;
 class PickupComponent;
 class StatsComponent;
+class DamageDealerComponent;
 
 class EntityManager;
 class EntityPrefab;
@@ -49,6 +50,9 @@ public:
 	void OnCollision(Entity& aOtherEntity);
 	void OnDeath();
 
+	bool IsPlayerOwned() const { return myType == PLAYER || myType == PLAYER_PROJECTILE; }
+	bool IsNPCOwned() const { return myType == NPC || myType == NPC_PROJECTILE; }
+
 	SpriteComponent* mySpriteComponent = nullptr;
 	AnimationComponent* myAnimationComponent = nullptr;
 	ProjectileShootingComponent* myProjectileShootingComponent = nullptr;
@@ -62,6 +66,7 @@ public:
 	ExperienceComponent* myExperienceComponent = nullptr;
 	PickupComponent* myPickupComponent = nullptr;
 	StatsComponent* myStatsComponent = nullptr;
+	DamageDealerComponent* myDamageDealerComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;

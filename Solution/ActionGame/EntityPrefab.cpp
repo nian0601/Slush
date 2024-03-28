@@ -40,6 +40,7 @@ EntityPrefab::EntityPrefab(const char* aName)
 	, myExperience("experience")
 	, myPickup("pickup")
 	, myStats("stats")
+	, myDamageDealer("damagedealer")
 {
 }
 
@@ -87,6 +88,7 @@ void EntityPrefab::ParsePrefab(Slush::AssetParser::Handle aRootHandle)
 	myExperience.Parse(aRootHandle);
 	myPickup.Parse(aRootHandle);
 	myStats.Parse(aRootHandle);
+	myDamageDealer.Parse(aRootHandle);
 }
 
 void EntityPrefab::BuildUI()
@@ -165,6 +167,14 @@ void EntityPrefab::BuildUI()
 
 	if (BaseComponentUI(myWeaponComponent.myEnabled, "Weapon Component", "Add Weapon Component"))
 	{
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputFloat("Base Cooldown", &myWeaponComponent.myBaseCooldown, 0.05f, 0.1f, "%.2f");
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputFloat("Base Projectile Speed", &myWeaponComponent.myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputInt("Base Damage", &myWeaponComponent.myBaseDamage);
 		ImGui::TreePop();
 	}
 
@@ -191,6 +201,14 @@ void EntityPrefab::BuildUI()
 
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputFloat("Damage Per Upgrade", &myStats.myDamagePerUpgrade, 0.05f, 1.f, "%.2f");
+
+		ImGui::TreePop();
+	}
+
+	if (BaseComponentUI(myDamageDealer.myEnabled, "DamageDealer Component", "Add DamageDealer Component"))
+	{
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputInt("Damage", &myDamageDealer.myDamage);
 
 		ImGui::TreePop();
 	}
@@ -279,4 +297,16 @@ void EntityPrefab::StatsComponent::OnParse(Slush::AssetParser::Handle aComponent
 
 	aComponentHandle.ParseIntField("maxdamageupgrades", myMaxDamageUpgrades);
 	aComponentHandle.ParseFloatField("damageperupgrade", myDamagePerUpgrade);
+}
+
+void EntityPrefab::DamageDealer::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.ParseIntField("damage", myDamage);
+}
+
+void EntityPrefab::Weapon::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.ParseFloatField("basecooldown", myBaseCooldown);
+	aComponentHandle.ParseFloatField("baseprojectilespeed", myBaseProjectileSpeed);
+	aComponentHandle.ParseIntField("basedamage", myBaseDamage);
 }

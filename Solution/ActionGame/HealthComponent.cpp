@@ -35,18 +35,6 @@ void HealthComponent::Render()
 	myForeground->Render(centeredPosition.x, centeredPosition.y);
 }
 
-void HealthComponent::OnCollision(Entity& aOtherEntity)
-{
-	Entity::Type otherType = aOtherEntity.myType;
-	if (otherType == Entity::ENVIRONMENT)
-		return;
-
-	if (myEntity.myType == Entity::PLAYER && (otherType == Entity::NPC || otherType == Entity::NPC_PROJECTILE))
-		DealDamage(1);
-	else if (myEntity.myType == Entity::NPC && otherType == Entity::PLAYER_PROJECTILE)
-		DealDamage(1);
-}
-
 void HealthComponent::SetMaxHealth(int aHealth)
 {
 	myMaxHealth = aHealth;

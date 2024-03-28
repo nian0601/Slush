@@ -100,6 +100,26 @@ public:
 		float myDamagePerUpgrade = 1.f;
 	};
 
+	struct DamageDealer : public ComponentData
+	{
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+
+		int myDamage = 10;
+	};
+
+	struct Weapon : public ComponentData
+	{
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+
+		float myBaseCooldown = 1.f;
+		float myBaseProjectileSpeed = 750.f;
+		int myBaseDamage = 10;
+	};
+
 	FW_String myName;
 	int myEntityType;
 
@@ -112,8 +132,9 @@ public:
 	Physics myPhysics;
 	ComponentData myRemoveOnCollision;
 	Targeting myTargeting;
-	ComponentData myWeaponComponent;
+	Weapon myWeaponComponent;
 	ComponentData myExperience;
 	ComponentData myPickup;
 	StatsComponent myStats;
+	DamageDealer myDamageDealer;
 };

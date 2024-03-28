@@ -16,6 +16,7 @@
 #include "PickupComponent.h"
 #include "StatsComponent.h"
 #include "EntityManager.h"
+#include "DamageDealerComponent.h"
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
@@ -37,6 +38,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myExperienceComponent);
 	FW_SAFE_DELETE(myPickupComponent);
 	FW_SAFE_DELETE(myStatsComponent);
+	FW_SAFE_DELETE(myDamageDealerComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -77,14 +79,14 @@ void Entity::Render()
 
 void Entity::OnCollision(Entity& aOtherEntity)
 {
-	if (myHealthComponent)
-		myHealthComponent->OnCollision(aOtherEntity);
-
 	if (myRemoveOnCollisionComponent)
 		myRemoveOnCollisionComponent->OnCollision(aOtherEntity);
 
 	if (myPickupComponent)
 		myPickupComponent->OnCollision(aOtherEntity);
+
+	if (myDamageDealerComponent)
+		myDamageDealerComponent->OnCollision(aOtherEntity);
 }
 
 void Entity::OnDeath()
@@ -133,4 +135,7 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 
 	if (aPrefab.myStats.myEnabled)
 		myStatsComponent = new StatsComponent(*this, aPrefab);
+
+	if (aPrefab.myDamageDealer.myEnabled)
+		myDamageDealerComponent = new DamageDealerComponent(*this, aPrefab);
 }

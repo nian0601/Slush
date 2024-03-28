@@ -2,7 +2,7 @@ entityprefab
 { 
 	health 
 	{ 
-		maxhealth 3 
+		maxhealth 50 
 	} 
 	experience 
 	{ 
@@ -34,6 +34,9 @@ entityprefab
 	} 
 	weaponcomponent 
 	{ 
+		basecooldown 1.000 
+		basedamage 10 
+		baseprojectilespeed 750.000 
 	} 
 	projectileshooting 
 	{ 

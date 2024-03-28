@@ -20,6 +20,9 @@ private:
 		void Update(Entity& anEntity);
 
 		Slush::Timer myActivationCooldown;
+		float myBaseCooldown = 0.5f;
+		float myBaseProjectileSpeed = 750.f;
+		int myBaseDamage = 10;
 		FW_String myProjectilePrefab;
 	};
 	FW_GrowingArray<Weapon> myWeapons;

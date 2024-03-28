@@ -229,7 +229,22 @@ void FW_FileProcessor::AddNewline()
 
 #if !USE_BINARY_FILE_PROCESSING
 	fputs("\n", myFile);
+
+	for(int i = 0; i < myIndentDepth; ++i)
+		fputs("\t", myFile);
 #endif
+}
+
+
+void FW_FileProcessor::IncreaseIndentDepth()
+{
+	++myIndentDepth;
+}
+
+void FW_FileProcessor::DecreaseIndentDepth()
+{
+	--myIndentDepth;
+	FW_ASSERT(myIndentDepth >= 0, "Decreased IndentDepth more than it got Increased");
 }
 
 bool FW_FileProcessor::AtEndOfFile() const

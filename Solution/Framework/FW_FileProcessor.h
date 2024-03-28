@@ -33,6 +33,10 @@ public:
 	void Process(bool& aValue);
 
 	void AddNewline();
+
+	void IncreaseIndentDepth();
+	void DecreaseIndentDepth();
+
 	bool IsWriting() const { return (myFlags & WRITE) > 0; }
 	bool IsReading() const { return (myFlags & READ) > 0; }
 
@@ -49,6 +53,8 @@ private:
 	int myFlags;
 	int myStatus;
 	const char* myFilePath; // Just for debugging
+
+	int myIndentDepth = 0;
 
 #if USING_RAM_STORAGE && USE_BINARY_FILE_PROCESSING
 	unsigned char* myData;

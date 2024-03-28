@@ -15,10 +15,18 @@ namespace Slush
 		struct Handle
 		{
 		public:
-			Handle();
-			Handle(Element* aElement);
+			Handle(){}
+			Handle(Element* aElement, bool aIsReading = true);
 
 			bool IsValid() const { return myElement != nullptr; }
+			bool IsReading() const { return myIsReading; }
+
+			Handle ParseChildElement(const char* aElementName);
+			void ParseIntField(const char* aFieldName, int& aValue);
+			void ParseFloatField(const char* aFieldName, float& aValue);
+			void ParseBoolField(const char* aFieldName, bool& aValue);
+
+		private:
 			Handle GetChildElement(const char* aElementName) const;
 			int GetIntField(const char* aFieldName) const;
 			float GetFloatField(const char* aFieldName) const;
@@ -29,8 +37,8 @@ namespace Slush
 			void WriteFloatField(const char* aFieldName, float aValue);
 			void WriteBoolField(const char* aFieldName, bool aValue);
 
-		private:
 			Element* myElement = nullptr;
+			bool myIsReading = true;
 		};
 
 		Handle Load(const char* aFile);

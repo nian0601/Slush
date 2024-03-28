@@ -3,26 +3,42 @@
 #include <FW_Math.h>
 #include <FW_FileSystem.h>
 
-void EntityPrefab::ComponentData::Load(Slush::AssetParser::Handle aComponentHandle)
+void EntityPrefab::ComponentData::Parse(Slush::AssetParser::Handle aRootHandle)
 {
-	if (!aComponentHandle.IsValid())
-		return;
-
-	myEnabled = true;
-	OnLoad(aComponentHandle);
-}
-
-void EntityPrefab::ComponentData::Save(const char* aComponentName, Slush::AssetParser::Handle aRootHandle)
-{
-	if (!myEnabled)
-		return;
-
-	Slush::AssetParser::Handle componentHandle = aRootHandle.AddChildElement(aComponentName);
-	OnSave(componentHandle);
+	if (aRootHandle.IsReading())
+	{
+		Slush::AssetParser::Handle componentHandle = aRootHandle.ParseChildElement(myComponentName);
+		if (componentHandle.IsValid())
+		{
+			myEnabled = true;
+			OnParse(componentHandle);
+		}
+	}
+	else
+	{
+		if (myEnabled)
+		{
+			Slush::AssetParser::Handle componentHandle = aRootHandle.ParseChildElement(myComponentName);
+			if (componentHandle.IsValid())
+				OnParse(componentHandle);
+		}
+	}
 }
 
 EntityPrefab::EntityPrefab(const char* aName)
 	: myName(aName)
+	, mySprite("sprite")
+	, myAnimation("animation")
+	, myProjectileShooting("projectileshooting")
+	, myPlayerController("playercontroller")
+	, myNPCController("npccontroller")
+	, myHealth("health")
+	, myPhysics("physics")
+	, myRemoveOnCollision("removeoncollision")
+	, myTargeting("targeting")
+	, myWeaponComponent("weaponcomponent")
+	, myExperience("experience")
+	, myPickup("pickup")
 {
 }
 
@@ -31,21 +47,7 @@ void EntityPrefab::SaveToDisk()
 	Slush::AssetParser parser;
 	Slush::AssetParser::Handle rootHandle = parser.StartWriting("entityprefab");
 
-	Slush::AssetParser::Handle entityTypeHandle = rootHandle.AddChildElement("entitytype");
-	entityTypeHandle.WriteIntField("type", (int)myEntityType);
-
-	mySprite.Save("sprite", rootHandle);
-	myAnimation.Save("animation", rootHandle);
-	myProjectileShooting.Save("projectileshooting", rootHandle);
-	myPlayerController.Save("playercontroller", rootHandle);
-	myNPCController.Save("npccontroller", rootHandle);
-	myHealth.Save("health", rootHandle);
-	myPhysics.Save("physics", rootHandle);
-	myRemoveOnCollision.Save("removeoncollision", rootHandle);
-	myTargeting.Save("targeting", rootHandle);
-	myWeaponComponent.Save("weaponcomponent", rootHandle);
-	myExperience.Save("experience", rootHandle);
-	myPickup.Save("pickup", rootHandle);
+	ParsePrefab(rootHandle);
 
 	FW_String filepath = "Data/EntityPrefabs/";
 	filepath += myName;
@@ -58,21 +60,31 @@ void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
 	Slush::AssetParser parser;
 	Slush::AssetParser::Handle rootHandle = parser.Load(aFilePath);
 
-	Slush::AssetParser::Handle entityTypeHandle = rootHandle.GetChildElement("entitytype");
-	myEntityType = entityTypeHandle.GetIntField("type");
+	ParsePrefab(rootHandle);
+}
 
-	mySprite.Load(rootHandle.GetChildElement("sprite"));
-	myAnimation.Load(rootHandle.GetChildElement("animation"));
-	myProjectileShooting.Load(rootHandle.GetChildElement("projectileshooting"));
-	myPlayerController.Load(rootHandle.GetChildElement("playercontroller"));
-	myNPCController.Load(rootHandle.GetChildElement("npccontroller"));
-	myHealth.Load(rootHandle.GetChildElement("health"));
-	myPhysics.Load(rootHandle.GetChildElement("physics"));
-	myRemoveOnCollision.Load(rootHandle.GetChildElement("removeoncollision"));
-	myTargeting.Load(rootHandle.GetChildElement("targeting"));
-	myWeaponComponent.Load(rootHandle.GetChildElement("weaponcomponent"));
-	myExperience.Load(rootHandle.GetChildElement("experience"));
-	myPickup.Load(rootHandle.GetChildElement("pickup"));
+void EntityPrefab::ParsePrefab(Slush::AssetParser::Handle aRootHandle)
+{
+	Slush::AssetParser::Handle entityTypeHandle = aRootHandle.ParseChildElement("entitytype");
+	if (entityTypeHandle.IsValid())
+	{
+		int entityTypeAsInt = myEntityType;
+		entityTypeHandle.ParseIntField("type", entityTypeAsInt);
+		myEntityType = Entity::Type(entityTypeAsInt);
+	}
+
+	mySprite.Parse(aRootHandle);
+	myAnimation.Parse(aRootHandle);
+	myProjectileShooting.Parse(aRootHandle);
+	myPlayerController.Parse(aRootHandle);
+	myNPCController.Parse(aRootHandle);
+	myHealth.Parse(aRootHandle);
+	myPhysics.Parse(aRootHandle);
+	myRemoveOnCollision.Parse(aRootHandle);
+	myTargeting.Parse(aRootHandle);
+	myWeaponComponent.Parse(aRootHandle);
+	myExperience.Parse(aRootHandle);
+	myPickup.Parse(aRootHandle);
 }
 
 void EntityPrefab::BuildUI()
@@ -178,97 +190,56 @@ bool EntityPrefab::BaseComponentUI(bool& aEnabledFlag, const char* aComponentLab
 	return false;
 }
 
-void EntityPrefab::Sprite::OnSave(Slush::AssetParser::Handle aComponentHandle)
+void EntityPrefab::Sprite::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	aComponentHandle.WriteFloatField("radius", myRadius);
-	aComponentHandle.WriteIntField("color", myColor);
+	aComponentHandle.ParseFloatField("radius", myRadius);
+	aComponentHandle.ParseIntField("color", myColor);
 
-	Slush::AssetParser::Handle sizeHandle = aComponentHandle.AddChildElement("size");
-	sizeHandle.WriteFloatField("width", mySize.x);
-	sizeHandle.WriteFloatField("height", mySize.y);
-
-	Slush::AssetParser::Handle colorHandle = aComponentHandle.AddChildElement("floatColor");
-	colorHandle.WriteFloatField("r", myFloatColor[0]);
-	colorHandle.WriteFloatField("g", myFloatColor[1]);
-	colorHandle.WriteFloatField("b", myFloatColor[2]);
-	colorHandle.WriteFloatField("a", myFloatColor[3]);
-}
-
-void EntityPrefab::Sprite::OnLoad(Slush::AssetParser::Handle aComponentHandle)
-{
-	myRadius = aComponentHandle.GetFloatField("radius");
-	myColor = aComponentHandle.GetIntField("color");
-
-	Slush::AssetParser::Handle sizeHandle = aComponentHandle.GetChildElement("size");
+	Slush::AssetParser::Handle sizeHandle = aComponentHandle.ParseChildElement("size");
 	if (sizeHandle.IsValid())
 	{
-		mySize.x = sizeHandle.GetFloatField("width");
-		mySize.y = sizeHandle.GetFloatField("height");
+		sizeHandle.ParseFloatField("width", mySize.x);
+		sizeHandle.ParseFloatField("height", mySize.y);
 	}
 
-	Slush::AssetParser::Handle colorHandle = aComponentHandle.GetChildElement("floatColor");
+	Slush::AssetParser::Handle colorHandle = aComponentHandle.ParseChildElement("floatColor");
 	if (colorHandle.IsValid())
 	{
-		myFloatColor[0] = colorHandle.GetFloatField("r");
-		myFloatColor[1] = colorHandle.GetFloatField("g");
-		myFloatColor[2] = colorHandle.GetFloatField("b");
-		myFloatColor[3] = colorHandle.GetFloatField("a");
+		colorHandle.ParseFloatField("r", myFloatColor[0]);
+		colorHandle.ParseFloatField("g", myFloatColor[1]);
+		colorHandle.ParseFloatField("b", myFloatColor[2]);
+		colorHandle.ParseFloatField("a", myFloatColor[3]);
 	}
 }
 
-void EntityPrefab::ProjectileShooting::OnSave(Slush::AssetParser::Handle aComponentHandle)
+void EntityPrefab::ProjectileShooting::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	aComponentHandle.WriteFloatField("cooldown", myCooldown);
+	aComponentHandle.ParseFloatField("cooldown", myCooldown);
 }
 
-void EntityPrefab::ProjectileShooting::OnLoad(Slush::AssetParser::Handle aComponentHandle)
+void EntityPrefab::Health::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	myCooldown = aComponentHandle.GetFloatField("cooldown");
+	aComponentHandle.ParseIntField("maxhealth", myMaxHealth);
 }
 
-void EntityPrefab::Health::OnSave(Slush::AssetParser::Handle aComponentHandle)
+void EntityPrefab::Physics::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	aComponentHandle.WriteIntField("maxhealth", myMaxHealth);
-}
+	aComponentHandle.ParseBoolField("isStatic", myStatic);
+	aComponentHandle.ParseBoolField("matchSprite", myMatchSprite);
 
-void EntityPrefab::Health::OnLoad(Slush::AssetParser::Handle aComponentHandle)
-{
-	myMaxHealth = aComponentHandle.GetIntField("maxhealth");
-}
+	aComponentHandle.ParseFloatField("radius", myRadius);
 
-void EntityPrefab::Physics::OnSave(Slush::AssetParser::Handle aComponentHandle)
-{
-	aComponentHandle.WriteBoolField("isStatic", myStatic);
-	aComponentHandle.WriteBoolField("matchSprite", myMatchSprite);
-
-	aComponentHandle.WriteFloatField("radius", myRadius);
-
-	Slush::AssetParser::Handle sizeHandle = aComponentHandle.AddChildElement("size");
-	sizeHandle.WriteFloatField("width", mySize.x);
-	sizeHandle.WriteFloatField("height", mySize.y);
-}
-
-void EntityPrefab::Physics::OnLoad(Slush::AssetParser::Handle aComponentHandle)
-{
-	myStatic = aComponentHandle.GetBoolField("isStatic");
-	myMatchSprite = aComponentHandle.GetBoolField("matchSprite");
-
-	myRadius = aComponentHandle.GetFloatField("radius");
-
-	Slush::AssetParser::Handle sizeHandle = aComponentHandle.GetChildElement("size");
+	Slush::AssetParser::Handle sizeHandle = aComponentHandle.ParseChildElement("size");
 	if (sizeHandle.IsValid())
 	{
-		mySize.x = sizeHandle.GetFloatField("width");
-		mySize.y = sizeHandle.GetFloatField("height");
+		sizeHandle.ParseFloatField("width", mySize.x);
+		sizeHandle.ParseFloatField("height", mySize.y);
 	}
 }
 
-void EntityPrefab::Targeting::OnSave(Slush::AssetParser::Handle aComponentHandle)
+void EntityPrefab::Targeting::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	aComponentHandle.WriteIntField("targettype", (int)myTargetType);
-}
-
-void EntityPrefab::Targeting::OnLoad(Slush::AssetParser::Handle aComponentHandle)
-{
-	myTargetType = Entity::Type(aComponentHandle.GetIntField("targettype"));
+	int targetTypeAsInt = myTargetType;
+	aComponentHandle.ParseIntField("targettype", targetTypeAsInt);
+	myTargetType = Entity::Type(targetTypeAsInt);
 }

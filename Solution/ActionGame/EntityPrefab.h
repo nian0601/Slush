@@ -11,13 +11,15 @@ class EntityPrefab
 private:
 	struct ComponentData
 	{
-		void Load(Slush::AssetParser::Handle aComponentHandle);
-		void Save(const char* aComponentName, Slush::AssetParser::Handle aRootHandle);
+		ComponentData(const char* aName)
+			: myComponentName(aName)
+		{}
 
-		virtual void OnLoad(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; };
-		virtual void OnSave(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; };
+		void Parse(Slush::AssetParser::Handle aRootHandle);
+		virtual void OnParse(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; }
 
 		bool myEnabled = false;
+		const char* myComponentName;
 	};
 
 public:
@@ -26,13 +28,16 @@ public:
 	void SaveToDisk();
 	void Load(const char* aFilePath, bool aIsAbsolutePath);
 
+	void ParsePrefab(Slush::AssetParser::Handle aRootHandle);
+
 	void BuildUI();
 	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel);
 
 	struct Sprite : public ComponentData
 	{
-		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
-		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
 		float myRadius = 10.f;
 		Vector2f mySize;
@@ -43,24 +48,27 @@ public:
 	
 	struct ProjectileShooting : public ComponentData
 	{
-		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
-		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
 		float myCooldown = 1.f;
 	};
 
 	struct Health : public ComponentData
 	{
-		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
-		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
 		int myMaxHealth = 3;
 	};
 
 	struct Physics : public ComponentData
 	{
-		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
-		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
 		bool myStatic = false;
 		bool myMatchSprite = true;
@@ -70,8 +78,9 @@ public:
 
 	struct Targeting : public ComponentData
 	{
-		void OnSave(Slush::AssetParser::Handle aComponentHandle) override;
-		void OnLoad(Slush::AssetParser::Handle aComponentHandle) override;
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
 		Entity::Type myTargetType;
 	};

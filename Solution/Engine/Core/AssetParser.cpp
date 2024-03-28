@@ -6,13 +6,66 @@
 
 namespace Slush
 {
-	AssetParser::Handle::Handle()
-	{
-	}
-
-	AssetParser::Handle::Handle(Element* aElement)
+	AssetParser::Handle::Handle(Element* aElement, bool aIsReading)
 	{
 		myElement = aElement;
+		myIsReading = aIsReading;
+	}
+
+	AssetParser::Handle AssetParser::Handle::ParseChildElement(const char* aElementName)
+	{
+		if (!IsValid())
+		{
+			SLUSH_ERROR("AssetParser: Tried to ParseChildElement '%s' on an invalid Handle", aElementName);
+			return Handle();
+		}
+
+		if (myIsReading)
+			return GetChildElement(aElementName);
+
+		return AddChildElement(aElementName);
+	}
+
+	void AssetParser::Handle::ParseIntField(const char* aFieldName, int& aValue)
+	{
+		if (!IsValid())
+		{
+			SLUSH_ERROR("AssetParser: Tried to ParseIntField '%s' on an invalid Handle", aFieldName);
+			return;
+		}
+
+		if (myIsReading)
+			aValue = GetIntField(aFieldName);
+		else
+			WriteIntField(aFieldName, aValue);
+	}
+
+	void AssetParser::Handle::ParseFloatField(const char* aFieldName, float& aValue)
+	{
+		if (!IsValid())
+		{
+			SLUSH_ERROR("AssetParser: Tried to ParseFloatField '%s' on an invalid Handle", aFieldName);
+			return;
+		}
+
+		if (myIsReading)
+			aValue = GetFloatField(aFieldName);
+		else
+			WriteFloatField(aFieldName, aValue);
+	}
+
+	void AssetParser::Handle::ParseBoolField(const char* aFieldName, bool& aValue)
+	{
+		if (!IsValid())
+		{
+			SLUSH_ERROR("AssetParser: Tried to ParseBoolField '%s' on an invalid Handle", aFieldName);
+			return;
+		}
+
+		if (myIsReading)
+			aValue = GetBoolField(aFieldName);
+		else
+			WriteBoolField(aFieldName, aValue);
 	}
 
 	AssetParser::Handle AssetParser::Handle::GetChildElement(const char* aElementName) const
@@ -79,7 +132,9 @@ namespace Slush
 		Element* child = new Element();
 		child->myElementTypeName = aElementName;
 		myElement->myChildElements[child->myElementTypeName] = child;
-		return Handle(child);
+
+		const bool isReading = false;
+		return Handle(child, isReading);
 	}
 
 	void AssetParser::Handle::WriteIntField(const char* aFieldName, int aValue)
@@ -138,7 +193,8 @@ namespace Slush
 	Slush::AssetParser::Handle AssetParser::StartWriting(const char* aRootElementType)
 	{
 		myRootElement.myElementTypeName = aRootElementType;
-		return Handle(&myRootElement);
+		const bool isReading = false;
+		return Handle(&myRootElement, isReading);
 	}
 
 	void AssetParser::FinishWriting(const char* aFile)

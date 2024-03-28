@@ -21,6 +21,13 @@ entityprefab
 	animation 
 	{ 
 	} 
+	stats 
+	{ 
+		maxcooldownupgrades 5 
+		damageperupgrade 1.000 
+		maxdamageupgrades 10 
+		cooldownperupgrade 0.200 
+	} 
 	targeting 
 	{ 
 		targettype 2 
@@ -31,6 +38,8 @@ entityprefab
 	projectileshooting 
 	{ 
 		cooldown 0.100 
+		projectilespawnoffset 35.000 
+		projectilespeed 1000.000 
 	} 
 	sprite 
 	{ 

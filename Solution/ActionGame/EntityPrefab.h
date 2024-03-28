@@ -53,6 +53,8 @@ public:
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
 		float myCooldown = 1.f;
+		float myProjectileSpeed = 500.f;
+		float myProjectileSpawnOffset = 35.f;
 	};
 
 	struct Health : public ComponentData
@@ -85,6 +87,19 @@ public:
 		Entity::Type myTargetType;
 	};
 
+	struct StatsComponent : public ComponentData
+	{
+		using ComponentData::ComponentData;
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+
+		int myMaxCooldownUpgrades = 5;
+		float myCooldownPerUpgrade = 0.2f;
+
+		int myMaxDamageUpgrades = 10;
+		float myDamagePerUpgrade = 1.f;
+	};
+
 	FW_String myName;
 	int myEntityType;
 
@@ -100,4 +115,5 @@ public:
 	ComponentData myWeaponComponent;
 	ComponentData myExperience;
 	ComponentData myPickup;
+	StatsComponent myStats;
 };

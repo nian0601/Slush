@@ -5,6 +5,8 @@
 #include <FW_Includes.h>
 #include <Core\Input.h>
 #include "ExperienceComponent.h"
+#include "StatsComponent.h"
+#include <imgui\imgui.h>
 
 Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)
@@ -35,6 +37,38 @@ void Level::Update()
 	if (input.WasKeyReleased(Slush::Input::E))
 	{
 		player->myExperienceComponent->AddExperience(1);
+	}
+
+	myIsLevelingUp = player->myExperienceComponent->NeedsLevelUp();
+	if (myIsLevelingUp)
+	{
+		if (StatsComponent* stats = player->myStatsComponent)
+		{
+			if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage())
+			{
+				player->myExperienceComponent->LevelUp();
+				myIsLevelingUp = false;
+				SLUSH_WARNING("No more available upgrades, auto-leveling");
+			}
+			else if (stats->CanUpgradeCooldownReduction() && ImGui::Button("Upgrade Cooldown"))
+			{
+				stats->AddCooldownReductionUpgrade();
+				player->myExperienceComponent->LevelUp();
+				myIsLevelingUp = false;
+			}
+			else if (stats->CanUpgradeDamage() && ImGui::Button("Upgrade Damage"))
+			{
+				stats->AddDamageUpgrade();
+				player->myExperienceComponent->LevelUp();
+				myIsLevelingUp = false;
+			}
+		}
+		else
+		{
+			SLUSH_ERROR("Player doesnt have a StatsComponent, not able to pick upgrade when Leveling");
+			player->myExperienceComponent->LevelUp();
+			myIsLevelingUp = false;
+		}
 	}
 }
 

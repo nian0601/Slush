@@ -52,6 +52,9 @@
     <ClCompile Include="PickupComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="StatsComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -108,6 +111,9 @@
       <Filter>Entities\Components</Filter>
     </ClInclude>
     <ClInclude Include="PickupComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="StatsComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
   </ItemGroup>

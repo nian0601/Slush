@@ -39,6 +39,7 @@ EntityPrefab::EntityPrefab(const char* aName)
 	, myWeaponComponent("weaponcomponent")
 	, myExperience("experience")
 	, myPickup("pickup")
+	, myStats("stats")
 {
 }
 
@@ -85,6 +86,7 @@ void EntityPrefab::ParsePrefab(Slush::AssetParser::Handle aRootHandle)
 	myWeaponComponent.Parse(aRootHandle);
 	myExperience.Parse(aRootHandle);
 	myPickup.Parse(aRootHandle);
+	myStats.Parse(aRootHandle);
 }
 
 void EntityPrefab::BuildUI()
@@ -110,7 +112,14 @@ void EntityPrefab::BuildUI()
 
 	if (BaseComponentUI(myProjectileShooting.myEnabled, "Projectile Shooter", "Add Projectile Shooter"))
 	{
+		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputFloat("Cooldown", &myProjectileShooting.myCooldown, 0.1f, 1.f, "%.2f");
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputFloat("Projectile Speed", &myProjectileShooting.myProjectileSpeed, 1.f, 10.f, "%.2f");
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputFloat("Projectile Spawn Offset", &myProjectileShooting.myProjectileSpawnOffset, 0.1f, 1.f, "%.2f");
 		ImGui::TreePop();
 	}
 
@@ -168,6 +177,23 @@ void EntityPrefab::BuildUI()
 	{
 		ImGui::TreePop();
 	}
+
+	if (BaseComponentUI(myStats.myEnabled, "Stats Component", "Add Stats Component"))
+	{
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputInt("Max Cooldown Upgrades", &myStats.myMaxCooldownUpgrades);
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputFloat("Cooldown Per Upgrade", &myStats.myCooldownPerUpgrade, 0.05f, 1.f, "%.2f");
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputInt("Max Damage Upgrades", &myStats.myMaxDamageUpgrades);
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputFloat("Damage Per Upgrade", &myStats.myDamagePerUpgrade, 0.05f, 1.f, "%.2f");
+
+		ImGui::TreePop();
+	}
 }
 
 bool EntityPrefab::BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel)
@@ -215,6 +241,8 @@ void EntityPrefab::Sprite::OnParse(Slush::AssetParser::Handle aComponentHandle)
 void EntityPrefab::ProjectileShooting::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseFloatField("cooldown", myCooldown);
+	aComponentHandle.ParseFloatField("projectilespeed", myProjectileSpeed);
+	aComponentHandle.ParseFloatField("projectilespawnoffset", myProjectileSpawnOffset);
 }
 
 void EntityPrefab::Health::OnParse(Slush::AssetParser::Handle aComponentHandle)
@@ -242,4 +270,13 @@ void EntityPrefab::Targeting::OnParse(Slush::AssetParser::Handle aComponentHandl
 	int targetTypeAsInt = myTargetType;
 	aComponentHandle.ParseIntField("targettype", targetTypeAsInt);
 	myTargetType = Entity::Type(targetTypeAsInt);
+}
+
+void EntityPrefab::StatsComponent::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.ParseIntField("maxcooldownupgrades", myMaxCooldownUpgrades);
+	aComponentHandle.ParseFloatField("cooldownperupgrade", myCooldownPerUpgrade);
+
+	aComponentHandle.ParseIntField("maxdamageupgrades", myMaxDamageUpgrades);
+	aComponentHandle.ParseFloatField("damageperupgrade", myDamagePerUpgrade);
 }

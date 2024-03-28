@@ -14,6 +14,7 @@
 #include "EntityPrefab.h"
 #include "ExperienceComponent.h"
 #include "PickupComponent.h"
+#include "StatsComponent.h"
 #include "EntityManager.h"
 
 Entity::Entity(EntityManager& aEntityManager)
@@ -35,6 +36,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myWeaponComponent);
 	FW_SAFE_DELETE(myExperienceComponent);
 	FW_SAFE_DELETE(myPickupComponent);
+	FW_SAFE_DELETE(myStatsComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -128,4 +130,7 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 
 	if (aPrefab.myPickup.myEnabled)
 		myPickupComponent = new PickupComponent(*this, aPrefab);
+
+	if (aPrefab.myStats.myEnabled)
+		myStatsComponent = new StatsComponent(*this, aPrefab);
 }

@@ -151,6 +151,7 @@
     <ClCompile Include="ProjectileShootingComponent.cpp" />
     <ClCompile Include="RemoveOnCollisionComponent.cpp" />
     <ClCompile Include="SpriteComponent.cpp" />
+    <ClCompile Include="StatsComponent.cpp" />
     <ClCompile Include="TargetingComponent.cpp" />
     <ClCompile Include="WeaponComponent.cpp" />
   </ItemGroup>
@@ -173,6 +174,7 @@
     <ClInclude Include="ProjectileShootingComponent.h" />
     <ClInclude Include="RemoveOnCollisionComponent.h" />
     <ClInclude Include="SpriteComponent.h" />
+    <ClInclude Include="StatsComponent.h" />
     <ClInclude Include="TargetingComponent.h" />
     <ClInclude Include="WeaponComponent.h" />
   </ItemGroup>

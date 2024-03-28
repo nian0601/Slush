@@ -18,13 +18,16 @@ public:
 
 	void AddExperience(int aAmount);
 
+	bool NeedsLevelUp() const;
+	void LevelUp();
+
 private:
 	void RecalculateBarSize();
 
 	Slush::RectSprite* myBackground;
 	Slush::RectSprite* myForeground;
 
-	int myLevel;
+	int myLevel = 1;
 	int myMaxExperience = 5;
 	int myCurrentExperience = 0;
 

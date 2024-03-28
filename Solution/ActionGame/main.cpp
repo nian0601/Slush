@@ -74,18 +74,24 @@ public:
 
 	void Update() override
 	{
+		bool pauseEntityUpdate = false;
+		if (myLevel)
+			pauseEntityUpdate = myLevel->IsLevelingUp();
+
 		UpdateGameState();
 
-		myEntityManager->PrePhysicsUpdate();
-
-		myPhysicsWorld->TickLimited(Slush::Time::GetDelta());
-
-		UpdatePhysics();
+		if (!pauseEntityUpdate)
+		{
+			myEntityManager->PrePhysicsUpdate();
+			myPhysicsWorld->TickLimited(Slush::Time::GetDelta());
+			UpdatePhysics();
+		}
 
 		if (myLevel)
 			myLevel->Update();
 
-		myEntityManager->Update();
+		if (!pauseEntityUpdate)
+			myEntityManager->Update();
 
 		myEntityManager->EndFrame();
 	}

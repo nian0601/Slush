@@ -5,6 +5,7 @@
 #include "TargetingComponent.h"
 #include "PhysicsComponent.h"
 #include <Physics\PhysicsWorld.h>
+#include "StatsComponent.h"
 
 WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
@@ -23,7 +24,11 @@ void WeaponComponent::Weapon::Update(Entity& anEntity)
 {
 	if (!myActivationCooldown.IsStarted() || myActivationCooldown.HasExpired())
 	{
-		myActivationCooldown.Start(0.25f);
+		float baseCooldown = 0.5f;
+		if (StatsComponent* stats = anEntity.myStatsComponent)
+			baseCooldown /= stats->GetCooldownReduction();
+
+		myActivationCooldown.Start(baseCooldown);
 
 		TargetingComponent* targeting = anEntity.myTargetingComponent;
 		if (!targeting)

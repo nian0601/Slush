@@ -16,6 +16,7 @@ class TargetingComponent;
 class WeaponComponent;
 class ExperienceComponent;
 class PickupComponent;
+class StatsComponent;
 
 class EntityManager;
 class EntityPrefab;
@@ -60,6 +61,7 @@ public:
 	WeaponComponent* myWeaponComponent = nullptr;
 	ExperienceComponent* myExperienceComponent = nullptr;
 	PickupComponent* myPickupComponent = nullptr;
+	StatsComponent* myStatsComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;

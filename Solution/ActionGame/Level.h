@@ -19,6 +19,7 @@ public:
 	void Update();
 
 	bool IsPlayerDead() const;
+	bool IsLevelingUp() const { return myIsLevelingUp; }
 
 private:
 	Slush::PhysicsWorld& myPhysicsWorld;
@@ -26,4 +27,5 @@ private:
 	EntityHandle myPlayerHandle;
 
 	NPCWave* myNPCWave;
+	bool myIsLevelingUp = false;
 };

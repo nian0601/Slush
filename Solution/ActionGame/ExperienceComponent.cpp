@@ -36,14 +36,23 @@ void ExperienceComponent::Render()
 void ExperienceComponent::AddExperience(int aAmount)
 {
 	myCurrentExperience += aAmount;
+	RecalculateBarSize();
+}
+
+bool ExperienceComponent::NeedsLevelUp() const
+{
+	return myCurrentExperience >= myMaxExperience;
+}
+
+void ExperienceComponent::LevelUp()
+{
 	if (myCurrentExperience >= myMaxExperience)
 	{
 		++myLevel;
 		myCurrentExperience -= myMaxExperience;
 		myMaxExperience += static_cast<int>(myMaxExperience * 0.5f);
+		RecalculateBarSize();
 	}
-
-	RecalculateBarSize();
 }
 
 void ExperienceComponent::RecalculateBarSize()
@@ -52,6 +61,7 @@ void ExperienceComponent::RecalculateBarSize()
 	if (myCurrentExperience > 0)
 		percent = static_cast<float>(myCurrentExperience) / myMaxExperience;
 
+	percent = FW_Clamp(percent, 0.f, 1.f);
 	float width = myTotalWidth - myPadding * 2.f;
 	width *= percent;
 

@@ -8,7 +8,6 @@
 ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	SetCooldown(anEntityPrefab.myProjectileShooting.myCooldown);
 }
 
 void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
@@ -22,16 +21,12 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 	if (myEntity.myType == Entity::NPC)
 		prefab = "NPCProjectile";
 
-	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, prefab);
-	projectile->myPhysicsComponent->myObject->myVelocity = aDirection * 1000.f;
-}
-
-void ProjectileShootingComponent::SetCooldown(float aCooldownInSeconds)
-{
-	myShootingCooldown = Slush::Time::ConvertGameTimeToTimeUnit(aCooldownInSeconds);
+	Vector2f projPosition = myEntity.myPosition + aDirection * myEntityPrefab.myProjectileShooting.myProjectileSpawnOffset;
+	Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, prefab);
+	projectile->myPhysicsComponent->myObject->myVelocity = aDirection * myEntityPrefab.myProjectileShooting.myProjectileSpeed;
 }
 
 void ProjectileShootingComponent::TriggerCooldown()
 {
-	myShootingReadyTimestamp = Slush::Time::GetCurrentExactTime() + myShootingCooldown;
+	myShootingReadyTimestamp = Slush::Time::GetCurrentExactTime() + Slush::Time::ConvertGameTimeToTimeUnit(myEntityPrefab.myProjectileShooting.myCooldown);
 }

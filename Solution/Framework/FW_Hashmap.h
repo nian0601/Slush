@@ -50,6 +50,7 @@ public:
 	const Value& Get(const Key &aKey) const;
 	const Value* GetIfExists(const Key &aKey) const;
 	void Remove(const Key &aKey);
+	void DeleteAll();
 	bool KeyExists(const Key &aKey) const;
 	Value& operator[](const Key &aKey);
 
@@ -147,6 +148,20 @@ void FW_Hashmap<Key, Value, StartSize, BucketSize>::Remove(const Key &aKey)
 			myBuckets[index].RemoveCyclicAtIndex(i);
 			return;
 		}
+	}
+}
+
+template<typename Key, typename Value, int StartSize, int BucketSize>
+void FW_Hashmap<Key, Value, StartSize, BucketSize>::DeleteAll()
+{
+	for (int i = 0; i < myBuckets.Count(); ++i)
+	{
+		FW_GrowingArray<KeyValuePair>& bucket = myBuckets[i];
+		for (const KeyValuePair& pair : bucket)
+		{
+			delete pair.myValue;
+		}
+		bucket.RemoveAll();
 	}
 }
 

@@ -52,6 +52,7 @@
     <ClInclude Include="Graphics\Animation\AnimationRuntime.h" />
     <ClInclude Include="Physics\PhysicsShapes.h" />
     <ClInclude Include="Physics\PhysicsWorld.h" />
+    <ClInclude Include="Core\AssetParser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="Graphics\Animation\AnimationRuntime.cpp" />
     <ClCompile Include="Physics\PhysicsShapes.cpp" />
     <ClCompile Include="Physics\PhysicsWorld.cpp" />
+    <ClCompile Include="Core\AssetParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

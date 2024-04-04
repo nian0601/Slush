@@ -138,6 +138,7 @@ void EntityPrefab::BuildUI()
 	if (BaseComponentUI(myHealth.myEnabled, "Health", "Add Health"))
 	{
 		ImGui::InputInt("Max Health", &myHealth.myMaxHealth);
+		ImGui::InputFloat("Grace Period Duration", &myHealth.myGracePeriodDuration);
 		ImGui::TreePop();
 	}
 
@@ -266,6 +267,7 @@ void EntityPrefab::ProjectileShooting::OnParse(Slush::AssetParser::Handle aCompo
 void EntityPrefab::Health::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseIntField("maxhealth", myMaxHealth);
+	aComponentHandle.ParseFloatField("graceperiodduration", myGracePeriodDuration);
 }
 
 void EntityPrefab::Physics::OnParse(Slush::AssetParser::Handle aComponentHandle)

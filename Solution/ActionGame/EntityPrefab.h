@@ -63,7 +63,8 @@ public:
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
-		int myMaxHealth = 3;
+		int myMaxHealth = 30;
+		float myGracePeriodDuration = 0.f;
 	};
 
 	struct Physics : public ComponentData

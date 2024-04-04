@@ -3,6 +3,7 @@ entityprefab
 	health 
 	{ 
 		maxhealth 50 
+		graceperiodduration 0.500 
 	} 
 	experience 
 	{ 

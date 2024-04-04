@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include <Core\Time.h>
 
 namespace Slush
 {
@@ -31,4 +32,6 @@ private:
 	float myTotalWidth = 150.f;
 	float myTotalHeight = 16.f;
 	float myPadding = 2.f;
+
+	Slush::Timer myGracePeriodTimer;
 };

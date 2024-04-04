@@ -18,6 +18,11 @@ HealthComponent::HealthComponent(Entity& anEntity, const EntityPrefab& anEntityP
 	myForeground->SetFillColor(0xFF00FF00);
 
 	SetMaxHealth(anEntityPrefab.myHealth.myMaxHealth);
+
+	if (anEntityPrefab.myHealth.myGracePeriodDuration > 0.f)
+	{
+		myGracePeriodTimer.Start(0.f);
+	}
 }
 
 HealthComponent::~HealthComponent()
@@ -44,6 +49,14 @@ void HealthComponent::SetMaxHealth(int aHealth)
 
 void HealthComponent::DealDamage(int aDamageAmount)
 {
+	if (myGracePeriodTimer.IsStarted())
+	{
+		if (!myGracePeriodTimer.HasExpired())
+			return;
+
+		myGracePeriodTimer.Start(myEntityPrefab.myHealth.myGracePeriodDuration);
+	}
+
 	myCurrentHealth -= aDamageAmount;
 	myCurrentHealth = FW_Max(myCurrentHealth, 0);
 

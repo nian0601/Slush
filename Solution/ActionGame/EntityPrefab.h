@@ -74,6 +74,7 @@ public:
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 
 		bool myStatic = false;
+		bool mySensor = false;
 		bool myMatchSprite = true;
 		float myRadius = 10.f;
 		Vector2f mySize;

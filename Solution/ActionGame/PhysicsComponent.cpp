@@ -44,6 +44,9 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 
 		if (anEntityPrefab.myPhysics.myStatic)
 			myObject->MakeStatic();
+
+		if (anEntityPrefab.myPhysics.mySensor)
+			myObject->MakeSensor();
 	}
 	else
 	{

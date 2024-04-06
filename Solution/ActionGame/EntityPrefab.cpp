@@ -145,6 +145,7 @@ void EntityPrefab::BuildUI()
 	if (BaseComponentUI(myPhysics.myEnabled, "Physics", "Add Physics"))
 	{
 		ImGui::Checkbox("Is Static", &myPhysics.myStatic);
+		ImGui::Checkbox("Is Sensor", &myPhysics.mySensor);
 		ImGui::Checkbox("Match Sprite", &myPhysics.myMatchSprite);
 
 		ImGui::InputFloat("Radius", &myPhysics.myRadius, 1.f, 10.f, "%.2f");
@@ -273,6 +274,7 @@ void EntityPrefab::Health::OnParse(Slush::AssetParser::Handle aComponentHandle)
 void EntityPrefab::Physics::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseBoolField("isStatic", myStatic);
+	aComponentHandle.ParseBoolField("isSensor", mySensor);
 	aComponentHandle.ParseBoolField("matchSprite", myMatchSprite);
 
 	aComponentHandle.ParseFloatField("radius", myRadius);

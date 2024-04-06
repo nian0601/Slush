@@ -2,6 +2,7 @@ entityprefab
 { 
 	physics 
 	{ 
+		isSensor 1 
 		radius 10.000 
 		matchSprite 1 
 		isStatic 1 

@@ -108,14 +108,14 @@ public:
 
 	void UpdatePhysics()
 	{
-		const FW_GrowingArray<Slush::Manifold>& contacts = myPhysicsWorld->GetContacts();
-		for (const Slush::Manifold& contact : contacts)
+		const FW_GrowingArray<Slush::Contact>& contacts = myPhysicsWorld->GetContacts();
+		for (const Slush::Contact& contact : contacts)
 		{
-			if (!contact.myObjectA || !contact.myObjectB)
+			if (!contact.myFirst|| !contact.mySecond)
 				continue;
 
-			PhysicsComponent* physA = contact.myObjectA->myUserData.Get<PhysicsComponent*>();
-			PhysicsComponent* physB = contact.myObjectB->myUserData.Get<PhysicsComponent*>();
+			PhysicsComponent* physA = contact.myFirst->myUserData.Get<PhysicsComponent*>();
+			PhysicsComponent* physB = contact.mySecond->myUserData.Get<PhysicsComponent*>();
 			if (!physA || !physB)
 			{
 				SLUSH_WARNING("PhysContact with Entity without PhysicsComponent");
@@ -123,7 +123,6 @@ public:
 			}
 
 			physA->myEntity.OnCollision(physB->myEntity);
-			physB->myEntity.OnCollision(physA->myEntity);
 		}
 	}
 

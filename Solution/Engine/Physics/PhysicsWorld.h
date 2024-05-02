@@ -44,6 +44,10 @@ namespace Slush
 
 		int myColor = 0xFFFFFFFF;
 
+		unsigned int myCollisionMask = 0;
+		unsigned int myCollidesWithMask = 0;
+		unsigned int myReportCollisionsWith = 0xffffffff;
+
 		PhysicsShape* myShape = nullptr;
 
 		void IntegrateForces(float aDelta);
@@ -61,6 +65,9 @@ namespace Slush
 		void SetPosition(const Vector2f& aPosition);
 		void SetOrientation(float aRadians);
 
+		bool CollidesWith(PhysicsObject* aOther) const;
+		bool ReportsCollisionsWith(PhysicsObject* aOther) const;
+
 		Vector2f myPreviousPosition;
 		Vector2f myPreviousVelocity;
 		float myPreviousOrientation = 0.f;
@@ -77,6 +84,14 @@ namespace Slush
 		Vector2f myContacts[2];
 		int myContactCount = 0;
 		float myPenetrationDepth = 0.f;
+
+		bool myNeedsToResolveCollision = true;
+	};
+
+	struct Contact
+	{
+		PhysicsObject* myFirst = nullptr;
+		PhysicsObject* mySecond = nullptr;
 	};
 
 	struct MaxDistanceConstraint
@@ -110,7 +125,7 @@ namespace Slush
 		void RemoveObject(PhysicsObject* aObject);
 
 		const FW_GrowingArray<PhysicsObject*>& GetObjects() const { return myObjects; }
-		const FW_GrowingArray<Manifold>& GetContacts() const { return myContacts; }
+		const FW_GrowingArray<Contact>& GetContacts() const { return myContacts; }
 		float GetFixedDeltaTime() const { return myFixedDeltaTime; }
 
 		static float ourGravityScale;
@@ -121,7 +136,8 @@ namespace Slush
 		void PositionalCorrection(const Manifold& aManifold);
 
 		float myFixedDeltaTime;
-		FW_GrowingArray<Manifold> myContacts;
+		FW_GrowingArray<Manifold> myManifolds;
+		FW_GrowingArray<Contact> myContacts;
 		FW_GrowingArray<PhysicsObject*> myObjects;
 		FW_GrowingArray<MaxDistanceConstraint*> myMaxDistanceConstraints;
 

@@ -100,6 +100,16 @@ namespace Slush
 		myShape->SetOrientation(myOrientation);
 	}
 
+	bool PhysicsObject::CollidesWith(PhysicsObject* aOther) const
+	{
+		return (myCollidesWithMask & aOther->myCollisionMask) > 0;
+	}
+
+	bool PhysicsObject::ReportsCollisionsWith(PhysicsObject* aOther) const
+	{
+		return (myReportCollisionsWith & aOther->myCollisionMask) > 0;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 
 	const Vector2f PhysicsWorld::ourGravity = Vector2f(0.f, 9.82f);
@@ -122,7 +132,6 @@ namespace Slush
 	{
 		Manifold tempManifold;
 		
-
 		for (int i = 0; i < myObjects.Count(); ++i)
 		{
 			PhysicsObject* A = myObjects[i];
@@ -132,13 +141,28 @@ namespace Slush
 
 			for (int j = i + 1; j < myObjects.Count(); ++j)
 			{
-				const PhysicsObject* B = myObjects[j];
+				PhysicsObject* B = myObjects[j];
 
 				if (A->myInvMass == 0.f && B->myInvMass == 0.f)
 					continue;
 
-				if (myObjects[i]->myShape->RunCollision(*myObjects[j]->myShape, tempManifold))
-					myContacts.Add(tempManifold);
+				bool needsPhysicsCollision = A->CollidesWith(B) && B->CollidesWith(A);
+				bool needsGameplayCollision = A->ReportsCollisionsWith(B) || B->ReportsCollisionsWith(A);
+
+				if (needsPhysicsCollision || needsGameplayCollision)
+				{
+					tempManifold.myNeedsToResolveCollision = needsPhysicsCollision;
+					if (myObjects[i]->myShape->RunCollision(*myObjects[j]->myShape, tempManifold))
+					{
+						myManifolds.Add(tempManifold);
+
+						if (A->ReportsCollisionsWith(B))
+							myContacts.Add({ A, B });
+
+						if (B->ReportsCollisionsWith(A))
+							myContacts.Add({ B, A });
+					}
+				}
 			}
 		}
 
@@ -148,7 +172,7 @@ namespace Slush
 		const int maxNumIterations = 10;
 		for (int i = 0; i < maxNumIterations; ++i)
 		{
-			for (const Manifold& manifold : myContacts)
+			for (const Manifold& manifold : myManifolds)
 				ResolveCollision(manifold);
 
 			for (MaxDistanceConstraint* constraint : myMaxDistanceConstraints)
@@ -158,7 +182,7 @@ namespace Slush
 		for (PhysicsObject* object : myObjects)
 			object->IntegrateVelocity(myFixedDeltaTime);
 
-		for (const Manifold& manifold : myContacts)
+		for (const Manifold& manifold : myManifolds)
 			PositionalCorrection(manifold);
 
 		for (PhysicsObject* object : myObjects)
@@ -170,6 +194,7 @@ namespace Slush
 
 	void PhysicsWorld::TickLimited(float aDeltaTime)
 	{
+		myManifolds.RemoveAll();
 		myContacts.RemoveAll();
 
 		static float accumulator = 0.f;
@@ -270,6 +295,9 @@ namespace Slush
 		}
 
 		if (A.mySensorFlag || B.mySensorFlag)
+			return;
+
+		if (!aManifold.myNeedsToResolveCollision)
 			return;
 
 		float e = FW_Min(A.myRestitution, B.myRestitution);

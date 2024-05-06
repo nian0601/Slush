@@ -20,6 +20,8 @@
 #include "Graphics/RectSprite.h"
 #include "Graphics/Animation/Animation.h"
 
+#include "UI/Button.h"
+
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsShapes.h"
 
@@ -63,6 +65,8 @@ public:
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
+
+		myButton = new Slush::Button();
 	}
 
 	void Shutdown() override
@@ -70,6 +74,7 @@ public:
 		FW_SAFE_DELETE(myLevel);
 		FW_SAFE_DELETE(myEntityManager);
 		FW_SAFE_DELETE(myPhysicsWorld);
+		FW_SAFE_DELETE(myButton);
 	}
 
 	void Update() override
@@ -93,6 +98,12 @@ public:
 		if (!pauseEntityUpdate)
 			myEntityManager->Update();
 
+		Slush::Engine& engine = Slush::Engine::GetInstance();
+		myButton->Update(engine.GetInput());
+
+		if (myButton->WasPressed())
+			SLUSH_INFO("Pressed");
+
 		myEntityManager->EndFrame();
 	}
 
@@ -102,6 +113,8 @@ public:
 		engine.GetWindow().StartOffscreenBuffer();
 
 		myEntityManager->Render();
+
+		myButton->Render();
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
@@ -173,6 +186,8 @@ private:
 
 	Level* myLevel;
 	GameState myGameState = START_SCREEN;
+
+	Slush::Button* myButton;
 };
 
 #include <FW_UnitTestSuite.h>

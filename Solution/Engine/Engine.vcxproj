@@ -170,6 +170,7 @@
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Graphics\Window.h" />
     <ClInclude Include="Graphics\Texture.h" />
+    <ClInclude Include="UI\Button.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\AssetParser.cpp" />
@@ -221,6 +222,7 @@
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Graphics\Window.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
+    <ClCompile Include="UI\Button.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.vcxproj">

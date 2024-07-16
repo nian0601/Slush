@@ -170,7 +170,10 @@
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Graphics\Window.h" />
     <ClInclude Include="Graphics\Texture.h" />
-    <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="UI\UIButton.h" />
+    <ClInclude Include="UI\UILayout.h" />
+    <ClInclude Include="UI\UIManager.h" />
+    <ClInclude Include="UI\UIWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\AssetParser.cpp" />
@@ -222,7 +225,8 @@
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Graphics\Window.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
-    <ClCompile Include="UI\Button.cpp" />
+    <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.vcxproj">

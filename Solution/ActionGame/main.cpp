@@ -17,7 +17,9 @@
 #include "Graphics/RectSprite.h"
 #include "Graphics/Animation/Animation.h"
 
-#include "UI/Button.h"
+#include "UI/UILayout.h"
+#include "UI/UIManager.h"
+#include "UI/UIButton.h"
 
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsShapes.h"
@@ -63,7 +65,24 @@ public:
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
 
-		myButton = new Slush::Button();
+		Slush::UILayout::Button& layoutButton = myUILayout.myButtons.Add();
+		layoutButton.myPosition.x = 800;
+		layoutButton.myPosition.y = 300;
+
+		layoutButton.mySize.x = 150;
+		layoutButton.mySize.y = 50;
+
+		layoutButton.myColor = 0xFFFF0000;
+		layoutButton.myHoverColor = 0xFF00FF00;
+		layoutButton.myPressedColor = 0xFF0000FF;
+
+		layoutButton.myIdentifier = "ProButton";
+
+		myUIManager = new Slush::UIManager();
+		myUIManager->SetLayout(&myUILayout);
+
+		if (Slush::UIWidget* button = myUIManager->FindWidget("ProButton"))
+			myButton = static_cast<Slush::UIButton*>(button);
 	}
 
 	void Shutdown() override
@@ -71,7 +90,7 @@ public:
 		FW_SAFE_DELETE(myLevel);
 		FW_SAFE_DELETE(myEntityManager);
 		FW_SAFE_DELETE(myPhysicsWorld);
-		FW_SAFE_DELETE(myButton);
+		FW_SAFE_DELETE(myUIManager);
 	}
 
 	void Update() override
@@ -96,7 +115,7 @@ public:
 			myEntityManager->Update();
 
 		Slush::Engine& engine = Slush::Engine::GetInstance();
-		myButton->Update(engine.GetInput());
+		myUIManager->Update(engine.GetInput());
 
 		if (myButton->WasPressed())
 			SLUSH_INFO("Pressed");
@@ -112,6 +131,7 @@ public:
 		myEntityManager->Render();
 
 		myButton->Render();
+		myUIManager->Render();
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}
@@ -184,7 +204,9 @@ private:
 	Level* myLevel;
 	GameState myGameState = START_SCREEN;
 
-	Slush::Button* myButton;
+	Slush::UIButton* myButton;
+	Slush::UILayout myUILayout;
+	Slush::UIManager* myUIManager;
 };
 
 #include <FW_UnitTestSuite.h>

@@ -53,7 +53,10 @@
     <ClInclude Include="Physics\PhysicsShapes.h" />
     <ClInclude Include="Physics\PhysicsWorld.h" />
     <ClInclude Include="Core\AssetParser.h" />
-    <ClInclude Include="UI\Button.h" />
+    <ClInclude Include="UI\UIButton.h" />
+    <ClInclude Include="UI\UIManager.h" />
+    <ClInclude Include="UI\UIWidget.h" />
+    <ClInclude Include="UI\UILayout.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -100,7 +103,8 @@
     <ClCompile Include="Physics\PhysicsShapes.cpp" />
     <ClCompile Include="Physics\PhysicsWorld.cpp" />
     <ClCompile Include="Core\AssetParser.cpp" />
-    <ClCompile Include="UI\Button.cpp" />
+    <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

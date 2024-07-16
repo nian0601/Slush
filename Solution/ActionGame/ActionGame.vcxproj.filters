@@ -58,6 +58,7 @@
     <ClCompile Include="DamageDealerComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -122,6 +123,7 @@
     <ClInclude Include="DamageDealerComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

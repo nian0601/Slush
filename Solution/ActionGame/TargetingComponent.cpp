@@ -1,8 +1,10 @@
-#include "TargetingComponent.h"
-#include "Entity.h"
-#include "EntityPrefab.h"
+#include "stdafx.h"
+
 #include "EntityManager.h"
+#include "EntityPrefab.h"
 #include "PhysicsComponent.h"
+#include "TargetingComponent.h"
+
 #include <Physics\PhysicsWorld.h>
 #include <float.h>
 

@@ -1,12 +1,13 @@
-#include "Level.h"
+#include "stdafx.h"
+
 #include "EntityManager.h"
-#include "HealthComponent.h"
-#include "NPCWave.h"
-#include <FW_Includes.h>
-#include <Core\Input.h>
 #include "ExperienceComponent.h"
+#include "HealthComponent.h"
+#include "Level.h"
+#include "NPCWave.h"
 #include "StatsComponent.h"
-#include <imgui\imgui.h>
+
+#include <Core\Input.h>
 
 Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)

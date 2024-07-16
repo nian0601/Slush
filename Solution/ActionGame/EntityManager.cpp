@@ -1,8 +1,7 @@
-#include "EntityManager.h"
-#include "Entity.h"
-#include "EntityPrefab.h"
+#include "stdafx.h"
 
-#include <Core\Log.h>
+#include "EntityManager.h"
+#include "EntityPrefab.h"
 
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
 	: myPrefabStorage(aPrefabStorage)

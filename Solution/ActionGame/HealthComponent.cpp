@@ -1,10 +1,9 @@
+#include "stdafx.h"
+
+#include "EntityPrefab.h"
 #include "HealthComponent.h"
 
-#include "Entity.h"
-#include "EntityPrefab.h"
-
 #include <Graphics/RectSprite.h>
-#include <FW_Includes.h>
 
 HealthComponent::HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)

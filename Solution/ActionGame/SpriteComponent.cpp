@@ -1,12 +1,10 @@
+#include "stdafx.h"
+
+#include "EntityPrefab.h"
 #include "SpriteComponent.h"
 
-#include "Entity.h"
-
 #include <Graphics/CircleSprite.h>
-
-#include <FW_Includes.h>
 #include <Graphics/RectSprite.h>
-#include "EntityPrefab.h"
 
 SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)

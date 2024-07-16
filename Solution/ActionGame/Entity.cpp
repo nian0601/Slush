@@ -1,21 +1,22 @@
+#include "stdafx.h"
+
 #include "Entity.h"
 
-#include <FW_Includes.h>
-#include "SpriteComponent.h"
 #include "AnimationComponent.h"
-#include "ProjectileShootingComponent.h"
-#include "PlayerControllerComponent.h"
-#include "NPCControllerComponent.h"
-#include "HealthComponent.h"
-#include "PhysicsComponent.h"
-#include "RemoveOnCollisionComponent.h"
-#include "TargetingComponent.h"
-#include "WeaponComponent.h"
+#include "EntityManager.h"
 #include "EntityPrefab.h"
 #include "ExperienceComponent.h"
+#include "HealthComponent.h"
+#include "NPCControllerComponent.h"
+#include "PhysicsComponent.h"
 #include "PickupComponent.h"
+#include "PlayerControllerComponent.h"
+#include "ProjectileShootingComponent.h"
+#include "RemoveOnCollisionComponent.h"
+#include "SpriteComponent.h"
 #include "StatsComponent.h"
-#include "EntityManager.h"
+#include "TargetingComponent.h"
+#include "WeaponComponent.h"
 #include "DamageDealerComponent.h"
 
 Entity::Entity(EntityManager& aEntityManager)

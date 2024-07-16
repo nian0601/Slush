@@ -1,12 +1,14 @@
-#include "WeaponComponent.h"
-#include "Entity.h"
-#include "EntityPrefab.h"
-#include "EntityManager.h"
-#include "TargetingComponent.h"
-#include "PhysicsComponent.h"
-#include <Physics\PhysicsWorld.h>
-#include "StatsComponent.h"
+#include "stdafx.h"
+
 #include "DamageDealerComponent.h"
+#include "EntityManager.h"
+#include "EntityPrefab.h"
+#include "PhysicsComponent.h"
+#include "StatsComponent.h"
+#include "TargetingComponent.h"
+#include "WeaponComponent.h"
+
+#include <Physics\PhysicsWorld.h>
 
 WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)

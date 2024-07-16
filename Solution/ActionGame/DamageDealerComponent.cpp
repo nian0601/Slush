@@ -1,9 +1,8 @@
-#include "DamageDealerComponent.h"
+#include "stdafx.h"
 
-#include "Entity.h"
+#include "DamageDealerComponent.h"
 #include "EntityPrefab.h"
 #include "HealthComponent.h"
-
 
 DamageDealerComponent::DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)

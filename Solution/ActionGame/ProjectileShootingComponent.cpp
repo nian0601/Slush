@@ -1,8 +1,10 @@
-#include "ProjectileShootingComponent.h"
-#include "Entity.h"
-#include "EntityPrefab.h"
+#include "stdafx.h"
+
 #include "EntityManager.h"
+#include "EntityPrefab.h"
 #include "PhysicsComponent.h"
+#include "ProjectileShootingComponent.h"
+
 #include <Physics\PhysicsWorld.h>
 
 ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)

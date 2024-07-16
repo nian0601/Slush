@@ -1,10 +1,9 @@
+#include "stdafx.h"
+
+#include "EntityPrefab.h"
 #include "ExperienceComponent.h"
 
-#include "Entity.h"
-#include "EntityPrefab.h"
-
 #include <Graphics/RectSprite.h>
-#include <FW_Includes.h>
 
 ExperienceComponent::ExperienceComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)

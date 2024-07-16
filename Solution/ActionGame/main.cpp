@@ -1,7 +1,4 @@
-#include "imgui/imgui.h"
-#include "imgui/imgui-SFML.h"
-
-#include <FW_Includes.h>
+#include "stdafx.h"
 
 #include "Core/IApp.h"
 #include "Core/Engine.h"

@@ -1,17 +1,13 @@
+#include "stdafx.h"
+
 #include "AnimationComponent.h"
-
-#include "Entity.h"
-#include "SpriteComponent.h"
 #include "PhysicsComponent.h"
-
-#include <Core\Log.h>
+#include "SpriteComponent.h"
 
 #include <Physics\PhysicsWorld.h>
 
 #include <Graphics\Animation\Animation.h>
 #include <Graphics\Animation\AnimationRuntime.h>
-
-#include <FW_Includes.h>
 
 AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)

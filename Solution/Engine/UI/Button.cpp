@@ -1,7 +1,9 @@
 #include "stdafx.h"
+
 #include "Button.h"
-#include <Graphics\RectSprite.h>
+
 #include <Core\Input.h>
+#include <Graphics\RectSprite.h>
 
 namespace Slush
 {

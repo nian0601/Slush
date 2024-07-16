@@ -1,14 +1,14 @@
-#include "PlayerControllerComponent.h"
+#include "stdafx.h"
 
-#include "Entity.h"
 #include "AnimationComponent.h"
+#include "HealthComponent.h"
+#include "PhysicsComponent.h"
+#include "PlayerControllerComponent.h"
 #include "ProjectileShootingComponent.h"
 
 #include <Core\Engine.h>
 #include <Core\Input.h>
-#include "HealthComponent.h"
 #include <Physics\PhysicsWorld.h>
-#include "PhysicsComponent.h"
 
 void PlayerControllerComponent::Update()
 {

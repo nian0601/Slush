@@ -1,11 +1,10 @@
-#include "NPCControllerComponent.h"
+#include "stdafx.h"
 
-#include "Entity.h"
-#include "ProjectileShootingComponent.h"
+#include "NPCControllerComponent.h"
 #include "PhysicsComponent.h"
+#include "ProjectileShootingComponent.h"
 #include "TargetingComponent.h"
 
-#include <Core\Log.h>
 #include <Physics\PhysicsWorld.h>
 
 void NPCControllerComponent::Update()

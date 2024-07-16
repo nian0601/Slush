@@ -1,6 +1,7 @@
+#include "stdafx.h"
+
 #include "EntityPrefab.h"
-#include <imgui\imgui.h>
-#include <FW_Math.h>
+
 #include <FW_FileSystem.h>
 
 void EntityPrefab::ComponentData::Parse(Slush::AssetParser::Handle aRootHandle)

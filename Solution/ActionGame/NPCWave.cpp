@@ -1,12 +1,10 @@
-#include "NPCWave.h"
+#include "stdafx.h"
 
-#include "Entity.h"
 #include "EntityManager.h"
 #include "EntityPrefab.h"
 #include "NPCControllerComponent.h"
+#include "NPCWave.h"
 #include "ProjectileShootingComponent.h"
-
-#include <FW_Math.h>
 
 NPCWave::NPCWave(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
 	: myEntityManager(aEntityManager)

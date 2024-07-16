@@ -1,10 +1,9 @@
+#include "stdafx.h"
+
+#include "EntityPrefab.h"
 #include "PhysicsComponent.h"
 
-#include "Entity.h"
 #include <Physics\PhysicsWorld.h>
-#include <FW_Includes.h>
-#include "EntityPrefab.h"
-#include <Core\Log.h>
 
 namespace
 {

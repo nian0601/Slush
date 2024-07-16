@@ -1,7 +1,7 @@
-#include "StatsComponent.h"
+#include "stdafx.h"
 
-#include "Entity.h"
 #include "EntityPrefab.h"
+#include "StatsComponent.h"
 
 void StatsComponent::Stat::Upgrade(float aValue)
 {

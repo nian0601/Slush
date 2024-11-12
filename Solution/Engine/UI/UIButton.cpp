@@ -71,6 +71,12 @@ namespace Slush
 		mySprite->Render(myRect.myCenterPos.x, myRect.myCenterPos.y);
 	}
 
+	void UIButton::Inactivate()
+	{
+		myState = INACTIVE;
+		myPreviousState = INACTIVE;
+	}
+
 	bool UIButton::WasPressed() const
 	{
 		return myState == MOUSE_DOWN && myPreviousState != MOUSE_DOWN;

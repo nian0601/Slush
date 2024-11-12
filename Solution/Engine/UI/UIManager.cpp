@@ -10,6 +10,7 @@ namespace Slush
 	UIManager::~UIManager()
 	{
 		myWidgets.DeleteAll();
+		myDiscardedWidgets.DeleteAll();
 	}
 
 	void UIManager::Update(const Input& aInput)
@@ -47,20 +48,43 @@ namespace Slush
 	void UIManager::ApplyLayout()
 	{
 		myLayout->myIsDirty = false;
-
-		// This is a problem due to FindWidget!
-		// Whatever we return from FindWidget cannot become invalid randomly
-		myWidgets.DeleteAll();
+	
+		myDiscardedWidgets.Add(myWidgets);
+		myWidgets.RemoveAll();
 
 		for (const UILayout::Button& layoutButton : myLayout->myButtons)
 		{
-			UIButton* button = new UIButton();
+			UIButton* button = nullptr;
+			if (UIWidget* discardedWidget = FindDiscardedWidget(layoutButton.myIdentifier.GetBuffer()))
+			{
+				button = static_cast<UIButton*>(discardedWidget);
+				myDiscardedWidgets.RemoveCyclic(discardedWidget);
+			}
+			else
+			{
+				button = new UIButton();
+			}
+
 			button->myIdentifier = layoutButton.myIdentifier;
 			button->SetSize(layoutButton.mySize);
 			button->SetPosition(layoutButton.myPosition);
 			button->SetColors(layoutButton.myColor, layoutButton.myHoverColor, layoutButton.myPressedColor);
 			myWidgets.Add(button);
 		}
+
+		for (UIWidget* discarded : myDiscardedWidgets)
+			discarded->Inactivate();
+	}
+
+	Slush::UIWidget* UIManager::FindDiscardedWidget(const char* aIdentifier) const
+	{
+		for (UIWidget* widget : myDiscardedWidgets)
+		{
+			if (widget->myIdentifier == aIdentifier)
+				return widget;
+		}
+
+		return nullptr;
 	}
 
 }

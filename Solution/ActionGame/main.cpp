@@ -124,7 +124,11 @@ public:
 		myUIManager->Update(engine.GetInput());
 
 		if (myButton->WasPressed())
+		{
+			myUILayout->Load("Data/UILayouts/TestLayout.uilayout", false);
 			SLUSH_INFO("Pressed");
+		}
+
 
 		myEntityManager->EndFrame();
 	}

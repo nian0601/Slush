@@ -17,6 +17,7 @@ namespace Slush
 
 		void Update(const Input& aInput) override;
 		void Render() override;
+		void Inactivate() override;
 
 		bool WasPressed() const;
 

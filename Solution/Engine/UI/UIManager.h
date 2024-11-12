@@ -21,8 +21,14 @@ namespace Slush
 
 	private:
 		void ApplyLayout();
+		UIWidget* FindDiscardedWidget(const char* aIdentifier) const;
 
-		FW_GrowingArray<UIWidget*> myWidgets;
 		UILayout* myLayout = nullptr;
+		FW_GrowingArray<UIWidget*> myWidgets;
+
+		// Widgets that were removed from a Layout during Hotreload is placed in this list
+		// to keep the pointers valid incase someone is still holding on to a pointer.
+		// The Widget wont be in 'myWidgets' anymore, so it wont be rendered or updated.
+		FW_GrowingArray<UIWidget*> myDiscardedWidgets;
 	};
 }

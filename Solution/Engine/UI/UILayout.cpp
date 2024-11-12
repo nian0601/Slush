@@ -36,8 +36,11 @@ namespace Slush
 
 		Slush::AssetParser::Handle buttonsHandle = rootHandle.ParseChildElement("buttons");
 
+		myButtons.RemoveAll();
 		Button& button = myButtons.Add();
 		button.Parse(buttonsHandle);
+
+		myIsDirty = true;
 	}
 
 	void UILayout::Button::Parse(Slush::AssetParser::Handle aParserHandle)

@@ -14,11 +14,8 @@ namespace Slush
 
 	AssetParser::Handle AssetParser::Handle::ParseChildElement(const char* aElementName)
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to ParseChildElement '%s' on an invalid Handle", aElementName);
-			return Handle();
-		}
+		if (!ValidateField(aElementName))
+			return AssetParser::Handle();
 
 		if (myIsReading)
 			return GetChildElement(aElementName);
@@ -28,11 +25,8 @@ namespace Slush
 
 	void AssetParser::Handle::ParseIntField(const char* aFieldName, int& aValue)
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to ParseIntField '%s' on an invalid Handle", aFieldName);
+		if (!ValidateField(aFieldName))
 			return;
-		}
 
 		if (myIsReading)
 			GetIntField(aFieldName, aValue);
@@ -42,11 +36,8 @@ namespace Slush
 
 	void AssetParser::Handle::ParseFloatField(const char* aFieldName, float& aValue)
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to ParseFloatField '%s' on an invalid Handle", aFieldName);
+		if (!ValidateField(aFieldName))
 			return;
-		}
 
 		if (myIsReading)
 			GetFloatField(aFieldName, aValue);
@@ -56,16 +47,55 @@ namespace Slush
 
 	void AssetParser::Handle::ParseBoolField(const char* aFieldName, bool& aValue)
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to ParseBoolField '%s' on an invalid Handle", aFieldName);
+		if (!ValidateField(aFieldName))
 			return;
-		}
 
 		if (myIsReading)
 			GetBoolField(aFieldName, aValue);
 		else
 			WriteBoolField(aFieldName, aValue);
+	}
+
+	void AssetParser::Handle::ParseStringField(const char* aFieldName, FW_String& aValue)
+	{
+		if (!ValidateField(aFieldName))
+			return;
+
+		if (myIsReading)
+			GetStringField(aFieldName, aValue);
+		else
+			WriteStringField(aFieldName, aValue);
+	}
+
+	void AssetParser::Handle::ParseVec2iField(const char* aFieldName, Vector2i& aValue)
+	{
+		if (!ValidateField(aFieldName))
+			return;
+
+		Handle fieldHandle = ParseChildElement(aFieldName);
+
+		fieldHandle.ParseIntField("x", aValue.x);
+		fieldHandle.ParseIntField("y", aValue.y);
+	}
+
+	void AssetParser::Handle::ParseVec2fField(const char* aFieldName, Vector2f& aValue)
+	{
+		if (!ValidateField(aFieldName))
+			return;
+
+		Handle fieldHandle = ParseChildElement(aFieldName);
+
+		fieldHandle.ParseFloatField("x", aValue.x);
+		fieldHandle.ParseFloatField("y", aValue.y);
+	}
+
+	bool AssetParser::Handle::ValidateField(const char* aFieldName)
+	{
+		if (IsValid())
+			return true;
+
+		SLUSH_ERROR("AssetParser: Tried to parse field '%s' on an invalid Handle", aFieldName);
+		return false;
 	}
 
 	AssetParser::Handle AssetParser::Handle::GetChildElement(const char* aElementName) const
@@ -82,12 +112,6 @@ namespace Slush
 
 	bool AssetParser::Handle::GetIntField(const char* aFieldName, int& aValue) const
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to read Field '%s' from an invalid Handle", aFieldName);
-			return false;
-		}
-
 		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
 		if (!field)
 		{
@@ -101,12 +125,6 @@ namespace Slush
 
 	bool AssetParser::Handle::GetFloatField(const char* aFieldName, float& aValue) const
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to read Field '%s' from an invalid Handle", aFieldName);
-			return false;
-		}
-
 		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
 		if (!field)
 		{
@@ -130,14 +148,21 @@ namespace Slush
 		return false;
 	}
 
-	AssetParser::Handle AssetParser::Handle::AddChildElement(const char* aElementName)
+	bool AssetParser::Handle::GetStringField(const char* aFieldName, FW_String& aValue) const
 	{
-		if (!IsValid())
+		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
+		if (!field)
 		{
-			SLUSH_ERROR("AssetParser: Tried to '%s'-Element to an invalid Handle", aElementName);
-			return Handle();
+			SLUSH_ERROR("AssetParser: Didnt find Field '%s'", aFieldName);
+			return false;
 		}
 
+		aValue = (*field)->myRawData;
+		return true;
+	}
+
+	AssetParser::Handle AssetParser::Handle::AddChildElement(const char* aElementName)
+	{
 		Element* child = new Element();
 		child->myElementTypeName = aElementName;
 		myElement->myChildElements[child->myElementTypeName] = child;
@@ -148,12 +173,6 @@ namespace Slush
 
 	void AssetParser::Handle::WriteIntField(const char* aFieldName, int aValue)
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to write Int '%s' to an invalid Handle", aFieldName);
-			return;
-		}
-
 		Field* field = new Field();
 		field->myFieldName = aFieldName;
 		field->myRawData += aValue;
@@ -162,12 +181,6 @@ namespace Slush
 
 	void AssetParser::Handle::WriteFloatField(const char* aFieldName, float aValue)
 	{
-		if (!IsValid())
-		{
-			SLUSH_ERROR("AssetParser: Tried to write Float '%s' to an invalid Handle", aFieldName);
-			return;
-		}
-
 		Field* field = new Field();
 		field->myFieldName = aFieldName;
 		field->myRawData += aValue;
@@ -177,6 +190,14 @@ namespace Slush
 	void AssetParser::Handle::WriteBoolField(const char* aFieldName, bool aValue)
 	{
 		WriteIntField(aFieldName, aValue ? 1 : 0);
+	}
+
+	void AssetParser::Handle::WriteStringField(const char* aFieldName, FW_String& aValue)
+	{
+		Field* field = new Field();
+		field->myFieldName = aFieldName;
+		field->myRawData = aValue;
+		myElement->myFields[aFieldName] = field;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

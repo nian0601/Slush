@@ -226,6 +226,7 @@
     <ClCompile Include="Graphics\Window.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UILayout.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>

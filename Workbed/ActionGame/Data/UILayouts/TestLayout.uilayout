@@ -1,0 +1,23 @@
+uilayout 
+{ 
+	buttons 
+	{ 
+		button 
+		{ 
+			pressedColor -16776961 
+			color -65536 
+			hoverColor -16711936 
+			identifier ProButton 
+			size 
+			{ 
+				y 50 
+				x 150 
+			} 
+			position 
+			{ 
+				y 300 
+				x 800 
+			} 
+		} 
+	} 
+} 

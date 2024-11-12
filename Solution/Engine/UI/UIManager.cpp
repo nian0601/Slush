@@ -48,6 +48,8 @@ namespace Slush
 	{
 		myLayout->myIsDirty = false;
 
+		// This is a problem due to FindWidget!
+		// Whatever we return from FindWidget cannot become invalid randomly
 		myWidgets.DeleteAll();
 
 		for (const UILayout::Button& layoutButton : myLayout->myButtons)

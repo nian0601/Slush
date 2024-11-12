@@ -36,6 +36,7 @@ public:
 	inline const ObjectType& operator[](const int& aIndex) const;
 
 	inline void Add(const ObjectType& aObject);
+	inline void Add(const FW_GrowingArray<ObjectType>& anArray);
 	inline ObjectType& Add();
 	inline bool AddUnique(const ObjectType& aObject);
 	inline void DeleteCyclic(ObjectType& aObject);
@@ -201,6 +202,13 @@ inline void FW_GrowingArray<ObjectType>::Add(const ObjectType& aObject)
 		Respace(myMaxSize * 2);
 
 	myData[myCurrentSize++] = aObject;
+}
+
+template<typename ObjectType>
+inline void FW_GrowingArray<ObjectType>::Add(const FW_GrowingArray<ObjectType>& anArray)
+{
+	for (const ObjectType& object : anArray)
+		Add(object);
 }
 
 

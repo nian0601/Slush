@@ -26,7 +26,7 @@ namespace Slush
 		OnParse(rootHandle);
 
 		FW_String filepath = GetTypeFolder();
-		filepath += myName;
+		filepath += myAssetName;
 		filepath += ".";
 		filepath += GetTypeExtention();
 		parser.FinishWriting(filepath.GetBuffer());

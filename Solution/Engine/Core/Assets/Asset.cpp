@@ -5,7 +5,7 @@
 namespace Slush
 {
 	Asset::Asset(const char* aName)
-		: myName(aName)
+		: myAssetName(aName)
 	{}
 
 	void Asset::Load(const char* aFilePath)

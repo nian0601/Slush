@@ -14,13 +14,13 @@ namespace Slush
 		virtual const char* GetTypeExtention() = 0;
 		virtual const char* GetTypeFolder() = 0;
 
-		const FW_String& GetAssetName() const { return myName; }
+		const FW_String& GetAssetName() const { return myAssetName; }
 		const FW_String& GetFilePath() const { return myFilePath; }
 		const FW_String& GetAbsoluteFilePath() const { return myAbsoluteFilePath; }
 
 	protected:
 
-		FW_String myName;
+		FW_String myAssetName;
 		FW_String myFilePath;
 		FW_String myAbsoluteFilePath;
 	};

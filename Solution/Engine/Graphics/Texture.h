@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FW_String.h"
+#include "Core/Assets/Asset.h"
 
 namespace sf
 {
@@ -9,31 +10,21 @@ namespace sf
 
 namespace Slush
 {
-	class Texture
+	class Texture : public Asset
 	{
 	public:
-		Texture(const char* anAssetName);
+		DEFINE_ASSET("Texture", "png", "data/textures");
+
+		using Asset::Asset;
 		~Texture();
 
-		static const char* GetAssetTypeName() { return "Texture"; }
-		static const char* GetAssetTypeExtention() { return "png"; }
-		static const char* GetAssetTypeFolder() { return "data/textures"; }
-
-		void Load(const char* aFilePath);
+		void Load(const char* aFilePath) override;
 
 		const sf::Texture* GetSFMLTexture() const { return mySFMLTexture; }
 		const Vector2i& GetSize() const { return mySize; }
 
-		const FW_String& GetAssetName() const { return myAssetName; }
-		const FW_String& GetFilePath() const { return myFilePath; }
-		const FW_String& GetAbsoluteFilePath() const { return myAbsoluteFilePath; }
-
 	private:
 		sf::Texture* mySFMLTexture = nullptr;
 		Vector2i mySize;
-
-		FW_String myAssetName;
-		FW_String myFilePath;
-		FW_String myAbsoluteFilePath;
 	};
 }

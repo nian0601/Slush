@@ -29,7 +29,7 @@ namespace Slush
 
 		if (ImGui::Button("Save Layout"))
 		{
-			layout->SaveToDisk();
+			layout->Save();
 		}
 
 		if (ImGui::Button("Add Button"))

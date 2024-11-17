@@ -1,19 +1,14 @@
 #pragma once
 #include "Core/Assets/AssetParser.h"
-
+#include "Core/Assets/DataAsset.h"
 namespace Slush
 {
-	struct UILayout
+	struct UILayout : public DataAsset
 	{
-		// https://coolors.co/db2b39-29335c-f3a712-f0cea0-534d41
-		UILayout(const char* aName);
+		DEFINE_ASSET("UI Layout", "uilayout", "data/uilayouts/");
+		using DataAsset::DataAsset;
 
-		static const char* GetAssetTypeName() { return "UI Layout"; }
-		static const char* GetAssetTypeExtention() { return "uilayout"; }
-		static const char* GetAssetTypeFolder() { return "data/uilayouts/"; }
-
-		void SaveToDisk();
-		void Load(const char* aFilePath);
+		void OnParse(AssetParser::Handle aRootHandle) override;
 
 		struct Button
 		{

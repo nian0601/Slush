@@ -5,8 +5,9 @@
 #include <FW_FileProcessor.h>
 #include <FW_FileParser.h>
 #include <Core/Assets/AssetParser.h>
+#include <Core/Assets/DataAsset.h>
 
-class EntityPrefab
+class EntityPrefab : public Slush::DataAsset
 {
 private:
 	struct ComponentData
@@ -23,16 +24,11 @@ private:
 	};
 
 public:
+	DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs/");
+
 	EntityPrefab(const char* aName);
 
-	static const char* GetAssetTypeName() { return "Entity Prefab"; }
-	static const char* GetAssetTypeExtention() { return "prefab"; }
-	static const char* GetAssetTypeFolder() { return "data/entityprefabs"; }
-
-	void SaveToDisk();
-	void Load(const char* aFilePath);
-
-	void ParsePrefab(Slush::AssetParser::Handle aRootHandle);
+	void OnParse(Slush::AssetParser::Handle aRootHandle) override;
 
 	void BuildUI();
 	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel);

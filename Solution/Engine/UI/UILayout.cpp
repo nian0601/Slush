@@ -4,19 +4,24 @@
 
 namespace Slush
 {
-	UILayout::UILayout(const char* aName)
-		: myName(aName)
+	void UILayout::OnParse(AssetParser::Handle aRootHandle)
 	{
-	}
-
-	void UILayout::SaveToDisk()
-	{
-		Slush::AssetParser parser;
-		Slush::AssetParser::Handle rootHandle = parser.StartWriting("uilayout");
-
+		Slush::AssetParser::Handle buttonsHandle = aRootHandle.ParseChildElement("buttons");
+		
+		if (aRootHandle.IsReading())
 		{
-			Slush::AssetParser::Handle buttonsHandle = rootHandle.ParseChildElement("buttons");
+			int buttonCount = 0;
+			buttonsHandle.ParseIntField("count", buttonCount);
 
+			myButtons.RemoveAll();
+			for (int i = 0; i < buttonCount; ++i)
+			{
+				Button& button = myButtons.Add();
+				button.Parse(buttonsHandle);
+			}
+		}
+		else
+		{
 			int buttonCount = myButtons.Count();
 			buttonsHandle.ParseIntField("count", buttonCount);
 			for (Button& button : myButtons)
@@ -24,32 +29,6 @@ namespace Slush
 				button.Parse(buttonsHandle);
 			}
 		}
-
-		FW_String filepath = GetAssetTypeFolder();
-		filepath += myName;
-		filepath += ".";
-		filepath += GetAssetTypeExtention();
-		parser.FinishWriting(filepath.GetBuffer());
-	}
-
-	void UILayout::Load(const char* aFilePath)
-	{
-		Slush::AssetParser parser;
-		Slush::AssetParser::Handle rootHandle = parser.Load(aFilePath);
-
-		Slush::AssetParser::Handle buttonsHandle = rootHandle.ParseChildElement("buttons");
-
-		int buttonCount = 0;
-		buttonsHandle.ParseIntField("count", buttonCount);
-
-		myButtons.RemoveAll();
-		for (int i = 0; i < buttonCount; ++i)
-		{
-			Button& button = myButtons.Add();
-			button.Parse(buttonsHandle);
-		}
-
-		myIsDirty = true;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -58,6 +37,8 @@ namespace Slush
 	{
 		myIdentifier = "<Button>";
 
+
+		// https://coolors.co/db2b39-29335c-f3a712-f0cea0-534d41
 		myColor = 0xff5B5548;
 		FW_ARGB_To_RGBAFloat(myColor, myFloatColor);
 

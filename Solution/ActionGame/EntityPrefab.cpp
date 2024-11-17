@@ -27,7 +27,8 @@ void EntityPrefab::ComponentData::Parse(Slush::AssetParser::Handle aRootHandle)
 }
 
 EntityPrefab::EntityPrefab(const char* aName)
-	: myName(aName)
+	: DataAsset(aName)
+	, myName(aName)
 	, mySprite("sprite")
 	, myAnimation("animation")
 	, myProjectileShooting("projectileshooting")
@@ -45,28 +46,7 @@ EntityPrefab::EntityPrefab(const char* aName)
 {
 }
 
-void EntityPrefab::SaveToDisk()
-{
-	Slush::AssetParser parser;
-	Slush::AssetParser::Handle rootHandle = parser.StartWriting("entityprefab");
-
-	ParsePrefab(rootHandle);
-
-	FW_String filepath = "Data/EntityPrefabs/";
-	filepath += myName;
-	filepath += ".prefab";
-	parser.FinishWriting(filepath.GetBuffer());
-}
-
-void EntityPrefab::Load(const char* aFilePath)
-{
-	Slush::AssetParser parser;
-	Slush::AssetParser::Handle rootHandle = parser.Load(aFilePath);
-
-	ParsePrefab(rootHandle);
-}
-
-void EntityPrefab::ParsePrefab(Slush::AssetParser::Handle aRootHandle)
+void EntityPrefab::OnParse(Slush::AssetParser::Handle aRootHandle)
 {
 	Slush::AssetParser::Handle entityTypeHandle = aRootHandle.ParseChildElement("entitytype");
 	if (entityTypeHandle.IsValid())

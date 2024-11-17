@@ -58,7 +58,7 @@ void EntityPrefab::SaveToDisk()
 	parser.FinishWriting(filepath.GetBuffer());
 }
 
-void EntityPrefab::Load(const char* aFilePath, bool aIsAbsolutePath)
+void EntityPrefab::Load(const char* aFilePath)
 {
 	Slush::AssetParser parser;
 	Slush::AssetParser::Handle rootHandle = parser.Load(aFilePath);

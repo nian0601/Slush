@@ -32,7 +32,7 @@ namespace Slush
 		parser.FinishWriting(filepath.GetBuffer());
 	}
 
-	void UILayout::Load(const char* aFilePath, bool /*aIsAbsolutePath*/)
+	void UILayout::Load(const char* aFilePath)
 	{
 		Slush::AssetParser parser;
 		Slush::AssetParser::Handle rootHandle = parser.Load(aFilePath);

@@ -127,7 +127,7 @@ public:
 
 		if (myButton && myButton->WasPressed())
 		{
-			myUILayout->Load("Data/UILayouts/TestLayout.uilayout", false);
+			myUILayout->Load("Data/UILayouts/TestLayout.uilayout");
 			SLUSH_INFO("Pressed");
 		}
 

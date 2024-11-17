@@ -2,6 +2,7 @@
 #include "Graphics/Texture.h"
 #include "Core/Engine.h"
 #include <SFML/Graphics/Texture.hpp>
+#include <FW_FileSystem.h>
 
 namespace Slush
 {
@@ -16,14 +17,10 @@ namespace Slush
 		FW_SAFE_DELETE(mySFMLTexture);
 	}
 
-	void Texture::Load(const char* aFilePath, bool aIsAbsolutePath /*= false*/)
+	void Texture::Load(const char* aFilePath)
 	{
 		myFilePath = aFilePath;
-		
-		if (!aIsAbsolutePath)
-			myAbsoluteFilePath = Engine::GetInstance().GetDataFolder();
-
-		myAbsoluteFilePath += aFilePath;
+		FW_FileSystem::GetAbsoluteFilePath(myFilePath, myAbsoluteFilePath);
 
 		mySFMLTexture = new sf::Texture();
 		if (!mySFMLTexture->loadFromFile(myAbsoluteFilePath.GetBuffer()))

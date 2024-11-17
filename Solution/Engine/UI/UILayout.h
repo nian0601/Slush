@@ -13,7 +13,7 @@ namespace Slush
 		static const char* GetAssetTypeFolder() { return "data/uilayouts"; }
 
 		void SaveToDisk();
-		void Load(const char* aFilePath, bool aIsAbsolutePath);
+		void Load(const char* aFilePath);
 
 		struct Button
 		{

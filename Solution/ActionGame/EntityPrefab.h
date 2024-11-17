@@ -30,7 +30,7 @@ public:
 	static const char* GetAssetTypeFolder() { return "data/entityprefabs"; }
 
 	void SaveToDisk();
-	void Load(const char* aFilePath, bool aIsAbsolutePath);
+	void Load(const char* aFilePath);
 
 	void ParsePrefab(Slush::AssetParser::Handle aRootHandle);
 

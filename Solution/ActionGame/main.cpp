@@ -20,6 +20,7 @@
 #include "UI/UILayout.h"
 #include "UI/UIManager.h"
 #include "UI/UIButton.h"
+#include "UI/UIEditorDockable.h"
 
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsShapes.h"
@@ -65,6 +66,7 @@ public:
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
+		window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
 
 		myUILayout = myUILayouts.GetAsset("TestLayout");
 		//myUILayout = new Slush::UILayout("TestLayout");
@@ -123,7 +125,7 @@ public:
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		myUIManager->Update(engine.GetInput());
 
-		if (myButton->WasPressed())
+		if (myButton && myButton->WasPressed())
 		{
 			myUILayout->Load("Data/UILayouts/TestLayout.uilayout", false);
 			SLUSH_INFO("Pressed");
@@ -140,7 +142,6 @@ public:
 
 		myEntityManager->Render();
 
-		myButton->Render();
 		myUIManager->Render();
 
 		engine.GetWindow().EndOffscreenBuffer();

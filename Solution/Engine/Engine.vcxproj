@@ -171,6 +171,7 @@
     <ClInclude Include="Graphics\Window.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="UI\UIButton.h" />
+    <ClInclude Include="UI\UIEditorDockable.h" />
     <ClInclude Include="UI\UILayout.h" />
     <ClInclude Include="UI\UIManager.h" />
     <ClInclude Include="UI\UIWidget.h" />
@@ -226,6 +227,7 @@
     <ClCompile Include="Graphics\Window.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UIEditorDockable.cpp" />
     <ClCompile Include="UI\UILayout.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>

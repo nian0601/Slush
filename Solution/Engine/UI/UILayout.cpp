@@ -17,6 +17,9 @@ namespace Slush
 
 		{
 			Slush::AssetParser::Handle buttonsHandle = rootHandle.ParseChildElement("buttons");
+
+			int buttonCount = myButtons.Count();
+			buttonsHandle.ParseIntField("count", buttonCount);
 			for (Button& button : myButtons)
 			{
 				button.Parse(buttonsHandle);
@@ -36,9 +39,15 @@ namespace Slush
 
 		Slush::AssetParser::Handle buttonsHandle = rootHandle.ParseChildElement("buttons");
 
+		int buttonCount = 0;
+		buttonsHandle.ParseIntField("count", buttonCount);
+
 		myButtons.RemoveAll();
-		Button& button = myButtons.Add();
-		button.Parse(buttonsHandle);
+		for (int i = 0; i < buttonCount; ++i)
+		{
+			Button& button = myButtons.Add();
+			button.Parse(buttonsHandle);
+		}
 
 		myIsDirty = true;
 	}
@@ -53,6 +62,13 @@ namespace Slush
 		handle.ParseIntField("hoverColor", myHoverColor);
 		handle.ParseIntField("pressedColor", myPressedColor);
 		handle.ParseStringField("identifier", myIdentifier);
+
+		if (aParserHandle.IsReading())
+		{
+			FW_ARGB_To_RGBAFloat(myColor, myFloatColor);
+			FW_ARGB_To_RGBAFloat(myHoverColor, myHoverFloatColor);
+			FW_ARGB_To_RGBAFloat(myPressedColor, myPressedFloatColor);
+		}
 	}
 
 }

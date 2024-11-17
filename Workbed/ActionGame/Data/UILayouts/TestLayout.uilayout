@@ -2,6 +2,7 @@ uilayout
 { 
 	buttons 
 	{ 
+		count 1
 		button 
 		{ 
 			pressedColor -16776961 

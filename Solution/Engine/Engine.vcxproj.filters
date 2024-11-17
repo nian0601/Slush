@@ -57,6 +57,7 @@
     <ClInclude Include="UI\UIManager.h" />
     <ClInclude Include="UI\UIWidget.h" />
     <ClInclude Include="UI\UILayout.h" />
+    <ClInclude Include="UI\UIEditorDockable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -106,6 +107,7 @@
     <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
     <ClCompile Include="UI\UILayout.cpp" />
+    <ClCompile Include="UI\UIEditorDockable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

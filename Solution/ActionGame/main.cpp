@@ -69,22 +69,6 @@ public:
 		window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
 
 		myUILayout = myUILayouts.GetAsset("TestLayout");
-		//myUILayout = new Slush::UILayout("TestLayout");
-		//myUILayout->Load("Data/UILayouts/TestLayout.uilayout", false);
-		//Slush::UILayout::Button& layoutButton = myUILayout->myButtons.Add();
-		//layoutButton.myPosition.x = 800;
-		//layoutButton.myPosition.y = 300;
-		//
-		//layoutButton.mySize.x = 150;
-		//layoutButton.mySize.y = 50;
-		//
-		//layoutButton.myColor = 0xFFFF0000;
-		//layoutButton.myHoverColor = 0xFF00FF00;
-		//layoutButton.myPressedColor = 0xFF0000FF;
-		//
-		//layoutButton.myIdentifier = "ProButton";
-		//
-		//myUILayout->SaveToDisk();
 
 		myUIManager = new Slush::UIManager();
 		myUIManager->SetLayout(myUILayout);
@@ -128,9 +112,7 @@ public:
 		if (myButton && myButton->WasPressed())
 		{
 			myUILayout->Load("Data/UILayouts/TestLayout.uilayout");
-			SLUSH_INFO("Pressed");
 		}
-
 
 		myEntityManager->EndFrame();
 	}

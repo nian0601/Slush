@@ -2,12 +2,12 @@ uilayout
 { 
 	buttons 
 	{ 
-		count 1
+		count 1 
 		button 
 		{ 
-			pressedColor -16776961 
-			color -65536 
-			hoverColor -16711936 
+			pressedColor -10280928 
+			color -5752776 
+			hoverColor -1815733 
 			identifier ProButton 
 			size 
 			{ 

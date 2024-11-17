@@ -23,9 +23,11 @@ namespace FW_FileSystem
 
 		FW_String absolutDirectory = ourDataFolderPath;
 		absolutDirectory += aRelativeDirectory;
-		absolutDirectory += "/*";
+		if (absolutDirectory[absolutDirectory.Length()] != '/')
+			absolutDirectory += "/";
 
-		
+		absolutDirectory += "*";
+
 		WIN32_FIND_DATA data;
 		HANDLE filehandle = FindFirstFile(absolutDirectory.GetBuffer(), &data);
 

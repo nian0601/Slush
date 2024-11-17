@@ -10,7 +10,7 @@ namespace Slush
 
 		static const char* GetAssetTypeName() { return "UI Layout"; }
 		static const char* GetAssetTypeExtention() { return "uilayout"; }
-		static const char* GetAssetTypeFolder() { return "data/uilayouts"; }
+		static const char* GetAssetTypeFolder() { return "data/uilayouts/"; }
 
 		void SaveToDisk();
 		void Load(const char* aFilePath);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Log.h"
+#include "Core/Log.h"
 #include "FW_Hashmap.h"
 #include "FW_GrowingArray.h"
 
@@ -12,7 +12,10 @@ namespace Slush
 		~AssetStorage();
 
 		AssetType& CreateNewAsset(const char* aName);
+
 		void Load(const char* aName, const char* aFilePath, bool aIsAbsolutePath = false);
+		void LoadAllAssets();
+
 		const AssetType* GetAsset(const char* aName) const;
 		AssetType* GetAsset(const char* aName);
 
@@ -34,7 +37,7 @@ namespace Slush
 	{
 		if (myAssetMap.KeyExists(aName))
 		{
-			SLUSH_WARNING("AssetStorage: '%s' already exists, returning existing one instead of creating a new Asset", aName);
+			SLUSH_WARNING("%ss: '%s' already exists, returning existing one instead of creating a new Asset", AssetType::GetAssetTypeName(), aName);
 			return *myAssetMap[aName];
 		}
 
@@ -43,7 +46,7 @@ namespace Slush
 		myAssets.Add(asset);
 		myAssetMap[aName] = asset;
 
-		SLUSH_INFO("AssetStorage: Created '%s' as new asset", aName);
+		SLUSH_INFO("%ss: Created '%s' as new asset", AssetType::GetAssetTypeName(), aName);
 
 		return *asset;
 	}
@@ -53,7 +56,7 @@ namespace Slush
 	{
 		if (myAssetMap.KeyExists(aName))
 		{
-			SLUSH_WARNING("AssetStorage: '%s' already exists, loading of '%s' failed.", aName, aFilePath);
+			SLUSH_WARNING("%ss: '%s' already exists, loading of '%s' failed.", AssetType::GetAssetTypeName(), aName, aFilePath);
 			return;
 		}
 
@@ -63,7 +66,18 @@ namespace Slush
 		myAssets.Add(asset);
 		myAssetMap[aName] = asset;
 
-		SLUSH_INFO("AssetStorage: Stored '%s' as '%s'.", aFilePath, aName);
+		SLUSH_INFO("%ss: '%s' loaded as '%s'.", AssetType::GetAssetTypeName(), aFilePath, aName);
+	}
+
+	template<typename AssetType>
+	void AssetStorage<AssetType>::LoadAllAssets()
+	{
+		SLUSH_INFO("Loading all %ss:", AssetType::GetAssetTypeName())
+		FW_GrowingArray<FW_FileSystem::FileInfo> assetFiles;
+		FW_FileSystem::GetAllFilesFromRelativeDirectory(AssetType::GetAssetTypeFolder(), assetFiles);
+
+		for (const FW_FileSystem::FileInfo& info : assetFiles)
+			Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
 	}
 
 	template<typename AssetType>
@@ -72,7 +86,7 @@ namespace Slush
 		if (const AssetType* const* asset = myAssetMap.GetIfExists(aName))
 			return *asset;
 
-		SLUSH_WARNING("AssetStorage: '%s' not found.", aName);
+		SLUSH_WARNING("%ss: '%s' not found.", AssetType::GetAssetTypeName(), aName);
 		return nullptr;
 	}
 
@@ -82,7 +96,7 @@ namespace Slush
 		if (AssetType* const* asset = myAssetMap.GetIfExists(aName))
 			return *asset;
 
-		SLUSH_WARNING("AssetStorage: '%s' not found.", aName);
+		SLUSH_WARNING("%ss: '%s' not found.", AssetType::GetAssetTypeName(), aName);
 		return nullptr;
 	}
 }

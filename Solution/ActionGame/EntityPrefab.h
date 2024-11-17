@@ -4,7 +4,7 @@
 #include <FW_String.h>
 #include <FW_FileProcessor.h>
 #include <FW_FileParser.h>
-#include <Core\AssetParser.h>
+#include <Core/Assets/AssetParser.h>
 
 class EntityPrefab
 {
@@ -24,6 +24,10 @@ private:
 
 public:
 	EntityPrefab(const char* aName);
+
+	static const char* GetAssetTypeName() { return "Entity Prefab"; }
+	static const char* GetAssetTypeExtention() { return "prefab"; }
+	static const char* GetAssetTypeFolder() { return "data/entityprefabs"; }
 
 	void SaveToDisk();
 	void Load(const char* aFilePath, bool aIsAbsolutePath);

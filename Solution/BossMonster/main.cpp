@@ -7,7 +7,7 @@
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Core/Time.h"
-#include "Core/AssetStorage.h"
+#include "Core/Assets/AssetStorage.h"
 
 #include "Graphics/Window.h"
 #include "Graphics/Texture.h"

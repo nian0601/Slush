@@ -39,7 +39,6 @@
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Graphics\Font.h" />
     <ClInclude Include="Graphics\Text.h" />
-    <ClInclude Include="Core\AssetStorage.h" />
     <ClInclude Include="Graphics\SFMLHelpers.h" />
     <ClInclude Include="Core\Dockables\Dockable.h" />
     <ClInclude Include="Core\Dockables\GameViewDockable.h" />
@@ -52,12 +51,13 @@
     <ClInclude Include="Graphics\Animation\AnimationRuntime.h" />
     <ClInclude Include="Physics\PhysicsShapes.h" />
     <ClInclude Include="Physics\PhysicsWorld.h" />
-    <ClInclude Include="Core\AssetParser.h" />
     <ClInclude Include="UI\UIButton.h" />
     <ClInclude Include="UI\UIManager.h" />
     <ClInclude Include="UI\UIWidget.h" />
     <ClInclude Include="UI\UILayout.h" />
     <ClInclude Include="UI\UIEditorDockable.h" />
+    <ClInclude Include="Core\Assets\AssetParser.h" />
+    <ClInclude Include="Core\Assets\AssetStorage.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -103,11 +103,11 @@
     <ClCompile Include="Graphics\Animation\AnimationRuntime.cpp" />
     <ClCompile Include="Physics\PhysicsShapes.cpp" />
     <ClCompile Include="Physics\PhysicsWorld.cpp" />
-    <ClCompile Include="Core\AssetParser.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
     <ClCompile Include="UI\UILayout.cpp" />
     <ClCompile Include="UI\UIEditorDockable.cpp" />
+    <ClCompile Include="Core\Assets\AssetParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

@@ -15,6 +15,10 @@ namespace Slush
 		Texture(const char* anAssetName);
 		~Texture();
 
+		static const char* GetAssetTypeName() { return "Texture"; }
+		static const char* GetAssetTypeExtention() { return "png"; }
+		static const char* GetAssetTypeFolder() { return "data/textures"; }
+
 		void Load(const char* aFilePath, bool aIsAbsolutePath = false);
 
 		const sf::Texture* GetSFMLTexture() const { return mySFMLTexture; }

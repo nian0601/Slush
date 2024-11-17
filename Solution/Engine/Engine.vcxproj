@@ -138,8 +138,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Core\AssetParser.h" />
-    <ClInclude Include="Core\AssetStorage.h" />
+    <ClInclude Include="Core\Assets\AssetParser.h" />
+    <ClInclude Include="Core\Assets\AssetStorage.h" />
     <ClInclude Include="Core\Dockables\Dockable.h" />
     <ClInclude Include="Core\Dockables\GameViewDockable.h" />
     <ClInclude Include="Core\Dockables\LogDockable.h" />
@@ -177,7 +177,7 @@
     <ClInclude Include="UI\UIWidget.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\AssetParser.cpp" />
+    <ClCompile Include="Core\Assets\AssetParser.cpp" />
     <ClCompile Include="Core\Dockables\Dockable.cpp" />
     <ClCompile Include="Core\Dockables\GameViewDockable.cpp" />
     <ClCompile Include="Core\Dockables\LogDockable.cpp" />

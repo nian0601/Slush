@@ -6,7 +6,7 @@
 
 #include <Core/Engine.h>
 #include "FW_FileProcessor.h"
-#include <Core/AssetStorage.h>
+#include <Core/Assets/AssetStorage.h>
 #include <Graphics/Texture.h>
 
 CardEditorDockable::CardEditorDockable(const Slush::AssetStorage<Slush::Texture>& someTextures)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Dockables/Dockable.h"
-#include "Core/AssetStorage.h"
+#include "Core/Assets/AssetStorage.h"
 
 #include "EntityPrefab.h"
 

@@ -4,7 +4,7 @@
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Core/Time.h"
-#include "Core/AssetStorage.h"
+#include "Core/Assets/AssetStorage.h"
 
 #include "Core/Dockables/GameViewDockable.h"
 #include "Core/Dockables/TextureViewerDockable.h"
@@ -55,8 +55,8 @@ public:
 			myTextures.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
-		CreatePrefabs();
-		CreateUILayouts();
+		myEntityPrefabs.LoadAllAssets();
+		myUILayouts.LoadAllAssets();
 
 		myPhysicsWorld = new Slush::PhysicsWorld();
 		myEntityManager = new EntityManager(myEntityPrefabs, *myPhysicsWorld);
@@ -165,24 +165,6 @@ public:
 
 			physA->myEntity.OnCollision(physB->myEntity);
 		}
-	}
-
-	void CreatePrefabs()
-	{
-		FW_GrowingArray<FW_FileSystem::FileInfo> prefabInfos;
-		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/EntityPrefabs", prefabInfos);
-		
-		for (const FW_FileSystem::FileInfo& info : prefabInfos)
-			myEntityPrefabs.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
-	}
-
-	void CreateUILayouts()
-	{
-		FW_GrowingArray<FW_FileSystem::FileInfo> layoutFiles;
-		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/UILayouts", layoutFiles);
-
-		for (const FW_FileSystem::FileInfo& info : layoutFiles)
-			myUILayouts.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
 	}
 
 	void UpdateGameState()

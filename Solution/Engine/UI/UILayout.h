@@ -1,5 +1,5 @@
 #pragma once
-#include <Core\AssetParser.h>
+#include "Core/Assets/AssetParser.h"
 
 namespace Slush
 {
@@ -8,24 +8,16 @@ namespace Slush
 		// https://coolors.co/db2b39-29335c-f3a712-f0cea0-534d41
 		UILayout(const char* aName);
 
+		static const char* GetAssetTypeName() { return "UI Layout"; }
+		static const char* GetAssetTypeExtention() { return "uilayout"; }
+		static const char* GetAssetTypeFolder() { return "data/uilayouts"; }
+
 		void SaveToDisk();
 		void Load(const char* aFilePath, bool aIsAbsolutePath);
 
 		struct Button
 		{
-			Button()
-			{
-				myIdentifier = "<Button>";
-
-				myColor = 0xff5B5548;
-				FW_ARGB_To_RGBAFloat(myColor, myFloatColor);
-
-				myHoverColor = 0xff454036;
-				FW_ARGB_To_RGBAFloat(myHoverColor, myHoverFloatColor);
-
-				myPressedColor = 0xff726A5A;
-				FW_ARGB_To_RGBAFloat(myPressedColor, myPressedFloatColor);
-			}
+			Button();
 
 			void Parse(Slush::AssetParser::Handle aParserHandle);
 

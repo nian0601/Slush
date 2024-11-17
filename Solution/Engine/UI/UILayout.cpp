@@ -1,13 +1,12 @@
 #include "stdafx.h"
 #include "UILayout.h"
-#include <Core\AssetParser.h>
+#include <Core/Assets/AssetParser.h>
 
 namespace Slush
 {
 	UILayout::UILayout(const char* aName)
 		: myName(aName)
 	{
-
 	}
 
 	void UILayout::SaveToDisk()
@@ -26,9 +25,10 @@ namespace Slush
 			}
 		}
 
-		FW_String filepath = "Data/UILayouts/";
+		FW_String filepath = GetAssetTypeFolder();
 		filepath += myName;
-		filepath += ".uilayout";
+		filepath += ".";
+		filepath += GetAssetTypeExtention();
 		parser.FinishWriting(filepath.GetBuffer());
 	}
 
@@ -50,6 +50,22 @@ namespace Slush
 		}
 
 		myIsDirty = true;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	UILayout::Button::Button()
+	{
+		myIdentifier = "<Button>";
+
+		myColor = 0xff5B5548;
+		FW_ARGB_To_RGBAFloat(myColor, myFloatColor);
+
+		myHoverColor = 0xff454036;
+		FW_ARGB_To_RGBAFloat(myHoverColor, myHoverFloatColor);
+
+		myPressedColor = 0xff726A5A;
+		FW_ARGB_To_RGBAFloat(myPressedColor, myPressedFloatColor);
 	}
 
 	void UILayout::Button::Parse(Slush::AssetParser::Handle aParserHandle)

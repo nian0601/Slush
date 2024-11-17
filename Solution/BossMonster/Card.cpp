@@ -5,7 +5,8 @@
 
 #include <FW_Includes.h>
 #include <FW_FileParser.h>
-#include <Core/AssetStorage.h>
+#include <Core/Assets/AssetStorage.h>
+#include <Graphics/Texture.h>
 
 Card::Card(const Slush::Font* aFont)
 {

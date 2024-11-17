@@ -5,7 +5,7 @@
 
 #include "Dockable.h"
 
-#include "Core/AssetStorage.h"
+#include "Core/Assets/AssetStorage.h"
 #include "Graphics/Texture.h"
 
 namespace Slush

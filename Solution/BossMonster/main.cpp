@@ -29,11 +29,7 @@ class App : public Slush::IApp
 public:
 	void Initialize() override
 	{
-		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
-		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/Textures", textureInfos);
-
-		for (const FW_FileSystem::FileInfo& info : textureInfos)
-			myTextures.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
+		myTextures.LoadAllAssets();
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 

@@ -20,11 +20,24 @@ namespace Slush
 		SetSize(h, w);
 	}
 
+	void RectSprite::SetOrigin(Origin anOrigin)
+	{
+		if (myOrigin != anOrigin)
+		{
+			myOrigin = anOrigin;
+			SetSize(mySize.x, mySize.y);
+		}
+	}
+
 	void RectSprite::SetSize(float aWidth, float aHeight)
 	{
 		mySize = { aWidth, aHeight };
 		static_cast<sf::RectangleShape*>(myShape)->setSize({ mySize.x, mySize.y });
-		myShape->setOrigin({ mySize.x * 0.5f, mySize.y * 0.5f });
+
+		if (myOrigin == Origin::CENTER)
+			myShape->setOrigin({ mySize.x * 0.5f, mySize.y * 0.5f });
+		else
+			myShape->setOrigin(0.f, 0.f);
 	}
 
 	void RectSprite::SetWidth(float aWidth)

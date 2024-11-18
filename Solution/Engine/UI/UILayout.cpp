@@ -10,23 +10,20 @@ namespace Slush
 		
 		if (aRootHandle.IsReading())
 		{
-			int buttonCount = 0;
-			buttonsHandle.ParseIntField("count", buttonCount);
-
 			myButtons.RemoveAll();
-			for (int i = 0; i < buttonCount; ++i)
+
+			int childCount = buttonsHandle.GetNumChildElements();
+			for (int i = 0; i < childCount; ++i)
 			{
 				Button& button = myButtons.Add();
-				button.Parse(buttonsHandle);
+				button.Parse(buttonsHandle.GetChildElementAtIndex(i));
 			}
 		}
 		else
 		{
-			int buttonCount = myButtons.Count();
-			buttonsHandle.ParseIntField("count", buttonCount);
 			for (Button& button : myButtons)
 			{
-				button.Parse(buttonsHandle);
+				button.Parse(buttonsHandle.ParseChildElement("button"));
 			}
 		}
 	}
@@ -49,18 +46,16 @@ namespace Slush
 		FW_ARGB_To_RGBAFloat(myPressedColor, myPressedFloatColor);
 	}
 
-	void UILayout::Button::Parse(Slush::AssetParser::Handle aParserHandle)
+	void UILayout::Button::Parse(Slush::AssetParser::Handle aHandle)
 	{
-		Slush::AssetParser::Handle handle = aParserHandle.ParseChildElement("button");
+		aHandle.ParseVec2iField("position", myPosition);
+		aHandle.ParseVec2iField("size", mySize);
+		aHandle.ParseIntField("color", myColor);
+		aHandle.ParseIntField("hoverColor", myHoverColor);
+		aHandle.ParseIntField("pressedColor", myPressedColor);
+		aHandle.ParseStringField("identifier", myIdentifier);
 
-		handle.ParseVec2iField("position", myPosition);
-		handle.ParseVec2iField("size", mySize);
-		handle.ParseIntField("color", myColor);
-		handle.ParseIntField("hoverColor", myHoverColor);
-		handle.ParseIntField("pressedColor", myPressedColor);
-		handle.ParseStringField("identifier", myIdentifier);
-
-		if (aParserHandle.IsReading())
+		if (aHandle.IsReading())
 		{
 			FW_ARGB_To_RGBAFloat(myColor, myFloatColor);
 			FW_ARGB_To_RGBAFloat(myHoverColor, myHoverFloatColor);

@@ -14,7 +14,7 @@ namespace Slush
 		{
 			Button();
 
-			void Parse(Slush::AssetParser::Handle aParserHandle);
+			void Parse(Slush::AssetParser::Handle aHandle);
 
 			Vector2i myPosition;
 			Vector2i mySize;

@@ -12,6 +12,27 @@ namespace Slush
 		myIsReading = aIsReading;
 	}
 
+	Slush::AssetParser::Handle AssetParser::Handle::GetChildElementAtIndex(int aIndex)
+	{
+		FW_ASSERT(myIsReading, "GetChildElementAtIndex is only valid while reading files");
+		if (!IsValid())
+			return Handle();
+
+		if (Element* child = myElement->GetChildElementByIndex(aIndex))
+			return Handle(child);
+
+		return Handle();
+	}
+
+	int AssetParser::Handle::GetNumChildElements()
+	{
+		FW_ASSERT(myIsReading, "GetNumChildElements is only valid while reading files");
+		if (!IsValid())
+			return 0;
+
+		return myElement->GetNumChildElements();
+	}
+
 	AssetParser::Handle AssetParser::Handle::ParseChildElement(const char* aElementName)
 	{
 		if (!ValidateField(aElementName))
@@ -103,37 +124,32 @@ namespace Slush
 		if (!IsValid())
 			return Handle();
 
-		Element* const* child = myElement->myChildElements.GetIfExists(aElementName);
-		if (child)
-			return Handle(*child);
+		if (Element* child = myElement->GetChildElement(aElementName))
+			return Handle(child);
 
 		return Handle();
 	}
 
 	bool AssetParser::Handle::GetIntField(const char* aFieldName, int& aValue) const
 	{
-		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
-		if (!field)
+		if (Field* field = myElement->GetField(aFieldName))
 		{
-			SLUSH_ERROR("AssetParser: Didnt find Field '%s'", aFieldName);
-			return false;
+			aValue = static_cast<int>(atoll(field->myRawData.GetBuffer()));
+			return true;
 		}
 
-		aValue = static_cast<int>(atoll((*field)->myRawData.GetBuffer()));
-		return true;
+		return false;
 	}
 
 	bool AssetParser::Handle::GetFloatField(const char* aFieldName, float& aValue) const
 	{
-		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
-		if (!field)
+		if (Field* field = myElement->GetField(aFieldName))
 		{
-			SLUSH_ERROR("AssetParser: Didnt find Field '%s'", aFieldName);
-			return false;
+			aValue = static_cast<float>(atof(field->myRawData.GetBuffer()));
+			return true;
 		}
 
-		aValue = static_cast<float>(atof((*field)->myRawData.GetBuffer()));
-		return true;
+		return false;
 	}
 
 	bool AssetParser::Handle::GetBoolField(const char* aFieldName, bool& aValue) const
@@ -150,22 +166,18 @@ namespace Slush
 
 	bool AssetParser::Handle::GetStringField(const char* aFieldName, FW_String& aValue) const
 	{
-		Field* const* field = myElement->myFields.GetIfExists(aFieldName);
-		if (!field)
+		if (Field* field = myElement->GetField(aFieldName))
 		{
-			SLUSH_ERROR("AssetParser: Didnt find Field '%s'", aFieldName);
-			return false;
+			aValue = field->myRawData;
+			return true;
 		}
 
-		aValue = (*field)->myRawData;
-		return true;
+		return false;
 	}
 
 	AssetParser::Handle AssetParser::Handle::AddChildElement(const char* aElementName)
 	{
-		Element* child = new Element();
-		child->myElementTypeName = aElementName;
-		myElement->myChildElements[child->myElementTypeName] = child;
+		Element* child = myElement->AddChildElement(aElementName);
 
 		const bool isReading = false;
 		return Handle(child, isReading);
@@ -173,18 +185,14 @@ namespace Slush
 
 	void AssetParser::Handle::WriteIntField(const char* aFieldName, int aValue)
 	{
-		Field* field = new Field();
-		field->myFieldName = aFieldName;
+		Field* field = myElement->AddField(aFieldName);
 		field->myRawData += aValue;
-		myElement->myFields[aFieldName] = field;
 	}
 
 	void AssetParser::Handle::WriteFloatField(const char* aFieldName, float aValue)
 	{
-		Field* field = new Field();
-		field->myFieldName = aFieldName;
+		Field* field = myElement->AddField(aFieldName);
 		field->myRawData += aValue;
-		myElement->myFields[aFieldName] = field;
 	}
 
 	void AssetParser::Handle::WriteBoolField(const char* aFieldName, bool aValue)
@@ -194,10 +202,8 @@ namespace Slush
 
 	void AssetParser::Handle::WriteStringField(const char* aFieldName, FW_String& aValue)
 	{
-		Field* field = new Field();
-		field->myFieldName = aFieldName;
-		field->myRawData = aValue;
-		myElement->myFields[aFieldName] = field;
+		Field* field = myElement->AddField(aFieldName);
+		field->myRawData += aValue;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -214,15 +220,15 @@ namespace Slush
 		}
 
 		fileParser.TrimBeginAndEnd(line);
-		myRootElement.myElementTypeName = line;
+		myRootElement.myElementName = line;
 		myRootElement.Load(fileParser);
 
 		return Handle(&myRootElement);
 	}
 
-	Slush::AssetParser::Handle AssetParser::StartWriting(const char* aRootElementType)
+	Slush::AssetParser::Handle AssetParser::StartWriting(const char* aRootElementName)
 	{
-		myRootElement.myElementTypeName = aRootElementType;
+		myRootElement.myElementName = aRootElementName;
 		const bool isReading = false;
 		return Handle(&myRootElement, isReading);
 	}
@@ -268,9 +274,9 @@ namespace Slush
 					return;
 
 				Element* child = new Element();
-				child->myElementTypeName = words[0];
+				child->myElementName = words[0];
 				child->Load(aFileParser);
-				myChildElements[child->myElementTypeName] = child;
+				myChildElements.Add(child);
 			}
 			// Two means that its a field (key + value-pair)
 			else if (words.Count() == 2)
@@ -278,7 +284,7 @@ namespace Slush
 				Field* field = new Field();
 				field->myFieldName = words[0];
 				field->myRawData = words[1];
-				myFields[field->myFieldName] = field;
+				myFields.Add(field);
 			}
 			// Anything else is invalid formatting
 			else
@@ -292,30 +298,67 @@ namespace Slush
 
 	void AssetParser::Element::Save(FW_FileProcessor& aFileProcessor)
 	{
-		aFileProcessor.Process(myElementTypeName);
+		aFileProcessor.Process(myElementName);
 		aFileProcessor.AddNewline();
 
 		aFileProcessor.Process("{");
 		aFileProcessor.IncreaseIndentDepth();
 		
-
-		for (auto it = myFields.Begin(); it != myFields.End(); it = myFields.Next(it))
+		for (Field* field : myFields)
 		{
 			aFileProcessor.AddNewline();
-			Field* field = it.Second();
 			aFileProcessor.Process(field->myFieldName);
 			aFileProcessor.Process(field->myRawData);
 		}
 
-		for (auto it = myChildElements.Begin(); it != myChildElements.End(); it = myChildElements.Next(it))
+		for (Element* child : myChildElements)
 		{
 			aFileProcessor.AddNewline();
-			Element* child = it.Second();
 			child->Save(aFileProcessor);
 		}
 
 		aFileProcessor.DecreaseIndentDepth();
 		aFileProcessor.AddNewline();
 		aFileProcessor.Process("}");
+	}
+
+	AssetParser::Field* AssetParser::Element::AddField(const FW_String& aFieldName)
+	{
+		Field* field = new Field();
+		field->myFieldName = aFieldName;
+		myFields.Add(field);
+
+		return field;
+	}
+
+	AssetParser::Element* AssetParser::Element::AddChildElement(const FW_String& aElementName)
+	{
+		Element* child = new Element();
+		child->myElementName = aElementName;
+		myChildElements.Add(child);
+
+		return child;
+	}
+
+	AssetParser::Field* AssetParser::Element::GetField(const FW_String& aFieldName)
+	{
+		for (Field* field : myFields)
+		{
+			if (field->myFieldName == aFieldName)
+				return field;
+		}
+
+		return nullptr;
+	}
+
+	AssetParser::Element* AssetParser::Element::GetChildElement(const FW_String& aElementName)
+	{
+		for (Element* child : myChildElements)
+		{
+			if (child->myElementName == aElementName)
+				return child;
+		}
+
+		return nullptr;
 	}
 }

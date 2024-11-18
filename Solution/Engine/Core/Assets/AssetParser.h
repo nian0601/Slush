@@ -10,7 +10,7 @@ namespace Slush
 {
 	class AssetParser
 	{
-		struct Element;
+		class Element;
 	public:
 		struct Handle
 		{
@@ -20,6 +20,9 @@ namespace Slush
 
 			bool IsValid() const { return myElement != nullptr; }
 			bool IsReading() const { return myIsReading; }
+
+			Handle GetChildElementAtIndex(int aIndex);
+			int GetNumChildElements();
 
 			Handle ParseChildElement(const char* aElementName);
 			void ParseIntField(const char* aFieldName, int& aValue);
@@ -50,7 +53,7 @@ namespace Slush
 		};
 
 		Handle Load(const char* aFile);
-		Handle StartWriting(const char* aRootElementType);
+		Handle StartWriting(const char* aRootElementName);
 		void FinishWriting(const char* aFile);
 
 	private:
@@ -59,16 +62,32 @@ namespace Slush
 			FW_String myFieldName;
 			FW_String myRawData;
 		};
-		struct Element 
+
+		class Element 
 		{
+		public:
 			~Element();
 			void Load(FW_FileParser& aFileParser);
 			void Save(FW_FileProcessor& aFileProcessor);
 
+			Field* AddField(const FW_String& aFieldName);
+			Element* AddChildElement(const FW_String& aElementName);
+
+			Field* GetField(const FW_String& aFieldName);
+			Element* GetChildElement(const FW_String& aElementName);
+
+			Field* GetFieldByIndex(int aIndex) { return myFields[aIndex]; }
+			Element* GetChildElementByIndex(int aIndex) { return myChildElements[aIndex]; }
+
+			int GetNumFields() const { return myFields.Count(); }
+			int GetNumChildElements() const { return myChildElements.Count(); }
+
+			FW_String myElementName;
+
+		private:
 			FW_String myFilePath;
-			FW_String myElementTypeName;
-			FW_Hashmap<FW_String, Field*> myFields;
-			FW_Hashmap<FW_String, Element*> myChildElements;
+			FW_GrowingArray<Field*> myFields;
+			FW_GrowingArray<Element*> myChildElements;
 		};
 		Element myRootElement;
 	};

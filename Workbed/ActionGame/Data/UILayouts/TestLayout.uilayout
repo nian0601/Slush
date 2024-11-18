@@ -2,22 +2,38 @@ UI Layout
 { 
 	buttons 
 	{ 
-		count 1 
 		button 
 		{ 
-			pressedColor -10280928 
-			color -5752776 
+			color -5680558 
 			hoverColor -1815733 
+			pressedColor -10280928 
 			identifier ProButton 
-			size 
-			{ 
-				y 50 
-				x 150 
-			} 
 			position 
 			{ 
-				y 300 
 				x 800 
+				y 300 
+			} 
+			size 
+			{ 
+				x 150 
+				y 50 
+			} 
+		} 
+		button 
+		{ 
+			color -10791608 
+			hoverColor -12238794 
+			pressedColor -9278886 
+			identifier Test 
+			position 
+			{ 
+				x 100 
+				y 100 
+			} 
+			size 
+			{ 
+				x 100 
+				y 100 
 			} 
 		} 
 	} 

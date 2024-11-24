@@ -176,6 +176,7 @@
     <ClInclude Include="UI\UIEditorDockable.h" />
     <ClInclude Include="UI\UILayout.h" />
     <ClInclude Include="UI\UIManager.h" />
+    <ClInclude Include="UI\UIRect.h" />
     <ClInclude Include="UI\UIWidget.h" />
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +235,7 @@
     <ClCompile Include="UI\UIEditorDockable.cpp" />
     <ClCompile Include="UI\UILayout.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
+    <ClCompile Include="UI\UIRect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.vcxproj">

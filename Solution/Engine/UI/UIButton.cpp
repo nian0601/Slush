@@ -4,6 +4,7 @@
 
 #include <Core\Input.h>
 #include <Graphics\RectSprite.h>
+#include <Graphics\Text.h>
 
 namespace Slush
 {
@@ -35,6 +36,20 @@ namespace Slush
 		myColor = aColor;
 		myHoverColor = aHoverColor;
 		myPressedColor = aPressedColor;
+	}
+
+	void UIButton::SetText(const char* aText, Font& aFont)
+	{
+		if (!myText)
+		{
+			myText = new Text();
+			myText->SetFont(aFont);
+			myText->SetHorizontalAlignment(Text::HorizontalAlignment::CENTER);
+			myText->SetVerticalAlignment(Text::VerticalAlignment::CENTER);
+			myText->SetCharacterSize(45);
+		}
+
+		myText->SetText(aText);
 	}
 
 	void UIButton::Update(const Input& aInput)
@@ -69,6 +84,9 @@ namespace Slush
 	void UIButton::Render()
 	{
 		mySprite->Render(myRect.myCenterPos.x, myRect.myCenterPos.y);
+
+		if (myText)
+			myText->Render(myRect.myCenterPos.x, myRect.myCenterPos.y);
 	}
 
 	void UIButton::Inactivate()

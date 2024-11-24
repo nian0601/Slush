@@ -34,6 +34,8 @@ namespace Slush
 		void SetText(const FW_String& aString);
 		void SetFont(const Font& aFont);
 
+		void SetCharacterSize(int aSizeInPixesl);
+
 		void SetColor(int argb);
 		void SetColor(float a, float r, float g, float b);
 

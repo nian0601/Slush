@@ -5,6 +5,9 @@ namespace Slush
 {
 	class RectSprite;
 	class Input;
+	class Font;
+	class Text;
+
 	class UIButton : public UIWidget
 	{
 	public:
@@ -14,6 +17,8 @@ namespace Slush
 		void SetSize(const Vector2i& aSize);
 		void SetPosition(const Vector2i& aPosition);
 		void SetColors(int aColor, int aHoverColor, int aPressedColor);
+
+		void SetText(const char* aText, Font& aFont);
 
 		void Update(const Input& aInput) override;
 		void Render() override;
@@ -36,5 +41,7 @@ namespace Slush
 		int myHoverColor = 0xFF555555;
 		int myPressedColor = 0xFF777777;
 		Rectf myRect;
+
+		Text* myText;
 	};
 }

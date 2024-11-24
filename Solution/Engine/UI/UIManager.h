@@ -6,10 +6,12 @@ namespace Slush
 
 	class UIWidget;
 	class Input;
+	class Font;
 
 	class UIManager
 	{
 	public:
+		UIManager(Font& aFont);
 		~UIManager();
 
 		void Update(const Input& aInput);
@@ -24,6 +26,8 @@ namespace Slush
 		UIWidget* FindDiscardedWidget(const char* aIdentifier) const;
 
 		UILayout* myLayout = nullptr;
+		Font& myFont;
+
 		FW_GrowingArray<UIWidget*> myWidgets;
 
 		// Widgets that were removed from a Layout during Hotreload is placed in this list

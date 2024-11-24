@@ -68,13 +68,13 @@ public:
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
 		window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
 
-		myUILayout = myUILayouts.GetAsset("TestLayout");
+		myStartGameUILayout = myUILayouts.GetAsset("StartGame");
 
-		myUIManager = new Slush::UIManager();
-		myUIManager->SetLayout(myUILayout);
+		myUIManager = new Slush::UIManager(myFont);
+		myUIManager->SetLayout(myStartGameUILayout);
 
-		if (Slush::UIWidget* button = myUIManager->FindWidget("ProButton"))
-			myButton = static_cast<Slush::UIButton*>(button);
+		if (Slush::UIWidget* button = myUIManager->FindWidget("StartGame"))
+			myStartGameButton = static_cast<Slush::UIButton*>(button);
 	}
 
 	void Shutdown() override
@@ -106,14 +106,6 @@ public:
 		if (!pauseEntityUpdate)
 			myEntityManager->Update();
 
-		Slush::Engine& engine = Slush::Engine::GetInstance();
-		myUIManager->Update(engine.GetInput());
-
-		if (myButton && myButton->WasPressed())
-		{
-			myUILayout->Load("Data/UILayouts/TestLayout.uilayout");
-		}
-
 		myEntityManager->EndFrame();
 	}
 
@@ -124,8 +116,13 @@ public:
 
 		myEntityManager->Render();
 
-		myUIManager->Render();
-
+		switch (myGameState)
+		{
+		case App::START_SCREEN:
+		{
+			myUIManager->Render();
+		}
+		}
 		engine.GetWindow().EndOffscreenBuffer();
 	}
 
@@ -154,9 +151,15 @@ public:
 		switch (myGameState)
 		{
 		case App::START_SCREEN:
-			if (ImGui::Button("Start Game"))
+		{
+			Slush::Engine& engine = Slush::Engine::GetInstance();
+			myUIManager->Update(engine.GetInput());
+
+			if (myStartGameButton->WasPressed())
 				myGameState = LOADING_LEVEL;
+
 			break;
+		}
 		case App::LOADING_LEVEL:
 			myLevel = new Level(*myEntityManager, *myPhysicsWorld);
 			myGameState = PLAYING;
@@ -189,8 +192,8 @@ private:
 	Level* myLevel;
 	GameState myGameState = START_SCREEN;
 
-	Slush::UIButton* myButton;
-	Slush::UILayout* myUILayout;
+	Slush::UIButton* myStartGameButton;
+	Slush::UILayout* myStartGameUILayout;
 	Slush::UIManager* myUIManager;
 };
 

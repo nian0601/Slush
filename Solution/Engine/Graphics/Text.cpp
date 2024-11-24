@@ -80,6 +80,11 @@ namespace Slush
 			SLUSH_ERROR("Text: Invalid font passed to SetFont")
 	}
 
+	void Text::SetCharacterSize(int aSizeInPixesl)
+	{
+		myText->setCharacterSize(aSizeInPixesl);
+	}
+
 	void Text::SetColor(int argb)
 	{
 		myText->setFillColor(SFMLHelpers::GetColor(argb));

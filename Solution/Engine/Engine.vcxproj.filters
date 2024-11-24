@@ -60,6 +60,7 @@
     <ClInclude Include="Core\Assets\AssetStorage.h" />
     <ClInclude Include="Core\Assets\Asset.h" />
     <ClInclude Include="Core\Assets\DataAsset.h" />
+    <ClInclude Include="UI\UIRect.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -112,6 +113,7 @@
     <ClCompile Include="Core\Assets\AssetParser.cpp" />
     <ClCompile Include="Core\Assets\Asset.cpp" />
     <ClCompile Include="Core\Assets\DataAsset.cpp" />
+    <ClCompile Include="UI\UIRect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

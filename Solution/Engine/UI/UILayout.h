@@ -18,6 +18,7 @@ namespace Slush
 
 			Vector2i myPosition;
 			Vector2i mySize;
+			FW_String myText;
 			int myColor;
 			float myFloatColor[4];
 			int myHoverColor;
@@ -27,6 +28,20 @@ namespace Slush
 			FW_String myIdentifier;
 		};
 		FW_GrowingArray<Button> myButtons;
+
+		struct Rect
+		{
+			Rect();
+			void Parse(Slush::AssetParser::Handle aHandle);
+
+			Vector2i myPosition;
+			Vector2i mySize;
+			int myColor;
+			float myFloatColor[4];
+			int myOutlineColor;
+			float myFloatOutlineColor[4];
+		};
+		FW_GrowingArray<Rect> myRects;
 
 		bool myIsDirty = true;
 		FW_String myName;

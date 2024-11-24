@@ -1,0 +1,42 @@
+UI Layout 
+{ 
+	buttons 
+	{ 
+		button 
+		{ 
+			text StartGame 
+			color -13813918 
+			hoverColor -12958082 
+			pressedColor -14670010 
+			identifier StartGame 
+			position 
+			{ 
+				x 960 
+				y 540 
+			} 
+			size 
+			{ 
+				x 500 
+				y 150 
+			} 
+		} 
+	} 
+	rects 
+	{ 
+		rect 
+		{ 
+			color -1269805494 
+			outlineColor -16777216 
+			position 
+			{ 
+				x 960 
+				y 540 
+			} 
+			size 
+			{ 
+				x 1900 
+				y 1060 
+			} 
+		} 
+	} 
+} 

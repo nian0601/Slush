@@ -4,9 +4,15 @@
 #include "UIWidget.h"
 #include "UILayout.h"
 #include "UIButton.h"
+#include "UIRect.h"
 
 namespace Slush
 {
+	UIManager::UIManager(Font& aFont)
+		: myFont(aFont)
+	{
+	}
+
 	UIManager::~UIManager()
 	{
 		myWidgets.DeleteAll();
@@ -52,6 +58,15 @@ namespace Slush
 		myDiscardedWidgets.Add(myWidgets);
 		myWidgets.RemoveAll();
 
+		for (const UILayout::Rect& layoutRect : myLayout->myRects)
+		{
+			UIRect* rect = new UIRect();
+			rect->SetSize(layoutRect.mySize);
+			rect->SetPosition(layoutRect.myPosition);
+			rect->SetColors(layoutRect.myColor, layoutRect.myOutlineColor);
+			myWidgets.Add(rect);
+		}
+
 		for (const UILayout::Button& layoutButton : myLayout->myButtons)
 		{
 			UIButton* button = nullptr;
@@ -69,6 +84,8 @@ namespace Slush
 			button->SetSize(layoutButton.mySize);
 			button->SetPosition(layoutButton.myPosition);
 			button->SetColors(layoutButton.myColor, layoutButton.myHoverColor, layoutButton.myPressedColor);
+			if (!layoutButton.myText.Empty() && layoutButton.myText != "<text>")
+				button->SetText(layoutButton.myText.GetBuffer(), myFont);
 			myWidgets.Add(button);
 		}
 
@@ -86,5 +103,4 @@ namespace Slush
 
 		return nullptr;
 	}
-
 }

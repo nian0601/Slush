@@ -12,6 +12,7 @@
 
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
+#include <FW_FileSystem.h>
 
 namespace Slush
 {
@@ -27,7 +28,7 @@ namespace Slush
 
 		myActiveRenderTarget = myRenderWindow;
 
-		ImGui::SFML::Init(*myRenderWindow);
+		ImGui::SFML::Init(*myRenderWindow, false);
 		
 		ImGuiIO& imguiIO = ImGui::GetIO();
 		imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -37,7 +38,6 @@ namespace Slush
 		//imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 		imguiIO.ConfigWindowsMoveFromTitleBarOnly = true;
-
 		SLUSH_INFO("Window Created");
 	}
 

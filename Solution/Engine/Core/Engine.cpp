@@ -46,14 +46,9 @@ namespace Slush
 
 	void Engine::Initialize()
 	{
-		myLogger = new Logger();
-		myWindow = new Window(1920, 1080);
-		myInput = new Input();
-		Time::Init();
-
 		char fileBuffer[128];
 		GetModuleFileNameA(NULL, fileBuffer, 128);
-		
+
 		std::string assetPath;
 		assetPath.append(fileBuffer);
 		assetPath.erase(assetPath.rfind("\\"), std::string::npos);
@@ -63,6 +58,20 @@ namespace Slush
 
 		// TODO: Make File-handling a part of engine instead to simplify filepath-handling?
 		FW_FileSystem::SetDataFolder(myDataFolder.GetBuffer());
+
+		myLogger = new Logger();
+		myWindow = new Window(1920, 1080);
+		myInput = new Input();
+		Time::Init();
+
+		
+		FW_String path = "Data/NotoSans.ttf";
+		FW_FileSystem::GetAbsoluteFilePath(path, path);
+
+		ImGuiIO& imguiIO = ImGui::GetIO();
+		imguiIO.Fonts->AddFontFromFileTTF(path.GetBuffer(), 20.f);
+		ImGui::SFML::UpdateFontTexture();
+		
 	}
 
 	void Engine::Shutdown()

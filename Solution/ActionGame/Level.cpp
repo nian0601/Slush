@@ -8,8 +8,10 @@
 #include "StatsComponent.h"
 
 #include <Core\Input.h>
+#include <UI\UIManager.h>
+#include <UI\UIButton.h>
 
-Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
+Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld, Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts)
 	: myEntityManager(aEntityManager)
 	, myPhysicsWorld(aPhysicsWorld)
 {
@@ -17,10 +19,20 @@ Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
 	myPlayerHandle = player->myHandle;
 
 	myNPCWave = new NPCWave(myEntityManager, myPhysicsWorld);
+
+	myUIManager = new Slush::UIManager(aFont);
+	myUIManager->SetLayout(someUILayouts.GetAsset("LevelUp"));
+
+	if (Slush::UIWidget* button = myUIManager->FindWidget("DamageUpgrade"))
+		myDamageUpgradeButton = static_cast<Slush::UIButton*>(button);
+
+	if (Slush::UIWidget* button = myUIManager->FindWidget("CooldownUpgrade"))
+		myCooldownUpgradeButton = static_cast<Slush::UIButton*>(button);
 }
 
 Level::~Level()
 {
+	FW_SAFE_DELETE(myUIManager);
 	FW_SAFE_DELETE(myNPCWave);
 	myEntityManager.DeleteAllEntities();
 }
@@ -45,19 +57,22 @@ void Level::Update()
 	{
 		if (StatsComponent* stats = player->myStatsComponent)
 		{
+			Slush::Engine& engine = Slush::Engine::GetInstance();
+			myUIManager->Update(engine.GetInput());
+
 			if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage())
 			{
 				player->myExperienceComponent->LevelUp();
 				myIsLevelingUp = false;
 				SLUSH_WARNING("No more available upgrades, auto-leveling");
 			}
-			else if (stats->CanUpgradeCooldownReduction() && ImGui::Button("Upgrade Cooldown"))
+			else if (stats->CanUpgradeCooldownReduction() && myCooldownUpgradeButton->WasPressed())
 			{
 				stats->AddCooldownReductionUpgrade();
 				player->myExperienceComponent->LevelUp();
 				myIsLevelingUp = false;
 			}
-			else if (stats->CanUpgradeDamage() && ImGui::Button("Upgrade Damage"))
+			else if (stats->CanUpgradeDamage() && myDamageUpgradeButton->WasPressed())
 			{
 				stats->AddDamageUpgrade();
 				player->myExperienceComponent->LevelUp();
@@ -71,6 +86,12 @@ void Level::Update()
 			myIsLevelingUp = false;
 		}
 	}
+}
+
+void Level::Render()
+{
+	if (myIsLevelingUp)
+		myUIManager->Render();
 }
 
 bool Level::IsPlayerDead() const

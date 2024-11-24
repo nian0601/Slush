@@ -68,13 +68,18 @@ public:
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
 		window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
 
-		myStartGameUILayout = myUILayouts.GetAsset("StartGame");
+		myStartGameUIManager = new Slush::UIManager(myFont);
+		myStartGameUIManager->SetLayout(myUILayouts.GetAsset("StartGame"));
 
-		myUIManager = new Slush::UIManager(myFont);
-		myUIManager->SetLayout(myStartGameUILayout);
-
-		if (Slush::UIWidget* button = myUIManager->FindWidget("StartGame"))
+		if (Slush::UIWidget* button = myStartGameUIManager->FindWidget("StartGame"))
 			myStartGameButton = static_cast<Slush::UIButton*>(button);
+
+
+		myRestartGameUIManager = new Slush::UIManager(myFont);
+		myRestartGameUIManager->SetLayout(myUILayouts.GetAsset("GameOver"));
+
+		if (Slush::UIWidget* button = myRestartGameUIManager->FindWidget("RestartGame"))
+			myRestartGameButton = static_cast<Slush::UIButton*>(button);
 	}
 
 	void Shutdown() override
@@ -82,7 +87,8 @@ public:
 		FW_SAFE_DELETE(myLevel);
 		FW_SAFE_DELETE(myEntityManager);
 		FW_SAFE_DELETE(myPhysicsWorld);
-		FW_SAFE_DELETE(myUIManager);
+		FW_SAFE_DELETE(myStartGameUIManager);
+		FW_SAFE_DELETE(myRestartGameUIManager);
 	}
 
 	void Update() override
@@ -119,10 +125,16 @@ public:
 		switch (myGameState)
 		{
 		case App::START_SCREEN:
-		{
-			myUIManager->Render();
+			myStartGameUIManager->Render();
+			break;
+		case App::GAME_OVER:
+			myRestartGameUIManager->Render();
+			break;
 		}
-		}
+
+		if (myLevel)
+			myLevel->Render();
+
 		engine.GetWindow().EndOffscreenBuffer();
 	}
 
@@ -153,15 +165,15 @@ public:
 		case App::START_SCREEN:
 		{
 			Slush::Engine& engine = Slush::Engine::GetInstance();
-			myUIManager->Update(engine.GetInput());
+			myStartGameUIManager->Update(engine.GetInput());
 
-			if (myStartGameButton->WasPressed())
+			if (myStartGameButton && myStartGameButton->WasPressed())
 				myGameState = LOADING_LEVEL;
 
 			break;
 		}
 		case App::LOADING_LEVEL:
-			myLevel = new Level(*myEntityManager, *myPhysicsWorld);
+			myLevel = new Level(*myEntityManager, *myPhysicsWorld, myFont, myUILayouts);
 			myGameState = PLAYING;
 			break;
 		case App::PLAYING:
@@ -172,9 +184,16 @@ public:
 			}
 			break;
 		case App::GAME_OVER:
-			if (ImGui::Button("Restart Game"))
+		{
+			Slush::Engine& engine = Slush::Engine::GetInstance();
+			myRestartGameUIManager->Update(engine.GetInput());
+
+			//if (ImGui::Button("Restart Game"))
+			if (myRestartGameButton && myRestartGameButton->WasPressed())
 				myGameState = LOADING_LEVEL;
+
 			break;
+		}
 		default:
 			break;
 		}
@@ -193,8 +212,10 @@ private:
 	GameState myGameState = START_SCREEN;
 
 	Slush::UIButton* myStartGameButton;
-	Slush::UILayout* myStartGameUILayout;
-	Slush::UIManager* myUIManager;
+	Slush::UIManager* myStartGameUIManager;
+
+	Slush::UIButton* myRestartGameButton;
+	Slush::UIManager* myRestartGameUIManager;
 };
 
 #include <FW_UnitTestSuite.h>

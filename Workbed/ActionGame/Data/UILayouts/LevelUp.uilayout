@@ -1,0 +1,60 @@
+UI Layout 
+{ 
+	buttons 
+	{ 
+		button 
+		{ 
+			text Damage 
+			color -2413767 
+			hoverColor -905410 
+			pressedColor -4578256 
+			identifier DamageUpgrade 
+			position 
+			{ 
+				x 760 
+				y 540 
+			} 
+			size 
+			{ 
+				x 350 
+				y 80 
+			} 
+		} 
+		button 
+		{ 
+			text Cooldown 
+			color -995680 
+			hoverColor -402768 
+			pressedColor -2310766 
+			identifier CooldownUpgrade 
+			position 
+			{ 
+				x 1160 
+				y 540 
+			} 
+			size 
+			{ 
+				x 350 
+				y 80 
+			} 
+		} 
+	} 
+	rects 
+	{ 
+		rect 
+		{ 
+			color -1269805494 
+			outlineColor -16777216 
+			position 
+			{ 
+				x 960 
+				y 540 
+			} 
+			size 
+			{ 
+				x 1900 
+				y 1060 
+			} 
+		} 
+	} 
+} 

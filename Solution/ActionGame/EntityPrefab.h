@@ -28,10 +28,17 @@ public:
 
 	EntityPrefab(const char* aName);
 
+	struct MissingComponent
+	{
+		FW_String myLabel;
+		bool* myEnabledFlag;
+	};
+
 	void OnParse(Slush::AssetParser::Handle aRootHandle) override;
 
 	void BuildUI();
-	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel);
+	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, FW_GrowingArray<MissingComponent>& someMissingComponentsOut);
+	void BuildMissingComponentsUI(const FW_GrowingArray<MissingComponent>& someMissingComponents);
 
 	struct Sprite : public ComponentData
 	{

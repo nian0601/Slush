@@ -74,10 +74,13 @@ void EntityPrefab::OnParse(Slush::AssetParser::Handle aRootHandle)
 
 void EntityPrefab::BuildUI()
 {
+	ImGui::SeparatorText(myName.GetBuffer());
+
 	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
 	ImGui::Combo("Entity Type", &myEntityType, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
 
-	if (BaseComponentUI(mySprite.myEnabled, "Sprite", "Add Sprite"))
+	FW_GrowingArray<MissingComponent> missingComponents;
+	if (BaseComponentUI(mySprite.myEnabled, "Sprite", missingComponents))
 	{
 		ImGui::ColorEdit4("Color", mySprite.myFloatColor);
 		ImGui::InputFloat("Radius", &mySprite.myRadius, 1.f, 10.f, "%.2f");
@@ -85,15 +88,15 @@ void EntityPrefab::BuildUI()
 
 		mySprite.myColor = FW_Float_To_ARGB(mySprite.myFloatColor[3], mySprite.myFloatColor[0], mySprite.myFloatColor[1], mySprite.myFloatColor[2]);
 
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myAnimation.myEnabled, "Animation", "Add Animation"))
+	if (BaseComponentUI(myAnimation.myEnabled, "Animation", missingComponents))
 	{
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myProjectileShooting.myEnabled, "Projectile Shooter", "Add Projectile Shooter"))
+	if (BaseComponentUI(myProjectileShooting.myEnabled, "Projectile Shooter", missingComponents))
 	{
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputFloat("Cooldown", &myProjectileShooting.myCooldown, 0.1f, 1.f, "%.2f");
@@ -103,27 +106,29 @@ void EntityPrefab::BuildUI()
 
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputFloat("Projectile Spawn Offset", &myProjectileShooting.myProjectileSpawnOffset, 0.1f, 1.f, "%.2f");
-		ImGui::TreePop();
+
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myPlayerController.myEnabled, "Player Controller", "Add Player Controller"))
+	if (BaseComponentUI(myPlayerController.myEnabled, "Player Controller", missingComponents))
 	{
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myNPCController.myEnabled, "NPC Controller", "Add NPC Controller"))
+	if (BaseComponentUI(myNPCController.myEnabled, "NPC Controller", missingComponents))
 	{
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myHealth.myEnabled, "Health", "Add Health"))
+	if (BaseComponentUI(myHealth.myEnabled, "Health", missingComponents))
 	{
 		ImGui::InputInt("Max Health", &myHealth.myMaxHealth);
 		ImGui::InputFloat("Grace Period Duration", &myHealth.myGracePeriodDuration);
-		ImGui::TreePop();
+
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myPhysics.myEnabled, "Physics", "Add Physics"))
+	if (BaseComponentUI(myPhysics.myEnabled, "Physics", missingComponents))
 	{
 		ImGui::Checkbox("Is Static", &myPhysics.myStatic);
 		ImGui::Checkbox("Is Sensor", &myPhysics.mySensor);
@@ -132,23 +137,24 @@ void EntityPrefab::BuildUI()
 		ImGui::InputFloat("Radius", &myPhysics.myRadius, 1.f, 10.f, "%.2f");
 		ImGui::InputFloat2("Size", &myPhysics.mySize.x, "%.2f");
 
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myRemoveOnCollision.myEnabled, "Remove On Collision", "Add Remove On Collision"))
+	if (BaseComponentUI(myRemoveOnCollision.myEnabled, "Remove On Collision", missingComponents))
 	{
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myTargeting.myEnabled, "Targeting", "Add Targeting"))
+	if (BaseComponentUI(myTargeting.myEnabled, "Targeting", missingComponents))
 	{
 		int type = myTargeting.myTargetType;
 		ImGui::Combo("Target Type", &type, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
 		myTargeting.myTargetType = Entity::Type(type);
-		ImGui::TreePop();
+
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myWeaponComponent.myEnabled, "Weapon Component", "Add Weapon Component"))
+	if (BaseComponentUI(myWeaponComponent.myEnabled, "Weapon", missingComponents))
 	{
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputFloat("Base Cooldown", &myWeaponComponent.myBaseCooldown, 0.05f, 0.1f, "%.2f");
@@ -158,20 +164,21 @@ void EntityPrefab::BuildUI()
 
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputInt("Base Damage", &myWeaponComponent.myBaseDamage);
-		ImGui::TreePop();
+
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myExperience.myEnabled, "Experience Component", "Add Experience Component"))
+	if (BaseComponentUI(myExperience.myEnabled, "Experience", missingComponents))
 	{
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myPickup.myEnabled, "Pickup Component", "Add Pickup Component"))
+	if (BaseComponentUI(myPickup.myEnabled, "Pickup", missingComponents))
 	{
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myStats.myEnabled, "Stats Component", "Add Stats Component"))
+	if (BaseComponentUI(myStats.myEnabled, "Stats", missingComponents))
 	{
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputInt("Max Cooldown Upgrades", &myStats.myMaxCooldownUpgrades);
@@ -185,36 +192,54 @@ void EntityPrefab::BuildUI()
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputFloat("Damage Per Upgrade", &myStats.myDamagePerUpgrade, 0.05f, 1.f, "%.2f");
 
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
 
-	if (BaseComponentUI(myDamageDealer.myEnabled, "DamageDealer Component", "Add DamageDealer Component"))
+	if (BaseComponentUI(myDamageDealer.myEnabled, "DamageDealer", missingComponents))
 	{
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputInt("Damage", &myDamageDealer.myDamage);
 
-		ImGui::TreePop();
+		ImGui::Unindent();
 	}
+
+	BuildMissingComponentsUI(missingComponents);
 }
 
-bool EntityPrefab::BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, const char* aAddComponentLabel)
+bool EntityPrefab::BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, FW_GrowingArray<MissingComponent>& someMissingComponentsOut)
 {
+	FW_String label = aComponentLabel;
+	label += " Component";
+
 	if (aEnabledFlag)
 	{
-		if (ImGui::TreeNode(aComponentLabel))
+		if (ImGui::CollapsingHeader(label.GetBuffer(), &aEnabledFlag))
 		{
-			if (ImGui::Button("Remove"))
-				aEnabledFlag = false;
-
+			ImGui::Indent();
 			return true;
 		}
 	}
 	else
-	{
-		aEnabledFlag = ImGui::Button(aAddComponentLabel);
+	{	
+		someMissingComponentsOut.Add({ label, &aEnabledFlag });
 	}
 
 	return false;
+}
+
+void EntityPrefab::BuildMissingComponentsUI(const FW_GrowingArray<MissingComponent>& someMissingComponents)
+{
+	if (ImGui::Button("Add Component"))
+		ImGui::OpenPopup("add_component_popup");
+
+	if (ImGui::BeginPopup("add_component_popup"))
+	{
+		for (int i = 0; i < someMissingComponents.Count(); ++i)
+			if (ImGui::Selectable(someMissingComponents[i].myLabel.GetBuffer()))
+				*someMissingComponents[i].myEnabledFlag = true;
+
+		ImGui::EndPopup();
+	}
 }
 
 void EntityPrefab::Sprite::OnParse(Slush::AssetParser::Handle aComponentHandle)

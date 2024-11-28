@@ -11,6 +11,9 @@ namespace Slush
 		virtual const char* GetName() const = 0;
 
 	protected:
+		Dockable(bool aShowMenuBar = false)
+			: myShowMenuBar(aShowMenuBar)
+		{}
 		virtual void OnBuildUI() {};
 
 		// This simply an incrementing counter for each dockable that gets created.
@@ -18,5 +21,6 @@ namespace Slush
 		int myDockableID = 0;
 
 		FW_String myUniqueIDName;
+		bool myShowMenuBar = false;
 	};
 }

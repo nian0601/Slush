@@ -15,6 +15,8 @@ protected:
 	void OnBuildUI() override;
 
 private:
+	EntityPrefab* mySelectedPrefab = nullptr;
+
 	Slush::AssetStorage<EntityPrefab>& myPrefabStorage;
 	FW_String myNewPrefabNameStorage;
 	bool myHasUniquePrefabName = false;

@@ -6,75 +6,87 @@
 #include "Graphics/Window.h"
 
 EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
-	: myPrefabStorage(aPrefabStorage)
+	: Dockable(true)
+	, myPrefabStorage(aPrefabStorage)
 	, myNewPrefabNameStorage("")
 {
+	const FW_GrowingArray<EntityPrefab*> prefabs = myPrefabStorage.GetAllAssets();
+	if (!prefabs.IsEmpty())
+		mySelectedPrefab = prefabs[0];
 }
 
 void EntityPrefabDockable::OnBuildUI()
 {
 	const FW_GrowingArray<EntityPrefab*> prefabs = myPrefabStorage.GetAllAssets();
-
-	if (ImGui::Button("New"))
-		ImGui::OpenPopup("New Prefab");
-
-	ImGui::SameLine();
-
-	if (ImGui::Button("Save All"))
+	if (ImGui::BeginMenuBar())
 	{
-		for (EntityPrefab* prefab : prefabs)
-			prefab->Save();
-	}
-
-	if (ImGui::BeginPopup("New Prefab"))
-	{
-		if (ImGui::InputText("Name", &myNewPrefabNameStorage))
+		if (ImGui::BeginMenu("File.."))
 		{
-			myHasUniquePrefabName = true;
-			for (EntityPrefab* prefab : prefabs)
+			if (ImGui::Selectable("New"))
+				ImGui::OpenPopup("New_Prefab_Popup");
+
+			if (ImGui::BeginPopup("New_Prefab_Popup"))
 			{
-				if (prefab->myName == myNewPrefabNameStorage.GetBuffer())
+				if (ImGui::InputText("Name", &myNewPrefabNameStorage))
 				{
-					myHasUniquePrefabName = false;
-					break;
+					myHasUniquePrefabName = true;
+					for (EntityPrefab* prefab : prefabs)
+					{
+						if (prefab->myName == myNewPrefabNameStorage.GetBuffer())
+						{
+							myHasUniquePrefabName = false;
+							break;
+						}
+					}
 				}
-			}
-		}
 
-		if (ImGui::Button("Create"))
-		{
-			if (!myNewPrefabNameStorage.Empty() && myHasUniquePrefabName)
+				if (ImGui::Button("Create"))
+				{
+					if (!myNewPrefabNameStorage.Empty() && myHasUniquePrefabName)
+					{
+						myPrefabStorage.CreateNewAsset(myNewPrefabNameStorage.GetBuffer());
+						myNewPrefabNameStorage.Clear();
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				if (ImGui::IsItemHovered())
+				{
+					if (myNewPrefabNameStorage.Empty())
+						ImGui::SetTooltip("Invalid name");
+					else if (!myHasUniquePrefabName)
+						ImGui::SetTooltip("Prefab with that name already exists");
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
+
+				ImGui::EndPopup();
+			}
+
+			if (ImGui::Selectable("Save All"))
 			{
-				myPrefabStorage.CreateNewAsset(myNewPrefabNameStorage.GetBuffer());
-				myNewPrefabNameStorage.Clear();
-				ImGui::CloseCurrentPopup();
+				for (EntityPrefab* prefab : prefabs)
+					prefab->Save();
 			}
+
+			if (ImGui::BeginMenu("Open.."))
+			{
+				for (EntityPrefab* prefab : prefabs)
+				{
+					if (ImGui::Selectable(prefab->myName.GetBuffer()))
+						mySelectedPrefab = prefab;
+				}
+
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
 		}
 
-		if (ImGui::IsItemHovered())
-		{
-			if (myNewPrefabNameStorage.Empty())
-				ImGui::SetTooltip("Invalid name");
-			else if (!myHasUniquePrefabName)
-				ImGui::SetTooltip("Prefab with that name already exists");
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
-
-		ImGui::EndPopup();
+		ImGui::EndMenuBar();
 	}
 
-	
-
-	ImGui::Separator();
-
-	for (EntityPrefab* prefab : prefabs)
-	{
-		if (ImGui::CollapsingHeader(prefab->myName.GetBuffer()))
-		{
-			prefab->BuildUI();
-		}
-	}
+	if (mySelectedPrefab)
+		mySelectedPrefab->BuildUI();
 }

@@ -16,7 +16,11 @@ namespace Slush
 			myUniqueIDName += myDockableID;
 		}
 
-		if (ImGui::Begin(myUniqueIDName.GetBuffer()))
+		int windowFlags = 0;
+		if (myShowMenuBar)
+			windowFlags |= ImGuiWindowFlags_MenuBar;
+
+		if (ImGui::Begin(myUniqueIDName.GetBuffer(), nullptr, windowFlags))
 			OnBuildUI();
 
 		ImGui::End();

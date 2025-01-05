@@ -46,4 +46,12 @@ namespace FW_FileSystem
 	void ReadEntireFile(const FW_String& aFilePath, FileContent& aFileContentOut);
 
 	void TrimBeginAndEnd(FW_String& aLine);
+
+	FW_String TakeFirstWord(FW_String& aLine);
+
+	void SplitLineOnSpace(const FW_String& aLine, FW_GrowingArray<FW_String>& outWords);
+	void SplitLine(const FW_String& aLine, const char* aSeperator, FW_GrowingArray<FW_String>& outWords);
+
+	float GetFloat(const FW_String& aWord);
+	int GetInt(const FW_String& aWord);
 }

@@ -233,4 +233,72 @@ namespace FW_FileSystem
 		if (begin != 0 || end != aLine.Length())
 			aLine = aLine.SubStr(begin, end);
 	}
+
+	FW_String TakeFirstWord(FW_String& aLine)
+	{
+		int begin = 0;
+		int end = aLine.Find(" ", begin);
+		if (end == -1)
+			return aLine;
+
+		FW_String word = aLine.SubStr(begin, end - 1);
+		aLine = aLine.SubStr(end + 1, aLine.Length());
+		return word;
+	}
+
+	void SplitLineOnSpace(const FW_String& aLine, FW_GrowingArray<FW_String>& outWords)
+	{
+		outWords.RemoveAll();
+
+		int begin = 0;
+		int end = aLine.Find(" ", begin);
+		if (end == -1)
+		{
+			outWords.Add(aLine);
+			return;
+		}
+
+		while (end != -1)
+		{
+			outWords.Add(aLine.SubStr(begin, end - 1));
+
+			begin = end + 1;
+			end = aLine.Find(" ", begin);
+		}
+
+		outWords.Add(aLine.SubStr(begin, aLine.Length()));
+	}
+
+	void SplitLine(const FW_String& aLine, const char* aSeperator, FW_GrowingArray<FW_String>& outWords)
+	{
+		outWords.RemoveAll();
+
+		int begin = 0;
+		int end = aLine.Find(aSeperator, begin);
+		if (end == -1)
+		{
+			outWords.Add(aLine);
+			return;
+		}
+
+		while (end != -1)
+		{
+			outWords.Add(aLine.SubStr(begin, end - 1));
+
+			begin = end + 1;
+			end = aLine.Find(aSeperator, begin);
+		}
+
+		outWords.Add(aLine.SubStr(begin, aLine.Length()));
+	}
+
+	float GetFloat(const FW_String& aWord)
+	{
+		return static_cast<float>(atof(aWord.GetBuffer()));
+	}
+
+	int GetInt(const FW_String& aWord)
+	{
+		return static_cast<int>(atoll(aWord.GetBuffer()));
+	}
 }

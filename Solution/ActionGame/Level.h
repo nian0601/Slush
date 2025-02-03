@@ -37,5 +37,6 @@ private:
 
 	Slush::UIButton* myDamageUpgradeButton;
 	Slush::UIButton* myCooldownUpgradeButton;
+	Slush::UIButton* myProjectileUpgradeButton;
 	Slush::UIManager* myUIManager;
 };

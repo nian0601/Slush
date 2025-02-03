@@ -28,6 +28,9 @@ Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld, 
 
 	if (Slush::UIWidget* button = myUIManager->FindWidget("CooldownUpgrade"))
 		myCooldownUpgradeButton = static_cast<Slush::UIButton*>(button);
+
+	if (Slush::UIWidget* button = myUIManager->FindWidget("ProjectileUpgrade"))
+		myProjectileUpgradeButton = static_cast<Slush::UIButton*>(button);
 }
 
 Level::~Level()
@@ -52,6 +55,13 @@ void Level::Update()
 		player->myExperienceComponent->AddExperience(1);
 	}
 
+	if (StatsComponent* stats = player->myStatsComponent)
+	{
+		Slush::Engine& engine = Slush::Engine::GetInstance();
+		if (engine.GetInput().WasKeyPressed(Slush::Input::Q))
+			stats->AddAdditionalProjectilesUpgrade();
+	}
+
 	myIsLevelingUp = player->myExperienceComponent->NeedsLevelUp();
 	if (myIsLevelingUp)
 	{
@@ -60,7 +70,7 @@ void Level::Update()
 			Slush::Engine& engine = Slush::Engine::GetInstance();
 			myUIManager->Update(engine.GetInput());
 
-			if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage())
+			if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage() && !stats->CanUpgradeAdditionalProjectiles())
 			{
 				player->myExperienceComponent->LevelUp();
 				myIsLevelingUp = false;
@@ -75,6 +85,12 @@ void Level::Update()
 			else if (stats->CanUpgradeDamage() && myDamageUpgradeButton->WasPressed())
 			{
 				stats->AddDamageUpgrade();
+				player->myExperienceComponent->LevelUp();
+				myIsLevelingUp = false;
+			}
+			else if (stats->CanUpgradeAdditionalProjectiles() && myProjectileUpgradeButton->WasPressed())
+			{
+				stats->AddAdditionalProjectilesUpgrade();
 				player->myExperienceComponent->LevelUp();
 				myIsLevelingUp = false;
 			}

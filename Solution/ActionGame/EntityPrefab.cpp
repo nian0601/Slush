@@ -192,6 +192,12 @@ void EntityPrefab::BuildUI()
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputFloat("Damage Per Upgrade", &myStats.myDamagePerUpgrade, 0.05f, 1.f, "%.2f");
 
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputInt("Max Additional Projectiles Upgrades", &myStats.myMaxAdditionalProjectileUpgrades);
+
+		ImGui::SetNextItemWidth(100.f);
+		ImGui::InputFloat("Additional Projectiles Per Upgrade", &myStats.myAdditionalProjectilesPerUpgrade, 1.f, 1.f, "%.0f");
+
 		ImGui::Unindent();
 	}
 
@@ -307,6 +313,9 @@ void EntityPrefab::StatsComponent::OnParse(Slush::AssetParser::Handle aComponent
 
 	aComponentHandle.ParseIntField("maxdamageupgrades", myMaxDamageUpgrades);
 	aComponentHandle.ParseFloatField("damageperupgrade", myDamagePerUpgrade);
+
+	aComponentHandle.ParseIntField("maxadditionalprojectileupgrades", myMaxAdditionalProjectileUpgrades);
+	aComponentHandle.ParseFloatField("additionalprojectilesperupgrade", myAdditionalProjectilesPerUpgrade);
 }
 
 void EntityPrefab::DamageDealer::OnParse(Slush::AssetParser::Handle aComponentHandle)

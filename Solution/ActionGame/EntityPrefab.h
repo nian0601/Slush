@@ -107,6 +107,9 @@ public:
 
 		int myMaxDamageUpgrades = 10;
 		float myDamagePerUpgrade = 1.f;
+
+		int myMaxAdditionalProjectileUpgrades = 3;
+		float myAdditionalProjectilesPerUpgrade = 1.f;
 	};
 
 	struct DamageDealer : public ComponentData

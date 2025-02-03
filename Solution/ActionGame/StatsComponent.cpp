@@ -19,6 +19,11 @@ void StatsComponent::AddDamageUpgrade()
 	myDamageModifier.Upgrade(myEntityPrefab.myStats.myDamagePerUpgrade);
 }
 
+void StatsComponent::AddAdditionalProjectilesUpgrade()
+{
+	myAdditionalProjectilesModifier.Upgrade(myEntityPrefab.myStats.myAdditionalProjectilesPerUpgrade);
+}
+
 bool StatsComponent::CanUpgradeCooldownReduction() const
 {
 	return myCooldownReduction.myNumberOfUpgrades < myEntityPrefab.myStats.myMaxCooldownUpgrades;
@@ -27,4 +32,9 @@ bool StatsComponent::CanUpgradeCooldownReduction() const
 bool StatsComponent::CanUpgradeDamage() const
 {
 	return myDamageModifier.myNumberOfUpgrades < myEntityPrefab.myStats.myMaxDamageUpgrades;
+}
+
+bool StatsComponent::CanUpgradeAdditionalProjectiles() const
+{
+	return myAdditionalProjectilesModifier.myNumberOfUpgrades < myEntityPrefab.myStats.myMaxAdditionalProjectileUpgrades;
 }

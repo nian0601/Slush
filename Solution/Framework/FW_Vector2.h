@@ -98,6 +98,18 @@ FW_Vector2<T> ReflectAround(const FW_Vector2<T>& aVector, const FW_Vector2<T>& a
 	return aVector - static_cast<T>(2) * aReflectionVector * Dot(aReflectionVector, aVector);
 }
 
+template <typename T>
+FW_Vector2<T> Rotate(const FW_Vector2<T>& aVector, float aRadians)
+{
+	float c = cos(aRadians);
+	float s = sin(aRadians);
+
+	FW_Vector2<T> result;
+	result.x = (c * aVector.x) + (-s * aVector.y);
+	result.y = (s * aVector.x) + (c * aVector.y);
+	return result;
+}
+
 // operator with vector
 template <typename T>
 bool operator==(const FW_Vector2<T>& aFirstVector, const FW_Vector2<T>& aSecondVector)

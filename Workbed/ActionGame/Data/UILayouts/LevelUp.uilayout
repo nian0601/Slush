@@ -38,6 +38,24 @@ UI Layout
 				y 80 
 			} 
 		} 
+		button 
+		{ 
+			text Projectile 
+			color -9649565 
+			hoverColor -9121942 
+			pressedColor -10507177 
+			identifier ProjectileUpgrade 
+			position 
+			{ 
+				x 935 
+				y 660 
+			} 
+			size 
+			{ 
+				x 350 
+				y 80 
+			} 
+		} 
 	} 
 	rects 
 	{ 

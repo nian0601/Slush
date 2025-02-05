@@ -86,6 +86,7 @@ namespace Slush
 		AnimationTrack myOutlineTrack;
 		AnimationTrack myScaleTrack;
 		AnimationTrack myPositionTrack;
+		AnimationTrack myColorTrack;
 
 	private:
 		void ApplyAnimation(AnimationRuntime& aRuntimeData, BaseSprite& aSprite);

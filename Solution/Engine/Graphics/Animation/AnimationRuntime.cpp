@@ -21,5 +21,6 @@ namespace Slush
 		myScaleData.Reset();
 		myScaleData.myValue = 1.f;
 		myPositionData.Reset();
+		myColorData.Reset();
 	}
 }

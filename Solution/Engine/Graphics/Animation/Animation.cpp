@@ -125,6 +125,7 @@ namespace Slush
 		anyTrackActive |= myOutlineTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myOutlineData);
 		anyTrackActive |= myScaleTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myScaleData);
 		anyTrackActive |= myPositionTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myPositionData);
+		anyTrackActive |= myColorTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myColorData);
 
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
@@ -145,5 +146,8 @@ namespace Slush
 
 		if (aRuntimeData.myPositionData.myIsActive)
 			aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, aRuntimeData.myPositionData.myValue);
+
+		if (aRuntimeData.myColorData.myIsActive)
+			aSprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, aRuntimeData.myColorData.myValue));
 	}
 }

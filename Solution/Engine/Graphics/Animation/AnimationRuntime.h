@@ -23,6 +23,7 @@ namespace Slush
 		};
 
 		void Start();
+		bool IsFinished() const { return myState == Finished; }
 
 		State myState = NotStarted;
 		float myElapsedTime = 0.f;
@@ -30,9 +31,14 @@ namespace Slush
 		AnimationRuntimeTrackData myOutlineData;
 		AnimationRuntimeTrackData myScaleData;
 		AnimationRuntimeTrackData myPositionData;
+		AnimationRuntimeTrackData myColorData;
 
 		Vector2f myStartPosition;
 		Vector2f myEndPosition;
 		Vector2f myCurrentPosition;
+
+		int myStartColor;
+		int myEndColor;
+		int myCurrentColor;
 	};
 }

@@ -21,8 +21,12 @@ public:
 	bool AnimationIsPlaying() const;
 
 	void PlayDash(const Vector2f& aTargetPosition);
+	void PlayBlink();
 
 private:
 	Slush::Animation* myDashAnimation = nullptr;
+	Slush::Animation* myBlinkAnimation = nullptr;
+
+	Slush::Animation* myCurrentAnimation = nullptr;
 	Slush::AnimationRuntime* myRuntime = nullptr;
 };

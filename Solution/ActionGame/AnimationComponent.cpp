@@ -8,6 +8,7 @@
 
 #include <Graphics\Animation\Animation.h>
 #include <Graphics\Animation\AnimationRuntime.h>
+#include <Graphics\BaseSprite.h>
 
 AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
@@ -21,6 +22,12 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	myDashAnimation->myPositionTrack
 		.Wait(0.1f)
 		.Linear(0.25f, 0.f, 1.f);
+
+	myBlinkAnimation = new Slush::Animation();
+	myBlinkAnimation->MakeOneShot();
+	myBlinkAnimation->myColorTrack
+		.Linear(0.1f, 0.f, 1.f)
+		.Linear(0.1f, 1.f, 0.f);
 
 	myRuntime = new Slush::AnimationRuntime();
 }
@@ -39,7 +46,10 @@ void AnimationComponent::Update()
 		return;
 	}
 
-	myDashAnimation->Update(*myRuntime, myEntity.mySpriteComponent->GetSprite());
+	if (!myCurrentAnimation)
+		return;
+
+	myCurrentAnimation->Update(*myRuntime, myEntity.mySpriteComponent->GetSprite());
 	if (myRuntime->myPositionData.myIsActive)
 	{
 		myEntity.myPosition = myRuntime->myCurrentPosition;
@@ -47,11 +57,13 @@ void AnimationComponent::Update()
 			phys->myObject->SetPosition(myEntity.myPosition);
 	}
 
+	if (myRuntime->IsFinished())
+		myCurrentAnimation = nullptr;
 }
 
 bool AnimationComponent::AnimationIsPlaying() const
 {
-	return myRuntime->myState == Slush::AnimationClip::Running;
+	return myRuntime->myState == Slush::AnimationClip::Running && myCurrentAnimation == myDashAnimation;
 }
 
 void AnimationComponent::PlayDash(const Vector2f& aTargetPosition)
@@ -59,4 +71,15 @@ void AnimationComponent::PlayDash(const Vector2f& aTargetPosition)
 	myRuntime->myStartPosition = myEntity.myPosition;
 	myRuntime->myEndPosition = aTargetPosition;
 	myRuntime->Start();
+
+	myCurrentAnimation = myDashAnimation;
+}
+
+void AnimationComponent::PlayBlink()
+{
+	myRuntime->myStartColor = myEntity.mySpriteComponent->GetSprite().GetFillColor();
+	myRuntime->myEndColor = 0xFFFFFFFF;
+	myRuntime->Start();
+
+	myCurrentAnimation = myBlinkAnimation;
 }

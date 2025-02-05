@@ -2,6 +2,7 @@
 
 #include "EntityPrefab.h"
 #include "HealthComponent.h"
+#include "AnimationComponent.h"
 
 #include <Graphics/RectSprite.h>
 
@@ -72,6 +73,11 @@ void HealthComponent::DealDamage(int aDamageAmount)
 	{
 		myEntity.OnDeath();
 		myEntity.myIsMarkedForRemoval = true;
+	}
+
+	if (myEntity.myAnimationComponent)
+	{
+		myEntity.myAnimationComponent->PlayBlink();
 	}
 }
 

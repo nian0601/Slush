@@ -198,3 +198,34 @@ inline Vector3f FW_ARGB_To_Vector(unsigned int aARGB)
 
 	return Vector3f(red / 255.f, green / 255.f, blue / 255.f);
 }
+
+inline short FW_Interpolate_ColorChannel(short aFirst, short aSecond, float aInterpolator)
+{
+	return static_cast<short>(FW_Lerp(aFirst / 255.f, aSecond / 255.f, aInterpolator) * 255.f);
+}
+
+inline int FW_Interpolate_Color(int aFirst, int aSecond, float aInterpolator)
+{
+	//short alpha = (aARGB & 0xFF000000) >> 24;
+	short red1 = (aFirst& 0x00FF0000) >> 16;
+	short green1 = (aFirst & 0x0000FF00) >> 8;
+	short blue1 = (aFirst & 0x000000FF) >> 0;
+
+	//short alpha = (aARGB & 0xFF000000) >> 24;
+	short red2 = (aSecond & 0x00FF0000) >> 16;
+	short green2 = (aSecond & 0x0000FF00) >> 8;
+	short blue2 = (aSecond & 0x000000FF) >> 0;
+
+	short lerpedRed = FW_Interpolate_ColorChannel(red1, red2, aInterpolator);
+	short lerpedGreen = FW_Interpolate_ColorChannel(green1, green2, aInterpolator);
+	short lerpedBlue = FW_Interpolate_ColorChannel(blue1, blue2, aInterpolator);
+
+	int color = 0;
+
+	color |= 255 << 24;
+	color |= lerpedRed << 16;
+	color |= lerpedGreen << 8;
+	color |= lerpedBlue;
+
+	return color;
+}

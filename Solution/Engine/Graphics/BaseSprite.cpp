@@ -32,6 +32,7 @@ namespace Slush
 
 	void BaseSprite::SetFillColor(int argb)
 	{
+		myFillColor = argb;
 		myShape->setFillColor(SFMLHelpers::GetColor(argb));
 	}
 
@@ -42,6 +43,7 @@ namespace Slush
 
 	void BaseSprite::SetOutlineColor(int argb)
 	{
+		myOutlineColor = argb;
 		myShape->setOutlineColor(SFMLHelpers::GetColor(argb));
 	}
 

@@ -25,8 +25,11 @@ namespace Slush
 		void SetOutlineThickness(float aThickness);
 
 		const Vector2f& GetPosition() const { return myPosition; }
-		float GetScale() const { return myScale; }
 		float GetRotation() const { return myRotation; }
+		float GetScale() const { return myScale; }
+
+		int GetFillColor() const { return myFillColor; }
+		int GetOutlineColor() const { return myOutlineColor; }
 		float GetOutlineThickness() const;
 
 		void Render();
@@ -40,5 +43,7 @@ namespace Slush
 		Vector2f myPosition;
 		float myRotation = 0.f;
 		float myScale = 1.f;
+		int myFillColor = 0xFFFFFFFF;
+		int myOutlineColor = 0xFFFFFFFF;
 	};
 }

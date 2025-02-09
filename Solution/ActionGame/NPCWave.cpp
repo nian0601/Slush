@@ -89,8 +89,8 @@ void NPCWave::CreateNPC(const Vector2f& aPosition)
 		npcPrefab = "NPCRanged";
 	
 	Entity* npc = myEntityManager.CreateEntity(aPosition, npcPrefab);
-	if (npc->myProjectileShootingComponent)
-		npc->myProjectileShootingComponent->TriggerCooldown();
+	if (ProjectileShootingComponent* projShoot = npc->GetComponent<ProjectileShootingComponent>())
+		projShoot->TriggerCooldown();
 
 	myNPCs.Add(npc->myHandle);
 }

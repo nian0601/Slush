@@ -10,7 +10,7 @@
 #include <Core\Input.h>
 #include <Physics\PhysicsWorld.h>
 
-void PlayerControllerComponent::Update()
+void PlayerControllerComponent::PrePhysicsUpdate()
 {
 	AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>();
 	if (!anim || !anim->AnimationIsPlaying())
@@ -36,10 +36,11 @@ void PlayerControllerComponent::Update()
 		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
 			anim->PlayDash(myEntity.myPosition + myDirection * 500.f);
 
-		if (myEntity.myProjectileShootingComponent && input.WasMousePressed(Slush::Input::LEFTMB))
+		ProjectileShootingComponent* projShoot = myEntity.GetComponent<ProjectileShootingComponent>();
+		if (projShoot && input.WasMousePressed(Slush::Input::LEFTMB))
 		{
 			Vector2f toCursor = input.GetMousePositionf() - myEntity.myPosition;
-			myEntity.myProjectileShootingComponent->TryShoot(GetNormalized(toCursor));
+			projShoot->TryShoot(GetNormalized(toCursor));
 		}
 	}
 }

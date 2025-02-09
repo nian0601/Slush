@@ -7,7 +7,7 @@
 
 #include <Physics\PhysicsWorld.h>
 
-void NPCControllerComponent::Update()
+void NPCControllerComponent::PrePhysicsUpdate()
 {
 	TargetingComponent* targeting = myEntity.myTargetingComponent;
 	if (!targeting)
@@ -27,7 +27,7 @@ void NPCControllerComponent::Update()
 		phys->myObject->myVelocity = GetNormalized(toTarget) * 100.f;
 	}
 
-	if (ProjectileShootingComponent* projShooter = myEntity.myProjectileShootingComponent)
+	if (ProjectileShootingComponent* projShooter = myEntity.GetComponent<ProjectileShootingComponent>())
 	{
 		float distance = Length(toTarget);
 		if (distance < myMaxDistance)

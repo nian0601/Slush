@@ -31,9 +31,6 @@ Entity::~Entity()
 {
 	myComponents.DeleteAll();
 
-	FW_SAFE_DELETE(myProjectileShootingComponent);
-	FW_SAFE_DELETE(myPlayerControllerComponent);
-	FW_SAFE_DELETE(myNPCControllerComponent);
 	FW_SAFE_DELETE(myHealthComponent);
 	FW_SAFE_DELETE(myPhysicsComponent);
 	FW_SAFE_DELETE(myRemoveOnCollisionComponent);
@@ -50,12 +47,6 @@ void Entity::PrePhysicsUpdate()
 {
 	for (Component* component : myPackedComponents)
 		component->PrePhysicsUpdate();
-
-	if (myNPCControllerComponent)
-		myNPCControllerComponent->Update();
-
-	if (myPlayerControllerComponent)
-		myPlayerControllerComponent->Update();
 }
 
 void Entity::Update()
@@ -105,7 +96,7 @@ void Entity::OnDeath()
 	for (Component* component : myPackedComponents)
 		component->OnDeath();
 
-	if (myNPCControllerComponent)
+	if (NPCControllerComponent* npcController = GetComponent<NPCControllerComponent>())
 		myEntityManager.CreateEntity(myPosition, "ExpPickup");
 }
 
@@ -126,16 +117,28 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 	}
 
 	if (aPrefab.myProjectileShooting.myEnabled)
-		myProjectileShootingComponent = new ProjectileShootingComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<ProjectileShootingComponent>();
+		myComponents[index] = new ProjectileShootingComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
+
+	if (aPrefab.myPlayerController.myEnabled)
+	{
+		int index = FW_TypeID<Component>::GetID<PlayerControllerComponent>();
+		myComponents[index] = new PlayerControllerComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
+
+	if (aPrefab.myNPCController.myEnabled)
+	{
+		int index = FW_TypeID<Component>::GetID<NPCControllerComponent>();
+		myComponents[index] = new NPCControllerComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myHealth.myEnabled)
 		myHealthComponent = new HealthComponent(*this, aPrefab);
-
-	if (aPrefab.myPlayerController.myEnabled)
-		myPlayerControllerComponent = new PlayerControllerComponent(*this, aPrefab);
-
-	if (aPrefab.myNPCController.myEnabled)
-		myNPCControllerComponent = new NPCControllerComponent(*this, aPrefab);
 
 	if (aPrefab.myPhysics.myEnabled)
 		myPhysicsComponent = new PhysicsComponent(*this, aPrefab, aPhysicsWorld);

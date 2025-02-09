@@ -8,7 +8,7 @@ class NPCControllerComponent : public Component
 public:
 	using Component::Component;
 
-	void Update();
+	void PrePhysicsUpdate() override;
 
 private:
 	float myMaxDistance = 800.f;

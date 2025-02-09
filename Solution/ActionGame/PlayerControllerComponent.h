@@ -9,7 +9,7 @@ class PlayerControllerComponent : public Component
 public:
 	using Component::Component;
 
-	void Update();
+	void PrePhysicsUpdate() override;
 
 private:
 	Vector2f myDirection;

@@ -62,9 +62,6 @@ public:
 	template <typename ComponentType>
 	const ComponentType* GetComponent() const;
 
-	ProjectileShootingComponent* myProjectileShootingComponent = nullptr;
-	PlayerControllerComponent* myPlayerControllerComponent = nullptr;
-	NPCControllerComponent* myNPCControllerComponent = nullptr;
 	HealthComponent* myHealthComponent = nullptr;
 	PhysicsComponent* myPhysicsComponent = nullptr;
 	RemoveOnCollisionComponent* myRemoveOnCollisionComponent = nullptr;

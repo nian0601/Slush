@@ -26,6 +26,9 @@ void HealthComponent::SetMaxHealth(int aHealth)
 
 void HealthComponent::DealDamage(int aDamageAmount)
 {
+	if (IsDead())
+		return;
+
 	if (myGracePeriodTimer.IsStarted())
 	{
 		if (!myGracePeriodTimer.HasExpired())

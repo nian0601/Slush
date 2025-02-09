@@ -62,7 +62,6 @@ public:
 	template <typename ComponentType>
 	const ComponentType* GetComponent() const;
 
-	FW_StaticArray<Component*, 32> myComponents;
 
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;
@@ -72,6 +71,9 @@ public:
 
 private:
 	Entity(EntityManager& aEntityManager);
+
+	// Will contain nullptrs, but Components are stored sorted by TypeID for easy access
+	FW_StaticArray<Component*, 32> myComponents;
 
 	// Guaranteed to not contain any nullptrs, but will not store components sorted by TypeID
 	FW_GrowingArray<Component*> myPackedComponents;

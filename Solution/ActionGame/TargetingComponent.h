@@ -10,7 +10,7 @@ class TargetingComponent : public Component
 public:
 	TargetingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
-	void Update();
+	void Update() override;
 	EntityHandle GetTarget() const { return myTarget; }
 
 private:

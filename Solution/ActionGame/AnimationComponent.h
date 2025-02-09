@@ -17,7 +17,7 @@ public:
 	AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~AnimationComponent();
 
-	void Update();
+	void Update() override;
 	bool AnimationIsPlaying() const;
 
 	void PlayDash(const Vector2f& aTargetPosition);

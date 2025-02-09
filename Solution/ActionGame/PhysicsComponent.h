@@ -18,7 +18,7 @@ public:
 	PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld);
 	~PhysicsComponent();
 
-	void Update();
+	void Update() override;
 
 	Slush::PhysicsObject* myObject;
 

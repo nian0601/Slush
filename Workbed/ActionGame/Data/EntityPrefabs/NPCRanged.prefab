@@ -1,5 +1,35 @@
 Entity Prefab 
 { 
+	entitytype 
+	{ 
+		type 2 
+	} 
+	sprite 
+	{ 
+		radius 20.000 
+		color -13068041 
+		size 
+		{ 
+			width 0.000 
+			height 0.000 
+		} 
+		floatColor 
+		{ 
+			r 0.222 
+			g 0.594 
+			b 0.966 
+			a 1.000 
+		} 
+	} 
+	projectileshooting 
+	{ 
+		cooldown 1.000 
+		projectilespeed 600.000 
+		projectilespawnoffset 35.000 
+	} 
+	npccontroller 
+	{ 
+	} 
 	health 
 	{ 
 		maxhealth 50 
@@ -7,52 +37,22 @@ Entity Prefab
 	} 
 	physics 
 	{ 
-		isSensor 0 
-		radius 10.000 
-		matchSprite 1 
 		isStatic 0 
+		isSensor 0 
+		matchSprite 1 
+		radius 10.000 
 		size 
 		{ 
-			height 0.000 
 			width 0.000 
+			height 0.000 
 		} 
-	} 
-	npccontroller 
-	{ 
-	} 
-	damagedealer 
-	{ 
-		damage 10 
 	} 
 	targeting 
 	{ 
 		targettype 1 
 	} 
-	projectileshooting 
+	damagedealer 
 	{ 
-		cooldown 1.000 
-		projectilespawnoffset 35.000 
-		projectilespeed 600.000 
-	} 
-	sprite 
-	{ 
-		color -13068041 
-		radius 20.000 
-		floatColor 
-		{ 
-			g 0.594 
-			a 1.000 
-			b 0.966 
-			r 0.222 
-		} 
-		size 
-		{ 
-			height 0.000 
-			width 0.000 
-		} 
-	} 
-	entitytype 
-	{ 
-		type 2 
+		damage 10 
 	} 
 } 

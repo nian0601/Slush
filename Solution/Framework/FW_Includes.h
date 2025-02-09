@@ -6,6 +6,7 @@
 
 #include "FW_Assert.h"
 #include "FW_GrowingArray.h"
+#include "FW_StaticArray.h"
 #include "FW_Hashmap.h"
 #include "FW_Rect.h"
 #include "FW_String.h"

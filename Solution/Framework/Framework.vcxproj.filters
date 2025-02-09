@@ -22,6 +22,8 @@
     <ClInclude Include="FW_XMLParser.h" />
     <ClInclude Include="FW_UnitTestSuite.h" />
     <ClInclude Include="FW_Any.h" />
+    <ClInclude Include="FW_TypeID.h" />
+    <ClInclude Include="FW_StaticArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FW_FileParser.cpp" />

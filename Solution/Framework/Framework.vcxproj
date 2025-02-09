@@ -139,8 +139,10 @@
     <ClInclude Include="FW_Matrix22.h" />
     <ClInclude Include="FW_Murmur.h" />
     <ClInclude Include="FW_Rect.h" />
+    <ClInclude Include="FW_StaticArray.h" />
     <ClInclude Include="FW_String.h" />
     <ClInclude Include="FW_Threading.h" />
+    <ClInclude Include="FW_TypeID.h" />
     <ClInclude Include="FW_UnitTestSuite.h" />
     <ClInclude Include="FW_Vector2.h" />
     <ClInclude Include="FW_Vector3.h" />

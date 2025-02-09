@@ -3,6 +3,7 @@
 #include <FW_Vector2.h>
 
 #include "EntityHandle.h"
+#include "Component.h"
 
 class SpriteComponent;
 class AnimationComponent;
@@ -70,6 +71,8 @@ public:
 	DamageDealerComponent* myDamageDealerComponent = nullptr;
 	HealthBarComponent* myHealthBarComponent = nullptr;
 
+	FW_StaticArray<Component*, 32> myComponents;
+
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;
 	bool myIsMarkedForRemoval = false;
@@ -78,6 +81,9 @@ public:
 
 private:
 	Entity(EntityManager& aEntityManager);
+
+	// Guaranteed to not contain any nullptrs, but will not store components sorted by TypeID
+	FW_GrowingArray<Component*> myPackedComponents;
 
 	void CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld);
 };

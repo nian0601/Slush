@@ -3,10 +3,29 @@
 #include "EntityManager.h"
 #include "EntityPrefab.h"
 
+#include "FW_TypeID.h"
+
+#include "Component.h"
+
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
 	: myPrefabStorage(aPrefabStorage)
 	, myPhysicsWorld(aPhysicsWorld)
 {
+	FW_TypeID<Component>::GetID<SpriteComponent>();
+	FW_TypeID<Component>::GetID<AnimationComponent>();
+	FW_TypeID<Component>::GetID<ProjectileShootingComponent>();
+	FW_TypeID<Component>::GetID<HealthComponent>();
+	FW_TypeID<Component>::GetID<PlayerControllerComponent>();
+	FW_TypeID<Component>::GetID<NPCControllerComponent>();
+	FW_TypeID<Component>::GetID<PhysicsComponent>();
+	FW_TypeID<Component>::GetID<RemoveOnCollisionComponent>();
+	FW_TypeID<Component>::GetID<TargetingComponent>();
+	FW_TypeID<Component>::GetID<WeaponComponent>();
+	FW_TypeID<Component>::GetID<ExperienceComponent>();
+	FW_TypeID<Component>::GetID<PickupComponent>();
+	FW_TypeID<Component>::GetID<StatsComponent>();
+	FW_TypeID<Component>::GetID<DamageDealerComponent>();
+	FW_TypeID<Component>::GetID<HealthBarComponent>();
 }
 
 EntityManager::~EntityManager()

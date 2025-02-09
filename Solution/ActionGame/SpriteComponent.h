@@ -16,7 +16,7 @@ public:
 	void MakeCircle(float aRadius, int aColor);
 	void MakeRect(float aWidth, float aHeight, int aColor);
 
-	void Render();
+	void Render() override;
 
 	Slush::BaseSprite& GetSprite() { return *mySprite; }
 	const Slush::BaseSprite& GetSprite() const { return *mySprite; }

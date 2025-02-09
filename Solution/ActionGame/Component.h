@@ -14,6 +14,13 @@ public:
 	{}
 	virtual ~Component() {}
 
+	virtual void PrePhysicsUpdate() {};
+	virtual void Update() {};
+	virtual void Render() {};
+
+	virtual void OnCollision(Entity& aOtherEntity) { aOtherEntity; };
+	virtual void OnDeath() {};
+
 	Entity& myEntity;
 	const EntityPrefab& myEntityPrefab;
 };

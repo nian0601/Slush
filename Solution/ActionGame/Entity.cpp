@@ -19,15 +19,18 @@
 #include "WeaponComponent.h"
 #include "DamageDealerComponent.h"
 #include "HealthBarComponent.h"
+#include <FW_TypeID.h>
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
 {
+	myComponents.Fill(nullptr);
 }
 
 Entity::~Entity()
 {
-	FW_SAFE_DELETE(mySpriteComponent);
+	myComponents.DeleteAll();
+
 	FW_SAFE_DELETE(myAnimationComponent);
 	FW_SAFE_DELETE(myProjectileShootingComponent);
 	FW_SAFE_DELETE(myPlayerControllerComponent);
@@ -46,6 +49,9 @@ Entity::~Entity()
 
 void Entity::PrePhysicsUpdate()
 {
+	for (Component* component : myPackedComponents)
+		component->PrePhysicsUpdate();
+
 	if (myNPCControllerComponent)
 		myNPCControllerComponent->Update();
 
@@ -55,6 +61,9 @@ void Entity::PrePhysicsUpdate()
 
 void Entity::Update()
 {
+	for (Component* component : myPackedComponents)
+		component->Update();
+
 	if (myPhysicsComponent)
 		myPhysicsComponent->Update();
 
@@ -70,8 +79,8 @@ void Entity::Update()
 
 void Entity::Render()
 {
-	if (mySpriteComponent)
-		mySpriteComponent->Render();
+	for (Component* component : myPackedComponents)
+		component->Render();
 
 	if (myExperienceComponent)
 		myExperienceComponent->Render();
@@ -82,6 +91,9 @@ void Entity::Render()
 
 void Entity::OnCollision(Entity& aOtherEntity)
 {
+	for (Component* component : myPackedComponents)
+		component->OnCollision(aOtherEntity);
+
 	if (myRemoveOnCollisionComponent)
 		myRemoveOnCollisionComponent->OnCollision(aOtherEntity);
 
@@ -94,6 +106,9 @@ void Entity::OnCollision(Entity& aOtherEntity)
 
 void Entity::OnDeath()
 {
+	for (Component* component : myPackedComponents)
+		component->OnDeath();
+
 	if (myNPCControllerComponent)
 		myEntityManager.CreateEntity(myPosition, "ExpPickup");
 }
@@ -101,7 +116,12 @@ void Entity::OnDeath()
 void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld)
 {
 	if (aPrefab.mySprite.myEnabled)
-		mySpriteComponent = new SpriteComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<SpriteComponent>();
+		myComponents[index] = new SpriteComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+		mySpriteComponent = static_cast<SpriteComponent*>(myComponents[index]);
+	}
 
 	if (aPrefab.myAnimation.myEnabled)
 		myAnimationComponent = new AnimationComponent(*this, aPrefab);

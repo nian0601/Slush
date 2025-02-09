@@ -48,6 +48,9 @@ public:
 
 	void Initialize() override
 	{
+		myPhysicsWorld = new Slush::PhysicsWorld();
+		myEntityManager = new EntityManager(myEntityPrefabs, *myPhysicsWorld);
+
 		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
 		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/Textures", textureInfos);
 
@@ -57,9 +60,6 @@ public:
 		myFont.Load("Data/OpenSans-Regular.ttf");
 		myEntityPrefabs.LoadAllAssets();
 		myUILayouts.LoadAllAssets();
-
-		myPhysicsWorld = new Slush::PhysicsWorld();
-		myEntityManager = new EntityManager(myEntityPrefabs, *myPhysicsWorld);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new Slush::GameViewDockable());

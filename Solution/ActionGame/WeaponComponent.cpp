@@ -109,18 +109,20 @@ void SpreadShooter::OnActivate()
 WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
+	const EntityPrefab::Weapon& weaponData = anEntityPrefab.GetWeaponData();
+
 	LineShooter* lineShooter = new LineShooter(anEntity);
 	lineShooter->myProjectilePrefab = "PlayerProjectile";
-	lineShooter->myBaseCooldown = myEntityPrefab.myWeaponComponent.myBaseCooldown;
-	lineShooter->myBaseProjectileSpeed = myEntityPrefab.myWeaponComponent.myBaseProjectileSpeed;
-	lineShooter->myBaseDamage = myEntityPrefab.myWeaponComponent.myBaseDamage;
+	lineShooter->myBaseCooldown = weaponData.myBaseCooldown;
+	lineShooter->myBaseProjectileSpeed = weaponData.myBaseProjectileSpeed;
+	lineShooter->myBaseDamage = weaponData.myBaseDamage;
 	myWeapons.Add(lineShooter);
 
 	SpreadShooter* spreadShooter = new SpreadShooter(anEntity);
 	spreadShooter->myProjectilePrefab = "PlayerProjectile";
-	spreadShooter->myBaseCooldown = myEntityPrefab.myWeaponComponent.myBaseCooldown;
-	spreadShooter->myBaseProjectileSpeed = myEntityPrefab.myWeaponComponent.myBaseProjectileSpeed;
-	spreadShooter->myBaseDamage = myEntityPrefab.myWeaponComponent.myBaseDamage;
+	spreadShooter->myBaseCooldown = weaponData.myBaseCooldown;
+	spreadShooter->myBaseProjectileSpeed = weaponData.myBaseProjectileSpeed;
+	spreadShooter->myBaseDamage = weaponData.myBaseDamage;
 	myWeapons.Add(spreadShooter);
 }
 

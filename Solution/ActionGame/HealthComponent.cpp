@@ -10,9 +10,11 @@
 HealthComponent::HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	SetMaxHealth(anEntityPrefab.myHealth.myMaxHealth);
+	const EntityPrefab::Health& healthData = anEntityPrefab.GetHealthData();
 
-	if (anEntityPrefab.myHealth.myGracePeriodDuration > 0.f)
+	SetMaxHealth(healthData.myMaxHealth);
+
+	if (healthData.myGracePeriodDuration > 0.f)
 		myGracePeriodTimer.Start(0.f);
 }
 
@@ -29,7 +31,7 @@ void HealthComponent::DealDamage(int aDamageAmount)
 		if (!myGracePeriodTimer.HasExpired())
 			return;
 
-		myGracePeriodTimer.Start(myEntityPrefab.myHealth.myGracePeriodDuration);
+		myGracePeriodTimer.Start(myEntityPrefab.GetHealthData().myGracePeriodDuration);
 	}
 
 	EntityDamageTakenEvent damageTaken;

@@ -17,10 +17,12 @@ void TargetingComponent::Update()
 {
 	myTarget.Clear();
 
-	FW_GrowingArray<EntityHandle> targets;
-	myEntity.myEntityManager.FindEntitiesOfType(myEntityPrefab.myTargeting.myTargetType, targets);
+	const EntityPrefab::Targeting& targetData = myEntityPrefab.GetTargetingData();
 
-	if (myEntityPrefab.myTargeting.myTargetType == Entity::PLAYER)
+	FW_GrowingArray<EntityHandle> targets;
+	myEntity.myEntityManager.FindEntitiesOfType(targetData.myTargetType, targets);
+
+	if (targetData.myTargetType == Entity::PLAYER)
 	{
 		if (!targets.IsEmpty())
 			myTarget = targets[0];

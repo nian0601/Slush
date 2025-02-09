@@ -9,10 +9,11 @@
 SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	if (anEntityPrefab.mySprite.mySize.x > 0.f)
-		MakeRect(anEntityPrefab.mySprite.mySize.x, anEntityPrefab.mySprite.mySize.y, anEntityPrefab.mySprite.myColor);
+	const EntityPrefab::Sprite& spriteData = anEntityPrefab.GetSpriteData();
+	if (spriteData.mySize.x > 0.f)
+		MakeRect(spriteData.mySize.x, spriteData.mySize.y, spriteData.myColor);
 	else
-		MakeCircle(anEntityPrefab.mySprite.myRadius, anEntityPrefab.mySprite.myColor);
+		MakeCircle(spriteData.myRadius, spriteData.myColor);
 }
 
 SpriteComponent::~SpriteComponent()

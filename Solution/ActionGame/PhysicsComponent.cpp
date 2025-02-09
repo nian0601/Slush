@@ -66,15 +66,18 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 	: Component(aEntity, anEntityPrefab)
 	, myPhysicsWorld(aPhysicsWorld)
 {
+	const EntityPrefab::Physics& physData = anEntityPrefab.GetPhysicsData();
+
 	Slush::PhysicsShape* shape = nullptr;
-	if (anEntityPrefab.myPhysics.myMatchSprite)
+	if (physData.myMatchSprite)
 	{
-		if (anEntityPrefab.mySprite.myEnabled)
+		if (anEntityPrefab.Has<SpriteComponent>())
 		{
-			if (anEntityPrefab.mySprite.mySize.x > 0.f)
-				shape = new Slush::AABBShape(anEntityPrefab.mySprite.mySize);
+			const EntityPrefab::Sprite& spriteData = anEntityPrefab.GetSpriteData();
+			if (spriteData.mySize.x > 0.f)
+				shape = new Slush::AABBShape(spriteData.mySize);
 			else
-				shape = new Slush::CircleShape(anEntityPrefab.mySprite.myRadius);
+				shape = new Slush::CircleShape(spriteData.myRadius);
 		}
 		else
 		{
@@ -84,10 +87,10 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 	}
 	else
 	{
-		if (anEntityPrefab.myPhysics.mySize.x > 0.f)
-			shape = new Slush::AABBShape(anEntityPrefab.myPhysics.mySize);
+		if (physData.mySize.x > 0.f)
+			shape = new Slush::AABBShape(physData.mySize);
 		else
-			shape = new Slush::CircleShape(anEntityPrefab.myPhysics.myRadius);
+			shape = new Slush::CircleShape(physData.myRadius);
 	}
 
 	if (shape)
@@ -101,10 +104,10 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 
 		aPhysicsWorld.AddObject(myObject);
 
-		if (anEntityPrefab.myPhysics.myStatic)
+		if (physData.myStatic)
 			myObject->MakeStatic();
 
-		if (anEntityPrefab.myPhysics.mySensor)
+		if (physData.mySensor)
 			myObject->MakeSensor();
 	}
 	else

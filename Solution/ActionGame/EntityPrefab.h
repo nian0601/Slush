@@ -163,22 +163,6 @@ public:
 	FW_String myName;
 	int myEntityType;
 
-	Sprite mySprite;
-	ComponentData myAnimation;
-	ProjectileShooting myProjectileShooting;
-	ComponentData myPlayerController;
-	ComponentData myNPCController;
-	Health myHealth;
-	Physics myPhysics;
-	ComponentData myRemoveOnCollision;
-	Targeting myTargeting;
-	Weapon myWeaponComponent;
-	ComponentData myExperience;
-	ComponentData myPickup;
-	Stats myStats;
-	DamageDealer myDamageDealer;
-	ComponentData myHealthBar;
-
 	FW_StaticArray<ComponentData*, 32> myComponentDatas;
 };
 

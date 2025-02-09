@@ -7,7 +7,7 @@
 DamageDealerComponent::DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	myDamage = myEntityPrefab.myDamageDealer.myDamage;
+	myDamage = myEntityPrefab.GetDamageDealerData().myDamage;
 }
 
 void DamageDealerComponent::OnCollision(Entity& aOtherEntity)

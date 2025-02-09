@@ -49,25 +49,10 @@ void EntityPrefab::ComponentData::BuildUI(FW_GrowingArray<MissingComponent>& som
 EntityPrefab::EntityPrefab(const char* aName)
 	: DataAsset(aName)
 	, myName(aName)
-	, mySprite("Sprite", "sprite")
-	, myAnimation("Animation", "animation")
-	, myProjectileShooting("Projectille Shooting", "projectileshooting")
-	, myPlayerController("Player Controller", "playercontroller")
-	, myNPCController("NPC Controller", "npccontroller")
-	, myHealth("Health", "health")
-	, myPhysics("Physics", "physics")
-	, myRemoveOnCollision("Remove On Collision", "removeoncollision")
-	, myTargeting("Targeting", "targeting")
-	, myWeaponComponent("Weapon", "weaponcomponent")
-	, myExperience("Experience", "experience")
-	, myPickup("Pickup", "pickup")
-	, myStats("Stats", "stats")
-	, myDamageDealer("Damage Dealer", "damagedealer")
-	, myHealthBar("Health Bar", "healthbar")
 {
 	myComponentDatas.Fill(nullptr);
 
-	/*myComponentDatas[GetComponentID<SpriteComponent>()] = new Sprite("Sprite", "sprite");
+	myComponentDatas[GetComponentID<SpriteComponent>()] = new Sprite("Sprite", "sprite");
 	myComponentDatas[GetComponentID<AnimationComponent>()] = new ComponentData("Animation", "animation");
 	myComponentDatas[GetComponentID<ProjectileShootingComponent>()] = new ProjectileShooting("Projectile Shooting", "projectileshooting");
 	myComponentDatas[GetComponentID<PlayerControllerComponent>()] = new ComponentData("Player Controller", "playercontroller");
@@ -81,29 +66,12 @@ EntityPrefab::EntityPrefab(const char* aName)
 	myComponentDatas[GetComponentID<PickupComponent>()] = new ComponentData("Pickup", "pickup");
 	myComponentDatas[GetComponentID<StatsComponent>()] = new Stats("Stats", "stats");
 	myComponentDatas[GetComponentID<DamageDealerComponent>()] = new DamageDealer("Daamge Dealer", "damagedealer");
-	myComponentDatas[GetComponentID<HealthBarComponent>()] = new ComponentData("Health Bar", "healthbar");*/
-
-
-	myComponentDatas[GetComponentID<SpriteComponent>()] = &mySprite;
-	myComponentDatas[GetComponentID<AnimationComponent>()] = &myAnimation;
-	myComponentDatas[GetComponentID<ProjectileShootingComponent>()] = &myProjectileShooting;
-	myComponentDatas[GetComponentID<PlayerControllerComponent>()] = &myPlayerController;
-	myComponentDatas[GetComponentID<NPCControllerComponent>()] = &myNPCController;
-	myComponentDatas[GetComponentID<HealthComponent>()] = &myHealth;
-	myComponentDatas[GetComponentID<PhysicsComponent>()] = &myPhysics;
-	myComponentDatas[GetComponentID<RemoveOnCollisionComponent>()] = &myRemoveOnCollision;
-	myComponentDatas[GetComponentID<TargetingComponent>()] = &myTargeting;
-	myComponentDatas[GetComponentID<WeaponComponent>()] = &myWeaponComponent;
-	myComponentDatas[GetComponentID<ExperienceComponent>()] = &myExperience;
-	myComponentDatas[GetComponentID<PickupComponent>()] = &myPickup;
-	myComponentDatas[GetComponentID<StatsComponent>()] = &myStats;
-	myComponentDatas[GetComponentID<DamageDealerComponent>()] = &myDamageDealer;
-	myComponentDatas[GetComponentID<HealthBarComponent>()] = &myHealthBar;
+	myComponentDatas[GetComponentID<HealthBarComponent>()] = new ComponentData("Health Bar", "healthbar");
 }
 
 EntityPrefab::~EntityPrefab()
 {
-	//myComponentDatas.DeleteAll();
+	myComponentDatas.DeleteAll();
 }
 
 void EntityPrefab::OnParse(Slush::AssetParser::Handle aRootHandle)

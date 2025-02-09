@@ -4,6 +4,7 @@
 
 #include "EntityHandle.h"
 #include "Component.h"
+#include <FW_TypeID.h>
 
 class SpriteComponent;
 class AnimationComponent;
@@ -55,8 +56,12 @@ public:
 	bool IsPlayerOwned() const { return myType == PLAYER || myType == PLAYER_PROJECTILE; }
 	bool IsNPCOwned() const { return myType == NPC || myType == NPC_PROJECTILE; }
 
-	SpriteComponent* mySpriteComponent = nullptr;
-	AnimationComponent* myAnimationComponent = nullptr;
+	template <typename ComponentType>
+	ComponentType* GetComponent();
+
+	template <typename ComponentType>
+	const ComponentType* GetComponent() const;
+
 	ProjectileShootingComponent* myProjectileShootingComponent = nullptr;
 	PlayerControllerComponent* myPlayerControllerComponent = nullptr;
 	NPCControllerComponent* myNPCControllerComponent = nullptr;
@@ -87,3 +92,19 @@ private:
 
 	void CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld);
 };
+
+template <typename ComponentType>
+inline ComponentType* Entity::GetComponent()
+{
+	unsigned int id = FW_TypeID<Component>::GetID<ComponentType>();
+	FW_ASSERT(id < 32, "Too many ComponentTypes");
+	return static_cast<ComponentType*>(myComponents[id]);
+}
+
+template <typename ComponentType>
+inline const ComponentType* Entity::GetComponent() const
+{
+	unsigned int id = FW_TypeID<Component>::GetID<ComponentType>();
+	FW_ASSERT(id < 32, "Too many ComponentTypes");
+	return static_cast<const ComponentType*>(myComponents[id]);
+}

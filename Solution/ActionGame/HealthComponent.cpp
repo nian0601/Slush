@@ -42,8 +42,8 @@ void HealthComponent::DealDamage(int aDamageAmount)
 
 	damageTaken.myNewHealth = myCurrentHealth;
 
-	if (myEntity.myAnimationComponent)
-		myEntity.myAnimationComponent->PlayBlink();
+	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+		anim->PlayBlink();
 
 	if (myEntity.myHealthBarComponent)
 		myEntity.myHealthBarComponent->OnDamageTaken(damageTaken);

@@ -12,7 +12,8 @@
 
 void PlayerControllerComponent::Update()
 {
-	if (!myEntity.myAnimationComponent || !myEntity.myAnimationComponent->AnimationIsPlaying())
+	AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>();
+	if (!anim || !anim->AnimationIsPlaying())
 	{
 		myDirection = { 0.f, 0.f };
 
@@ -32,8 +33,8 @@ void PlayerControllerComponent::Update()
 		if (myEntity.myPhysicsComponent)
 			myEntity.myPhysicsComponent->myObject->myVelocity = myDirection * mySpeed;
 
-		if (myEntity.myAnimationComponent && input.WasKeyPressed(Slush::Input::SPACE))
-			myEntity.myAnimationComponent->PlayDash(myEntity.myPosition + myDirection * 500.f);
+		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
+			anim->PlayDash(myEntity.myPosition + myDirection * 500.f);
 
 		if (myEntity.myProjectileShootingComponent && input.WasMousePressed(Slush::Input::LEFTMB))
 		{

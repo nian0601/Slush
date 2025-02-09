@@ -40,7 +40,8 @@ AnimationComponent::~AnimationComponent()
 
 void AnimationComponent::Update()
 {
-	if (!myEntity.mySpriteComponent)
+	SpriteComponent* sprite = myEntity.GetComponent<SpriteComponent>();
+	if (!sprite)
 	{
 		SLUSH_WARNING("Updating AnimationComponent without a SpriteComponent");
 		return;
@@ -49,7 +50,7 @@ void AnimationComponent::Update()
 	if (!myCurrentAnimation)
 		return;
 
-	myCurrentAnimation->Update(*myRuntime, myEntity.mySpriteComponent->GetSprite());
+	myCurrentAnimation->Update(*myRuntime, sprite->GetSprite());
 	if (myRuntime->myPositionData.myIsActive)
 	{
 		myEntity.myPosition = myRuntime->myCurrentPosition;
@@ -77,7 +78,7 @@ void AnimationComponent::PlayDash(const Vector2f& aTargetPosition)
 
 void AnimationComponent::PlayBlink()
 {
-	myRuntime->myStartColor = myEntity.mySpriteComponent->GetSprite().GetFillColor();
+	myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
 	myRuntime->myEndColor = 0xFFFFFFFF;
 	myRuntime->Start();
 

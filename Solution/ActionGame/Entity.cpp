@@ -31,7 +31,6 @@ Entity::~Entity()
 {
 	myComponents.DeleteAll();
 
-	FW_SAFE_DELETE(myAnimationComponent);
 	FW_SAFE_DELETE(myProjectileShootingComponent);
 	FW_SAFE_DELETE(myPlayerControllerComponent);
 	FW_SAFE_DELETE(myNPCControllerComponent);
@@ -66,9 +65,6 @@ void Entity::Update()
 
 	if (myPhysicsComponent)
 		myPhysicsComponent->Update();
-
-	if (myAnimationComponent)
-		myAnimationComponent->Update();
 
 	if (myTargetingComponent)
 		myTargetingComponent->Update();
@@ -120,11 +116,14 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 		int index = FW_TypeID<Component>::GetID<SpriteComponent>();
 		myComponents[index] = new SpriteComponent(*this, aPrefab);
 		myPackedComponents.Add(myComponents[index]);
-		mySpriteComponent = static_cast<SpriteComponent*>(myComponents[index]);
 	}
 
 	if (aPrefab.myAnimation.myEnabled)
-		myAnimationComponent = new AnimationComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<AnimationComponent>();
+		myComponents[index] = new AnimationComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myProjectileShooting.myEnabled)
 		myProjectileShootingComponent = new ProjectileShootingComponent(*this, aPrefab);

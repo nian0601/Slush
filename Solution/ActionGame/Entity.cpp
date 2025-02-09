@@ -31,9 +31,6 @@ Entity::~Entity()
 {
 	myComponents.DeleteAll();
 
-	FW_SAFE_DELETE(myExperienceComponent);
-	FW_SAFE_DELETE(myPickupComponent);
-	FW_SAFE_DELETE(myStatsComponent);
 	FW_SAFE_DELETE(myDamageDealerComponent);
 	FW_SAFE_DELETE(myHealthBarComponent);
 }
@@ -55,9 +52,6 @@ void Entity::Render()
 	for (Component* component : myPackedComponents)
 		component->Render();
 
-	if (myExperienceComponent)
-		myExperienceComponent->Render();
-
 	if (myHealthBarComponent)
 		myHealthBarComponent->Render();
 }
@@ -66,9 +60,6 @@ void Entity::OnCollision(Entity& aOtherEntity)
 {
 	for (Component* component : myPackedComponents)
 		component->OnCollision(aOtherEntity);
-
-	if (myPickupComponent)
-		myPickupComponent->OnCollision(aOtherEntity);
 
 	if (myDamageDealerComponent)
 		myDamageDealerComponent->OnCollision(aOtherEntity);
@@ -156,13 +147,25 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 	}
 
 	if (aPrefab.myExperience.myEnabled)
-		myExperienceComponent = new ExperienceComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<ExperienceComponent>();
+		myComponents[index] = new ExperienceComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myPickup.myEnabled)
-		myPickupComponent = new PickupComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<PickupComponent>();
+		myComponents[index] = new PickupComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myStats.myEnabled)
-		myStatsComponent = new StatsComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<StatsComponent>();
+		myComponents[index] = new StatsComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myDamageDealer.myEnabled)
 		myDamageDealerComponent = new DamageDealerComponent(*this, aPrefab);

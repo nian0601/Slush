@@ -62,9 +62,6 @@ public:
 	template <typename ComponentType>
 	const ComponentType* GetComponent() const;
 
-	ExperienceComponent* myExperienceComponent = nullptr;
-	PickupComponent* myPickupComponent = nullptr;
-	StatsComponent* myStatsComponent = nullptr;
 	DamageDealerComponent* myDamageDealerComponent = nullptr;
 	HealthBarComponent* myHealthBarComponent = nullptr;
 

@@ -48,57 +48,59 @@ void Level::Update()
 	if (!player)
 		return;
 
+	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
+
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	const Slush::Input& input = engine.GetInput();
 	if (input.WasKeyReleased(Slush::Input::E))
 	{
-		player->myExperienceComponent->AddExperience(1);
+		expComp->AddExperience(1);
 	}
 
-	if (StatsComponent* stats = player->myStatsComponent)
+	if (StatsComponent* stats = player->GetComponent<StatsComponent>())
 	{
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		if (engine.GetInput().WasKeyPressed(Slush::Input::Q))
 			stats->AddAdditionalProjectilesUpgrade();
 	}
 
-	myIsLevelingUp = player->myExperienceComponent->NeedsLevelUp();
+	myIsLevelingUp = expComp->NeedsLevelUp();
 	if (myIsLevelingUp)
 	{
-		if (StatsComponent* stats = player->myStatsComponent)
+		if (StatsComponent* stats = player->GetComponent<StatsComponent>())
 		{
 			Slush::Engine& engine = Slush::Engine::GetInstance();
 			myUIManager->Update(engine.GetInput());
 
 			if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage() && !stats->CanUpgradeAdditionalProjectiles())
 			{
-				player->myExperienceComponent->LevelUp();
+				expComp->LevelUp();
 				myIsLevelingUp = false;
 				SLUSH_WARNING("No more available upgrades, auto-leveling");
 			}
 			else if (stats->CanUpgradeCooldownReduction() && myCooldownUpgradeButton->WasPressed())
 			{
 				stats->AddCooldownReductionUpgrade();
-				player->myExperienceComponent->LevelUp();
+				expComp->LevelUp();
 				myIsLevelingUp = false;
 			}
 			else if (stats->CanUpgradeDamage() && myDamageUpgradeButton->WasPressed())
 			{
 				stats->AddDamageUpgrade();
-				player->myExperienceComponent->LevelUp();
+				expComp->LevelUp();
 				myIsLevelingUp = false;
 			}
 			else if (stats->CanUpgradeAdditionalProjectiles() && myProjectileUpgradeButton->WasPressed())
 			{
 				stats->AddAdditionalProjectilesUpgrade();
-				player->myExperienceComponent->LevelUp();
+				expComp->LevelUp();
 				myIsLevelingUp = false;
 			}
 		}
 		else
 		{
 			SLUSH_ERROR("Player doesnt have a StatsComponent, not able to pick upgrade when Leveling");
-			player->myExperienceComponent->LevelUp();
+			expComp->LevelUp();
 			myIsLevelingUp = false;
 		}
 	}

@@ -20,8 +20,7 @@ void Weapon::Update()
 	if (!myActivationCooldown.IsStarted() || myActivationCooldown.HasExpired())
 	{
 		float cooldown = myBaseCooldown;
-		StatsComponent* stats = myEntity.myStatsComponent;
-		if (stats)
+		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 		{
 			cooldown /= stats->GetCooldownReduction();
 			cooldown /= GetAdditionalCooldownReduction(stats);
@@ -43,7 +42,7 @@ void ProjectileShooter::ShootProjectile(const Vector2f& aDirection)
 	if (DamageDealerComponent* projDamage = projectile->myDamageDealerComponent)
 	{
 		int damage = myBaseDamage;
-		if (StatsComponent* stats = myEntity.myStatsComponent)
+		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 			damage = static_cast<int>(damage * stats->GetDamageModifier());
 
 		projDamage->SetDamage(damage);
@@ -92,7 +91,7 @@ void SpreadShooter::OnActivate()
 	Vector2f direction = GetNormalized(target.Get()->myPosition - myEntity.myPosition);
 	ShootProjectile(direction);
 
-	if (StatsComponent* stats = myEntity.myStatsComponent)
+	if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 	{
 		int additionalProj = stats->GetAdditionalProjectiles();
 		for (int i = 0; i < additionalProj; ++i)

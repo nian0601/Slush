@@ -14,7 +14,7 @@ public:
 	ExperienceComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~ExperienceComponent();
 
-	void Render();
+	void Render() override;
 
 	void AddExperience(int aAmount);
 

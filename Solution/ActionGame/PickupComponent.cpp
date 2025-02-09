@@ -10,7 +10,7 @@ void PickupComponent::OnCollision(Entity& aOtherEntity)
 	{
 		myEntity.myIsMarkedForRemoval = true;
 
-		if (ExperienceComponent* exp = aOtherEntity.myExperienceComponent)
+		if (ExperienceComponent* exp = aOtherEntity.GetComponent<ExperienceComponent>())
 		{
 			exp->AddExperience(1);
 		}

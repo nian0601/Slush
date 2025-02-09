@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntityComponentEvents.h"
+#include <FW_TypeID.h>
 
 class Entity;
 class EntityPrefab;
@@ -24,3 +25,9 @@ public:
 	Entity& myEntity;
 	const EntityPrefab& myEntityPrefab;
 };
+
+template <typename ComponentType>
+unsigned int GetComponentID()
+{
+	return FW_TypeID<Component>::GetID<ComponentType>();
+}

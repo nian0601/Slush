@@ -10,34 +10,39 @@
 class EntityPrefab : public Slush::DataAsset
 {
 private:
-	struct ComponentData
-	{
-		ComponentData(const char* aName)
-			: myComponentName(aName)
-		{}
-
-		void Parse(Slush::AssetParser::Handle aRootHandle);
-		virtual void OnParse(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; }
-
-		bool myEnabled = false;
-		const char* myComponentName;
-	};
-
-public:
-	DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs/");
-
-	EntityPrefab(const char* aName);
-
 	struct MissingComponent
 	{
 		FW_String myLabel;
 		bool* myEnabledFlag;
 	};
 
+	struct ComponentData
+	{
+		ComponentData(const char* aUIName, const char* aDataName)
+			: myComponentLabel(aUIName)
+			, myComponentDataName(aDataName)
+		{}
+
+		void Parse(Slush::AssetParser::Handle aRootHandle);
+		virtual void OnParse(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; }
+
+		void BuildUI(FW_GrowingArray<MissingComponent>& someMissingComponentsOut);
+		virtual void OnBuildUI() {};
+
+		bool myEnabled = false;
+		const char* myComponentDataName; // Used for seriallization, should not have any spaces
+		const char* myComponentLabel; // Used for UI-display, can be whatever
+	};
+
+public:
+	DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs/");
+
+	EntityPrefab(const char* aName);
+	~EntityPrefab();
+
 	void OnParse(Slush::AssetParser::Handle aRootHandle) override;
 
 	void BuildUI();
-	bool BaseComponentUI(bool& aEnabledFlag, const char* aComponentLabel, FW_GrowingArray<MissingComponent>& someMissingComponentsOut);
 	void BuildMissingComponentsUI(const FW_GrowingArray<MissingComponent>& someMissingComponents);
 
 	struct Sprite : public ComponentData
@@ -45,6 +50,7 @@ public:
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		float myRadius = 10.f;
 		Vector2f mySize;
@@ -58,6 +64,7 @@ public:
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		float myCooldown = 1.f;
 		float myProjectileSpeed = 500.f;
@@ -69,6 +76,7 @@ public:
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		int myMaxHealth = 30;
 		float myGracePeriodDuration = 0.f;
@@ -79,6 +87,7 @@ public:
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		bool myStatic = false;
 		bool mySensor = false;
@@ -92,15 +101,17 @@ public:
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		Entity::Type myTargetType;
 	};
 
-	struct StatsComponent : public ComponentData
+	struct Stats : public ComponentData
 	{
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		int myMaxCooldownUpgrades = 5;
 		float myCooldownPerUpgrade = 0.2f;
@@ -117,6 +128,7 @@ public:
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		int myDamage = 10;
 	};
@@ -126,6 +138,7 @@ public:
 		using ComponentData::ComponentData;
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
 
 		float myBaseCooldown = 1.f;
 		float myBaseProjectileSpeed = 750.f;
@@ -147,7 +160,9 @@ public:
 	Weapon myWeaponComponent;
 	ComponentData myExperience;
 	ComponentData myPickup;
-	StatsComponent myStats;
+	Stats myStats;
 	DamageDealer myDamageDealer;
 	ComponentData myHealthBar;
+
+	FW_StaticArray<ComponentData*, 32> myComponentDatas;
 };

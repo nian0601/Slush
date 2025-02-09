@@ -62,9 +62,6 @@ public:
 	template <typename ComponentType>
 	const ComponentType* GetComponent() const;
 
-	RemoveOnCollisionComponent* myRemoveOnCollisionComponent = nullptr;
-	TargetingComponent* myTargetingComponent = nullptr;
-	WeaponComponent* myWeaponComponent = nullptr;
 	ExperienceComponent* myExperienceComponent = nullptr;
 	PickupComponent* myPickupComponent = nullptr;
 	StatsComponent* myStatsComponent = nullptr;

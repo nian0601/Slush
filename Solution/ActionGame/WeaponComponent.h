@@ -60,7 +60,7 @@ public:
 	WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~WeaponComponent();
 
-	void Update();
+	void Update() override;
 
 private:
 	

@@ -7,5 +7,5 @@ class RemoveOnCollisionComponent : public Component
 public:
 	using Component::Component;
 
-	void OnCollision(Entity& aOtherEntity);
+	void OnCollision(Entity& aOtherEntity) override;
 };

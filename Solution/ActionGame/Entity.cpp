@@ -31,9 +31,6 @@ Entity::~Entity()
 {
 	myComponents.DeleteAll();
 
-	FW_SAFE_DELETE(myRemoveOnCollisionComponent);
-	FW_SAFE_DELETE(myTargetingComponent);
-	FW_SAFE_DELETE(myWeaponComponent);
 	FW_SAFE_DELETE(myExperienceComponent);
 	FW_SAFE_DELETE(myPickupComponent);
 	FW_SAFE_DELETE(myStatsComponent);
@@ -51,12 +48,6 @@ void Entity::Update()
 {
 	for (Component* component : myPackedComponents)
 		component->Update();
-
-	if (myTargetingComponent)
-		myTargetingComponent->Update();
-
-	if (myWeaponComponent)
-		myWeaponComponent->Update();
 }
 
 void Entity::Render()
@@ -75,9 +66,6 @@ void Entity::OnCollision(Entity& aOtherEntity)
 {
 	for (Component* component : myPackedComponents)
 		component->OnCollision(aOtherEntity);
-
-	if (myRemoveOnCollisionComponent)
-		myRemoveOnCollisionComponent->OnCollision(aOtherEntity);
 
 	if (myPickupComponent)
 		myPickupComponent->OnCollision(aOtherEntity);
@@ -147,13 +135,25 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 	}
 
 	if (aPrefab.myRemoveOnCollision.myEnabled)
-		myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<RemoveOnCollisionComponent>();
+		myComponents[index] = new RemoveOnCollisionComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myTargeting.myEnabled)
-		myTargetingComponent = new TargetingComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<TargetingComponent>();
+		myComponents[index] = new TargetingComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myWeaponComponent.myEnabled)
-		myWeaponComponent = new WeaponComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<WeaponComponent>();
+		myComponents[index] = new WeaponComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myExperience.myEnabled)
 		myExperienceComponent = new ExperienceComponent(*this, aPrefab);

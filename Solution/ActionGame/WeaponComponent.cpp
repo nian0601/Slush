@@ -54,7 +54,7 @@ void ProjectileShooter::ShootProjectile(const Vector2f& aDirection)
 
 void LineShooter::OnActivate()
 {
-	TargetingComponent* targeting = myEntity.myTargetingComponent;
+	TargetingComponent* targeting = myEntity.GetComponent<TargetingComponent>();
 	if (!targeting)
 	{
 		SLUSH_ERROR("Entity with 'WeaponComponent' is missing a 'TargetingComponent'");
@@ -78,7 +78,7 @@ float LineShooter::GetAdditionalCooldownReduction(StatsComponent* aStatsComponen
 
 void SpreadShooter::OnActivate()
 {
-	TargetingComponent* targeting = myEntity.myTargetingComponent;
+	TargetingComponent* targeting = myEntity.GetComponent<TargetingComponent>();
 	if (!targeting)
 	{
 		SLUSH_ERROR("Entity with 'WeaponComponent' is missing a 'TargetingComponent'");

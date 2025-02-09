@@ -9,7 +9,7 @@
 
 void NPCControllerComponent::PrePhysicsUpdate()
 {
-	TargetingComponent* targeting = myEntity.myTargetingComponent;
+	TargetingComponent* targeting = myEntity.GetComponent<TargetingComponent>();
 	if (!targeting)
 	{
 		SLUSH_ERROR("Entity with 'NPCControllerComponent' is missing a 'TargetingComponent'");

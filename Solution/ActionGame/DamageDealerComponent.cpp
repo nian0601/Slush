@@ -16,7 +16,7 @@ void DamageDealerComponent::OnCollision(Entity& aOtherEntity)
 	if (otherType == Entity::ENVIRONMENT)
 		return;
 
-	HealthComponent* otherHealth = aOtherEntity.myHealthComponent;
+	HealthComponent* otherHealth = aOtherEntity.GetComponent<HealthComponent>();
 	if (!otherHealth)
 		return;
 

@@ -22,7 +22,7 @@ void NPCControllerComponent::PrePhysicsUpdate()
 
 	Vector2f toTarget = target.Get()->myPosition - myEntity.myPosition;
 
-	if (PhysicsComponent* phys = myEntity.myPhysicsComponent)
+	if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
 	{
 		phys->myObject->myVelocity = GetNormalized(toTarget) * 100.f;
 	}

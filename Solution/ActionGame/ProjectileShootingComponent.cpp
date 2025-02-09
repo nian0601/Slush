@@ -25,7 +25,7 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 
 	Vector2f projPosition = myEntity.myPosition + aDirection * myEntityPrefab.myProjectileShooting.myProjectileSpawnOffset;
 	Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, prefab);
-	projectile->myPhysicsComponent->myObject->myVelocity = aDirection * myEntityPrefab.myProjectileShooting.myProjectileSpeed;
+	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myEntityPrefab.myProjectileShooting.myProjectileSpeed;
 }
 
 void ProjectileShootingComponent::TriggerCooldown()

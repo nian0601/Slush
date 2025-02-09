@@ -54,7 +54,7 @@ void AnimationComponent::Update()
 	if (myRuntime->myPositionData.myIsActive)
 	{
 		myEntity.myPosition = myRuntime->myCurrentPosition;
-		if (PhysicsComponent* phys = myEntity.myPhysicsComponent)
+		if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
 			phys->myObject->SetPosition(myEntity.myPosition);
 	}
 

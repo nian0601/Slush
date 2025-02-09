@@ -116,7 +116,7 @@ bool Level::IsPlayerDead() const
 	if (!player)
 		return true;
 
-	if (HealthComponent* health = player->myHealthComponent)
+	if (HealthComponent* health = player->GetComponent<HealthComponent>())
 		return health->IsDead();
 
 	return true;

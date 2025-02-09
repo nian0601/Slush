@@ -30,8 +30,8 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 
 		Normalize(myDirection);
 
-		if (myEntity.myPhysicsComponent)
-			myEntity.myPhysicsComponent->myObject->myVelocity = myDirection * mySpeed;
+		if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
+			phys->myObject->myVelocity = myDirection * mySpeed;
 
 		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
 			anim->PlayDash(myEntity.myPosition + myDirection * 500.f);

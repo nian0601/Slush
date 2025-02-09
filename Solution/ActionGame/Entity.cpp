@@ -31,8 +31,6 @@ Entity::~Entity()
 {
 	myComponents.DeleteAll();
 
-	FW_SAFE_DELETE(myHealthComponent);
-	FW_SAFE_DELETE(myPhysicsComponent);
 	FW_SAFE_DELETE(myRemoveOnCollisionComponent);
 	FW_SAFE_DELETE(myTargetingComponent);
 	FW_SAFE_DELETE(myWeaponComponent);
@@ -53,9 +51,6 @@ void Entity::Update()
 {
 	for (Component* component : myPackedComponents)
 		component->Update();
-
-	if (myPhysicsComponent)
-		myPhysicsComponent->Update();
 
 	if (myTargetingComponent)
 		myTargetingComponent->Update();
@@ -138,10 +133,18 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 	}
 
 	if (aPrefab.myHealth.myEnabled)
-		myHealthComponent = new HealthComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<HealthComponent>();
+		myComponents[index] = new HealthComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myPhysics.myEnabled)
-		myPhysicsComponent = new PhysicsComponent(*this, aPrefab, aPhysicsWorld);
+	{
+		int index = FW_TypeID<Component>::GetID<PhysicsComponent>();
+		myComponents[index] = new PhysicsComponent(*this, aPrefab, aPhysicsWorld);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myRemoveOnCollision.myEnabled)
 		myRemoveOnCollisionComponent = new RemoveOnCollisionComponent(*this, aPrefab);

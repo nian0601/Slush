@@ -43,6 +43,7 @@ EntityPrefab::EntityPrefab(const char* aName)
 	, myPickup("pickup")
 	, myStats("stats")
 	, myDamageDealer("damagedealer")
+	, myHealthBar("healthbar")
 {
 }
 
@@ -70,6 +71,7 @@ void EntityPrefab::OnParse(Slush::AssetParser::Handle aRootHandle)
 	myPickup.Parse(aRootHandle);
 	myStats.Parse(aRootHandle);
 	myDamageDealer.Parse(aRootHandle);
+	myHealthBar.Parse(aRootHandle);
 }
 
 void EntityPrefab::BuildUI()
@@ -206,6 +208,11 @@ void EntityPrefab::BuildUI()
 		ImGui::SetNextItemWidth(100.f);
 		ImGui::InputInt("Damage", &myDamageDealer.myDamage);
 
+		ImGui::Unindent();
+	}
+
+	if (BaseComponentUI(myHealthBar.myEnabled, "HealthBar", missingComponents))
+	{
 		ImGui::Unindent();
 	}
 

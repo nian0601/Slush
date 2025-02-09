@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EntityComponentEvents.h"
+
 class Entity;
 class EntityPrefab;
 

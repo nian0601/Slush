@@ -18,6 +18,7 @@ class ExperienceComponent;
 class PickupComponent;
 class StatsComponent;
 class DamageDealerComponent;
+class HealthBarComponent;
 
 class EntityManager;
 class EntityPrefab;
@@ -67,6 +68,7 @@ public:
 	PickupComponent* myPickupComponent = nullptr;
 	StatsComponent* myStatsComponent = nullptr;
 	DamageDealerComponent* myDamageDealerComponent = nullptr;
+	HealthBarComponent* myHealthBarComponent = nullptr;
 
 	Vector2f myPosition;
 	Type myType = ENVIRONMENT;

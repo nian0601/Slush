@@ -149,4 +149,5 @@ public:
 	ComponentData myPickup;
 	StatsComponent myStats;
 	DamageDealer myDamageDealer;
+	ComponentData myHealthBar;
 };

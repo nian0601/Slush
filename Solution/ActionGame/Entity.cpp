@@ -18,6 +18,7 @@
 #include "TargetingComponent.h"
 #include "WeaponComponent.h"
 #include "DamageDealerComponent.h"
+#include "HealthBarComponent.h"
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
@@ -40,6 +41,7 @@ Entity::~Entity()
 	FW_SAFE_DELETE(myPickupComponent);
 	FW_SAFE_DELETE(myStatsComponent);
 	FW_SAFE_DELETE(myDamageDealerComponent);
+	FW_SAFE_DELETE(myHealthBarComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -71,11 +73,11 @@ void Entity::Render()
 	if (mySpriteComponent)
 		mySpriteComponent->Render();
 
-	if (myHealthComponent)
-		myHealthComponent->Render();
-
 	if (myExperienceComponent)
 		myExperienceComponent->Render();
+
+	if (myHealthBarComponent)
+		myHealthBarComponent->Render();
 }
 
 void Entity::OnCollision(Entity& aOtherEntity)
@@ -139,4 +141,7 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 
 	if (aPrefab.myDamageDealer.myEnabled)
 		myDamageDealerComponent = new DamageDealerComponent(*this, aPrefab);
+
+	if (aPrefab.myHealthBar.myEnabled)
+		myHealthBarComponent = new HealthBarComponent(*this, aPrefab);
 }

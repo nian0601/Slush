@@ -13,19 +13,16 @@ class HealthComponent : public Component
 {
 public:
 	HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
-	~HealthComponent();
-
-	void Render();
 
 	void SetMaxHealth(int aHealth);
 	void DealDamage(int aDamageAmount);
 
 	bool IsDead() const { return myCurrentHealth <= 0; }
 
-private:
-	Slush::RectSprite* myBackground;
-	Slush::RectSprite* myForeground;
+	int GetCurrentHealth() const { return myCurrentHealth; }
+	int GetMaxHealth() const { return myMaxHealth; }
 
+private:
 	int myMaxHealth = 10;
 	int myCurrentHealth = 10;
 

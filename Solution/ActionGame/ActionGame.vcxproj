@@ -143,6 +143,7 @@
     <ClCompile Include="EntityPrefab.cpp" />
     <ClCompile Include="EntityPrefabDockable.cpp" />
     <ClCompile Include="ExperienceComponent.cpp" />
+    <ClCompile Include="HealthBarComponent.cpp" />
     <ClCompile Include="HealthComponent.cpp" />
     <ClCompile Include="Level.cpp" />
     <ClCompile Include="main.cpp" />
@@ -167,11 +168,13 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="DamageDealerComponent.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityComponentEvents.h" />
     <ClInclude Include="EntityHandle.h" />
     <ClInclude Include="EntityManager.h" />
     <ClInclude Include="EntityPrefab.h" />
     <ClInclude Include="EntityPrefabDockable.h" />
     <ClInclude Include="ExperienceComponent.h" />
+    <ClInclude Include="HealthBarComponent.h" />
     <ClInclude Include="HealthComponent.h" />
     <ClInclude Include="Level.h" />
     <ClInclude Include="NPCControllerComponent.h" />

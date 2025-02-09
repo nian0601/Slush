@@ -156,6 +156,54 @@ void EntityPrefab::BuildMissingComponentsUI(const FW_GrowingArray<MissingCompone
 	}
 }
 
+const EntityPrefab::Sprite& EntityPrefab::GetSpriteData() const
+{
+	const ComponentData* data = GetComponentData<SpriteComponent>();
+	return static_cast<const Sprite&>(*data);
+}
+
+const EntityPrefab::ProjectileShooting& EntityPrefab::GetProjectileShootingData() const
+{
+	const ComponentData* data = GetComponentData<ProjectileShootingComponent>();
+	return static_cast<const ProjectileShooting&>(*data);
+}
+
+const EntityPrefab::Health& EntityPrefab::GetHealthData() const
+{
+	const ComponentData* data = GetComponentData<HealthComponent>();
+	return static_cast<const Health&>(*data);
+}
+
+const EntityPrefab::Physics& EntityPrefab::GetPhysicsData() const
+{
+	const ComponentData* data = GetComponentData<PhysicsComponent>();
+	return static_cast<const Physics&>(*data);
+}
+
+const EntityPrefab::Targeting& EntityPrefab::GetTargetingData() const
+{
+	const ComponentData* data = GetComponentData<TargetingComponent>();
+	return static_cast<const Targeting&>(*data);
+}
+
+const EntityPrefab::Weapon& EntityPrefab::GetWeaponData() const
+{
+	const ComponentData* data = GetComponentData<WeaponComponent>();
+	return static_cast<const Weapon&>(*data);
+}
+
+const EntityPrefab::Stats& EntityPrefab::GetStatsData() const
+{
+	const ComponentData* data = GetComponentData<StatsComponent>();
+	return static_cast<const Stats&>(*data);
+}
+
+const EntityPrefab::DamageDealer& EntityPrefab::GetDamageDealerData() const
+{
+	const ComponentData* data = GetComponentData<DamageDealerComponent>();
+	return static_cast<const DamageDealer&>(*data);
+}
+
 void EntityPrefab::Sprite::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseFloatField("radius", myRadius);

@@ -145,6 +145,21 @@ public:
 		int myBaseDamage = 10;
 	};
 
+	template <typename ComponentType>
+	bool Has() const;
+
+	template <typename ComponentType>
+	const ComponentData* GetComponentData() const;
+
+	const Sprite& GetSpriteData() const;
+	const ProjectileShooting& GetProjectileShootingData() const;
+	const Health& GetHealthData() const;
+	const Physics& GetPhysicsData() const;
+	const Targeting& GetTargetingData() const;
+	const Weapon& GetWeaponData() const;
+	const Stats& GetStatsData() const;
+	const DamageDealer& GetDamageDealerData() const;
+
 	FW_String myName;
 	int myEntityType;
 
@@ -166,3 +181,21 @@ public:
 
 	FW_StaticArray<ComponentData*, 32> myComponentDatas;
 };
+
+template <typename ComponentType>
+bool EntityPrefab::Has() const
+{
+	unsigned int id = GetComponentID<ComponentType>();
+	ComponentData* data = myComponentDatas[id];
+	if (!data)
+		return false;
+
+	return data->myEnabled;
+}
+
+template <typename ComponentType>
+const EntityPrefab::ComponentData* EntityPrefab::GetComponentData() const
+{
+	unsigned int id = GetComponentID<ComponentType>();
+	return myComponentDatas[id];
+}

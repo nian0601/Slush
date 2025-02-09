@@ -39,7 +39,7 @@ void ProjectileShooter::ShootProjectile(const Vector2f& aDirection)
 	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myProjectilePrefab.GetBuffer());
 	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myBaseProjectileSpeed;
 
-	if (DamageDealerComponent* projDamage = projectile->myDamageDealerComponent)
+	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
 		int damage = myBaseDamage;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())

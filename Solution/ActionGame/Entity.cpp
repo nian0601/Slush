@@ -30,9 +30,6 @@ Entity::Entity(EntityManager& aEntityManager)
 Entity::~Entity()
 {
 	myComponents.DeleteAll();
-
-	FW_SAFE_DELETE(myDamageDealerComponent);
-	FW_SAFE_DELETE(myHealthBarComponent);
 }
 
 void Entity::PrePhysicsUpdate()
@@ -51,18 +48,12 @@ void Entity::Render()
 {
 	for (Component* component : myPackedComponents)
 		component->Render();
-
-	if (myHealthBarComponent)
-		myHealthBarComponent->Render();
 }
 
 void Entity::OnCollision(Entity& aOtherEntity)
 {
 	for (Component* component : myPackedComponents)
 		component->OnCollision(aOtherEntity);
-
-	if (myDamageDealerComponent)
-		myDamageDealerComponent->OnCollision(aOtherEntity);
 }
 
 void Entity::OnDeath()
@@ -168,8 +159,16 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 	}
 
 	if (aPrefab.myDamageDealer.myEnabled)
-		myDamageDealerComponent = new DamageDealerComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<DamageDealerComponent>();
+		myComponents[index] = new DamageDealerComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 
 	if (aPrefab.myHealthBar.myEnabled)
-		myHealthBarComponent = new HealthBarComponent(*this, aPrefab);
+	{
+		int index = FW_TypeID<Component>::GetID<HealthBarComponent>();
+		myComponents[index] = new HealthBarComponent(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 }

@@ -62,9 +62,6 @@ public:
 	template <typename ComponentType>
 	const ComponentType* GetComponent() const;
 
-	DamageDealerComponent* myDamageDealerComponent = nullptr;
-	HealthBarComponent* myHealthBarComponent = nullptr;
-
 	FW_StaticArray<Component*, 32> myComponents;
 
 	Vector2f myPosition;

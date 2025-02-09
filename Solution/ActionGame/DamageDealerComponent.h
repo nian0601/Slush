@@ -7,7 +7,7 @@ class DamageDealerComponent : public Component
 public:
 	DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
-	void OnCollision(Entity& aOtherEntity);
+	void OnCollision(Entity& aOtherEntity) override;
 
 	void SetDamage(int aDamage) { myDamage = aDamage; }
 

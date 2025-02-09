@@ -45,8 +45,8 @@ void HealthComponent::DealDamage(int aDamageAmount)
 	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
 		anim->PlayBlink();
 
-	if (myEntity.myHealthBarComponent)
-		myEntity.myHealthBarComponent->OnDamageTaken(damageTaken);
+	if (HealthBarComponent* healthBar = myEntity.GetComponent<HealthBarComponent>())
+		healthBar->OnDamageTaken(damageTaken);
 
 	if (IsDead())
 	{

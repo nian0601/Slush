@@ -15,7 +15,7 @@ public:
 	HealthBarComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~HealthBarComponent();
 
-	void Render();
+	void Render() override;
 
 	void OnDamageTaken(const EntityDamageTakenEvent& anEvent);
 

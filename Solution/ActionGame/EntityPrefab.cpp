@@ -81,7 +81,7 @@ void EntityPrefab::OnParse(Slush::AssetParser::Handle aRootHandle)
 	{
 		int entityTypeAsInt = myEntityType;
 		entityTypeHandle.ParseIntField("type", entityTypeAsInt);
-		myEntityType = Entity::Type(entityTypeAsInt);
+		myEntityType = EntityType(entityTypeAsInt);
 	}
 
 	for (ComponentData* data : myComponentDatas)
@@ -264,7 +264,7 @@ void EntityPrefab::Targeting::OnParse(Slush::AssetParser::Handle aComponentHandl
 {
 	int targetTypeAsInt = myTargetType;
 	aComponentHandle.ParseIntField("targettype", targetTypeAsInt);
-	myTargetType = Entity::Type(targetTypeAsInt);
+	myTargetType = EntityType(targetTypeAsInt);
 }
 
 void EntityPrefab::Targeting::OnBuildUI()
@@ -272,7 +272,7 @@ void EntityPrefab::Targeting::OnBuildUI()
 	int type = myTargetType;
 	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
 	ImGui::Combo("Target Type", &type, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
-	myTargetType = Entity::Type(type);
+	myTargetType = EntityType(type);
 }
 
 void EntityPrefab::Stats::OnParse(Slush::AssetParser::Handle aComponentHandle)

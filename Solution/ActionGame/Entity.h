@@ -5,6 +5,7 @@
 #include "EntityHandle.h"
 #include "Component.h"
 #include <FW_TypeID.h>
+#include "EntityPrefab.h"
 
 class SpriteComponent;
 class AnimationComponent;
@@ -23,7 +24,6 @@ class DamageDealerComponent;
 class HealthBarComponent;
 
 class EntityManager;
-class EntityPrefab;
 
 namespace Slush
 {
@@ -35,16 +35,6 @@ class Entity
 	friend class EntityManager;
 public:
 	~Entity();
-
-	enum Type
-	{
-		ENVIRONMENT,
-		PLAYER,
-		NPC,
-		PLAYER_PROJECTILE,
-		NPC_PROJECTILE,
-		PICKUP,
-	};
 
 	void PrePhysicsUpdate();
 	void Update();
@@ -64,7 +54,7 @@ public:
 
 
 	Vector2f myPosition;
-	Type myType = ENVIRONMENT;
+	EntityType myType = ENVIRONMENT;
 	bool myIsMarkedForRemoval = false;
 	EntityHandle myHandle;
 	EntityManager& myEntityManager;
@@ -79,6 +69,9 @@ private:
 	FW_GrowingArray<Component*> myPackedComponents;
 
 	void CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld);
+
+	template <typename ComponentType>
+	void CreateComponent(const EntityPrefab& aPrefab);
 };
 
 template <typename ComponentType>
@@ -95,4 +88,15 @@ inline const ComponentType* Entity::GetComponent() const
 	unsigned int id = FW_TypeID<Component>::GetID<ComponentType>();
 	FW_ASSERT(id < 32, "Too many ComponentTypes");
 	return static_cast<const ComponentType*>(myComponents[id]);
+}
+
+template <typename ComponentType>
+inline void Entity::CreateComponent(const EntityPrefab& aPrefab)
+{
+	if (aPrefab.Has<ComponentType>())
+	{
+		int index = GetComponentID<ComponentType>();
+		myComponents[index] = new ComponentType(*this, aPrefab);
+		myPackedComponents.Add(myComponents[index]);
+	}
 }

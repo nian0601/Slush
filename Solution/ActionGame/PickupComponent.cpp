@@ -6,7 +6,7 @@
 
 void PickupComponent::OnCollision(Entity& aOtherEntity)
 {
-	if (aOtherEntity.myType == Entity::PLAYER)
+	if (aOtherEntity.myType == EntityType::PLAYER)
 	{
 		myEntity.myIsMarkedForRemoval = true;
 

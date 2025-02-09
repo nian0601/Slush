@@ -38,7 +38,7 @@ void NPCWave::Update()
 void NPCWave::StartWave(int aNumberOfNPCs)
 {
 	FW_GrowingArray<EntityHandle> playerHandles;
-	myEntityManager.FindEntitiesOfType(Entity::PLAYER, playerHandles);
+	myEntityManager.FindEntitiesOfType(EntityType::PLAYER, playerHandles);
 
 	if (playerHandles.IsEmpty())
 	{

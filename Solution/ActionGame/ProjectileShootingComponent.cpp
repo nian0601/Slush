@@ -20,7 +20,7 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 	TriggerCooldown();
 
 	const char* prefab = "PlayerProjectile";
-	if (myEntity.myType == Entity::NPC)
+	if (myEntity.myType == EntityType::NPC)
 		prefab = "NPCProjectile";
 
 	const EntityPrefab::ProjectileShooting& shootingData = myEntityPrefab.GetProjectileShootingData();

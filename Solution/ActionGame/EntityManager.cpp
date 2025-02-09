@@ -52,7 +52,7 @@ Entity* EntityManager::CreateEmptyEntity()
 Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab)
 {
 	Entity* entity = CreateEmptyEntity();
-	entity->myType = static_cast<Entity::Type>(aPrefab.myEntityType);
+	entity->myType = static_cast<EntityType>(aPrefab.myEntityType);
 	entity->myPosition = aPosition;
 	entity->CreateComponents(aPrefab, myPhysicsWorld);
 
@@ -76,7 +76,7 @@ void EntityManager::DeleteAllEntities()
 	myEntities.DeleteAll();
 }
 
-void EntityManager::FindEntitiesOfType(Entity::Type aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const
+void EntityManager::FindEntitiesOfType(EntityType aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const
 {
 	for (Entity* entity : myEntities)
 	{

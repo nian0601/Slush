@@ -27,7 +27,7 @@ public:
 
 	void DeleteAllEntities();
 
-	void FindEntitiesOfType(Entity::Type aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const;
+	void FindEntitiesOfType(EntityType aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const;
 
 	void PrePhysicsUpdate();
 

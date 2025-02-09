@@ -22,7 +22,7 @@ void TargetingComponent::Update()
 	FW_GrowingArray<EntityHandle> targets;
 	myEntity.myEntityManager.FindEntitiesOfType(targetData.myTargetType, targets);
 
-	if (targetData.myTargetType == Entity::PLAYER)
+	if (targetData.myTargetType == EntityType::PLAYER)
 	{
 		if (!targets.IsEmpty())
 			myTarget = targets[0];

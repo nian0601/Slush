@@ -7,6 +7,16 @@
 #include <Core/Assets/AssetParser.h>
 #include <Core/Assets/DataAsset.h>
 
+enum EntityType
+{
+	ENVIRONMENT,
+	PLAYER,
+	NPC,
+	PLAYER_PROJECTILE,
+	NPC_PROJECTILE,
+	PICKUP,
+};
+
 class EntityPrefab : public Slush::DataAsset
 {
 private:
@@ -103,7 +113,7 @@ public:
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
-		Entity::Type myTargetType;
+		EntityType myTargetType;
 	};
 
 	struct Stats : public ComponentData

@@ -17,21 +17,21 @@ namespace
 		COL_PICKUP = 1 << 6
 	};
 
-	unsigned int GetCollisionFlag(Entity::Type anEntityType)
+	unsigned int GetCollisionFlag(EntityType anEntityType)
 	{
 		switch (anEntityType)
 		{
-		case Entity::ENVIRONMENT:
+		case EntityType::ENVIRONMENT:
 			return COL_ENVIRONMENT;
-		case Entity::PLAYER:
+		case EntityType::PLAYER:
 			return COL_PLAYER;
-		case Entity::NPC:
+		case EntityType::NPC:
 			return COL_NPC;
-		case Entity::PLAYER_PROJECTILE:
+		case EntityType::PLAYER_PROJECTILE:
 			return COL_PLAYER_PROJECTILE;
-		case Entity::NPC_PROJECTILE:
+		case EntityType::NPC_PROJECTILE:
 			return COL_NPC_PROJECTILE;
-		case Entity::PICKUP:
+		case EntityType::PICKUP:
 			return COL_PICKUP;
 		default:
 			FW_ASSERT_ALWAYS("Unhandled EntityType");
@@ -39,21 +39,21 @@ namespace
 		}
 	}
 
-	unsigned int GetCollidesWithFlag(Entity::Type anEntityType)
+	unsigned int GetCollidesWithFlag(EntityType anEntityType)
 	{
 		switch (anEntityType)
 		{
-		case Entity::ENVIRONMENT:
+		case EntityType::ENVIRONMENT:
 			return COL_PLAYER | COL_NPC | COL_PLAYER_PROJECTILE | COL_NPC_PROJECTILE;
-		case Entity::PLAYER:
+		case EntityType::PLAYER:
 			return COL_ENVIRONMENT | COL_NPC | COL_NPC_PROJECTILE | COL_PICKUP;
-		case Entity::NPC:
+		case EntityType::NPC:
 			return COL_ENVIRONMENT | COL_PLAYER | COL_PLAYER_PROJECTILE;
-		case Entity::PLAYER_PROJECTILE:
+		case EntityType::PLAYER_PROJECTILE:
 			return COL_ENVIRONMENT | COL_NPC;
-		case Entity::NPC_PROJECTILE:
+		case EntityType::NPC_PROJECTILE:
 			return COL_ENVIRONMENT | COL_PLAYER;
-		case Entity::PICKUP:
+		case EntityType::PICKUP:
 			return COL_PLAYER;
 		default:
 			FW_ASSERT_ALWAYS("Unhandled EntityType");

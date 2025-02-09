@@ -12,8 +12,8 @@ DamageDealerComponent::DamageDealerComponent(Entity& anEntity, const EntityPrefa
 
 void DamageDealerComponent::OnCollision(Entity& aOtherEntity)
 {
-	Entity::Type otherType = aOtherEntity.myType;
-	if (otherType == Entity::ENVIRONMENT)
+	EntityType otherType = aOtherEntity.myType;
+	if (otherType == EntityType::ENVIRONMENT)
 		return;
 
 	HealthComponent* otherHealth = aOtherEntity.GetComponent<HealthComponent>();

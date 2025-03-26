@@ -124,6 +124,15 @@ void EntityPrefab::BuildMissingComponentsUI(const FW_GrowingArray<MissingCompone
 	}
 }
 
+bool EntityPrefab::Has(int aComponentID) const
+{
+	ComponentData* data = myComponentDatas[aComponentID];
+	if (!data)
+		return false;
+
+	return data->myEnabled;
+}
+
 const EntityPrefab::Sprite& EntityPrefab::GetSpriteData() const
 {
 	const ComponentData* data = GetComponentData<SpriteComponent>();

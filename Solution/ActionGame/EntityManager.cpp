@@ -3,29 +3,49 @@
 #include "EntityManager.h"
 #include "EntityPrefab.h"
 
+#include "ComponentRegistry.h"
+
 #include "FW_TypeID.h"
 
 #include "Component.h"
+
+#include "AnimationComponent.h"
+#include "ExperienceComponent.h"
+#include "HealthComponent.h"
+#include "NPCControllerComponent.h"
+#include "PhysicsComponent.h"
+#include "PickupComponent.h"
+#include "PlayerControllerComponent.h"
+#include "ProjectileShootingComponent.h"
+#include "RemoveOnCollisionComponent.h"
+#include "SpriteComponent.h"
+#include "StatsComponent.h"
+#include "TargetingComponent.h"
+#include "WeaponComponent.h"
+#include "DamageDealerComponent.h"
+#include "HealthBarComponent.h"
+
 
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
 	: myPrefabStorage(aPrefabStorage)
 	, myPhysicsWorld(aPhysicsWorld)
 {
-	FW_TypeID<Component>::GetID<SpriteComponent>();
-	FW_TypeID<Component>::GetID<AnimationComponent>();
-	FW_TypeID<Component>::GetID<ProjectileShootingComponent>();
-	FW_TypeID<Component>::GetID<HealthComponent>();
-	FW_TypeID<Component>::GetID<PlayerControllerComponent>();
-	FW_TypeID<Component>::GetID<NPCControllerComponent>();
-	FW_TypeID<Component>::GetID<PhysicsComponent>();
-	FW_TypeID<Component>::GetID<RemoveOnCollisionComponent>();
-	FW_TypeID<Component>::GetID<TargetingComponent>();
-	FW_TypeID<Component>::GetID<WeaponComponent>();
-	FW_TypeID<Component>::GetID<ExperienceComponent>();
-	FW_TypeID<Component>::GetID<PickupComponent>();
-	FW_TypeID<Component>::GetID<StatsComponent>();
-	FW_TypeID<Component>::GetID<DamageDealerComponent>();
-	FW_TypeID<Component>::GetID<HealthBarComponent>();
+	ComponentRegistry& registry = ComponentRegistry::GetInstance();
+	registry.RegisterComponent<SpriteComponent>("sprite");
+	registry.RegisterComponent<AnimationComponent>("animation");
+	registry.RegisterComponent<ProjectileShootingComponent>("projectileshooting");
+	registry.RegisterComponent<HealthComponent>("playercontroller");
+	registry.RegisterComponent<PlayerControllerComponent>("npccontroller");
+	registry.RegisterComponent<NPCControllerComponent>("health");
+	registry.RegisterComponent<PhysicsComponent>("physics");
+	registry.RegisterComponent<RemoveOnCollisionComponent>("removeoncollision");
+	registry.RegisterComponent<TargetingComponent>("targeting");
+	registry.RegisterComponent<WeaponComponent>("weaponcomponent");
+	registry.RegisterComponent<ExperienceComponent>("experience");
+	registry.RegisterComponent<PickupComponent>("pickup");
+	registry.RegisterComponent<StatsComponent>("stats");
+	registry.RegisterComponent<DamageDealerComponent>("damagedealer");
+	registry.RegisterComponent<HealthBarComponent>("healthbar");
 }
 
 EntityManager::~EntityManager()

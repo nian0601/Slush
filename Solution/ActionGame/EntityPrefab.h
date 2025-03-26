@@ -158,6 +158,8 @@ public:
 	template <typename ComponentType>
 	bool Has() const;
 
+	bool Has(int aComponentID) const;
+
 	template <typename ComponentType>
 	const ComponentData* GetComponentData() const;
 
@@ -180,11 +182,7 @@ template <typename ComponentType>
 bool EntityPrefab::Has() const
 {
 	unsigned int id = GetComponentID<ComponentType>();
-	ComponentData* data = myComponentDatas[id];
-	if (!data)
-		return false;
-
-	return data->myEnabled;
+	return Has(id);
 }
 
 template <typename ComponentType>

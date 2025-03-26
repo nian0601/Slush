@@ -31,3 +31,5 @@ unsigned int GetComponentID()
 {
 	return FW_TypeID<Component>::GetID<ComponentType>();
 }
+
+#define MAX_COMPONENTS 32

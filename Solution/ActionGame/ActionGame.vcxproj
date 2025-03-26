@@ -137,6 +137,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimationComponent.cpp" />
+    <ClCompile Include="ComponentRegistry.cpp" />
     <ClCompile Include="DamageDealerComponent.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="EntityManager.cpp" />
@@ -166,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="AnimationComponent.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ComponentRegistry.h" />
     <ClInclude Include="DamageDealerComponent.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="EntityComponentEvents.h" />

@@ -18,7 +18,7 @@ namespace Slush
 class EntityManager
 {
 public:
-	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld);
+	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage);
 	~EntityManager();
 
 	Entity* CreateEmptyEntity();
@@ -45,5 +45,4 @@ private:
 	FW_GrowingArray<Entity*> myAddQueue;
 
 	Slush::AssetStorage<EntityPrefab>& myPrefabStorage;
-	Slush::PhysicsWorld& myPhysicsWorld;
 };

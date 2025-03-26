@@ -4,6 +4,7 @@
 #include "PhysicsComponent.h"
 
 #include <Physics\PhysicsWorld.h>
+#include "ActionGameGlobals.h"
 
 namespace
 {
@@ -62,9 +63,9 @@ namespace
 	}
 }
 
-PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld)
+PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab)
 	: Component(aEntity, anEntityPrefab)
-	, myPhysicsWorld(aPhysicsWorld)
+	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
 {
 	const EntityPrefab::Physics& physData = anEntityPrefab.GetPhysicsData();
 
@@ -102,7 +103,7 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 		myObject->myCollidesWithMask = GetCollidesWithFlag(aEntity.myType);
 		myObject->myReportCollisionsWith = myObject->myCollidesWithMask;
 
-		aPhysicsWorld.AddObject(myObject);
+		myPhysicsWorld.AddObject(myObject);
 
 		if (physData.myStatic)
 			myObject->MakeStatic();

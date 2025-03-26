@@ -17,7 +17,7 @@ namespace Slush
 class Level
 {
 public:
-	Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld, Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts);
+	Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts);
 	~Level();
 
 	void Update();

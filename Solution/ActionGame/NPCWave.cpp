@@ -5,10 +5,11 @@
 #include "NPCControllerComponent.h"
 #include "NPCWave.h"
 #include "ProjectileShootingComponent.h"
+#include "ActionGameGlobals.h"
 
-NPCWave::NPCWave(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld)
-	: myEntityManager(aEntityManager)
-	, myPhysicsWorld(aPhysicsWorld)
+NPCWave::NPCWave()
+	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
+	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
 {
 	myWaveTimer.Start(1.f);
 }

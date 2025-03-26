@@ -68,7 +68,7 @@ private:
 	// Guaranteed to not contain any nullptrs, but will not store components sorted by TypeID
 	FW_GrowingArray<Component*> myPackedComponents;
 
-	void CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld);
+	void CreateComponents(const EntityPrefab& aPrefab);
 
 	template <typename ComponentType>
 	void CreateComponent(const EntityPrefab& aPrefab);

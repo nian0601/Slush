@@ -65,7 +65,7 @@ void Entity::OnDeath()
 		myEntityManager.CreateEntity(myPosition, "ExpPickup");
 }
 
-void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& aPhysicsWorld)
+void Entity::CreateComponents(const EntityPrefab& aPrefab)
 {
 	CreateComponent<SpriteComponent>(aPrefab);
 	CreateComponent<AnimationComponent>(aPrefab);
@@ -73,15 +73,7 @@ void Entity::CreateComponents(const EntityPrefab& aPrefab, Slush::PhysicsWorld& 
 	CreateComponent<PlayerControllerComponent>(aPrefab);
 	CreateComponent<NPCControllerComponent>(aPrefab);
 	CreateComponent<HealthComponent>(aPrefab);
-
-
-	if (aPrefab.Has<PhysicsComponent>())
-	{
-		int index = GetComponentID<PhysicsComponent>();
-		myComponents[index] = new PhysicsComponent(*this, aPrefab, aPhysicsWorld);
-		myPackedComponents.Add(myComponents[index]);
-	}
-
+	CreateComponent<PhysicsComponent>(aPrefab);
 	CreateComponent<RemoveOnCollisionComponent>(aPrefab);
 	CreateComponent<TargetingComponent>(aPrefab);
 	CreateComponent<WeaponComponent>(aPrefab);

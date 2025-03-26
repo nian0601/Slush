@@ -6,19 +6,20 @@
 #include "Level.h"
 #include "NPCWave.h"
 #include "StatsComponent.h"
+#include "ActionGameGlobals.h"
 
 #include <Core\Input.h>
 #include <UI\UIManager.h>
 #include <UI\UIButton.h>
 
-Level::Level(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld, Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts)
-	: myEntityManager(aEntityManager)
-	, myPhysicsWorld(aPhysicsWorld)
+Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts)
+	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
+	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
 {
 	Entity* player = myEntityManager.CreateEntity({ 400.f, 400.f }, "Player");
 	myPlayerHandle = player->myHandle;
 
-	myNPCWave = new NPCWave(myEntityManager, myPhysicsWorld);
+	myNPCWave = new NPCWave();
 
 	myUIManager = new Slush::UIManager(aFont);
 	myUIManager->SetLayout(someUILayouts.GetAsset("LevelUp"));

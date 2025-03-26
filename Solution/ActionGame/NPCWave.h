@@ -16,7 +16,7 @@ namespace Slush
 class NPCWave
 {
 public:
-	NPCWave(EntityManager& aEntityManager, Slush::PhysicsWorld& aPhysicsWorld);
+	NPCWave();
 
 	void Update();
 

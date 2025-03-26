@@ -65,6 +65,7 @@
     <ClCompile Include="ComponentRegistry.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="ActionGameGlobals.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -139,6 +140,7 @@
     <ClInclude Include="ComponentRegistry.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="ActionGameGlobals.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

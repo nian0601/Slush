@@ -136,6 +136,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionGameGlobals.cpp" />
     <ClCompile Include="AnimationComponent.cpp" />
     <ClCompile Include="ComponentRegistry.cpp" />
     <ClCompile Include="DamageDealerComponent.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="WeaponComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ActionGameGlobals.h" />
     <ClInclude Include="AnimationComponent.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ComponentRegistry.h" />

@@ -15,7 +15,7 @@ class EntityPrefab;
 class PhysicsComponent : public Component
 {
 public:
-	PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab, Slush::PhysicsWorld& aPhysicsWorld);
+	PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab);
 	~PhysicsComponent();
 
 	void Update() override;

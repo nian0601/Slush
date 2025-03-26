@@ -26,9 +26,8 @@
 #include "HealthBarComponent.h"
 
 
-EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage, Slush::PhysicsWorld& aPhysicsWorld)
+EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
 	: myPrefabStorage(aPrefabStorage)
-	, myPhysicsWorld(aPhysicsWorld)
 {
 	ComponentRegistry& registry = ComponentRegistry::GetInstance();
 	registry.RegisterComponent<SpriteComponent>("sprite");
@@ -74,7 +73,7 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 	Entity* entity = CreateEmptyEntity();
 	entity->myType = static_cast<EntityType>(aPrefab.myEntityType);
 	entity->myPosition = aPosition;
-	entity->CreateComponents(aPrefab, myPhysicsWorld);
+	entity->CreateComponents(aPrefab);
 
 	return entity;
 }

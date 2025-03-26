@@ -35,6 +35,8 @@
 
 #include "Level.h"
 
+#include "ActionGameGlobals.h"
+
 class App : public Slush::IApp
 {
 public:
@@ -49,7 +51,10 @@ public:
 	void Initialize() override
 	{
 		myPhysicsWorld = new Slush::PhysicsWorld();
-		myEntityManager = new EntityManager(myEntityPrefabs, *myPhysicsWorld);
+		myEntityManager = new EntityManager(myEntityPrefabs);
+
+		ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);
+		ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
 
 		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
 		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/Textures", textureInfos);
@@ -89,6 +94,8 @@ public:
 		FW_SAFE_DELETE(myPhysicsWorld);
 		FW_SAFE_DELETE(myStartGameUIManager);
 		FW_SAFE_DELETE(myRestartGameUIManager);
+
+		ActionGameGlobals::Destroy();
 	}
 
 	void Update() override
@@ -173,7 +180,7 @@ public:
 			break;
 		}
 		case App::LOADING_LEVEL:
-			myLevel = new Level(*myEntityManager, *myPhysicsWorld, myFont, myUILayouts);
+			myLevel = new Level(myFont, myUILayouts);
 			myGameState = PLAYING;
 			break;
 		case App::PLAYING:

@@ -5,13 +5,13 @@ class Entity;
 class EntityHandle
 {
 	friend class EntityManager;
-public:
 	struct ProxyObject
 	{
 		Entity* myObject = nullptr;
 		int myRefCount = 0;
 	};
 
+public:
 	EntityHandle()
 		: myProxy(nullptr)
 	{}

@@ -25,6 +25,16 @@ class HealthBarComponent;
 
 class EntityManager;
 
+enum EntityType
+{
+	ENVIRONMENT,
+	PLAYER,
+	NPC,
+	PLAYER_PROJECTILE,
+	NPC_PROJECTILE,
+	PICKUP,
+};
+
 namespace Slush
 {
 	class PhysicsWorld;

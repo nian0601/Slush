@@ -15,6 +15,21 @@ class EntityPrefab;
 class PhysicsComponent : public Component
 {
 public:
+	struct Data : public Component::BaseData
+	{
+		Data();
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
+
+		bool myStatic = false;
+		bool mySensor = false;
+		bool myMatchSprite = true;
+		float myRadius = 10.f;
+		Vector2f mySize;
+	};
+
+public:
 	PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab);
 	~PhysicsComponent();
 

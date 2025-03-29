@@ -12,6 +12,18 @@ class EntityPrefab;
 class HealthComponent : public Component
 {
 public:
+	struct Data : public Component::BaseData
+	{
+		Data();
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
+
+		int myMaxHealth = 30;
+		float myGracePeriodDuration = 0.f;
+	};
+
+public:
 	HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
 	void SetMaxHealth(int aHealth);

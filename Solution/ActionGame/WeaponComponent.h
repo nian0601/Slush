@@ -6,7 +6,7 @@
 #include <FW_String.h>
 #include <FW_GrowingArray.h>
 
-
+class StatsComponent;
 class Weapon
 {
 public:
@@ -56,6 +56,19 @@ public:
 
 class WeaponComponent : public Component
 {
+public:
+	struct Data : public Component::BaseData
+	{
+		Data();
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
+
+		float myBaseCooldown = 1.f;
+		float myBaseProjectileSpeed = 750.f;
+		int myBaseDamage = 10;
+	};
+
 public:
 	WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~WeaponComponent();

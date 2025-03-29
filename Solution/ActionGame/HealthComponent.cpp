@@ -7,10 +7,28 @@
 
 #include <Graphics/RectSprite.h>
 
+HealthComponent::Data::Data()
+	: Component::BaseData("Health", "health")
+{}
+
+void HealthComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.ParseIntField("maxhealth", myMaxHealth);
+	aComponentHandle.ParseFloatField("graceperiodduration", myGracePeriodDuration);
+}
+
+void HealthComponent::Data::OnBuildUI()
+{
+	ImGui::InputInt("Max Health", &myMaxHealth);
+	ImGui::InputFloat("Grace Period Duration", &myGracePeriodDuration);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 HealthComponent::HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	const EntityPrefab::Health& healthData = anEntityPrefab.GetHealthData();
+	const Data& healthData = anEntityPrefab.GetHealthData();
 
 	SetMaxHealth(healthData.myMaxHealth);
 

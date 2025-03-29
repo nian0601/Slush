@@ -10,6 +10,21 @@ namespace Slush
 class SpriteComponent : public Component
 {
 public:
+	struct Data : public Component::BaseData
+	{
+		Data();
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
+
+		float myRadius = 10.f;
+		Vector2f mySize;
+		int myColor = 0xFFFF3399;
+
+		float myFloatColor[4] = { 1.f, 51.f / 255.f, 153.f / 255.f, 1.f };
+	};
+
+public:
 	SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~SpriteComponent();
 

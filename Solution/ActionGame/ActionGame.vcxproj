@@ -138,6 +138,7 @@
   <ItemGroup>
     <ClCompile Include="ActionGameGlobals.cpp" />
     <ClCompile Include="AnimationComponent.cpp" />
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentRegistry.cpp" />
     <ClCompile Include="DamageDealerComponent.cpp" />
     <ClCompile Include="Entity.cpp" />

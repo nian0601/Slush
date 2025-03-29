@@ -24,6 +24,6 @@ ComponentRegistry::ComponentRegistry()
 
 ComponentRegistry::~ComponentRegistry()
 {
-	//myComponentFactories.DeleteAll();
+	myComponentFactories.DeleteAll();
 }
 

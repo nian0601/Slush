@@ -4,6 +4,23 @@
 #include "EntityPrefab.h"
 #include "HealthComponent.h"
 
+DamageDealerComponent::Data::Data()
+	: Component::BaseData("Damage Dealer", "damagedealer")
+{}
+
+void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.ParseIntField("damage", myDamage);
+}
+
+void DamageDealerComponent::Data::OnBuildUI()
+{
+	ImGui::SetNextItemWidth(100.f);
+	ImGui::InputInt("Damage", &myDamage);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
 DamageDealerComponent::DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {

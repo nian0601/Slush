@@ -106,10 +106,34 @@ void SpreadShooter::OnActivate()
 
 //////////////////////////////////////////////////////////////////////////
 
+WeaponComponent::Data::Data()
+	: Component::BaseData("Weapon", "weaponcomponent")
+{}
+
+void WeaponComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.ParseFloatField("basecooldown", myBaseCooldown);
+	aComponentHandle.ParseFloatField("baseprojectilespeed", myBaseProjectileSpeed);
+	aComponentHandle.ParseIntField("basedamage", myBaseDamage);
+}
+
+void WeaponComponent::Data::OnBuildUI()
+{
+	ImGui::SetNextItemWidth(100.f);
+	ImGui::InputFloat("Base Cooldown", &myBaseCooldown, 0.05f, 0.1f, "%.2f");
+
+	ImGui::SetNextItemWidth(100.f);
+	ImGui::InputFloat("Base Projectile Speed", &myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
+
+	ImGui::SetNextItemWidth(100.f);
+	ImGui::InputInt("Base Damage", &myBaseDamage);
+}
+
+
 WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	const EntityPrefab::Weapon& weaponData = anEntityPrefab.GetWeaponData();
+	const Data& weaponData = anEntityPrefab.GetWeaponData();
 
 	LineShooter* lineShooter = new LineShooter(anEntity);
 	lineShooter->myProjectilePrefab = "PlayerProjectile";

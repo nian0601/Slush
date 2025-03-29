@@ -5,6 +5,24 @@
 class StatsComponent : public Component
 {
 public:
+	struct Data : public Component::BaseData
+	{
+		Data();
+
+		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnBuildUI() override;
+
+		int myMaxCooldownUpgrades = 5;
+		float myCooldownPerUpgrade = 0.2f;
+
+		int myMaxDamageUpgrades = 10;
+		float myDamagePerUpgrade = 1.f;
+
+		int myMaxAdditionalProjectileUpgrades = 3;
+		float myAdditionalProjectilesPerUpgrade = 1.f;
+	};
+
+public:
 	using Component::Component;
 
 	void AddCooldownReductionUpgrade();

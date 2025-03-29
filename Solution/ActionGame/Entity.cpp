@@ -20,6 +20,7 @@
 #include "DamageDealerComponent.h"
 #include "HealthBarComponent.h"
 #include <FW_TypeID.h>
+#include "ComponentRegistry.h"
 
 Entity::Entity(EntityManager& aEntityManager)
 	: myEntityManager(aEntityManager)
@@ -67,19 +68,13 @@ void Entity::OnDeath()
 
 void Entity::CreateComponents(const EntityPrefab& aPrefab)
 {
-	CreateComponent<SpriteComponent>(aPrefab);
-	CreateComponent<AnimationComponent>(aPrefab);
-	CreateComponent<ProjectileShootingComponent>(aPrefab);
-	CreateComponent<PlayerControllerComponent>(aPrefab);
-	CreateComponent<NPCControllerComponent>(aPrefab);
-	CreateComponent<HealthComponent>(aPrefab);
-	CreateComponent<PhysicsComponent>(aPrefab);
-	CreateComponent<RemoveOnCollisionComponent>(aPrefab);
-	CreateComponent<TargetingComponent>(aPrefab);
-	CreateComponent<WeaponComponent>(aPrefab);
-	CreateComponent<ExperienceComponent>(aPrefab);
-	CreateComponent<PickupComponent>(aPrefab);
-	CreateComponent<StatsComponent>(aPrefab);
-	CreateComponent<DamageDealerComponent>(aPrefab);
-	CreateComponent<HealthBarComponent>(aPrefab);
+	for (const IComponentFactory* factory : ComponentRegistry::GetInstance().GetFactories())
+	{
+		if (aPrefab.Has(factory->GetID()))
+		{
+			int index = factory->GetID();
+			myComponents[index] = factory->CreateComponent(*this, aPrefab);
+			myPackedComponents.Add(myComponents[index]);
+		}
+	}
 }

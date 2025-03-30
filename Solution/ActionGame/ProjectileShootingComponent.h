@@ -12,8 +12,6 @@ class ProjectileShootingComponent : public Component
 public:
 	struct Data : public Component::BaseData
 	{
-		Data();
-
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
@@ -23,6 +21,8 @@ public:
 	};
 
 public:
+	COMPONENT_HELPER("Projectile Shooting", "projectileshooting");
+
 	ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
 	void TryShoot(const Vector2f& aDirection);

@@ -6,10 +6,6 @@
 #include <Graphics/CircleSprite.h>
 #include <Graphics/RectSprite.h>
 
-SpriteComponent::Data::Data()
-	: Component::BaseData("Sprite", "sprite")
-{}
-
 void SpriteComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseFloatField("radius", myRadius);

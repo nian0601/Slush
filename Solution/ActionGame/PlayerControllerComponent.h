@@ -7,6 +7,8 @@
 class PlayerControllerComponent : public Component
 {
 public:
+	COMPONENT_HELPER("Player Controller", "playercontroller");
+
 	using Component::Component;
 
 	void PrePhysicsUpdate() override;

@@ -7,10 +7,6 @@
 
 #include <Physics\PhysicsWorld.h>
 
-ProjectileShootingComponent::Data::Data()
-	: BaseData("Projectile Shooting", "projectileshooting")
-{}
-
 void ProjectileShootingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseFloatField("cooldown", myCooldown);

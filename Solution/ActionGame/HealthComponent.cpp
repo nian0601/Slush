@@ -7,10 +7,6 @@
 
 #include <Graphics/RectSprite.h>
 
-HealthComponent::Data::Data()
-	: Component::BaseData("Health", "health")
-{}
-
 void HealthComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseIntField("maxhealth", myMaxHealth);

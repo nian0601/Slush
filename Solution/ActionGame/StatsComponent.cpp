@@ -3,10 +3,6 @@
 #include "EntityPrefab.h"
 #include "StatsComponent.h"
 
-StatsComponent::Data::Data()
-	: Component::BaseData("Stats", "stats")
-{}
-
 void StatsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseIntField("maxcooldownupgrades", myMaxCooldownUpgrades);

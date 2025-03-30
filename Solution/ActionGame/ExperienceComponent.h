@@ -11,6 +11,8 @@ class EntityPrefab;
 class ExperienceComponent : public Component
 {
 public:
+	COMPONENT_HELPER("Experience", "experience");
+
 	ExperienceComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~ExperienceComponent();
 

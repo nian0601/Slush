@@ -4,10 +4,6 @@
 #include "EntityPrefab.h"
 #include "HealthComponent.h"
 
-DamageDealerComponent::Data::Data()
-	: Component::BaseData("Damage Dealer", "damagedealer")
-{}
-
 void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseIntField("damage", myDamage);

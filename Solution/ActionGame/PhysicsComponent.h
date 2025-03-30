@@ -17,8 +17,6 @@ class PhysicsComponent : public Component
 public:
 	struct Data : public Component::BaseData
 	{
-		Data();
-
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
@@ -30,6 +28,8 @@ public:
 	};
 
 public:
+	COMPONENT_HELPER("Physics", "physics");
+
 	PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab);
 	~PhysicsComponent();
 

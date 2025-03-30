@@ -7,22 +7,30 @@ class IComponentFactory
 {
 public:
 	virtual Component* CreateComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab) const = 0;
+	virtual Component::BaseData* CreateComponentData() const = 0;
 	virtual unsigned int GetID() const = 0;
 };
 
-template <typename ComponentType>
+template <typename ComponentType, typename ComponentData>
 class ComponentFactory : public IComponentFactory
 {
 public:
-	ComponentFactory(const char* aComponentDataName)
+	ComponentFactory()
 	{
 		myComponentID = GetComponentID<ComponentType>();
-		myComponentDataName = aComponentDataName;
 	}
 
 	Component* CreateComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab) const override
 	{
 		return new ComponentType(anEntity, anEntityPrefab);
+	}
+
+	Component::BaseData* CreateComponentData() const override
+	{
+		Component::BaseData* data = new ComponentData();
+		data->myComponentLabel = ComponentType::GetComponentLabel();
+		data->myComponentDataName = ComponentType::GetComponentDataName();
+		return data;
 	}
 
 	unsigned int GetID() const override
@@ -32,7 +40,6 @@ public:
 
 private:
 	unsigned int myComponentID;
-	FW_String myComponentDataName;
 };
 
 class ComponentRegistry
@@ -42,7 +49,10 @@ public:
 	static void Destroy();
 
 	template <typename ComponentType>
-	void RegisterComponent(const char* aComponentDataName);
+	void RegisterComponent();
+
+	template <typename ComponentType, typename ComponentDataType>
+	void RegisterComponent();
 
 	const FW_GrowingArray<IComponentFactory*>& GetFactories() const { return myComponentFactories; }
 
@@ -52,12 +62,16 @@ private:
 	static ComponentRegistry* ourInstance;
 
 	FW_GrowingArray<IComponentFactory*> myComponentFactories;
-	//FW_StaticArray<IComponentFactory*, MAX_COMPONENTS> myComponentFactories;
 };
 
 template <typename ComponentType>
-inline void ComponentRegistry::RegisterComponent(const char* aComponentDataName)
+inline void ComponentRegistry::RegisterComponent()
 {
-	myComponentFactories.Add(new ComponentFactory<ComponentType>(aComponentDataName));
-	//myComponentFactories[GetComponentID<ComponentType>()] = new ComponentFactory<ComponentType>(aComponentDataName);
+	myComponentFactories.Add(new ComponentFactory<ComponentType, Component::BaseData>());
+}
+
+template <typename ComponentType, typename ComponentDataType>
+inline void ComponentRegistry::RegisterComponent()
+{
+	myComponentFactories.Add(new ComponentFactory<ComponentType, ComponentDataType>());
 }

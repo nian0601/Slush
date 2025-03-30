@@ -12,6 +12,8 @@ class EntityPrefab;
 class HealthBarComponent : public Component
 {
 public:
+	COMPONENT_HELPER("Health Bar", "healthbar");
+
 	HealthBarComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~HealthBarComponent();
 

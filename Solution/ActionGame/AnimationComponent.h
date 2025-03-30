@@ -14,6 +14,8 @@ class EntityPrefab;
 class AnimationComponent : public Component
 {
 public:
+	COMPONENT_HELPER("Animation", "animation");
+
 	AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~AnimationComponent();
 

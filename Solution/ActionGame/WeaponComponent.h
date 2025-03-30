@@ -59,8 +59,6 @@ class WeaponComponent : public Component
 public:
 	struct Data : public Component::BaseData
 	{
-		Data();
-
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
@@ -70,6 +68,8 @@ public:
 	};
 
 public:
+	COMPONENT_HELPER("Weapon", "weaponcomponent");
+
 	WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~WeaponComponent();
 

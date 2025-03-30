@@ -106,10 +106,6 @@ void SpreadShooter::OnActivate()
 
 //////////////////////////////////////////////////////////////////////////
 
-WeaponComponent::Data::Data()
-	: Component::BaseData("Weapon", "weaponcomponent")
-{}
-
 void WeaponComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseFloatField("basecooldown", myBaseCooldown);

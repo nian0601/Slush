@@ -10,10 +10,10 @@ namespace Slush
 class SpriteComponent : public Component
 {
 public:
+	COMPONENT_HELPER("Sprite", "sprite");
+
 	struct Data : public Component::BaseData
 	{
-		Data();
-
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 

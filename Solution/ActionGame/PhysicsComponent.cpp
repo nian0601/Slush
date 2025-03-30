@@ -63,10 +63,6 @@ namespace
 	}
 }
 
-PhysicsComponent::Data::Data()
-	: Component::BaseData("Physics", "physics")
-{}
-
 void PhysicsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseBoolField("isStatic", myStatic);

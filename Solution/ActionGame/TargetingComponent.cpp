@@ -8,10 +8,6 @@
 #include <Physics\PhysicsWorld.h>
 #include <float.h>
 
-TargetingComponent::Data::Data()
-	: Component::BaseData("Targeting", "targeting")
-{}
-
 void TargetingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	int targetTypeAsInt = myTargetType;

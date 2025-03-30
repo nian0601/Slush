@@ -29,9 +29,9 @@ public:
 
 	struct BaseData
 	{
-		BaseData(const char* aUIName, const char* aDataName)
-			: myComponentLabel(aUIName)
-			, myComponentDataName(aDataName)
+		BaseData()
+			: myComponentLabel("Unknown")
+			, myComponentDataName("UNKNOWN")
 		{}
 
 		void Parse(Slush::AssetParser::Handle aRootHandle);
@@ -41,8 +41,8 @@ public:
 		virtual void OnBuildUI() {};
 
 		bool myEnabled = false;
-		const char* myComponentDataName; // Used for seriallization, should not have any spaces
-		const char* myComponentLabel; // Used for UI-display, can be whatever
+		const char* myComponentDataName = nullptr; // Used for seriallization, should not have any spaces
+		const char* myComponentLabel = nullptr; // Used for UI-display, can be whatever
 	};
 };
 
@@ -53,3 +53,7 @@ unsigned int GetComponentID()
 }
 
 #define MAX_COMPONENTS 32
+
+#define COMPONENT_HELPER(Label, DataName) \
+static const char* GetComponentLabel() { return Label; }; \
+static const char* GetComponentDataName() { return DataName; };

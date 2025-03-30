@@ -30,21 +30,21 @@ EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
 	: myPrefabStorage(aPrefabStorage)
 {
 	ComponentRegistry& registry = ComponentRegistry::GetInstance();
-	registry.RegisterComponent<SpriteComponent>("sprite");
-	registry.RegisterComponent<AnimationComponent>("animation");
-	registry.RegisterComponent<ProjectileShootingComponent>("projectileshooting");
-	registry.RegisterComponent<HealthComponent>("playercontroller");
-	registry.RegisterComponent<PlayerControllerComponent>("npccontroller");
-	registry.RegisterComponent<NPCControllerComponent>("health");
-	registry.RegisterComponent<PhysicsComponent>("physics");
-	registry.RegisterComponent<RemoveOnCollisionComponent>("removeoncollision");
-	registry.RegisterComponent<TargetingComponent>("targeting");
-	registry.RegisterComponent<WeaponComponent>("weaponcomponent");
-	registry.RegisterComponent<ExperienceComponent>("experience");
-	registry.RegisterComponent<PickupComponent>("pickup");
-	registry.RegisterComponent<StatsComponent>("stats");
-	registry.RegisterComponent<DamageDealerComponent>("damagedealer");
-	registry.RegisterComponent<HealthBarComponent>("healthbar");
+	registry.RegisterComponent<SpriteComponent, SpriteComponent::Data>();
+	registry.RegisterComponent<AnimationComponent>();
+	registry.RegisterComponent<ProjectileShootingComponent, ProjectileShootingComponent::Data>();
+	registry.RegisterComponent<HealthComponent, HealthComponent::Data>();
+	registry.RegisterComponent<PlayerControllerComponent>();
+	registry.RegisterComponent<NPCControllerComponent>();
+	registry.RegisterComponent<PhysicsComponent, PhysicsComponent::Data>();
+	registry.RegisterComponent<RemoveOnCollisionComponent>();
+	registry.RegisterComponent<TargetingComponent, TargetingComponent::Data>();
+	registry.RegisterComponent<WeaponComponent, WeaponComponent::Data>();
+	registry.RegisterComponent<ExperienceComponent>();
+	registry.RegisterComponent<PickupComponent>();
+	registry.RegisterComponent<StatsComponent, StatsComponent::Data>();
+	registry.RegisterComponent<DamageDealerComponent, DamageDealerComponent::Data>();
+	registry.RegisterComponent<HealthBarComponent>();
 }
 
 EntityManager::~EntityManager()

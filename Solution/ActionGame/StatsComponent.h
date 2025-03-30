@@ -7,8 +7,6 @@ class StatsComponent : public Component
 public:
 	struct Data : public Component::BaseData
 	{
-		Data();
-
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
@@ -23,6 +21,8 @@ public:
 	};
 
 public:
+	COMPONENT_HELPER("Stats", "stats");
+
 	using Component::Component;
 
 	void AddCooldownReductionUpgrade();

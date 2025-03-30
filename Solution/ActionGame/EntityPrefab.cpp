@@ -3,6 +3,7 @@
 #include "EntityPrefab.h"
 
 #include <FW_FileSystem.h>
+#include "ComponentRegistry.h"
 
 void EntityPrefab::ComponentData::Parse(Slush::AssetParser::Handle aRootHandle)
 {
@@ -48,21 +49,8 @@ EntityPrefab::EntityPrefab(const char* aName)
 {
 	myComponentBaseDatas.Fill(nullptr);
 
-	myComponentBaseDatas[GetComponentID<SpriteComponent>()] = new SpriteComponent::Data();
-	myComponentBaseDatas[GetComponentID<AnimationComponent>()] = new Component::BaseData("Animation", "animation");
-	myComponentBaseDatas[GetComponentID<ProjectileShootingComponent>()] = new ProjectileShootingComponent::Data();
-	myComponentBaseDatas[GetComponentID<PlayerControllerComponent>()] = new Component::BaseData("Player Controller", "playercontroller");
-	myComponentBaseDatas[GetComponentID<NPCControllerComponent>()] = new Component::BaseData("NPC Controller", "npccontroller");
-	myComponentBaseDatas[GetComponentID<HealthComponent>()] = new HealthComponent::Data();
-	myComponentBaseDatas[GetComponentID<PhysicsComponent>()] = new PhysicsComponent::Data();
-	myComponentBaseDatas[GetComponentID<RemoveOnCollisionComponent>()] = new Component::BaseData("Remove On Collision", "removeoncollision");
-	myComponentBaseDatas[GetComponentID<TargetingComponent>()] = new TargetingComponent::Data();
-	myComponentBaseDatas[GetComponentID<WeaponComponent>()] = new WeaponComponent::Data();
-	myComponentBaseDatas[GetComponentID<ExperienceComponent>()] = new Component::BaseData("Experience", "experience");
-	myComponentBaseDatas[GetComponentID<PickupComponent>()] = new Component::BaseData("Pickup", "pickup");
-	myComponentBaseDatas[GetComponentID<StatsComponent>()] = new StatsComponent::Data();
-	myComponentBaseDatas[GetComponentID<DamageDealerComponent>()] = new DamageDealerComponent::Data();
-	myComponentBaseDatas[GetComponentID<HealthBarComponent>()] = new Component::BaseData("Health Bar", "healthbar");
+	for (const IComponentFactory* factory : ComponentRegistry::GetInstance().GetFactories())
+		myComponentBaseDatas[factory->GetID()] = factory->CreateComponentData();
 }
 
 EntityPrefab::~EntityPrefab()

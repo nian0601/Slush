@@ -12,10 +12,10 @@ class EntityPrefab;
 class HealthComponent : public Component
 {
 public:
+	COMPONENT_HELPER("Health", "health");
+
 	struct Data : public Component::BaseData
 	{
-		Data();
-
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 

@@ -30,6 +30,12 @@ namespace Slush
 			SLUSH_ERROR("Sprite: Invalid texture passed to SetTexture");
 	}
 
+	void BaseSprite::SetTextureRect(int x, int y, int aWidth, int aHeight)
+	{
+		sf::IntRect rect = { x, y, aWidth, aHeight };
+		myShape->setTextureRect(rect);
+	}
+
 	void BaseSprite::SetFillColor(int argb)
 	{
 		myFillColor = argb;

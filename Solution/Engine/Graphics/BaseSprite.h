@@ -14,6 +14,7 @@ namespace Slush
 		virtual ~BaseSprite();
 
 		void SetTexture(const Texture& aTexture);
+		void SetTextureRect(int x, int y, int aWidth, int aHeight);
 		void SetPosition(float x, float y);
 		void SetRotation(float aRadians);
 		void SetScale(float aScale);

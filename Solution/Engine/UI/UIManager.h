@@ -2,6 +2,9 @@
 
 namespace Slush
 {
+	// https://www.youtube.com/watch?v=DYWTw19_8r4&t=100s&ab_channel=NicBarker
+	// https://www.youtube.com/watch?v=by9lQvpvMIc&ab_channel=NicBarker
+
 	struct UILayout;
 
 	class UIWidget;

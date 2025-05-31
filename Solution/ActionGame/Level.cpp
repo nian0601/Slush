@@ -11,6 +11,7 @@
 #include <Core\Input.h>
 #include <UI\UIManager.h>
 #include <UI\UIButton.h>
+#include "Tilemap.h"
 
 Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts)
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
@@ -32,10 +33,13 @@ Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILay
 
 	if (Slush::UIWidget* button = myUIManager->FindWidget("ProjectileUpgrade"))
 		myProjectileUpgradeButton = static_cast<Slush::UIButton*>(button);
+
+	myTilemap = new Tilemap();
 }
 
 Level::~Level()
 {
+	FW_SAFE_DELETE(myTilemap);
 	FW_SAFE_DELETE(myUIManager);
 	FW_SAFE_DELETE(myNPCWave);
 	myEntityManager.DeleteAllEntities();
@@ -107,7 +111,12 @@ void Level::Update()
 	}
 }
 
-void Level::Render()
+void Level::RenderGame()
+{
+	myTilemap->Render();
+}
+
+void Level::RenderUI()
 {
 	if (myIsLevelingUp)
 		myUIManager->Render();

@@ -29,6 +29,12 @@ Slush::PhysicsWorld& ActionGameGlobals::GetPhysicsWorld()
 	return *myPhysicsWorld;
 }
 
+Slush::AssetStorage<Slush::Texture>& ActionGameGlobals::GetTextureStorage()
+{
+	FW_ASSERT(myTextureStorage != nullptr, "Neet to set a TextureStorage");
+	return *myTextureStorage;
+}
+
 ActionGameGlobals::ActionGameGlobals()
 {
 }
@@ -37,5 +43,6 @@ ActionGameGlobals::~ActionGameGlobals()
 {
 	myEntityManager = nullptr;
 	myPhysicsWorld = nullptr;
+	myTextureStorage = nullptr;
 }
 

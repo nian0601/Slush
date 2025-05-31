@@ -69,6 +69,7 @@
     <ClCompile Include="Component.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Tilemap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -144,6 +145,7 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="ActionGameGlobals.h" />
+    <ClInclude Include="Tilemap.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

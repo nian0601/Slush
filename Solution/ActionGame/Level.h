@@ -5,6 +5,7 @@
 
 class EntityManager;
 class NPCWave;
+class Tilemap;
 
 namespace Slush
 {
@@ -21,7 +22,9 @@ public:
 	~Level();
 
 	void Update();
-	void Render();
+
+	void RenderGame();
+	void RenderUI();
 
 	bool IsPlayerDead() const;
 	bool IsLevelingUp() const { return myIsLevelingUp; }
@@ -39,4 +42,6 @@ private:
 	Slush::UIButton* myCooldownUpgradeButton;
 	Slush::UIButton* myProjectileUpgradeButton;
 	Slush::UIManager* myUIManager;
+
+	Tilemap* myTilemap;
 };

@@ -55,14 +55,11 @@ public:
 
 		ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);
 		ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
-
-		FW_GrowingArray<FW_FileSystem::FileInfo> textureInfos;
-		FW_FileSystem::GetAllFilesFromRelativeDirectory("Data/Textures", textureInfos);
-
-		for (const FW_FileSystem::FileInfo& info : textureInfos)
-			myTextures.Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
+		ActionGameGlobals::GetInstance().SetTextureStorage(myTextures);
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
+
+		myTextures.LoadAllAssets();
 		myEntityPrefabs.LoadAllAssets();
 		myUILayouts.LoadAllAssets();
 
@@ -127,6 +124,9 @@ public:
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 		engine.GetWindow().StartOffscreenBuffer();
 
+		if (myLevel)
+			myLevel->RenderGame();
+
 		myEntityManager->Render();
 
 		switch (myGameState)
@@ -140,7 +140,7 @@ public:
 		}
 
 		if (myLevel)
-			myLevel->Render();
+			myLevel->RenderUI();
 
 		engine.GetWindow().EndOffscreenBuffer();
 	}

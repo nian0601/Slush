@@ -35,7 +35,8 @@ private:
 		Layer();
 		~Layer();
 
-		void SetupSprites(const Slush::Texture* aTexture, int aStartTextureTileX, int aStartTextureTileY);
+		void AddSprite(const Slush::Texture* aTexture, int aTileID, int aTextureTileX, int aTextureTileY);
+		void SetupGroundSprites(const Slush::Texture* aTexture, int aStartTextureTileX, int aStartTextureTileY);
 		void FillWith(int aTileType);
 		void CalculateSubTypes();
 
@@ -44,13 +45,13 @@ private:
 
 		int GetCornerBitValue(int x, int y) const;
 
-		FW_GrowingArray<int> myTiles; //0 or 1 based on if this Layer has a tile in that spot
-		FW_GrowingArray<int> myTilesSubType; //0-16 based on neighbouring tiles
+		FW_GrowingArray<int> myTiles;
+		FW_GrowingArray<int> myVisualTiles;
 		FW_StaticArray<Slush::RectSprite*, 16> myTileSprites;
 
 		int myTileSize = 48;
-		int myXCount = 32;
-		int myYCount = 16;
+		int myXCount = 1920 / 48;
+		int myYCount = 1080 / 48 +1;
 	};
 	FW_GrowingArray<Layer> myLayers;
 	bool myDisableSubTypes = false;

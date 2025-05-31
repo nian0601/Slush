@@ -13,21 +13,52 @@ Tilemap::Tilemap()
 	const Slush::Texture* groundTexture = textures.GetAsset("RA_Ground_Tiles");
 
 	Layer& grassLayer = myLayers.Add();
-	grassLayer.SetupSprites(groundTexture, 1, 1);
+	grassLayer.SetupGroundSprites(groundTexture, 1, 1);
 	grassLayer.FillWith(GRASS);
 	
 	Layer& dirtLayer = myLayers.Add();
-	dirtLayer.SetupSprites(groundTexture, 1, 9);
+	dirtLayer.SetupGroundSprites(groundTexture, 1, 9);
 	dirtLayer.FillWith(NONE);
 	
-	RandomMutation(dirtLayer, DIRT, 0.1f);
-	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 1, 3, 0.1f);
-	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 1, 3, 0.1f);
-	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 1, 3, 0.1f);
-	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 2, 7, 1.f);
+	RandomMutation(dirtLayer, DIRT, 0.1f); // Initial seeds
+	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 1, 3, 0.1f); // Grow initial seeds
+	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 2, 3, 0.25f); // Continue to grow pairs
+	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 4, 7, 1.f); // Fill in gaps in big groups
+	CelluarAutomataMutation(dirtLayer, DIRT, NONE, NONE, 4, 4, 1.f); // Remove any dirt with no dirt-neighbours
 
-	for (Layer& layer : myLayers)
-		layer.CalculateSubTypes();
+	grassLayer.CalculateSubTypes();
+	dirtLayer.CalculateSubTypes();
+
+	const Slush::Texture* cryptTexture = textures.GetAsset("RA_Crypt");
+	Layer& wallLayer = myLayers.Add();
+	wallLayer.FillWith(0);
+	wallLayer.AddSprite(cryptTexture, 1, 3, 8); // TopLeft
+	wallLayer.AddSprite(cryptTexture, 2, 4, 8); // Top
+	wallLayer.AddSprite(cryptTexture, 3, 4, 9); // Top2
+	wallLayer.AddSprite(cryptTexture, 4, 5, 8); // TopRight
+	wallLayer.AddSprite(cryptTexture, 5, 3, 9); // Left
+	wallLayer.AddSprite(cryptTexture, 6, 5, 9); // Right
+	wallLayer.AddSprite(cryptTexture, 7, 3, 11); // BottomLeft
+	wallLayer.AddSprite(cryptTexture, 8, 4, 11); // Bottom
+	wallLayer.AddSprite(cryptTexture, 9, 5, 11); // BottomRight
+
+	for (int x = 0; x < wallLayer.myXCount; ++x)
+	{
+		wallLayer.myVisualTiles[wallLayer.GetTileIndex(x, 0)] = 2;
+		wallLayer.myVisualTiles[wallLayer.GetTileIndex(x, 1)] = 3;
+		wallLayer.myVisualTiles[wallLayer.GetTileIndex(x, wallLayer.myYCount-1)] = 8;
+	}
+
+	for (int y = 0; y < wallLayer.myYCount; ++y)
+	{
+		wallLayer.myVisualTiles[wallLayer.GetTileIndex(0, y)] = 5;
+		wallLayer.myVisualTiles[wallLayer.GetTileIndex(wallLayer.myXCount -1, y)] = 6;
+	}
+
+	wallLayer.myVisualTiles[wallLayer.GetTileIndex(0, 0)] = 1;
+	wallLayer.myVisualTiles[wallLayer.GetTileIndex(wallLayer.myXCount-1, 0)] = 4;
+	wallLayer.myVisualTiles[wallLayer.GetTileIndex(0, wallLayer.myYCount-1)] = 7;
+	wallLayer.myVisualTiles[wallLayer.GetTileIndex(wallLayer.myXCount - 1, wallLayer.myYCount - 1)] = 9;
 }
 
 Tilemap::~Tilemap()
@@ -38,12 +69,12 @@ void Tilemap::Render()
 {
 	for (const Layer& layer : myLayers)
 	{
-		for (int y = 0; y < layer.myYCount - 1; ++y)
+		for (int y = 0; y < layer.myYCount; ++y)
 		{
-			for (int x = 0; x < layer.myXCount - 1; ++x)
+			for (int x = 0; x < layer.myXCount; ++x)
 			{
 				int tileIndex = layer.GetTileIndex(x, y);
-				int subType = layer.myTilesSubType[tileIndex];
+				int subType = layer.myVisualTiles[tileIndex];
 				if (myDisableSubTypes)
 				{
 					if (layer.myTiles[tileIndex] == NONE)
@@ -52,6 +83,9 @@ void Tilemap::Render()
 					subType = 15;
 				}
 
+				if (subType == 0)
+					continue;
+
 				Slush::RectSprite* tileSprite = layer.myTileSprites[subType];
 				if (!tileSprite)
 				{
@@ -59,9 +93,9 @@ void Tilemap::Render()
 					continue;
 				}
 
-				float offset = 1.f;
+				float offset = 0.f;
 				if (myDisableSubTypes)
-					offset = 0.5f;
+					offset = -0.5f;
 
 				tileSprite->Render(x * layer.myTileSize + layer.myTileSize * offset, y * layer.myTileSize + layer.myTileSize * offset);
 			}
@@ -144,13 +178,23 @@ Tilemap::Layer::~Layer()
 	myTileSprites.DeleteAll();
 }
 
-void Tilemap::Layer::SetupSprites(const Slush::Texture* aTexture, int aStartTextureTileX, int aStartTextureTileY)
+void Tilemap::Layer::AddSprite(const Slush::Texture* aTexture, int aTileID, int aTextureTileX, int aTextureTileY)
+{
+	myTileSprites[aTileID] = new Slush::RectSprite();
+	myTileSprites[aTileID]->SetTexture(*aTexture);
+	myTileSprites[aTileID]->SetSize((float)myTileSize, (float)myTileSize);
+	myTileSprites[aTileID]->SetTextureRect(aTextureTileX * myTileSize, aTextureTileY * myTileSize, myTileSize, myTileSize);
+	myTileSprites[aTileID]->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
+}
+
+void Tilemap::Layer::SetupGroundSprites(const Slush::Texture* aTexture, int aStartTextureTileX, int aStartTextureTileY)
 {
 	for (int i = 0; i < 16; ++i)
 	{
 		myTileSprites[i] = new Slush::RectSprite();
 		myTileSprites[i]->SetSize((float)myTileSize, (float)myTileSize);
 		myTileSprites[i]->SetTexture(*aTexture);
+		myTileSprites[i]->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
 	}
 	
 	const Vector2i textureOffsets[16] = 
@@ -184,21 +228,21 @@ void Tilemap::Layer::SetupSprites(const Slush::Texture* aTexture, int aStartText
 void Tilemap::Layer::FillWith(int aTileType)
 {
 	myTiles.Reserve(myXCount * myYCount);
-	myTilesSubType.Reserve(myXCount * myYCount);
+	myVisualTiles.Reserve(myXCount * myYCount);
 	for (int i = 0; i < myXCount * myYCount; ++i)
 	{
 		myTiles[i] = aTileType;
-		myTilesSubType[i] = 0;
+		myVisualTiles[i] = 0;
 	}
 }
 
 void Tilemap::Layer::CalculateSubTypes()
 {
-	for (int y = 0; y < myYCount - 1; ++y)
+	for (int y = 0; y < myYCount; ++y)
 	{
-		for (int x = 0; x < myXCount - 1; ++x)
+		for (int x = 0; x < myXCount; ++x)
 		{
-			myTilesSubType[GetTileIndex(x, y)] = GetCornerBitValue(x, y);
+			myVisualTiles[GetTileIndex(x, y)] = GetCornerBitValue(x, y);
 		}
 	}
 }

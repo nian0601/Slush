@@ -9,82 +9,246 @@
 
 Tilemap::Tilemap()
 {
-	//	  0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15
-	//0 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	//1 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	//2 { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	//3 { 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 },
-	//4 { 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 },
-	//5 { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 1, 0, 0, 0 },
-	//6 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0 },
-	//7 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0 },
-	//8 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	//9 { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-
-	for (FW_StaticArray<int, 16>& row : myTiles)
-		row.Fill(0);
-
-	myTiles[2][2] = 1;
-	myTiles[3][2] = 1;
-	myTiles[4][2] = 1;
-	myTiles[3][3] = 1;
-	myTiles[4][3] = 1;
-
-	myTiles[4][6] = 1;
-	myTiles[3][7] = 1;
-	myTiles[4][7] = 1;
-	myTiles[5][7] = 1;
-	myTiles[4][8] = 1;
-
-	myTiles[5][10] = 1;
-	myTiles[6][10] = 1;
-	myTiles[7][10] = 1;
-	myTiles[5][11] = 1;
-	myTiles[7][11] = 1;
-	myTiles[5][12] = 1;
-	myTiles[6][12] = 1;
-	myTiles[7][12] = 1;
-
-	
-
 	const Slush::AssetStorage<Slush::Texture>& textures = ActionGameGlobals::GetInstance().GetTextureStorage();
 	const Slush::Texture* groundTexture = textures.GetAsset("RA_Ground_Tiles");
 
-	myTileSprites.Fill(nullptr);
-	myTileSprites[0] = new Slush::RectSprite();
-	myTileSprites[0]->SetSize((float)myTileSize, (float)myTileSize);
-	myTileSprites[0]->SetTexture(*groundTexture);
-	myTileSprites[0]->SetTextureRect(2 * myTileSize, 5 * myTileSize, myTileSize, myTileSize);
+	Layer& grassLayer = myLayers.Add();
+	grassLayer.SetupSprites(groundTexture, 1, 1);
+	grassLayer.FillWith(GRASS);
+	
+	Layer& dirtLayer = myLayers.Add();
+	dirtLayer.SetupSprites(groundTexture, 1, 9);
+	dirtLayer.FillWith(NONE);
+	
+	RandomMutation(dirtLayer, DIRT, 0.1f);
+	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 1, 3, 0.1f);
+	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 1, 3, 0.1f);
+	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 1, 3, 0.1f);
+	CelluarAutomataMutation(dirtLayer, NONE, DIRT, DIRT, 2, 7, 1.f);
 
-	myTileSprites[1] = new Slush::RectSprite();
-	myTileSprites[1]->SetSize((float)myTileSize, (float)myTileSize);
-	myTileSprites[1]->SetTexture(*groundTexture);
-	myTileSprites[1]->SetTextureRect(2 * myTileSize, 13 * myTileSize, myTileSize, myTileSize);
+	for (Layer& layer : myLayers)
+		layer.CalculateSubTypes();
 }
 
 Tilemap::~Tilemap()
 {
-	myTileSprites.DeleteAll();
 }
 
 void Tilemap::Render()
 {
-	int yCount = myTiles.Count();
-	int xCount = myTiles[0].Count();
-	for (int y = 0; y < yCount; ++y)
+	for (const Layer& layer : myLayers)
 	{
-		for (int x = 0; x < xCount; ++x)
+		for (int y = 0; y < layer.myYCount - 1; ++y)
 		{
-			int tileType = myTiles[y][x];
-			Slush::RectSprite* tileSprite = myTileSprites[tileType];
-			if (!tileSprite)
+			for (int x = 0; x < layer.myXCount - 1; ++x)
 			{
-				SLUSH_ERROR("Missing sprite for TileType %i", tileType);
-				continue;
+				int tileIndex = layer.GetTileIndex(x, y);
+				int subType = layer.myTilesSubType[tileIndex];
+				if (myDisableSubTypes)
+				{
+					if (layer.myTiles[tileIndex] == NONE)
+						continue;
+
+					subType = 15;
+				}
+
+				Slush::RectSprite* tileSprite = layer.myTileSprites[subType];
+				if (!tileSprite)
+				{
+					SLUSH_ERROR("Missing sprite for SubType %i", subType);
+					continue;
+				}
+
+				float offset = 1.f;
+				if (myDisableSubTypes)
+					offset = 0.5f;
+
+				tileSprite->Render(x * layer.myTileSize + layer.myTileSize * offset, y * layer.myTileSize + layer.myTileSize * offset);
 			}
-
-			tileSprite->Render(x * myTileSize, y * myTileSize);
-
 		}
 	}
+}
+
+void Tilemap::RandomMutation(Layer& aLayer, int aNewTileType, float aChance)
+{
+	for (int& tile : aLayer.myTiles)
+	{
+		if (FW_RandFloat() > aChance)
+			continue;
+
+		tile = aNewTileType;
+	}
+}
+
+void Tilemap::CelluarAutomataMutation(Layer& aLayer, int aOldTileType, int aNewTileType, int aNeighbourType, int aNeighbourMinCount, int aNeighbourMaxCount, float aChance)
+{
+	FW_GrowingArray<int> newTiles = aLayer.myTiles;
+
+	for (int y = 0; y < aLayer.myYCount; ++y)
+	{
+		for (int x = 0; x < aLayer.myXCount; ++x)
+		{
+			int tileIndex = aLayer.GetTileIndex(x, y);
+			if (newTiles[tileIndex] != aOldTileType)
+				continue;
+
+			int neighbourCount = GetNeighbourCount(aLayer, aNeighbourType, x, y);
+			if (neighbourCount < aNeighbourMinCount || aNeighbourMinCount > aNeighbourMaxCount)
+				continue;
+
+			if (FW_RandFloat() > aChance)
+				continue;
+
+			newTiles[tileIndex] = aNewTileType;
+		}
+	}
+
+	aLayer.myTiles = newTiles;
+}
+
+int Tilemap::GetNeighbourCount(Layer& aLayer, int aNeighbourType, int aX, int aY)
+{
+	int count = 0;
+
+	for (int y = aY - 1; y < aY + 2; y++)
+	{
+		if (y < 0 || y >= aLayer.myYCount)
+			continue;
+
+		for (int x = aX - 1; x < aX + 2; x++)
+		{
+			if (x < 0 || x >= aLayer.myXCount)
+				continue;
+
+			if (x == aX && y == aY)
+				continue;
+
+			int tileIndex = aLayer.GetTileIndex(x, y);
+			if (aLayer.myTiles[tileIndex] == aNeighbourType)
+				count++;
+		}
+	}
+
+	return count;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+Tilemap::Layer::Layer()
+{
+	myTileSprites.Fill(nullptr);
+}
+
+Tilemap::Layer::~Layer()
+{
+	myTileSprites.DeleteAll();
+}
+
+void Tilemap::Layer::SetupSprites(const Slush::Texture* aTexture, int aStartTextureTileX, int aStartTextureTileY)
+{
+	for (int i = 0; i < 16; ++i)
+	{
+		myTileSprites[i] = new Slush::RectSprite();
+		myTileSprites[i]->SetSize((float)myTileSize, (float)myTileSize);
+		myTileSprites[i]->SetTexture(*aTexture);
+	}
+	
+	const Vector2i textureOffsets[16] = 
+	{
+		{1,1}, // 0
+		{0, 5}, // 1
+		{0, 3}, // 2
+		{0, 4}, // 3
+		{2, 3}, // 4
+		{0, 6}, // 5
+		{1, 3}, // 6
+		{2, 2}, // 7
+		{2, 5}, // 8
+		{1, 5}, // 9
+		{2, 6}, // 10
+		{2, 0}, // 11
+		{0, 1}, // 12
+		{0, 0}, // 13
+		{0, 2}, // 14
+		{1, 4}, // 15
+	};
+
+	for (int i = 0; i < 16; ++i)
+	{
+		int x = (aStartTextureTileX + textureOffsets[i].x) * myTileSize;
+		int y = (aStartTextureTileY + textureOffsets[i].y) * myTileSize;
+		myTileSprites[i]->SetTextureRect(x, y, myTileSize, myTileSize);
+	}
+}
+
+void Tilemap::Layer::FillWith(int aTileType)
+{
+	myTiles.Reserve(myXCount * myYCount);
+	myTilesSubType.Reserve(myXCount * myYCount);
+	for (int i = 0; i < myXCount * myYCount; ++i)
+	{
+		myTiles[i] = aTileType;
+		myTilesSubType[i] = 0;
+	}
+}
+
+void Tilemap::Layer::CalculateSubTypes()
+{
+	for (int y = 0; y < myYCount - 1; ++y)
+	{
+		for (int x = 0; x < myXCount - 1; ++x)
+		{
+			myTilesSubType[GetTileIndex(x, y)] = GetCornerBitValue(x, y);
+		}
+	}
+}
+
+int Tilemap::Layer::GetTileValue(int x, int y) const
+{
+	// Should we handle reading outside of the map here? or on the callsite?
+	// Not sure.. handling it here for now..
+	return myTiles[GetTileIndex(x, y)];
+}
+
+int Tilemap::Layer::GetTileIndex(int x, int y) const
+{
+	return y * myXCount + x;
+}
+
+int Tilemap::Layer::GetCornerBitValue(int x, int y) const
+{
+	int value = 0;
+
+	Vector2i tileOffsets[4] =
+	{
+		{1, 0},
+		{1, 1},
+		{0, 1},
+		{0, 0}
+	};
+
+	int tileValues[4] = { 1, 2, 4, 8 };
+
+	for (int i = 0; i < 4; ++i)
+	{
+		int cornerX = x + tileOffsets[i].x;
+		int cornerY = y + tileOffsets[i].y;
+
+		if (cornerX < 0 || cornerX >= myXCount)
+		{
+			value += tileValues[i];
+			continue;
+		}
+
+		if (cornerY < 0 || cornerY >= myYCount)
+		{
+			value += tileValues[i];
+			continue;
+		}
+
+		if (GetTileValue(cornerX, cornerY) != 0)
+			value += tileValues[i];
+	}
+
+	return value;
 }

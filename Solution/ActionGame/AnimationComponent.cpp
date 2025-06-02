@@ -29,6 +29,11 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 		.Linear(0.1f, 0.f, 1.f)
 		.Linear(0.1f, 1.f, 0.f);
 
+	mySpawnAnimation = new Slush::Animation();
+	mySpawnAnimation->MakeOneShot();
+	mySpawnAnimation->myScaleTrack
+		.Linear(0.25f, 0.f, 1.f);
+
 	myRuntime = new Slush::AnimationRuntime();
 }
 
@@ -83,4 +88,11 @@ void AnimationComponent::PlayBlink()
 	myRuntime->Start();
 
 	myCurrentAnimation = myBlinkAnimation;
+}
+
+void AnimationComponent::PlaySpawn()
+{
+	myRuntime->Start();
+
+	myCurrentAnimation = mySpawnAnimation;
 }

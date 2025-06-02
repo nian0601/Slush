@@ -24,10 +24,14 @@ public:
 
 	void PlayDash(const Vector2f& aTargetPosition);
 	void PlayBlink();
+	void PlaySpawn();
+
+	bool IsPlayingSpawn() const { return myCurrentAnimation == mySpawnAnimation; }
 
 private:
 	Slush::Animation* myDashAnimation = nullptr;
 	Slush::Animation* myBlinkAnimation = nullptr;
+	Slush::Animation* mySpawnAnimation = nullptr;
 
 	Slush::Animation* myCurrentAnimation = nullptr;
 	Slush::AnimationRuntime* myRuntime = nullptr;

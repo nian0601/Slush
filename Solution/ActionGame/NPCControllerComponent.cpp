@@ -6,9 +6,26 @@
 #include "TargetingComponent.h"
 
 #include <Physics\PhysicsWorld.h>
+#include "AnimationComponent.h"
+
+void NPCControllerComponent::OnEnterWorld()
+{
+	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+	{
+		anim->PlaySpawn();
+		myHasFinishedSpawning = !anim->IsPlayingSpawn();
+	}
+	else
+	{
+		myHasFinishedSpawning = true;
+	}
+}
 
 void NPCControllerComponent::PrePhysicsUpdate()
 {
+	if (!myHasFinishedSpawning)
+		return;
+
 	TargetingComponent* targeting = myEntity.GetComponent<TargetingComponent>();
 	if (!targeting)
 	{
@@ -32,5 +49,16 @@ void NPCControllerComponent::PrePhysicsUpdate()
 		float distance = Length(toTarget);
 		if (distance < myMaxDistance)
 			projShooter->TryShoot(GetNormalized(toTarget));
+	}
+}
+
+void NPCControllerComponent::Update()
+{
+	if (myHasFinishedSpawning)
+		return;
+
+	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+	{
+		myHasFinishedSpawning = !anim->IsPlayingSpawn();
 	}
 }

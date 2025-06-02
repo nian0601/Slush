@@ -10,8 +10,11 @@ public:
 
 	using Component::Component;
 
+	void OnEnterWorld() override;
 	void PrePhysicsUpdate() override;
+	void Update() override;
 
 private:
+	bool myHasFinishedSpawning = false;
 	float myMaxDistance = 800.f;
 };

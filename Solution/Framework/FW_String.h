@@ -62,6 +62,7 @@ public:
 	void RemoveOne();
 
 private:
+	void NullTerminate();
 	void UpdateHash();
 
 	int myCurrentSize;
@@ -76,6 +77,7 @@ inline FW_String::FW_String()
 	, myData(new char[FW_STRING_START_SIZE])
 {
 	myHash = 0;
+	NullTerminate();
 }
 
 inline FW_String::~FW_String()
@@ -126,11 +128,7 @@ inline FW_String& FW_String::operator+=(const FW_String &aString)
 		++myCurrentSize;
 	}
 
-	if (myData[myCurrentSize] != NullTermination)
-	{
-		myData[myCurrentSize] = NullTermination;
-	}
-
+	NullTerminate();
 	UpdateHash();
 
 	return *this;
@@ -250,11 +248,7 @@ inline void FW_String::operator=(const FW_String &aString)
 		++myCurrentSize;
 	}
 
-	if (myData[myCurrentSize] != NullTermination)
-	{
-		myData[myCurrentSize] = NullTermination;
-	}
-
+	NullTerminate();
 	UpdateHash();
 }
 
@@ -272,11 +266,7 @@ inline void FW_String::operator=(const char* aString)
 		++myCurrentSize;
 	}
 
-	if (myData[myCurrentSize] != NullTermination)
-	{
-		myData[myCurrentSize] = NullTermination;
-	}
-
+	NullTerminate();
 	UpdateHash();
 }
 
@@ -408,12 +398,7 @@ inline FW_String FW_String::SubStr(const int aStart, const int aEnd) const
 		newString += static_cast<char>(operator[](i));
 	}
 
-
-	if (newString[newString.myCurrentSize] != NullTermination)
-	{
-		newString[newString.myCurrentSize] = NullTermination;
-	}
-
+	newString.NullTerminate();
 	return newString;
 }
 
@@ -500,6 +485,7 @@ inline void FW_String::Clear()
 		myData[i] = NullTermination;
 
 	myCurrentSize = 0;
+	NullTerminate();
 }
 
 inline void FW_String::RemoveOne()
@@ -509,12 +495,16 @@ inline void FW_String::RemoveOne()
 
 	myCurrentSize -= 1;
 
+	NullTerminate();
+	UpdateHash();
+}
+
+inline void FW_String::NullTerminate()
+{
 	if (myData[myCurrentSize] != NullTermination)
 	{
 		myData[myCurrentSize] = NullTermination;
 	}
-	
-	UpdateHash();
 }
 
 inline void FW_String::UpdateHash()

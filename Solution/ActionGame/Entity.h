@@ -46,6 +46,7 @@ class Entity
 public:
 	~Entity();
 
+	void OnEnterWorld();
 	void PrePhysicsUpdate();
 	void Update();
 	void Render();

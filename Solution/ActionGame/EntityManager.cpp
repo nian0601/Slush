@@ -148,7 +148,10 @@ void EntityManager::EndFrame()
 	}
 
 	for (Entity* entity : myAddQueue)
+	{
+		entity->OnEnterWorld();
 		myEntities.Add(entity);
+	}
 
 	myAddQueue.RemoveAll();
 

@@ -33,6 +33,12 @@ Entity::~Entity()
 	myComponents.DeleteAll();
 }
 
+void Entity::OnEnterWorld()
+{
+	for (Component* component : myPackedComponents)
+		component->OnEnterWorld();
+}
+
 void Entity::PrePhysicsUpdate()
 {
 	for (Component* component : myPackedComponents)

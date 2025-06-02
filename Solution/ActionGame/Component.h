@@ -16,6 +16,7 @@ public:
 	{}
 	virtual ~Component() {}
 
+	virtual void OnEnterWorld() {};
 	virtual void PrePhysicsUpdate() {};
 	virtual void Update() {};
 	virtual void Render() {};

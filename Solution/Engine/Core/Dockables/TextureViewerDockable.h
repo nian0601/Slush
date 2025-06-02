@@ -14,7 +14,7 @@ namespace Slush
 	{
 	public:
 		TextureViewerDockable(const Slush::AssetStorage<Slush::Texture>& aTextureStorage);
-		const char* GetName() const override { return "Texture Viewwer"; }
+		const char* GetName() const override { return "Texture Viewer"; }
 
 	protected:
 		void OnBuildUI() override;

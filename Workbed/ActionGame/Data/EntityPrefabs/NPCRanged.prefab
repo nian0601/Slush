@@ -7,18 +7,26 @@ Entity Prefab
 	sprite 
 	{ 
 		radius 20.000 
-		color -13068041 
+		color -1 
+		textureID Enemy_001_A 
 		size 
 		{ 
-			width 0.000 
-			height 0.000 
+			width 96.000 
+			height 96.000 
 		} 
 		floatColor 
 		{ 
-			r 0.222 
-			g 0.594 
-			b 0.966 
+			r 1.000 
+			g 1.000 
+			b 1.000 
 			a 1.000 
+		} 
+		textureRect 
+		{ 
+			x 0 
+			y 0 
+			width 96 
+			height 96 
 		} 
 	} 
 	projectileshooting 
@@ -27,24 +35,24 @@ Entity Prefab
 		projectilespeed 600.000 
 		projectilespawnoffset 35.000 
 	} 
-	npccontroller 
-	{ 
-	} 
 	health 
 	{ 
 		maxhealth 50 
 		graceperiodduration 0.000 
 	} 
+	npccontroller 
+	{ 
+	} 
 	physics 
 	{ 
 		isStatic 0 
 		isSensor 0 
-		matchSprite 1 
+		matchSprite 0 
 		radius 10.000 
 		size 
 		{ 
-			width 0.000 
-			height 0.000 
+			width 40.000 
+			height 40.000 
 		} 
 	} 
 	targeting 

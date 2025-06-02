@@ -5,6 +5,9 @@
 
 #include <Graphics/CircleSprite.h>
 #include <Graphics/RectSprite.h>
+#include "ActionGameGlobals.h"
+#include <Core/Assets/AssetStorage.h>
+#include <Graphics/Texture.h>
 
 void SpriteComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -26,6 +29,18 @@ void SpriteComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 		colorHandle.ParseFloatField("b", myFloatColor[2]);
 		colorHandle.ParseFloatField("a", myFloatColor[3]);
 	}
+
+	if (aComponentHandle.HasField("textureID") || !aComponentHandle.IsReading())
+		aComponentHandle.ParseStringField("textureID", myTextureID);
+
+	Slush::AssetParser::Handle textureRectHandle = aComponentHandle.ParseChildElement("textureRect");
+	if (textureRectHandle.IsValid())
+	{
+		textureRectHandle.ParseIntField("x", myTextureRectPos.x);
+		textureRectHandle.ParseIntField("y", myTextureRectPos.y);
+		textureRectHandle.ParseIntField("width", myTextureRectSize.x);
+		textureRectHandle.ParseIntField("height", myTextureRectSize.y);
+	}
 }
 
 void SpriteComponent::Data::OnBuildUI()
@@ -33,6 +48,9 @@ void SpriteComponent::Data::OnBuildUI()
 	ImGui::ColorEdit4("Color", myFloatColor);
 	ImGui::InputFloat("Radius", &myRadius, 1.f, 10.f, "%.2f");
 	ImGui::InputFloat2("Size", &mySize.x, "%.2f");
+	ImGui::InputText("TextureID", &myTextureID);
+	ImGui::InputInt2("TextureRectPos", &myTextureRectPos.x);
+	ImGui::InputInt2("TextureRectSize", &myTextureRectSize.x);
 
 	myColor = FW_Float_To_ARGB(myFloatColor[3], myFloatColor[0], myFloatColor[1], myFloatColor[2]);
 }
@@ -47,6 +65,27 @@ SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityP
 		MakeRect(spriteData.mySize.x, spriteData.mySize.y, spriteData.myColor);
 	else
 		MakeCircle(spriteData.myRadius, spriteData.myColor);
+
+	if (!spriteData.myTextureID.Empty())
+	{
+		const Slush::Texture* texture = ActionGameGlobals::GetInstance().GetTextureStorage().GetAsset(spriteData.myTextureID);
+		if (texture)
+		{
+			mySprite->SetTexture(*texture);
+			mySprite->SetOutlineColor(0x00000000);
+		}
+		else
+		{
+			SLUSH_ERROR("[Entity] %i failed to load texture '%s'", anEntityPrefab.GetAssetName().GetBuffer(), spriteData.myTextureID.GetBuffer());
+		}
+
+		if (spriteData.myTextureRectSize.x > 0)
+			mySprite->SetTextureRect(
+				spriteData.myTextureRectPos.x,
+				spriteData.myTextureRectPos.y,
+				spriteData.myTextureRectSize.x,
+				spriteData.myTextureRectSize.y);
+	}
 }
 
 SpriteComponent::~SpriteComponent()

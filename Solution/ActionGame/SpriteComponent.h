@@ -20,7 +20,9 @@ public:
 		float myRadius = 10.f;
 		Vector2f mySize;
 		int myColor = 0xFFFF3399;
-
+		FW_String myTextureID;
+		Vector2i myTextureRectPos;
+		Vector2i myTextureRectSize;
 		float myFloatColor[4] = { 1.f, 51.f / 255.f, 153.f / 255.f, 1.f };
 	};
 

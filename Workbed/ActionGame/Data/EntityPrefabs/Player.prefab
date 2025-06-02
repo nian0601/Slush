@@ -7,18 +7,26 @@ Entity Prefab
 	sprite 
 	{ 
 		radius 20.000 
-		color -65536 
+		color -1 
+		textureID Hero_01 
 		size 
 		{ 
-			width 0.000 
-			height 0.000 
+			width 96.000 
+			height 96.000 
 		} 
 		floatColor 
 		{ 
 			r 1.000 
-			g 0.000 
-			b 0.000 
+			g 1.000 
+			b 1.000 
 			a 1.000 
+		} 
+		textureRect 
+		{ 
+			x 0 
+			y 0 
+			width 96 
+			height 96 
 		} 
 	} 
 	animation 
@@ -30,13 +38,13 @@ Entity Prefab
 		projectilespeed 1000.000 
 		projectilespawnoffset 35.000 
 	} 
-	playercontroller 
-	{ 
-	} 
 	health 
 	{ 
 		maxhealth 50 
 		graceperiodduration 0.500 
+	} 
+	playercontroller 
+	{ 
 	} 
 	physics 
 	{ 

@@ -47,7 +47,7 @@ Level::~Level()
 
 void Level::Update()
 {
-	//myNPCWave->Update();
+	myNPCWave->Update();
 
 	Entity* player = myPlayerHandle.Get();
 	if (!player)
@@ -59,8 +59,7 @@ void Level::Update()
 	const Slush::Input& input = engine.GetInput();
 	if (input.WasKeyReleased(Slush::Input::E))
 	{
-		//expComp->AddExperience(1);
-		myTilemap->ToggleSubTypes();
+		expComp->AddExperience(1);
 	}
 
 	if (StatsComponent* stats = player->GetComponent<StatsComponent>())

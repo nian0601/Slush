@@ -61,12 +61,13 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 
 	const int iterationLimit = 100;
 	int iterations = 0;
-	Vector2f spawnArea = { 1280.f, 720.f };
+	Vector2f spawnArea = { 1920.f, 1080.f };
+	Vector2f spawnAreaMargin = { 75.f, 75.f };
 	while (myNPCs.Count() < aNumberOfNPCs && iterations <= iterationLimit)
 	{
-		float randX = FW_RandFloat(-spawnArea.x, spawnArea.x);
-		float randY = FW_RandFloat(-spawnArea.y, spawnArea.y);
-		Vector2f position = player->myPosition;
+		float randX = FW_RandFloat(spawnAreaMargin.x, spawnArea.x - spawnAreaMargin.x);
+		float randY = FW_RandFloat(spawnAreaMargin.y, spawnArea.y - spawnAreaMargin.y);
+		Vector2f position;
 		position.x += randX;
 		position.y += randY;
 

@@ -17,7 +17,9 @@ namespace Slush
 		void LoadAllAssets();
 
 		const AssetType* GetAsset(const char* aName) const;
+		const AssetType* GetAsset(const FW_String& aName) const;
 		AssetType* GetAsset(const char* aName);
+		AssetType* GetAsset(const FW_String& aName);
 
 		const FW_GrowingArray<AssetType*>& GetAllAssets() const { return myAssets; }
 	private:
@@ -91,6 +93,12 @@ namespace Slush
 	}
 
 	template<typename AssetType>
+	const AssetType* AssetStorage<AssetType>::GetAsset(const FW_String& aName) const
+	{
+		return GetAsset(aName.GetBuffer());
+	}
+
+	template<typename AssetType>
 	AssetType* AssetStorage<AssetType>::GetAsset(const char* aName)
 	{
 		if (AssetType* const* asset = myAssetMap.GetIfExists(aName))
@@ -98,5 +106,11 @@ namespace Slush
 
 		SLUSH_WARNING("%ss: '%s' not found.", AssetType::GetAssetTypeName(), aName);
 		return nullptr;
+	}
+
+	template<typename AssetType>
+	AssetType* AssetStorage<AssetType>::GetAsset(const FW_String& aName)
+	{
+		return GetAsset(aName.GetBuffer());
 	}
 }

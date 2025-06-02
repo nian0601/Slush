@@ -50,12 +50,12 @@ Entity Prefab
 	{ 
 		isStatic 0 
 		isSensor 0 
-		matchSprite 1 
+		matchSprite 0 
 		radius 10.000 
 		size 
 		{ 
-			width 0.000 
-			height 0.000 
+			width 40.000 
+			height 40.000 
 		} 
 	} 
 	targeting 

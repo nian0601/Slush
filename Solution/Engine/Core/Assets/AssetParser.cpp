@@ -44,6 +44,14 @@ namespace Slush
 		return AddChildElement(aElementName);
 	}
 
+	bool AssetParser::Handle::HasField(const char* aFieldName) const
+	{
+		if (!IsValid())
+			return false;
+
+		return myElement->GetField(aFieldName) != nullptr;
+	}
+
 	void AssetParser::Handle::ParseIntField(const char* aFieldName, int& aValue)
 	{
 		if (!ValidateField(aFieldName))
@@ -202,6 +210,9 @@ namespace Slush
 
 	void AssetParser::Handle::WriteStringField(const char* aFieldName, FW_String& aValue)
 	{
+		if (aValue.Empty())
+			return;
+
 		Field* field = myElement->AddField(aFieldName);
 		field->myRawData += aValue;
 	}

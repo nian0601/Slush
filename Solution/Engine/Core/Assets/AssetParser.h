@@ -25,6 +25,7 @@ namespace Slush
 			int GetNumChildElements();
 
 			Handle ParseChildElement(const char* aElementName);
+			bool HasField(const char* aFieldName) const;
 			void ParseIntField(const char* aFieldName, int& aValue);
 			void ParseFloatField(const char* aFieldName, float& aValue);
 			void ParseBoolField(const char* aFieldName, bool& aValue);

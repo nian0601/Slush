@@ -69,9 +69,10 @@ void CardEditorDockable::OnBuildUI()
 			static ImGuiTextFilter textureFilter;
 			textureFilter.Draw("Search");
 
-			const FW_GrowingArray<Slush::Texture*> textures = myCardTextures.GetAllAssets();
-			for (const Slush::Texture* texture : textures)
+			const FW_GrowingArray<Slush::Asset*> assets = myCardTextures.GetAllAssets();
+			for (Slush::Asset* asset : assets)
 			{
+				Slush::Texture* texture = static_cast<Slush::Texture*>(asset);
 				if(!textureFilter.PassFilter(texture->GetAssetName().GetBuffer()))
 					continue;
 

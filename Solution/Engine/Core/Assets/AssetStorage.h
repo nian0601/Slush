@@ -1,12 +1,22 @@
 #pragma once
+
+#include "Core/Assets/Asset.h"
 #include "Core/Log.h"
-#include "FW_Hashmap.h"
+
 #include "FW_GrowingArray.h"
+#include "FW_Hashmap.h"
 
 namespace Slush
 {
+	class IAssetStorage
+	{
+	public:
+		virtual const char* GetAssetTypeName() const = 0;
+		virtual const FW_GrowingArray<Asset*>& GetAllAssets() const = 0;
+	};
+
 	template<typename AssetType>
-	class AssetStorage
+	class AssetStorage : public IAssetStorage
 	{
 	public:
 		~AssetStorage();
@@ -21,10 +31,12 @@ namespace Slush
 		AssetType* GetAsset(const char* aName);
 		AssetType* GetAsset(const FW_String& aName);
 
-		const FW_GrowingArray<AssetType*>& GetAllAssets() const { return myAssets; }
+		const char* GetAssetTypeName() const override { return AssetType::GetAssetTypeName(); }
+		const FW_GrowingArray<Asset*>& GetAllAssets() const override { return myAssets; }
+
 	private:
 		FW_Hashmap<FW_String, AssetType*> myAssetMap;
-		FW_GrowingArray<AssetType*> myAssets;
+		FW_GrowingArray<Asset*> myAssets;
 	};
 
 	template<typename AssetType>

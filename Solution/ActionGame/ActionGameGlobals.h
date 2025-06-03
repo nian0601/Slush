@@ -1,5 +1,13 @@
 #pragma once
 
+
+// I dont like needing to include Texture here, but its needed due to AssetStorage
+// Perhaps I should expand on the IAssetStorage-concept to allow storing AssetStorage
+// in places where I dont necessarily care about the concrete asset-type.
+// It will make it a bit more cumbersome to use in the places that grabs the storage
+// from here, since IAssetStorage will return base Asset*, so it needs to be
+// casted into the actual asset, but maybe thats fine?
+#include "Graphics/Texture.h"
 class EntityManager;
 
 namespace Slush

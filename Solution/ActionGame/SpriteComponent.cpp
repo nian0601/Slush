@@ -49,8 +49,23 @@ void SpriteComponent::Data::OnBuildUI()
 	ImGui::InputFloat("Radius", &myRadius, 1.f, 10.f, "%.2f");
 	ImGui::InputFloat2("Size", &mySize.x, "%.2f");
 	ImGui::InputText("TextureID", &myTextureID);
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		ImGuiDragDropFlags target_flags = 0;
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(Slush::Texture::GetAssetTypeName(), target_flags))
+		{
+			int textureIndex = *(const int*)payload->Data;
+			const Slush::Texture* texture = static_cast<Slush::Texture*>(ActionGameGlobals::GetInstance().GetTextureStorage().GetAllAssets()[textureIndex]);
+			myTextureID = texture->GetAssetName();
+		}
+		ImGui::EndDragDropTarget();
+	}
+
 	ImGui::InputInt2("TextureRectPos", &myTextureRectPos.x);
 	ImGui::InputInt2("TextureRectSize", &myTextureRectSize.x);
+
+	
 
 	myColor = FW_Float_To_ARGB(myFloatColor[3], myFloatColor[0], myFloatColor[1], myFloatColor[2]);
 }

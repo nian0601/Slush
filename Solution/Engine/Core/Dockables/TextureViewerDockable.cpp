@@ -14,9 +14,10 @@ namespace Slush
 
 	void TextureViewerDockable::OnBuildUI()
 	{
-		const FW_GrowingArray<Slush::Texture*> textures = myTextureStorage.GetAllAssets();
-		for (Slush::Texture* texture : textures)
+		const FW_GrowingArray<Slush::Asset*> assets = myTextureStorage.GetAllAssets();
+		for (Slush::Asset* asset : assets)
 		{
+			Slush::Texture* texture = static_cast<Slush::Texture*>(asset);
 			if (ImGui::CollapsingHeader(texture->GetAssetName().GetBuffer()))
 			{
 				ImGui::Text("File: %s", texture->GetFilePath().GetBuffer());

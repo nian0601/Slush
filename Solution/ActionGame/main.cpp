@@ -9,6 +9,7 @@
 #include "Core/Dockables/GameViewDockable.h"
 #include "Core/Dockables/TextureViewerDockable.h"
 #include "Core/Dockables/LogDockable.h"
+#include "Core/Dockables/ContentBrowserDockable.h"
 
 #include "Graphics/Window.h"
 #include "Graphics/Texture.h"
@@ -67,8 +68,15 @@ public:
 		window.AddDockable(new Slush::GameViewDockable());
 		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
 		window.AddDockable(new Slush::LogDockable());
-		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
 		window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
+		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
+
+		Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
+		window.AddDockable(contentBrowser);
+
+		contentBrowser->AddAssetStorage(&myEntityPrefabs);
+		contentBrowser->AddAssetStorage(&myTextures);
+		contentBrowser->AddAssetStorage(&myUILayouts);
 
 		myStartGameUIManager = new Slush::UIManager(myFont);
 		myStartGameUIManager->SetLayout(myUILayouts.GetAsset("StartGame"));

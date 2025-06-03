@@ -14,6 +14,8 @@ namespace Slush
 		Dockable(bool aShowMenuBar = false)
 			: myShowMenuBar(aShowMenuBar)
 		{}
+
+		virtual void OnUpdate() {};
 		virtual void OnBuildUI() {};
 
 		// This simply an incrementing counter for each dockable that gets created.
@@ -22,5 +24,6 @@ namespace Slush
 
 		FW_String myUniqueIDName;
 		bool myShowMenuBar = false;
+		bool myShouldShowDockable = true;
 	};
 }

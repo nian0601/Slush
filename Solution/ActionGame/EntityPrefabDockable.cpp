@@ -10,14 +10,14 @@ EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aP
 	, myPrefabStorage(aPrefabStorage)
 	, myNewPrefabNameStorage("")
 {
-	const FW_GrowingArray<EntityPrefab*> prefabs = myPrefabStorage.GetAllAssets();
+	const FW_GrowingArray<Slush::Asset*> prefabs = myPrefabStorage.GetAllAssets();
 	if (!prefabs.IsEmpty())
-		mySelectedPrefab = prefabs[0];
+		mySelectedPrefab = static_cast<EntityPrefab*>(prefabs[0]);
 }
 
 void EntityPrefabDockable::OnBuildUI()
 {
-	const FW_GrowingArray<EntityPrefab*> prefabs = myPrefabStorage.GetAllAssets();
+	const FW_GrowingArray<Slush::Asset*> assets = myPrefabStorage.GetAllAssets();
 	if (ImGui::BeginMenuBar())
 	{
 		if (ImGui::BeginMenu("File.."))
@@ -30,8 +30,9 @@ void EntityPrefabDockable::OnBuildUI()
 				if (ImGui::InputText("Name", &myNewPrefabNameStorage))
 				{
 					myHasUniquePrefabName = true;
-					for (EntityPrefab* prefab : prefabs)
+					for (Slush::Asset* asset : assets)
 					{
+						EntityPrefab* prefab = static_cast<EntityPrefab*>(asset);
 						if (prefab->myName == myNewPrefabNameStorage.GetBuffer())
 						{
 							myHasUniquePrefabName = false;
@@ -67,14 +68,15 @@ void EntityPrefabDockable::OnBuildUI()
 
 			if (ImGui::Selectable("Save All"))
 			{
-				for (EntityPrefab* prefab : prefabs)
-					prefab->Save();
+				for (Slush::Asset* asset : assets)
+					asset->Save();
 			}
 
 			if (ImGui::BeginMenu("Open.."))
 			{
-				for (EntityPrefab* prefab : prefabs)
+				for (Slush::Asset* asset : assets)
 				{
+					EntityPrefab* prefab = static_cast<EntityPrefab*>(asset);
 					if (ImGui::Selectable(prefab->myName.GetBuffer()))
 						mySelectedPrefab = prefab;
 				}
@@ -89,4 +91,19 @@ void EntityPrefabDockable::OnBuildUI()
 
 	if (mySelectedPrefab)
 		mySelectedPrefab->BuildUI();
+
+
+	ImGui::BeginChild("dragndropdummy");
+	ImGui::EndChild();
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		ImGuiDragDropFlags target_flags = 0;
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(EntityPrefab::GetAssetTypeName(), target_flags))
+		{
+			int assetIndex = *(const int*)payload->Data;
+			mySelectedPrefab = static_cast<EntityPrefab*>(myPrefabStorage.GetAllAssets()[assetIndex]);
+		}
+		ImGui::EndDragDropTarget();
+	}
 }

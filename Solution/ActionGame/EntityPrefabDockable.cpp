@@ -89,11 +89,11 @@ void EntityPrefabDockable::OnBuildUI()
 		ImGui::EndMenuBar();
 	}
 
+	ImGui::BeginChild("dragndropdummy");
+
 	if (mySelectedPrefab)
 		mySelectedPrefab->BuildUI();
 
-
-	ImGui::BeginChild("dragndropdummy");
 	ImGui::EndChild();
 
 	if (ImGui::BeginDragDropTarget())

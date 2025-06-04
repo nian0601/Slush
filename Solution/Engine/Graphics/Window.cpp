@@ -65,6 +65,10 @@ namespace Slush
 			else if (event.type == sf::Event::Resized)
 			{
 				SetRectSize(myWindowRect, { static_cast<float>(event.size.width), static_cast<float>(event.size.height) });
+				//myGameViewRect = MakeRectFromTopLeft<float>({ 0.f, 0.f }, GetSizeThatRespectsAspectRatio(aWidth, aHeight));
+				//myRenderWindow->setSize({ event.size.width, event.size.height });
+				sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
+				myRenderWindow->setView(sf::View(visibleArea));
 			}
 		}
 

@@ -31,8 +31,14 @@ Slush::PhysicsWorld& ActionGameGlobals::GetPhysicsWorld()
 
 Slush::AssetStorage<Slush::Texture>& ActionGameGlobals::GetTextureStorage()
 {
-	FW_ASSERT(myTextureStorage != nullptr, "Neet to set a TextureStorage");
+	FW_ASSERT(myTextureStorage != nullptr, "Need to set a TextureStorage");
 	return *myTextureStorage;
+}
+
+Slush::AssetStorage<EntityPrefab>& ActionGameGlobals::GetEntityPrefabStorage()
+{
+	FW_ASSERT(myEntityPrefabStorage != nullptr, "Need to set a EntityPrefabStorage");
+	return *myEntityPrefabStorage;
 }
 
 ActionGameGlobals::ActionGameGlobals()
@@ -44,5 +50,6 @@ ActionGameGlobals::~ActionGameGlobals()
 	myEntityManager = nullptr;
 	myPhysicsWorld = nullptr;
 	myTextureStorage = nullptr;
+	myEntityPrefabStorage = nullptr;
 }
 

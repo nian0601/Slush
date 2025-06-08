@@ -28,10 +28,12 @@ public:
 	void SetEntityManager(EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
 	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
 	void SetTextureStorage(Slush::AssetStorage<Slush::Texture>& aStorage) { myTextureStorage = &aStorage; }
+	void SetEntityPrefabStorage(Slush::AssetStorage<EntityPrefab>& aStorage) { myEntityPrefabStorage = &aStorage; }
 
 	EntityManager& GetEntityManager();
 	Slush::PhysicsWorld& GetPhysicsWorld();
 	Slush::AssetStorage<Slush::Texture>& GetTextureStorage();
+	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
 
 private:
 	ActionGameGlobals();
@@ -41,4 +43,5 @@ private:
 	EntityManager* myEntityManager = nullptr;
 	Slush::PhysicsWorld* myPhysicsWorld = nullptr;
 	Slush::AssetStorage<Slush::Texture>* myTextureStorage = nullptr;
+	Slush::AssetStorage<EntityPrefab>* myEntityPrefabStorage = nullptr;
 };

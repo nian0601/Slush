@@ -57,6 +57,7 @@ public:
 		ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);
 		ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
 		ActionGameGlobals::GetInstance().SetTextureStorage(myTextures);
+		ActionGameGlobals::GetInstance().SetEntityPrefabStorage(myEntityPrefabs);
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 

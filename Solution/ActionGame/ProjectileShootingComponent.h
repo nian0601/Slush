@@ -18,6 +18,7 @@ public:
 		float myCooldown = 1.f;
 		float myProjectileSpeed = 500.f;
 		float myProjectileSpawnOffset = 35.f;
+		FW_String myProjectileEntityPrefab;
 	};
 
 public:

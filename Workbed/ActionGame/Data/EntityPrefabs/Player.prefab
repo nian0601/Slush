@@ -37,6 +37,7 @@ Entity Prefab
 		cooldown 0.100 
 		projectilespeed 1000.000 
 		projectilespawnoffset 35.000 
+		projectiletype PlayerProjectile 
 	} 
 	health 
 	{ 

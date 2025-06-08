@@ -4,8 +4,10 @@
 #include "EntityPrefab.h"
 #include "PhysicsComponent.h"
 #include "ProjectileShootingComponent.h"
+#include "SpriteComponent.h"
 
 #include <Physics\PhysicsWorld.h>
+#include <Graphics\BaseSprite.h>
 
 void ProjectileShootingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -49,6 +51,7 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 	Vector2f projPosition = myEntity.myPosition + aDirection * shootingData.myProjectileSpawnOffset;
 	Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, prefab);
 	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
+	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 }
 
 void ProjectileShootingComponent::TriggerCooldown()

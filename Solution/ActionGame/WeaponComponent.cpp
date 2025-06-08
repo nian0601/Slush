@@ -7,8 +7,10 @@
 #include "StatsComponent.h"
 #include "TargetingComponent.h"
 #include "WeaponComponent.h"
+#include "SpriteComponent.h"
 
 #include <Physics\PhysicsWorld.h>
+#include <Graphics\BaseSprite.h>
 
 Weapon::Weapon(Entity& anEntity)
 	: myEntity(anEntity)
@@ -38,7 +40,7 @@ void ProjectileShooter::ShootProjectile(const Vector2f& aDirection)
 {
 	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myProjectilePrefab.GetBuffer());
 	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myBaseProjectileSpeed;
-
+	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
 		int damage = myBaseDamage;

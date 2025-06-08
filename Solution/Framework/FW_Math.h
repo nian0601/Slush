@@ -35,6 +35,30 @@ inline int FW_RandInt(int aMin, int aMax)
 	return (rand() & (aMax - aMin + 1)) + aMin;
 }
 
+inline float FW_SignedAngle(const Vector2f& aVector)
+{
+	Vector2f normalized = GetNormalized(aVector);
+	return atan2f(normalized.y, normalized.x);
+}
+
+inline float FW_AngleBetweenVectors(const Vector2f& a, const Vector2f& b)
+{
+	Vector2f normalizedA = GetNormalized(a);
+	Vector2f normalizedB = GetNormalized(b);
+
+	float angle = Dot(normalizedA, normalizedB);
+	return acosf(angle);
+}
+
+inline float FW_AngleBetweenVectors(const Vector3f& a, const Vector3f& b)
+{
+	Vector3f normalizedA = GetNormalized(a);
+	Vector3f normalizedB = GetNormalized(b);
+
+	float angle = Dot(normalizedA, normalizedB);
+	return acosf(angle);
+}
+
 inline Vector2f FW_RandomVector2f()
 {
 	return { FW_RandFloat(), FW_RandFloat() };

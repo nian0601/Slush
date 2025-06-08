@@ -6,11 +6,18 @@ namespace Slush
 {
 	struct AnimationRuntimeTrackData
 	{
-		void Reset();
+		virtual void Reset();
 
 		bool myIsActive = false;
 		float myValue = FLT_MAX;
 		int myCurrentClip = 0;
+	};
+
+	struct SpritesheetRuntimeTrackData : public AnimationRuntimeTrackData
+	{
+		void Reset() override;
+
+		Recti myFrameRect;
 	};
 
 	struct AnimationRuntime
@@ -32,6 +39,7 @@ namespace Slush
 		AnimationRuntimeTrackData myScaleData;
 		AnimationRuntimeTrackData myPositionData;
 		AnimationRuntimeTrackData myColorData;
+		SpritesheetRuntimeTrackData mySpritesheetData;
 
 		Vector2f myStartPosition;
 		Vector2f myEndPosition;

@@ -11,6 +11,7 @@
 
 #include <Physics\PhysicsWorld.h>
 #include <Graphics\BaseSprite.h>
+#include "AnimationComponent.h"
 
 Weapon::Weapon(Entity& anEntity)
 	: myEntity(anEntity)
@@ -49,6 +50,9 @@ void ProjectileShooter::ShootProjectile(const Vector2f& aDirection)
 
 		projDamage->SetDamage(damage);
 	}
+
+	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+		anim->PlaySpritesheetAnimation();
 }
 
 //////////////////////////////////////////////////////////////////////////

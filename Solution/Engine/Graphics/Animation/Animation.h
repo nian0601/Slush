@@ -9,6 +9,8 @@ namespace Slush
 
 	struct AnimationRuntime;
 	struct AnimationRuntimeTrackData;
+	struct SpritesheetRuntimeTrackData;
+
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -51,9 +53,17 @@ namespace Slush
 		Interpolator myInterpolator;
 
 	protected:
+		virtual void OnUpdate() {}
+
 		float myStartTime = FLT_MAX;
 		float myEndTime = FLT_MAX;
 		bool myIsWaitingClip = false;
+	};
+
+	class SpritesheetClip : public AnimationClip
+	{
+	public:
+		Vector2i myFramePos;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -67,11 +77,31 @@ namespace Slush
 
 		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData);
 
-	private:
+	protected:
 		AnimationClip& AddClip(float aDuration);
 
 		FW_GrowingArray<AnimationClip> myClips;
 		float myEndTime = 0.f;
+	};
+
+	class SpritesheetTrack
+	{
+	public:
+		void SetFPS(float aFPS) { myFPS = aFPS; }
+		void SetFrameSize(const Vector2i& aFrameSize) { myFrameSize = aFrameSize; }
+
+		SpritesheetTrack& Frame(const Vector2i& aFramePosition);
+
+		bool Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData);
+
+	private:
+		SpritesheetClip& AddClip(float aDuration);
+
+		FW_GrowingArray<SpritesheetClip> myClips;
+		float myEndTime = 0.f;
+
+		float myFPS;
+		Vector2i myFrameSize;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -87,6 +117,7 @@ namespace Slush
 		AnimationTrack myScaleTrack;
 		AnimationTrack myPositionTrack;
 		AnimationTrack myColorTrack;
+		SpritesheetTrack mySpritesheetTrack;
 
 	private:
 		void ApplyAnimation(AnimationRuntime& aRuntimeData, BaseSprite& aSprite);

@@ -34,6 +34,13 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	mySpawnAnimation->myScaleTrack
 		.Linear(0.25f, 0.f, 1.f);
 
+	mySpritesheetAnimation = new Slush::Animation();
+	mySpritesheetAnimation->MakeOneShot();
+	mySpritesheetAnimation->mySpritesheetTrack.SetFPS(15.f);
+	mySpritesheetAnimation->mySpritesheetTrack.SetFrameSize({ 96, 96 });
+	for (int i = 0; i < 6; ++i)
+		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 });
+	
 	myRuntime = new Slush::AnimationRuntime();
 }
 
@@ -95,4 +102,10 @@ void AnimationComponent::PlaySpawn()
 	myRuntime->Start();
 
 	myCurrentAnimation = mySpawnAnimation;
+}
+
+void AnimationComponent::PlaySpritesheetAnimation()
+{
+	myRuntime->Start();
+	myCurrentAnimation = mySpritesheetAnimation;
 }

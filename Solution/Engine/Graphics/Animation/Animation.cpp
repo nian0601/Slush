@@ -47,7 +47,10 @@ namespace Slush
 		if (anElapsedTime >= myEndTime)
 		{
 			if (!myIsWaitingClip)
+			{
 				outValue = myInterpolator.GetValue(1.f);
+				OnUpdate();
+			}
 
 			return State::Finished;
 		}
@@ -56,6 +59,7 @@ namespace Slush
 		{
 			float progress = FW_UnLerp(myStartTime, myEndTime, anElapsedTime);
 			outValue = myInterpolator.GetValue(progress);
+			OnUpdate();
 		}
 
 		return State::Running;
@@ -103,11 +107,50 @@ namespace Slush
 		return true;
 	}
 
-	Slush::AnimationClip& AnimationTrack::AddClip(float aDuration)
+	AnimationClip& AnimationTrack::AddClip(float aDuration)
 	{
 		AnimationClip& clip = myClips.Add();
 		clip.SetStartTimeAndDuration(myEndTime, aDuration);
 
+		myEndTime += aDuration;
+
+		return clip;
+	}
+
+
+	SpritesheetTrack& SpritesheetTrack::Frame(const Vector2i& aFramePosition)
+	{
+		SpritesheetClip& clip = AddClip(1.f / myFPS);
+		clip.myFramePos = aFramePosition;
+
+		return *this;
+	}
+
+
+	bool SpritesheetTrack::Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData)
+	{
+		if (aTrackData.myCurrentClip >= myClips.Count())
+		{
+			aTrackData.myIsActive = false;
+			return false;
+		}
+
+		AnimationClip::State state = myClips[aTrackData.myCurrentClip].Update(anElapsedTime, aTrackData.myValue);
+
+		Vector2i framePos = myClips[aTrackData.myCurrentClip].myFramePos;
+		aTrackData.myFrameRect = MakeRectFromTopLeft(framePos * myFrameSize, myFrameSize);
+
+		if (state == AnimationClip::State::Finished)
+			++aTrackData.myCurrentClip;
+
+		aTrackData.myIsActive = state != AnimationClip::State::NotStarted;
+		return true;
+	}
+
+	SpritesheetClip& SpritesheetTrack::AddClip(float aDuration)
+	{
+		SpritesheetClip& clip = myClips.Add();
+		clip.SetStartTimeAndDuration(myEndTime, aDuration);
 		myEndTime += aDuration;
 
 		return clip;
@@ -126,6 +169,7 @@ namespace Slush
 		anyTrackActive |= myScaleTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myScaleData);
 		anyTrackActive |= myPositionTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myPositionData);
 		anyTrackActive |= myColorTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myColorData);
+		anyTrackActive |= mySpritesheetTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.mySpritesheetData);
 
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
@@ -149,5 +193,11 @@ namespace Slush
 
 		if (aRuntimeData.myColorData.myIsActive)
 			aSprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, aRuntimeData.myColorData.myValue));
+
+		if (aRuntimeData.mySpritesheetData.myIsActive)
+		{
+			const Recti& texRect = aRuntimeData.mySpritesheetData.myFrameRect;
+			aSprite.SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
+		}
 	}
 }

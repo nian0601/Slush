@@ -36,11 +36,17 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
 			anim->PlayDash(myEntity.myPosition + myDirection * 500.f);
 
+		if (anim && input.WasKeyPressed(Slush::Input::V))
+			anim->PlaySpritesheetAnimation();
+
 		ProjectileShootingComponent* projShoot = myEntity.GetComponent<ProjectileShootingComponent>();
 		if (projShoot && input.WasMousePressed(Slush::Input::LEFTMB))
 		{
 			Vector2f toCursor = input.GetMousePositionf() - myEntity.myPosition;
 			projShoot->TryShoot(GetNormalized(toCursor));
+
+			if (anim)
+				anim->PlaySpritesheetAnimation();
 		}
 	}
 }

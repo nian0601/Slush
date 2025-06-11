@@ -71,6 +71,7 @@ public:
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
 		window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
+		window.AddDockable(new ActionGameGlobals::DebugSettingsDockable());
 
 		Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
 		window.AddDockable(contentBrowser);
@@ -180,6 +181,9 @@ public:
 		{
 		case App::START_SCREEN:
 		{
+			if (ActionGameGlobals::GetInstance().myDebugSettings.mySkipStartScreen)
+				myGameState = LOADING_LEVEL;
+
 			Slush::Engine& engine = Slush::Engine::GetInstance();
 			myStartGameUIManager->Update(engine.GetInput());
 

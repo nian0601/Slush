@@ -2,8 +2,43 @@
 
 #include "ActionGameGlobals.h"
 
-ActionGameGlobals* ActionGameGlobals::ourInstance = nullptr;
+void ActionGameGlobals::DebugSettings::LoadFromDisk()
+{
+	Slush::AssetParser parser;
+	Slush::AssetParser::Handle rootHandle = parser.Load("Data/DebugSettings.sdebug");
 
+	if (rootHandle.IsValid())
+		OnParse(rootHandle);
+}
+
+void ActionGameGlobals::DebugSettings::SaveToDisk()
+{
+	Slush::AssetParser parser;
+	Slush::AssetParser::Handle rootHandle = parser.StartWriting("DebugSettings");
+
+	OnParse(rootHandle);
+
+	parser.FinishWriting("Data/DebugSettings.sdebug");
+}
+
+void ActionGameGlobals::DebugSettings::OnParse(Slush::AssetParser::Handle aHandle)
+{
+	aHandle.ParseBoolField("PauseEnemySpawning", myPauseEnemySpawning);
+	aHandle.ParseBoolField("SkipStartScreen", mySkipStartScreen);
+}
+
+
+void ActionGameGlobals::DebugSettingsDockable::OnBuildUI()
+{
+	ActionGameGlobals::DebugSettings& settings = ActionGameGlobals::GetInstance().myDebugSettings;
+	ImGui::Checkbox("Pause Enemy Spawning", &settings.myPauseEnemySpawning);
+	ImGui::Checkbox("Skip Start Screen", &settings.mySkipStartScreen);
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+
+ActionGameGlobals* ActionGameGlobals::ourInstance = nullptr;
 ActionGameGlobals& ActionGameGlobals::GetInstance()
 {
 	if (!ourInstance)
@@ -43,13 +78,15 @@ Slush::AssetStorage<EntityPrefab>& ActionGameGlobals::GetEntityPrefabStorage()
 
 ActionGameGlobals::ActionGameGlobals()
 {
+	myDebugSettings.LoadFromDisk();
 }
 
 ActionGameGlobals::~ActionGameGlobals()
 {
+	myDebugSettings.SaveToDisk();
+
 	myEntityManager = nullptr;
 	myPhysicsWorld = nullptr;
 	myTextureStorage = nullptr;
 	myEntityPrefabStorage = nullptr;
 }
-

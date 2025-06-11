@@ -8,8 +8,9 @@
 // from here, since IAssetStorage will return base Asset*, so it needs to be
 // casted into the actual asset, but maybe thats fine?
 #include "Graphics/Texture.h"
+#include "Core/Assets/AssetParser.h"
+#include "Core/Dockables/Dockable.h"
 class EntityManager;
-
 namespace Slush
 {
 	template<typename T>
@@ -22,6 +23,27 @@ namespace Slush
 class ActionGameGlobals
 {
 public:
+	struct DebugSettings
+	{
+		void LoadFromDisk();
+		void SaveToDisk();
+
+		bool myPauseEnemySpawning = false;
+		bool mySkipStartScreen = false;
+
+	private:
+		void OnParse(Slush::AssetParser::Handle aHandle);
+	};
+
+	class DebugSettingsDockable : public Slush::Dockable
+	{
+	public:
+		const char* GetName() const override { return "Debug Settings"; }
+
+	protected:
+		void OnBuildUI() override;
+	};
+
 	static ActionGameGlobals& GetInstance();
 	static void Destroy();
 
@@ -34,6 +56,8 @@ public:
 	Slush::PhysicsWorld& GetPhysicsWorld();
 	Slush::AssetStorage<Slush::Texture>& GetTextureStorage();
 	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
+
+	DebugSettings myDebugSettings;
 
 private:
 	ActionGameGlobals();

@@ -16,6 +16,9 @@ NPCWave::NPCWave()
 
 void NPCWave::Update()
 {
+	if (ActionGameGlobals::GetInstance().myDebugSettings.myPauseEnemySpawning)
+		return;
+
 	for (int i = 0; i < myNPCs.Count();)
 	{
 		if (!myNPCs[i].IsValid())

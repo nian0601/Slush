@@ -1,0 +1,5 @@
+DebugSettings 
+{ 
+	PauseEnemySpawning 1 
+	SkipStartScreen 1 
+} 

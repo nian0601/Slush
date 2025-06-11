@@ -25,6 +25,7 @@ public:
 
 private:
 	FILE* myFile;
+	int myOpenResult;
 	FW_String myFilePath;
 };
 

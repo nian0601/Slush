@@ -8,17 +8,20 @@ FW_FileParser::FW_FileParser(const char* aFile)
 	FW_String realFilePath;
 	FW_FileSystem::GetAbsoluteFilePath(aFile, realFilePath);
 
-	int result = fopen_s(&myFile, realFilePath.GetBuffer(), "r");
-	FW_ASSERT(result == 0, "Failed to open file");
+	myOpenResult = fopen_s(&myFile, realFilePath.GetBuffer(), "r");
 }
 
 FW_FileParser::~FW_FileParser()
 {
-	fclose(myFile);
+	if (myOpenResult == 0)
+		fclose(myFile);
 }
 
 bool FW_FileParser::ReadLine(FW_String& outLine)
 {
+	if (myOpenResult != 0)
+		return false;
+
 	char text[256];
 
 	char* result = fgets(text, 256, myFile);

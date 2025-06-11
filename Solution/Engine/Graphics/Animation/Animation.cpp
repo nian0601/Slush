@@ -118,10 +118,11 @@ namespace Slush
 	}
 
 
-	SpritesheetTrack& SpritesheetTrack::Frame(const Vector2i& aFramePosition)
+	SpritesheetTrack& SpritesheetTrack::Frame(const Vector2i& aFramePosition, Texture* aTexture /*= nullptr*/)
 	{
 		SpritesheetClip& clip = AddClip(1.f / myFPS);
 		clip.myFramePos = aFramePosition;
+		clip.myTexture = aTexture;
 
 		return *this;
 	}
@@ -157,7 +158,7 @@ namespace Slush
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	void Animation::Update(AnimationRuntime& aRuntimeData, BaseSprite& aSprite)
+	void Animation::Update(AnimationRuntime& aRuntimeData)
 	{
 		if (aRuntimeData.myState != AnimationClip::Running)
 			return;
@@ -174,30 +175,35 @@ namespace Slush
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
 
-		ApplyAnimation(aRuntimeData, aSprite);
+		ApplyAnimation(aRuntimeData);
 
-		if (aRuntimeData.myState == AnimationRuntime::Finished && myIsLooping)
-			aRuntimeData.Start();
+		if (aRuntimeData.myState == AnimationRuntime::Finished)
+		{
+			aRuntimeData.Stop();
+
+			if (myIsLooping)
+				aRuntimeData.Start();
+		}
 	}
 
-	void Animation::ApplyAnimation(AnimationRuntime& aRuntimeData, BaseSprite& aSprite)
+	void Animation::ApplyAnimation(AnimationRuntime& aRuntimeData)
 	{
 		if (aRuntimeData.myOutlineData.myIsActive)
-			aSprite.SetOutlineThickness(aRuntimeData.myOutlineData.myValue);
+			aRuntimeData.mySprite.SetOutlineThickness(aRuntimeData.myOutlineData.myValue);
 
 		if (aRuntimeData.myScaleData.myIsActive)
-			aSprite.SetScale(aRuntimeData.myScaleData.myValue);
+			aRuntimeData.mySprite.SetScale(aRuntimeData.myScaleData.myValue);
 
 		if (aRuntimeData.myPositionData.myIsActive)
 			aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, aRuntimeData.myPositionData.myValue);
 
 		if (aRuntimeData.myColorData.myIsActive)
-			aSprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, aRuntimeData.myColorData.myValue));
+			aRuntimeData.mySprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, aRuntimeData.myColorData.myValue));
 
 		if (aRuntimeData.mySpritesheetData.myIsActive)
 		{
 			const Recti& texRect = aRuntimeData.mySpritesheetData.myFrameRect;
-			aSprite.SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
+			aRuntimeData.mySprite.SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
 		}
 	}
 }

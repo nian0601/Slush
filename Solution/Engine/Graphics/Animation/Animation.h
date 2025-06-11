@@ -6,6 +6,7 @@ namespace Slush
 {
 	class Animation;
 	class BaseSprite;
+	class Texture;
 
 	struct AnimationRuntime;
 	struct AnimationRuntimeTrackData;
@@ -64,6 +65,7 @@ namespace Slush
 	{
 	public:
 		Vector2i myFramePos;
+		Texture* myTexture = nullptr;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -90,7 +92,7 @@ namespace Slush
 		void SetFPS(float aFPS) { myFPS = aFPS; }
 		void SetFrameSize(const Vector2i& aFrameSize) { myFrameSize = aFrameSize; }
 
-		SpritesheetTrack& Frame(const Vector2i& aFramePosition);
+		SpritesheetTrack& Frame(const Vector2i& aFramePosition, Texture* aTexture = nullptr);
 
 		bool Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData);
 
@@ -109,7 +111,7 @@ namespace Slush
 	class Animation
 	{
 	public:
-		void Update(AnimationRuntime& aRuntimeData, BaseSprite& aSprite);
+		void Update(AnimationRuntime& aRuntimeData);
 
 		void MakeOneShot() { myIsLooping = false; }
 
@@ -120,7 +122,7 @@ namespace Slush
 		SpritesheetTrack mySpritesheetTrack;
 
 	private:
-		void ApplyAnimation(AnimationRuntime& aRuntimeData, BaseSprite& aSprite);
+		void ApplyAnimation(AnimationRuntime& aRuntimeData);
 
 		bool myIsLooping = true;
 	};

@@ -41,7 +41,7 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	for (int i = 0; i < 6; ++i)
 		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 });
 	
-	myRuntime = new Slush::AnimationRuntime();
+	
 }
 
 AnimationComponent::~AnimationComponent()
@@ -50,7 +50,7 @@ AnimationComponent::~AnimationComponent()
 	FW_SAFE_DELETE(myRuntime);
 }
 
-void AnimationComponent::Update()
+void AnimationComponent::OnEnterWorld()
 {
 	SpriteComponent* sprite = myEntity.GetComponent<SpriteComponent>();
 	if (!sprite)
@@ -59,10 +59,21 @@ void AnimationComponent::Update()
 		return;
 	}
 
+	myRuntime = new Slush::AnimationRuntime(sprite->GetSprite());
+}
+
+void AnimationComponent::Update()
+{
+	if (!myRuntime)
+	{
+		SLUSH_WARNING("Updating AnimationComponent without a Runtime");
+		return;
+	}
+
 	if (!myCurrentAnimation)
 		return;
 
-	myCurrentAnimation->Update(*myRuntime, sprite->GetSprite());
+	myCurrentAnimation->Update(*myRuntime);
 	if (myRuntime->myPositionData.myIsActive)
 	{
 		myEntity.myPosition = myRuntime->myCurrentPosition;

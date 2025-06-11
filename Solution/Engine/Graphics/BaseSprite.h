@@ -25,6 +25,8 @@ namespace Slush
 		void SetOutlineColor(float a, float r, float g, float b);
 		void SetOutlineThickness(float aThickness);
 
+		const Texture* GetTexture() const { return myTexture; }
+		const Recti& GetTextureRect() const { return myTextureRect; }
 		const Vector2f& GetPosition() const { return myPosition; }
 		float GetRotation() const { return myRotation; }
 		float GetScale() const { return myScale; }
@@ -40,6 +42,8 @@ namespace Slush
 		BaseSprite(sf::Shape* aShape);
 
 		sf::Shape* myShape;
+		const Texture* myTexture;
+		Recti myTextureRect;
 		Vector2f mySize;
 		Vector2f myPosition;
 		float myRotation = 0.f;

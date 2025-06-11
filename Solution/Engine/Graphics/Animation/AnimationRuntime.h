@@ -4,9 +4,13 @@
 
 namespace Slush
 {
+	class BaseSprite;
+	class Texture;
+
 	struct AnimationRuntimeTrackData
 	{
-		virtual void Reset();
+		virtual void Start(BaseSprite& aSprite);
+		virtual void End(BaseSprite& aSprite) { aSprite; };
 
 		bool myIsActive = false;
 		float myValue = FLT_MAX;
@@ -15,9 +19,13 @@ namespace Slush
 
 	struct SpritesheetRuntimeTrackData : public AnimationRuntimeTrackData
 	{
-		void Reset() override;
+		void Start(BaseSprite& aSprite) override;
+		void End(BaseSprite& aSprite) override;
 
 		Recti myFrameRect;
+
+		const Texture* myPreviousTexture;
+		Recti myPreviousFrameRect;
 	};
 
 	struct AnimationRuntime
@@ -29,9 +37,14 @@ namespace Slush
 			Finished,
 		};
 
+		AnimationRuntime(BaseSprite& aSprite);
+
 		void Start();
+		void Stop();
+
 		bool IsFinished() const { return myState == Finished; }
 
+		BaseSprite& mySprite;
 		State myState = NotStarted;
 		float myElapsedTime = 0.f;
 

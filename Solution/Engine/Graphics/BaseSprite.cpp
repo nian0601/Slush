@@ -14,6 +14,7 @@ namespace Slush
 {
 	BaseSprite::BaseSprite(sf::Shape* aShape)
 		: myShape(aShape)
+		, myTexture(nullptr)
 	{
 	}
 
@@ -24,6 +25,8 @@ namespace Slush
 
 	void BaseSprite::SetTexture(const Texture& aTexture)
 	{
+		myTexture = &aTexture;
+
 		if (const sf::Texture* sfmlTexture = aTexture.GetSFMLTexture())
 			myShape->setTexture(sfmlTexture);
 		else
@@ -32,6 +35,7 @@ namespace Slush
 
 	void BaseSprite::SetTextureRect(int x, int y, int aWidth, int aHeight)
 	{
+		myTextureRect = MakeRectFromTopLeft<int>({ x, y }, { aWidth, aHeight });
 		sf::IntRect rect = { x, y, aWidth, aHeight };
 		myShape->setTextureRect(rect);
 	}

@@ -19,6 +19,7 @@ public:
 	AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~AnimationComponent();
 
+	void OnEnterWorld() override;
 	void Update() override;
 	bool AnimationIsPlaying() const;
 

@@ -2,6 +2,7 @@
 
 #include "EntityHandle.h"
 #include <UI\UILayout.h>
+#include <UI\UIManager.h>
 
 class EntityManager;
 class NPCWave;
@@ -13,6 +14,7 @@ namespace Slush
 	class UIButton;
 	class UIManager;
 	class Font;
+	class RectSprite;
 }
 
 class Level
@@ -42,6 +44,10 @@ private:
 	Slush::UIButton* myCooldownUpgradeButton;
 	Slush::UIButton* myProjectileUpgradeButton;
 	Slush::UIManager* myUIManager;
+
+
+	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
+	Slush::RectSprite* myUISprite;
 
 	Tilemap* myTilemap;
 };

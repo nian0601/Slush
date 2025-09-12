@@ -6,6 +6,7 @@
 #include "UIButton.h"
 #include "UIRect.h"
 #include <Graphics\Window.h>
+#include <Core\Input.h>
 
 namespace Slush
 {
@@ -107,6 +108,54 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
+	void UIElementStyle::SetLayoutDirection(UIElementStyle::LayoutDirection aDirection)
+	{
+		myLayoutDirection = aDirection;
+	}
+
+	void UIElementStyle::SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
+	{
+		myXSizing = aSizingMode;
+		if (aSizingMode == UIElementStyle::FIXED)
+		{
+			myMinSize.x = aSize;
+			myMaxSize.x = aSize;
+		}
+	}
+
+	void UIElementStyle::SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
+	{
+		myYSizing = aSizingMode;
+		if (aSizingMode == UIElementStyle::FIXED)
+		{
+			myMinSize.y = aSize;
+			myMaxSize.y = aSize;
+		}
+	}
+
+	void UIElementStyle::SetPadding(int x, int y)
+	{
+		myPadding = { x, y };
+	}
+
+	void UIElementStyle::SetChildGap(int aGap)
+	{
+		myChildGap = aGap;
+	}
+
+	void UIElementStyle::SetColor(int aColor)
+	{
+		myColor = aColor;
+	}
+
+	void UIElementStyle::EnableButtonInteraction(int aHoverColor)
+	{
+		myInteractionFlags = UIElementStyle::BUTTON;
+		myHoverColor = aHoverColor;
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
 	void DynamicUIBuilder::Start()
 	{
 		//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -114,10 +163,11 @@ namespace Slush
 		Vector2f windowSize = { 1920.f, 1080.f };
 
 		myRoot.mySize = { (int)windowSize.x, (int)windowSize.y };
-		myRoot.myMinSize = { (int)windowSize.x, (int)windowSize.y };
-		myRoot.myMaxSize = { (int)windowSize.x, (int)windowSize.y };
-		myRoot.myXSizing = FIXED;
-		myRoot.myYSizing = FIXED;
+		myRoot.myStyle.myMinSize = { (int)windowSize.x, (int)windowSize.y };
+		myRoot.myStyle.myMaxSize = { (int)windowSize.x, (int)windowSize.y };
+		myRoot.myStyle.myXSizing = UIElementStyle::FIXED;
+		myRoot.myStyle.myYSizing = UIElementStyle::FIXED;
+		myRoot.myStyle.myColor = 0x44FFFFFF;
 	}
 
 	void DynamicUIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
@@ -138,6 +188,8 @@ namespace Slush
 		CalculatePositions(myRoot);
 
 		// Handle input
+		for (Element* child : myRoot.myChildren)
+			HandleInput(*child);
 
 		for (Element* child : myRoot.myChildren)
 			GenerateRenderCommands(*child, outRenderCommands);
@@ -165,10 +217,10 @@ namespace Slush
 
 	void DynamicUIBuilder::CloseElement()
 	{
-		int leftRightPadding = myCurrentElement->myPadding.x * 2;
-		int topBottomPadding = myCurrentElement->myPadding.y * 2;
+		int leftRightPadding = myCurrentElement->myStyle.myPadding.x * 2;
+		int topBottomPadding = myCurrentElement->myStyle.myPadding.y * 2;
 
-		if (myCurrentElement->myLayoutDirection == LEFT_TO_RIGHT)
+		if (myCurrentElement->myStyle.myLayoutDirection == UIElementStyle::LEFT_TO_RIGHT)
 		{
 			myCurrentElement->mySize.x = leftRightPadding;
 
@@ -178,10 +230,10 @@ namespace Slush
 				myCurrentElement->mySize.y = FW_Max(myCurrentElement->mySize.y, child->mySize.y + topBottomPadding);
 			}
 
-			int childGap = (myCurrentElement->myChildren.Count() - 1) * myCurrentElement->myChildGap;
+			int childGap = (myCurrentElement->myChildren.Count() - 1) * myCurrentElement->myStyle.myChildGap;
 			myCurrentElement->mySize.x += childGap;
 		}
-		else if (myCurrentElement->myLayoutDirection == TOP_TO_BOTTOM)
+		else if (myCurrentElement->myStyle.myLayoutDirection == UIElementStyle::TOP_TO_BOTTOM)
 		{
 			myCurrentElement->mySize.y = topBottomPadding;
 
@@ -191,64 +243,36 @@ namespace Slush
 				myCurrentElement->mySize.x = FW_Max(myCurrentElement->mySize.x, child->mySize.x + leftRightPadding);
 			}
 
-			int childGap = (myCurrentElement->myChildren.Count() - 1) * myCurrentElement->myChildGap;
+			int childGap = (myCurrentElement->myChildren.Count() - 1) * myCurrentElement->myStyle.myChildGap;
 			myCurrentElement->mySize.y += childGap;
 		}
 
-		myCurrentElement->mySize.x = FW_Clamp(myCurrentElement->mySize.x, myCurrentElement->myMinSize.x, myCurrentElement->myMaxSize.x);
-		myCurrentElement->mySize.y = FW_Clamp(myCurrentElement->mySize.y, myCurrentElement->myMinSize.y, myCurrentElement->myMaxSize.y);
+		myCurrentElement->mySize.x = FW_Clamp(myCurrentElement->mySize.x, myCurrentElement->myStyle.myMinSize.x, myCurrentElement->myStyle.myMaxSize.x);
+		myCurrentElement->mySize.y = FW_Clamp(myCurrentElement->mySize.y, myCurrentElement->myStyle.myMinSize.y, myCurrentElement->myStyle.myMaxSize.y);
 
 		myCurrentElement = myCurrentElement->myParent;
 	}
 
-	void DynamicUIBuilder::SetLayoutDirection(LayoutDirection aDirection)
+	void DynamicUIBuilder::SetStyle(const UIElementStyle& aStyle)
 	{
 		FW_ASSERT(myCurrentElement != nullptr);
-
-		myCurrentElement->myLayoutDirection = aDirection;
+		myCurrentElement->myStyle = aStyle;
 	}
 
-	void DynamicUIBuilder::SetXSizing(SizingMode aSizingMode, int aSize /*= 0*/)
+	Slush::UIElementStyle& DynamicUIBuilder::GetStyle()
 	{
 		FW_ASSERT(myCurrentElement != nullptr);
+		return myCurrentElement->myStyle;
+	}
 
-		myCurrentElement->myXSizing = aSizingMode;
-		if (aSizingMode == FIXED)
+	bool DynamicUIBuilder::WasClicked(const char* aIdentifier) const
+	{
+		if (Element* const* element = myInteractiveElements.GetIfExists(aIdentifier))
 		{
-			myCurrentElement->myMinSize.x = aSize;
-			myCurrentElement->myMaxSize.x = aSize;
+			return (*element)->myWasMouseReleased;
 		}
-	}
 
-	void DynamicUIBuilder::SetYSizing(SizingMode aSizingMode, int aSize /*= 0*/)
-	{
-		FW_ASSERT(myCurrentElement != nullptr);
-
-		myCurrentElement->myYSizing = aSizingMode;
-		if (aSizingMode == FIXED)
-		{
-			myCurrentElement->myMinSize.y = aSize;
-			myCurrentElement->myMaxSize.y = aSize;
-		}
-	}
-
-	void DynamicUIBuilder::SetPadding(int x, int y)
-	{
-		FW_ASSERT(myCurrentElement != nullptr);
-		myCurrentElement->myPadding = { x, y };
-	}
-
-	void DynamicUIBuilder::SetChildGap(int aGap)
-	{
-		FW_ASSERT(myCurrentElement != nullptr);
-		myCurrentElement->myChildGap = aGap;
-	}
-
-	void DynamicUIBuilder::SetColor(int aColor)
-	{
-		FW_ASSERT(myCurrentElement != nullptr);
-
-		myCurrentElement->myColor = aColor;
+		return false;
 	}
 
 	void DynamicUIBuilder::CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis)
@@ -257,9 +281,9 @@ namespace Slush
 			return;
 
 		const int parentSize = aIsXAxis ? aParent.mySize.x : aParent.mySize.y;
-		const int parentPadding = aIsXAxis ? aParent.myPadding.x * 2 : aParent.myPadding.y * 2;
-		const int parentChildGap = aParent.myChildGap;
-		const bool sizingAlongAxis = (aIsXAxis && aParent.myLayoutDirection == LEFT_TO_RIGHT) || (!aIsXAxis && aParent.myLayoutDirection == TOP_TO_BOTTOM);
+		const int parentPadding = aIsXAxis ? aParent.myStyle.myPadding.x * 2 : aParent.myStyle.myPadding.y * 2;
+		const int parentChildGap = aParent.myStyle.myChildGap;
+		const bool sizingAlongAxis = (aIsXAxis && aParent.myStyle.myLayoutDirection == UIElementStyle::LEFT_TO_RIGHT) || (!aIsXAxis && aParent.myStyle.myLayoutDirection == UIElementStyle::TOP_TO_BOTTOM);
 
 		int innerContentSize = 0;
 		int totalPaddingAndChildGaps = parentPadding;
@@ -270,15 +294,15 @@ namespace Slush
 		{
 			Element* child = aParent.myChildren[i];
 			const int childSize = aIsXAxis ? child->mySize.x : child->mySize.y;
-			const SizingMode childSizingMode = aIsXAxis ? child->myXSizing : child->myYSizing;
+			const UIElementStyle::SizingMode childSizingMode = aIsXAxis ? child->myStyle.myXSizing : child->myStyle.myYSizing;
 
-			if (childSizingMode == GROW)
+			if (childSizingMode == UIElementStyle::GROW)
 				resizables.Add(child);
 
 			if (sizingAlongAxis)
 			{
 				innerContentSize += childSize;
-				if (childSizingMode == GROW)
+				if (childSizingMode == UIElementStyle::GROW)
 					++numGrowContainers;
 
 				if (i > 0)
@@ -334,7 +358,7 @@ namespace Slush
 					{
 						Element* child = resizables[i];
 						int& childSize = aIsXAxis ? child->mySize.x : child->mySize.y;
-						const int maxSize = aIsXAxis ? child->myMaxSize.x : child->myMaxSize.y;
+						const int maxSize = aIsXAxis ? child->myStyle.myMaxSize.x : child->myStyle.myMaxSize.y;
 						int previousSize = childSize;
 						if (childSize == smallest)
 						{
@@ -355,12 +379,12 @@ namespace Slush
 				{
 					Element* child = resizables[i];
 					int& childSize = aIsXAxis ? child->mySize.x : child->mySize.y;
-					const int childMinSize = aIsXAxis ? child->myMinSize.x : child->myMinSize.y;
-					const int childMaxSize = aIsXAxis ? child->myMaxSize.x : child->myMaxSize.y;
-					const SizingMode childSizingMode = aIsXAxis ? child->myXSizing : child->myYSizing;
+					const int childMinSize = aIsXAxis ? child->myStyle.myMinSize.x : child->myStyle.myMinSize.y;
+					const int childMaxSize = aIsXAxis ? child->myStyle.myMaxSize.x : child->myStyle.myMaxSize.y;
+					const UIElementStyle::SizingMode childSizingMode = aIsXAxis ? child->myStyle.myXSizing : child->myStyle.myYSizing;
 
 					int maxSize = parentSize - parentPadding;
-					if (childSizingMode == GROW)
+					if (childSizingMode == UIElementStyle::GROW)
 						childSize = FW_Min(maxSize, childMaxSize);
 
 					childSize = FW_Max(childMinSize, FW_Min(childSize, maxSize));
@@ -374,18 +398,18 @@ namespace Slush
 
 	void DynamicUIBuilder::CalculatePositions(Element& anElement)
 	{
-		int xOffset = anElement.myPadding.x;
-		int yOffset = anElement.myPadding.y;
+		int xOffset = anElement.myStyle.myPadding.x;
+		int yOffset = anElement.myStyle.myPadding.y;
 		for (Element* child : anElement.myChildren)
 		{
 			child->myPosition.x = anElement.myPosition.x + xOffset;
 			child->myPosition.y = anElement.myPosition.y + yOffset;
 			CalculatePositions(*child);
 
-			if (anElement.myLayoutDirection == LEFT_TO_RIGHT)
-				xOffset += child->mySize.x + anElement.myChildGap;
-			else if (anElement.myLayoutDirection == TOP_TO_BOTTOM)
-				yOffset += child->mySize.y + anElement.myChildGap;
+			if (anElement.myStyle.myLayoutDirection == UIElementStyle::LEFT_TO_RIGHT)
+				xOffset += child->mySize.x + anElement.myStyle.myChildGap;
+			else if (anElement.myStyle.myLayoutDirection == UIElementStyle::TOP_TO_BOTTOM)
+				yOffset += child->mySize.y + anElement.myStyle.myChildGap;
 		}
 	}
 
@@ -400,15 +424,44 @@ namespace Slush
 		}
 	}
 
+	bool DynamicUIBuilder::HandleInput(Element& anElement)
+	{
+		const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
+		for (Element* child : anElement.myChildren)
+		{
+			if (HandleInput(*child))
+				return true;
+		}
+
+		if (anElement.myStyle.myInteractionFlags != UIElementStyle::BUTTON)
+			return false;
+
+		myInteractiveElements[anElement.myIdentifier] = &anElement;
+
+		Recti rect = MakeRectFromTopLeft(anElement.myPosition, anElement.mySize);
+
+		if (Contains(rect, input.GetMousePosition()))
+		{
+			anElement.myStyle.myColor = anElement.myStyle.myHoverColor;
+
+			if (input.WasMouseReleased(Input::LEFTMB))
+			{
+				anElement.myWasMouseReleased = true;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	void DynamicUIBuilder::GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands)
 	{
 		RenderCommand& command = outRenderCommands.Add();
 		command.myPosition = anElement.myPosition;
 		command.mySize = anElement.mySize;
-		command.myColor = anElement.myColor;
+		command.myColor = anElement.myStyle.myColor;
 
 		for (Element* child : anElement.myChildren)
 			GenerateRenderCommands(*child, outRenderCommands);
 	}
-
 }

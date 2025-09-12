@@ -108,10 +108,6 @@ void Level::Update()
 					expComp->LevelUp();
 					myIsLevelingUp = false;
 				}
-
-
-				
-
 			}
 		}
 		else
@@ -124,26 +120,65 @@ void Level::Update()
 
 	myUIRenderCommands.RemoveAll();
 
+	Slush::UIElementStyle backgroundStyle;
+	backgroundStyle.SetPadding(16, 32);
+	backgroundStyle.SetChildGap(16);
+	backgroundStyle.SetColor(0xAA121212);
+	backgroundStyle.SetXSizing(Slush::UIElementStyle::GROW);
+
+	Slush::UIElementStyle btnStyle;
+	btnStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
+	btnStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
+	btnStyle.SetColor(0xFFAAFFAF);
+	btnStyle.EnableButtonInteraction(0xFFFF00FF);
+
+
 	Slush::DynamicUIBuilder uiBuilder;
 	uiBuilder.Start();
 
 	uiBuilder.OpenElement("Middle background");
-	uiBuilder.SetPadding(16, 16);
-	uiBuilder.SetChildGap(16);
-	uiBuilder.SetColor(0xFF3333FF);
+	uiBuilder.SetStyle(backgroundStyle);
 
-	for (int i = 0; i < 3; ++i)
-	{
-		uiBuilder.OpenElement("Middle button");
-		uiBuilder.SetXSizing(Slush::DynamicUIBuilder::FIXED, 250);
-		uiBuilder.SetYSizing(Slush::DynamicUIBuilder::FIXED, 75);
-		uiBuilder.SetColor(0xFFAAFFAA);
-		uiBuilder.CloseElement();
-	}
-
+	uiBuilder.OpenElement();
+	uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
 	uiBuilder.CloseElement();
 
+	uiBuilder.OpenElement("Btn1");
+	uiBuilder.SetStyle(btnStyle);
+	uiBuilder.GetStyle().SetColor(0xFFFF3333);
+	uiBuilder.CloseElement();
+	
+	uiBuilder.OpenElement("Btn2");
+	uiBuilder.SetStyle(btnStyle);
+	uiBuilder.GetStyle().SetColor(0xFFFFFF33);
+	uiBuilder.CloseElement();
+	
+	uiBuilder.OpenElement("Btn3");
+	uiBuilder.GetStyle().SetColor(0xFF33FF33);
+	uiBuilder.SetStyle(btnStyle);
+	uiBuilder.CloseElement();
+	
+	uiBuilder.OpenElement();
+	uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
+	uiBuilder.CloseElement();
+
+	uiBuilder.CloseElement();
+	
 	uiBuilder.Finish(myUIRenderCommands);
+
+
+	if (uiBuilder.WasClicked("Btn1"))
+	{
+		SLUSH_ERROR("BTN1 CLICKED");
+	}
+	if (uiBuilder.WasClicked("Btn2"))
+	{
+		SLUSH_INFO("BTN2 CLICKED");
+	}
+	if (uiBuilder.WasClicked("Btn3"))
+	{
+		SLUSH_WARNING("BTN3 CLICKED");
+	}
 }
 
 void Level::RenderGame()

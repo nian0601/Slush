@@ -39,11 +39,8 @@ namespace Slush
 		FW_GrowingArray<UIWidget*> myDiscardedWidgets;
 	};
 
-
-
-	class DynamicUIBuilder
+	struct UIElementStyle
 	{
-	public:
 		enum SizingMode
 		{
 			FIT,
@@ -57,6 +54,38 @@ namespace Slush
 			TOP_TO_BOTTOM,
 		};
 
+		enum InteractionFlag
+		{
+			NONE,
+			BUTTON,
+		};
+
+		void SetLayoutDirection(UIElementStyle::LayoutDirection aDirection);
+		void SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
+		void SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
+		void SetPadding(int x, int y);
+		void SetChildGap(int aGap);
+		void SetColor(int aColor);
+
+		void EnableButtonInteraction(int aHoverColor);
+
+		SizingMode myXSizing = FIT;
+		SizingMode myYSizing = FIT;
+		LayoutDirection myLayoutDirection = LEFT_TO_RIGHT;
+
+		Vector2i myMinSize = { 0, 0 };
+		Vector2i myMaxSize = { INT_MAX, INT_MAX };
+		Vector2i myPadding = { 0, 0 };
+		int myChildGap = 0;
+		int myColor = -1;
+
+		int myInteractionFlags = NONE;
+		int myHoverColor = -1;
+	};
+
+	class DynamicUIBuilder
+	{
+	public:
 		enum Alignment
 		{
 			TOP_LEFT,
@@ -76,12 +105,10 @@ namespace Slush
 		void OpenElement(const char* aIdentifier = nullptr);
 		void CloseElement();
 
-		void SetLayoutDirection(LayoutDirection aDirection);
-		void SetXSizing(SizingMode aSizingMode, int aSize = 0);
-		void SetYSizing(SizingMode aSizingMode, int aSize = 0);
-		void SetPadding(int x, int y);
-		void SetChildGap(int aGap);
-		void SetColor(int aColor);
+		void SetStyle(const UIElementStyle& aStyle);
+		UIElementStyle& GetStyle();
+
+		bool WasClicked(const char* aIdentifier) const;
 
 	private:
 		struct Element
@@ -93,17 +120,13 @@ namespace Slush
 
 			FW_String myIdentifier;
 
-			SizingMode myXSizing = FIT;
-			SizingMode myYSizing = FIT;
-			LayoutDirection myLayoutDirection = LEFT_TO_RIGHT;
+			UIElementStyle myStyle;
 
 			Vector2i myPosition = { 0, 0 };
 			Vector2i mySize = { 0, 0 };
-			Vector2i myMinSize = { 0, 0 };
-			Vector2i myMaxSize = { INT_MAX, INT_MAX };
-			Vector2i myPadding = { 0, 0 };
-			int myChildGap = 0;
 			int myColor = -1;
+
+			bool myWasMouseReleased = false; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames
 
 			Element* myParent = nullptr;
 			FW_GrowingArray<Element*> myChildren;
@@ -111,11 +134,13 @@ namespace Slush
 
 		Element myRoot;
 		Element* myCurrentElement = nullptr;
+		FW_Hashmap<FW_String, Element*> myInteractiveElements;
 		Alignment myAligment = CENTER;
 
 		void CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis);
 		void CalculatePositions(Element& anElement);
 		void CalculateBounds(Element& aParent, Vector2i& outBounds);
+		bool HandleInput(Element& anElement);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};
 }

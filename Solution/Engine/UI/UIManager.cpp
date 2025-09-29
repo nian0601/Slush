@@ -108,11 +108,6 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	void UIElementStyle::SetLayoutDirection(UIElementStyle::LayoutDirection aDirection)
-	{
-		myLayoutDirection = aDirection;
-	}
-
 	void UIElementStyle::SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
 	{
 		myXSizing = aSizingMode;
@@ -131,6 +126,16 @@ namespace Slush
 			myMinSize.y = aSize;
 			myMaxSize.y = aSize;
 		}
+	}
+
+	void UIElementStyle::SetLayoutDirection(UIElementStyle::LayoutDirection aDirection)
+	{
+		myLayoutDirection = aDirection;
+	}
+
+	void UIElementStyle::SetAlingment(UIElementStyle::Alignment anAlignment)
+	{
+		myAlignment = anAlignment;
 	}
 
 	void UIElementStyle::SetPadding(int x, int y)
@@ -168,22 +173,17 @@ namespace Slush
 		myRoot.myStyle.myXSizing = UIElementStyle::FIXED;
 		myRoot.myStyle.myYSizing = UIElementStyle::FIXED;
 		myRoot.myStyle.myColor = 0x44FFFFFF;
+
+		myRoot.myStyle.myAlignment = UIElementStyle::CENTER;
+		myRoot.myStyle.myLayoutDirection = UIElementStyle::TOP_TO_BOTTOM;
 	}
 
 	void DynamicUIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
 	{
+		FW_ASSERT(myCurrentElement == &myRoot, "Not all Elements are closed!");
+
 		CalculateSizeAlongAxis(myRoot, true);
 		CalculateSizeAlongAxis(myRoot, false);
-
-		Vector2i bounds = { 0, 0 };
-		CalculateBounds(myRoot, bounds);
-
-
-		if (myAligment == CENTER)
-		{
-			myRoot.myPosition = myRoot.mySize / 2;
-			myRoot.myPosition -= bounds / 2;
-		}
 
 		CalculatePositions(myRoot);
 
@@ -363,6 +363,11 @@ namespace Slush
 						if (childSize == smallest)
 						{
 							childSize += sizeToAdd;
+
+							//
+							innerContentSize += sizeToAdd;
+							//
+
 							if (childSize >= maxSize)
 							{
 								resizables.RemoveCyclicAtIndex(i);
@@ -373,24 +378,30 @@ namespace Slush
 					}
 				}
 			}
-			else // Sizing "off axis"
+		}
+		else // Sizing "off axis"
+		{
+			for (int i = 0; i < resizables.Count(); ++i)
 			{
-				for (int i = 0; i < resizables.Count(); ++i)
-				{
-					Element* child = resizables[i];
-					int& childSize = aIsXAxis ? child->mySize.x : child->mySize.y;
-					const int childMinSize = aIsXAxis ? child->myStyle.myMinSize.x : child->myStyle.myMinSize.y;
-					const int childMaxSize = aIsXAxis ? child->myStyle.myMaxSize.x : child->myStyle.myMaxSize.y;
-					const UIElementStyle::SizingMode childSizingMode = aIsXAxis ? child->myStyle.myXSizing : child->myStyle.myYSizing;
+				Element* child = resizables[i];
+				int& childSize = aIsXAxis ? child->mySize.x : child->mySize.y;
+				const int childMinSize = aIsXAxis ? child->myStyle.myMinSize.x : child->myStyle.myMinSize.y;
+				const int childMaxSize = aIsXAxis ? child->myStyle.myMaxSize.x : child->myStyle.myMaxSize.y;
+				const UIElementStyle::SizingMode childSizingMode = aIsXAxis ? child->myStyle.myXSizing : child->myStyle.myYSizing;
 
-					int maxSize = parentSize - parentPadding;
-					if (childSizingMode == UIElementStyle::GROW)
-						childSize = FW_Min(maxSize, childMaxSize);
+				int maxSize = parentSize - parentPadding;
+				if (childSizingMode == UIElementStyle::GROW)
+					childSize = FW_Min(maxSize, childMaxSize);
 
-					childSize = FW_Max(childMinSize, FW_Min(childSize, maxSize));
-				}
+				childSize = FW_Max(childMinSize, FW_Min(childSize, maxSize));
+				innerContentSize = FW_Max(innerContentSize, childSize);
 			}
 		}
+
+		if (aIsXAxis)
+			aParent.myContentSize.x = innerContentSize + parentPadding;
+		else
+			aParent.myContentSize.y = innerContentSize + parentPadding;
 
 		for (Element* child : aParent.myChildren)
 			CalculateSizeAlongAxis(*child, aIsXAxis);
@@ -400,27 +411,39 @@ namespace Slush
 	{
 		int xOffset = anElement.myStyle.myPadding.x;
 		int yOffset = anElement.myStyle.myPadding.y;
+
+		if (anElement.myStyle.myAlignment == UIElementStyle::CENTER)
+		{
+			xOffset += anElement.mySize.x / 2;
+			yOffset += anElement.mySize.y / 2;
+
+			xOffset -= anElement.myContentSize.x / 2;
+			yOffset -= anElement.myContentSize.y / 2;
+		}
+
 		for (Element* child : anElement.myChildren)
 		{
+			if (child->myStyle.myAlignment == UIElementStyle::CENTER)
+			{
+				if (anElement.myStyle.myLayoutDirection == UIElementStyle::LEFT_TO_RIGHT)
+					yOffset = (anElement.mySize.y / 2) - (child->mySize.y / 2);
+				else if (anElement.myStyle.myLayoutDirection == UIElementStyle::TOP_TO_BOTTOM)
+					xOffset = (anElement.mySize.x / 2) - (child->mySize.x / 2);
+			}
+
 			child->myPosition.x = anElement.myPosition.x + xOffset;
 			child->myPosition.y = anElement.myPosition.y + yOffset;
+
 			CalculatePositions(*child);
 
 			if (anElement.myStyle.myLayoutDirection == UIElementStyle::LEFT_TO_RIGHT)
+			{
 				xOffset += child->mySize.x + anElement.myStyle.myChildGap;
+			}
 			else if (anElement.myStyle.myLayoutDirection == UIElementStyle::TOP_TO_BOTTOM)
+			{
 				yOffset += child->mySize.y + anElement.myStyle.myChildGap;
-		}
-	}
-
-	void DynamicUIBuilder::CalculateBounds(Element& aParent, Vector2i& outBounds)
-	{
-		for (Element* child : aParent.myChildren)
-		{
-			CalculateBounds(*child, outBounds);
-
-			outBounds.x = FW_Max(outBounds.x, child->mySize.x);
-			outBounds.y = FW_Max(outBounds.y, child->mySize.y);
+			}
 		}
 	}
 

@@ -60,9 +60,16 @@ namespace Slush
 			BUTTON,
 		};
 
-		void SetLayoutDirection(UIElementStyle::LayoutDirection aDirection);
+		enum Alignment
+		{
+			TOP_LEFT,
+			CENTER
+		};
+
 		void SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
 		void SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
+		void SetLayoutDirection(UIElementStyle::LayoutDirection aDirection);
+		void SetAlingment(UIElementStyle::Alignment anAlignment);
 		void SetPadding(int x, int y);
 		void SetChildGap(int aGap);
 		void SetColor(int aColor);
@@ -72,6 +79,7 @@ namespace Slush
 		SizingMode myXSizing = FIT;
 		SizingMode myYSizing = FIT;
 		LayoutDirection myLayoutDirection = LEFT_TO_RIGHT;
+		Alignment myAlignment = TOP_LEFT;
 
 		Vector2i myMinSize = { 0, 0 };
 		Vector2i myMaxSize = { INT_MAX, INT_MAX };
@@ -86,11 +94,7 @@ namespace Slush
 	class DynamicUIBuilder
 	{
 	public:
-		enum Alignment
-		{
-			TOP_LEFT,
-			CENTER
-		};
+		
 
 		struct RenderCommand
 		{
@@ -124,6 +128,7 @@ namespace Slush
 
 			Vector2i myPosition = { 0, 0 };
 			Vector2i mySize = { 0, 0 };
+			Vector2i myContentSize = { 0, 0 };
 			int myColor = -1;
 
 			bool myWasMouseReleased = false; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames
@@ -135,11 +140,9 @@ namespace Slush
 		Element myRoot;
 		Element* myCurrentElement = nullptr;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;
-		Alignment myAligment = CENTER;
 
 		void CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis);
 		void CalculatePositions(Element& anElement);
-		void CalculateBounds(Element& aParent, Vector2i& outBounds);
 		bool HandleInput(Element& anElement);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};

@@ -121,10 +121,11 @@ void Level::Update()
 	myUIRenderCommands.RemoveAll();
 
 	Slush::UIElementStyle backgroundStyle;
-	backgroundStyle.SetPadding(16, 32);
+	backgroundStyle.SetPadding(16, 16);
 	backgroundStyle.SetChildGap(16);
 	backgroundStyle.SetColor(0xAA121212);
-	backgroundStyle.SetXSizing(Slush::UIElementStyle::GROW);
+	backgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
+	backgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
 
 	Slush::UIElementStyle btnStyle;
 	btnStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
@@ -136,34 +137,43 @@ void Level::Update()
 	Slush::DynamicUIBuilder uiBuilder;
 	uiBuilder.Start();
 
-	uiBuilder.OpenElement("Middle background");
-	uiBuilder.SetStyle(backgroundStyle);
+	{
+		uiBuilder.OpenElement("Bg2");
+		uiBuilder.SetStyle(backgroundStyle);
+		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::FIT);
 
-	uiBuilder.OpenElement();
-	uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-	uiBuilder.CloseElement();
+		// Replace Btn-element with "Leveled Up!"-textelement
+		uiBuilder.OpenElement("Btn4");
+		uiBuilder.SetStyle(btnStyle);
+		uiBuilder.GetStyle().SetColor(0xFFFFFF33);
+		uiBuilder.CloseElement();
 
-	uiBuilder.OpenElement("Btn1");
-	uiBuilder.SetStyle(btnStyle);
-	uiBuilder.GetStyle().SetColor(0xFFFF3333);
-	uiBuilder.CloseElement();
-	
-	uiBuilder.OpenElement("Btn2");
-	uiBuilder.SetStyle(btnStyle);
-	uiBuilder.GetStyle().SetColor(0xFFFFFF33);
-	uiBuilder.CloseElement();
-	
-	uiBuilder.OpenElement("Btn3");
-	uiBuilder.GetStyle().SetColor(0xFF33FF33);
-	uiBuilder.SetStyle(btnStyle);
-	uiBuilder.CloseElement();
-	
-	uiBuilder.OpenElement();
-	uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-	uiBuilder.CloseElement();
+		uiBuilder.CloseElement(); // Bg2
+	}
 
-	uiBuilder.CloseElement();
-	
+	{
+		uiBuilder.OpenElement("Middle background");
+		uiBuilder.SetStyle(backgroundStyle);
+
+		uiBuilder.OpenElement("Btn1");
+		uiBuilder.SetStyle(btnStyle);
+		uiBuilder.GetStyle().SetColor(0xFFFF3333);
+		uiBuilder.CloseElement();
+
+		uiBuilder.OpenElement("Btn2");
+		uiBuilder.SetStyle(btnStyle);
+		uiBuilder.GetStyle().SetColor(0xFFFFFF33);
+		uiBuilder.CloseElement();
+
+		uiBuilder.OpenElement("Btn3");
+		uiBuilder.GetStyle().SetColor(0xFF33FF33);
+		uiBuilder.SetStyle(btnStyle);
+		uiBuilder.CloseElement();
+
+		uiBuilder.CloseElement(); // Middle backround
+	}
+
+
 	uiBuilder.Finish(myUIRenderCommands);
 
 

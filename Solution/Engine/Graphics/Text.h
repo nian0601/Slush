@@ -44,6 +44,7 @@ namespace Slush
 		void SetVerticalAlignment(VerticalAlignment anAlignment);
 		void SetMaxWidth(float aWidth);
 
+		Vector2f CalculateBounds(const char* aText);
 
 		void Render();
 		void Render(float x, float y);

@@ -13,10 +13,12 @@
 #include <UI\UIButton.h>
 #include "Tilemap.h"
 #include <Graphics\RectSprite.h>
+#include <Graphics\Text.h>
 
 Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts)
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
 	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
+	, myFont(aFont)
 {
 	Entity* player = myEntityManager.CreateEntity({ 400.f, 400.f }, "Player");
 	myPlayerHandle = player->myHandle;
@@ -38,6 +40,8 @@ Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILay
 	myTilemap = new Tilemap();
 
 	myUISprite = new Slush::RectSprite();
+	myText = new Slush::Text();
+	myText->SetFont(aFont);
 }
 
 Level::~Level()
@@ -48,6 +52,7 @@ Level::~Level()
 	myEntityManager.DeleteAllEntities();
 
 	FW_SAFE_DELETE(myUISprite);
+	FW_SAFE_DELETE(myText);
 }
 
 void Level::Update()
@@ -130,8 +135,9 @@ void Level::Update()
 	Slush::UIElementStyle btnStyle;
 	btnStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
 	btnStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
+	btnStyle.SetAlingment(Slush::UIElementStyle::CENTER);
 	btnStyle.SetColor(0xFFAAFFAF);
-	btnStyle.EnableButtonInteraction(0xFFFF00FF);
+	btnStyle.EnableButtonInteraction(0xFFDDDDDD);
 
 
 	Slush::DynamicUIBuilder uiBuilder;
@@ -140,12 +146,10 @@ void Level::Update()
 	{
 		uiBuilder.OpenElement("Bg2");
 		uiBuilder.SetStyle(backgroundStyle);
-		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::FIT);
+		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
 
-		// Replace Btn-element with "Leveled Up!"-textelement
-		uiBuilder.OpenElement("Btn4");
-		uiBuilder.SetStyle(btnStyle);
-		uiBuilder.GetStyle().SetColor(0xFFFFFF33);
+		uiBuilder.OpenElement("title");
+		uiBuilder.SetText("Leveled Up!", myFont, 32);
 		uiBuilder.CloseElement();
 
 		uiBuilder.CloseElement(); // Bg2
@@ -155,21 +159,44 @@ void Level::Update()
 		uiBuilder.OpenElement("Middle background");
 		uiBuilder.SetStyle(backgroundStyle);
 
-		uiBuilder.OpenElement("Btn1");
-		uiBuilder.SetStyle(btnStyle);
-		uiBuilder.GetStyle().SetColor(0xFFFF3333);
-		uiBuilder.CloseElement();
+		{
+			uiBuilder.OpenElement("Btn1");
+			uiBuilder.SetStyle(btnStyle);
+			uiBuilder.GetStyle().SetColor(0xFFFF3333);
 
-		uiBuilder.OpenElement("Btn2");
-		uiBuilder.SetStyle(btnStyle);
-		uiBuilder.GetStyle().SetColor(0xFFFFFF33);
-		uiBuilder.CloseElement();
+			uiBuilder.OpenElement();
+			uiBuilder.SetText("Cooldown", myFont, 25);
+			uiBuilder.GetStyle().SetColor(0xFF000000);
+			uiBuilder.CloseElement();
 
-		uiBuilder.OpenElement("Btn3");
-		uiBuilder.GetStyle().SetColor(0xFF33FF33);
-		uiBuilder.SetStyle(btnStyle);
-		uiBuilder.CloseElement();
+			uiBuilder.CloseElement();
+		}
 
+		{
+			uiBuilder.OpenElement("Btn2");
+			uiBuilder.SetStyle(btnStyle);
+			uiBuilder.GetStyle().SetColor(0xFFFFFF33);
+
+			uiBuilder.OpenElement();
+			uiBuilder.SetText("Damage", myFont, 25);
+			uiBuilder.GetStyle().SetColor(0xFF000000);
+			uiBuilder.CloseElement();
+
+			uiBuilder.CloseElement();
+		}
+
+		{
+			uiBuilder.OpenElement("Btn3");
+			uiBuilder.GetStyle().SetColor(0xFF33FF33);
+			uiBuilder.SetStyle(btnStyle);
+
+			uiBuilder.OpenElement();
+			uiBuilder.SetText("Projectile", myFont, 25);
+			uiBuilder.GetStyle().SetColor(0xFF000000);
+			uiBuilder.CloseElement();
+
+			uiBuilder.CloseElement();
+		}
 		uiBuilder.CloseElement(); // Middle backround
 	}
 
@@ -197,11 +224,22 @@ void Level::RenderGame()
 
 	for (Slush::DynamicUIBuilder::RenderCommand& command : myUIRenderCommands)
 	{
-		myUISprite->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
-		myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
-		myUISprite->SetSize(command.mySize.x, command.mySize.y);
-		myUISprite->SetFillColor(command.myColor);
-		myUISprite->Render();
+		if (command.myText.Empty())
+		{
+			myUISprite->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
+			myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
+			myUISprite->SetSize(command.mySize.x, command.mySize.y);
+			myUISprite->SetFillColor(command.myColor);
+			myUISprite->Render();
+		}
+		else
+		{
+			myText->SetText(command.myText);
+			myText->SetCharacterSize(command.myTextSize);
+			myText->SetColor(command.myColor);
+			myText->SetPosition(command.myPosition.x, command.myPosition.y);
+			myText->Render();
+		}
 	}
 }
 

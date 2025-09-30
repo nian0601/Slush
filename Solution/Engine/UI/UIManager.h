@@ -39,6 +39,9 @@ namespace Slush
 		FW_GrowingArray<UIWidget*> myDiscardedWidgets;
 	};
 
+
+	//////////////////////////////////////////////////////////////////////////
+
 	struct UIElementStyle
 	{
 		enum SizingMode
@@ -94,13 +97,13 @@ namespace Slush
 	class DynamicUIBuilder
 	{
 	public:
-		
-
 		struct RenderCommand
 		{
 			Vector2i myPosition;
 			Vector2i mySize;
 			int myColor;
+			FW_String myText;
+			int myTextSize = 15;
 		};
 
 		void Start();
@@ -111,6 +114,12 @@ namespace Slush
 
 		void SetStyle(const UIElementStyle& aStyle);
 		UIElementStyle& GetStyle();
+
+		// Unsure about this interface, but text-rendering in general just doesnt feel great at the moment..
+		// Need to ensure that the same font is used here and when rendering.
+		// But dont really want to put a whole Font-object in the Element or RenderCommmands..
+		// Or do I? Its not *that* bad to just copy around a pointer?
+		void SetText(const char* someText, Font& aFont, int aTextSize = 15);
 
 		bool WasClicked(const char* aIdentifier) const;
 
@@ -130,7 +139,8 @@ namespace Slush
 			Vector2i mySize = { 0, 0 };
 			Vector2i myContentSize = { 0, 0 };
 			int myColor = -1;
-
+			FW_String myText;
+			int myTextSize = 15;
 			bool myWasMouseReleased = false; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames
 
 			Element* myParent = nullptr;

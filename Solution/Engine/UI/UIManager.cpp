@@ -7,6 +7,7 @@
 #include "UIRect.h"
 #include <Graphics\Window.h>
 #include <Core\Input.h>
+#include "Graphics\Text.h"
 
 namespace Slush
 {
@@ -265,6 +266,21 @@ namespace Slush
 		return myCurrentElement->myStyle;
 	}
 
+	void DynamicUIBuilder::SetText(const char* someText, Font& aFont, int aTextSize /*= 15*/)
+	{
+		FW_ASSERT(myCurrentElement != nullptr);
+		myCurrentElement->myText = someText;
+		myCurrentElement->myTextSize = aTextSize;
+
+		Slush::Text tempText;
+		tempText.SetFont(aFont);
+		tempText.SetCharacterSize(aTextSize);
+
+		Vector2f textSize = tempText.CalculateBounds(someText);
+		myCurrentElement->myStyle.SetXSizing(UIElementStyle::FIXED, static_cast<int>(textSize.x));
+		myCurrentElement->myStyle.SetYSizing(UIElementStyle::FIXED, static_cast<int>(textSize.y));
+	}
+
 	bool DynamicUIBuilder::WasClicked(const char* aIdentifier) const
 	{
 		if (Element* const* element = myInteractiveElements.GetIfExists(aIdentifier))
@@ -483,6 +499,8 @@ namespace Slush
 		command.myPosition = anElement.myPosition;
 		command.mySize = anElement.mySize;
 		command.myColor = anElement.myStyle.myColor;
+		command.myText = anElement.myText;
+		command.myTextSize = anElement.myTextSize;
 
 		for (Element* child : anElement.myChildren)
 			GenerateRenderCommands(*child, outRenderCommands);

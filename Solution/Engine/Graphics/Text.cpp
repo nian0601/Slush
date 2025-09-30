@@ -151,6 +151,13 @@ namespace Slush
 			SetText(myString.GetBuffer());
 	}
 
+	Vector2f Text::CalculateBounds(const char* aText)
+	{
+		myText->setString(aText);
+		sf::FloatRect bounds = myText->getGlobalBounds();
+		return { bounds.width, bounds.height };
+	}
+
 	void Text::Render(float x, float y)
 	{
 		SetPosition(x, y);

@@ -15,6 +15,7 @@ namespace Slush
 	class UIManager;
 	class Font;
 	class RectSprite;
+	class Text;
 }
 
 class Level
@@ -48,6 +49,7 @@ private:
 
 	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::RectSprite* myUISprite;
-
+	Slush::Text* myText;
+	Slush::Font& myFont;
 	Tilemap* myTilemap;
 };

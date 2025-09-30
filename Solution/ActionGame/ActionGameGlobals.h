@@ -30,6 +30,7 @@ public:
 
 		bool myPauseEnemySpawning = false;
 		bool mySkipStartScreen = false;
+		bool myUseNewUI = false;
 
 	private:
 		void OnParse(Slush::AssetParser::Handle aHandle);

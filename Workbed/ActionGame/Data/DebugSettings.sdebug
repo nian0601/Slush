@@ -2,4 +2,5 @@ DebugSettings
 { 
 	PauseEnemySpawning 1 
 	SkipStartScreen 1 
+	UseNewUI 1 
 } 

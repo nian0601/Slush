@@ -216,6 +216,18 @@ namespace Slush
 		myCurrentElement = newElement;
 	}
 
+	void DynamicUIBuilder::OpenElement(const UIElementStyle& aStyle)
+	{
+		OpenElement();
+		myCurrentElement->myStyle = aStyle;
+	}
+
+	void DynamicUIBuilder::OpenElement(const char* aIdentifier, const UIElementStyle& aStyle)
+	{
+		OpenElement(aIdentifier);
+		myCurrentElement->myStyle = aStyle;
+	}
+
 	void DynamicUIBuilder::CloseElement()
 	{
 		int leftRightPadding = myCurrentElement->myStyle.myPadding.x * 2;

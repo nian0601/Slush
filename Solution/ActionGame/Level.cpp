@@ -42,6 +42,19 @@ Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILay
 	myUISprite = new Slush::RectSprite();
 	myText = new Slush::Text();
 	myText->SetFont(aFont);
+
+	
+	myUIBackgroundStyle.SetPadding(16, 16);
+	myUIBackgroundStyle.SetChildGap(16);
+	myUIBackgroundStyle.SetColor(0xAA121212);
+	myUIBackgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
+	myUIBackgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
+
+	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
+	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
+	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
+	myUIButtonStyle.SetColor(0xFFAAFFAF);
+	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 }
 
 Level::~Level()
@@ -92,22 +105,77 @@ void Level::Update()
 			}
 			else
 			{
-				Slush::Engine& engine = Slush::Engine::GetInstance();
-				myUIManager->Update(engine.GetInput());
+				Slush::DynamicUIBuilder uiBuilder;
+				uiBuilder.Start();
 
-				if (stats->CanUpgradeCooldownReduction() && myCooldownUpgradeButton->WasPressed())
+				{
+					uiBuilder.OpenElement("Title", myUIBackgroundStyle);
+					uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
+
+					uiBuilder.OpenElement("title");
+					uiBuilder.SetText("Leveled Up!", myFont, 32);
+					uiBuilder.CloseElement();
+
+					uiBuilder.CloseElement(); // Title
+				}
+
+				{
+					uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
+
+					{
+						uiBuilder.OpenElement("Cooldown", myUIButtonStyle);
+						uiBuilder.GetStyle().SetColor(0xFFFF3333);
+
+						uiBuilder.OpenElement();
+						uiBuilder.SetText("Cooldown", myFont, 25);
+						uiBuilder.GetStyle().SetColor(0xFF000000);
+						uiBuilder.CloseElement();
+
+						uiBuilder.CloseElement();
+					}
+
+					{
+						uiBuilder.OpenElement("Damage", myUIButtonStyle);
+						uiBuilder.GetStyle().SetColor(0xFFFFFF33);
+
+						uiBuilder.OpenElement();
+						uiBuilder.SetText("Damage", myFont, 25);
+						uiBuilder.GetStyle().SetColor(0xFF000000);
+						uiBuilder.CloseElement();
+
+						uiBuilder.CloseElement();
+					}
+
+					{
+						uiBuilder.OpenElement("Projectile", myUIButtonStyle);
+						uiBuilder.GetStyle().SetColor(0xFF33FF33);
+
+						uiBuilder.OpenElement();
+						uiBuilder.SetText("Projectile", myFont, 25);
+						uiBuilder.GetStyle().SetColor(0xFF000000);
+						uiBuilder.CloseElement();
+
+						uiBuilder.CloseElement();
+					}
+					uiBuilder.CloseElement(); // ButtonBackground
+				}
+
+				uiBuilder.Finish(myUIRenderCommands);
+
+
+				if (stats->CanUpgradeCooldownReduction() && uiBuilder.WasClicked("Cooldown"))
 				{
 					stats->AddCooldownReductionUpgrade();
 					expComp->LevelUp();
 					myIsLevelingUp = false;
 				}
-				else if (stats->CanUpgradeDamage() && myDamageUpgradeButton->WasPressed())
+				if (stats->CanUpgradeDamage() && uiBuilder.WasClicked("Damage"))
 				{
 					stats->AddDamageUpgrade();
 					expComp->LevelUp();
 					myIsLevelingUp = false;
 				}
-				else if (stats->CanUpgradeAdditionalProjectiles() && myProjectileUpgradeButton->WasPressed())
+				if (stats->CanUpgradeAdditionalProjectiles() && uiBuilder.WasClicked("Projectile"))
 				{
 					stats->AddAdditionalProjectilesUpgrade();
 					expComp->LevelUp();
@@ -123,105 +191,16 @@ void Level::Update()
 		}
 	}
 
-	myUIRenderCommands.RemoveAll();
-
-	Slush::UIElementStyle backgroundStyle;
-	backgroundStyle.SetPadding(16, 16);
-	backgroundStyle.SetChildGap(16);
-	backgroundStyle.SetColor(0xAA121212);
-	backgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
-	backgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-
-	Slush::UIElementStyle btnStyle;
-	btnStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-	btnStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
-	btnStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	btnStyle.SetColor(0xFFAAFFAF);
-	btnStyle.EnableButtonInteraction(0xFFDDDDDD);
-
-
-	Slush::DynamicUIBuilder uiBuilder;
-	uiBuilder.Start();
-
-	{
-		uiBuilder.OpenElement("Bg2");
-		uiBuilder.SetStyle(backgroundStyle);
-		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-
-		uiBuilder.OpenElement("title");
-		uiBuilder.SetText("Leveled Up!", myFont, 32);
-		uiBuilder.CloseElement();
-
-		uiBuilder.CloseElement(); // Bg2
-	}
-
-	{
-		uiBuilder.OpenElement("Middle background");
-		uiBuilder.SetStyle(backgroundStyle);
-
-		{
-			uiBuilder.OpenElement("Btn1");
-			uiBuilder.SetStyle(btnStyle);
-			uiBuilder.GetStyle().SetColor(0xFFFF3333);
-
-			uiBuilder.OpenElement();
-			uiBuilder.SetText("Cooldown", myFont, 25);
-			uiBuilder.GetStyle().SetColor(0xFF000000);
-			uiBuilder.CloseElement();
-
-			uiBuilder.CloseElement();
-		}
-
-		{
-			uiBuilder.OpenElement("Btn2");
-			uiBuilder.SetStyle(btnStyle);
-			uiBuilder.GetStyle().SetColor(0xFFFFFF33);
-
-			uiBuilder.OpenElement();
-			uiBuilder.SetText("Damage", myFont, 25);
-			uiBuilder.GetStyle().SetColor(0xFF000000);
-			uiBuilder.CloseElement();
-
-			uiBuilder.CloseElement();
-		}
-
-		{
-			uiBuilder.OpenElement("Btn3");
-			uiBuilder.GetStyle().SetColor(0xFF33FF33);
-			uiBuilder.SetStyle(btnStyle);
-
-			uiBuilder.OpenElement();
-			uiBuilder.SetText("Projectile", myFont, 25);
-			uiBuilder.GetStyle().SetColor(0xFF000000);
-			uiBuilder.CloseElement();
-
-			uiBuilder.CloseElement();
-		}
-		uiBuilder.CloseElement(); // Middle backround
-	}
-
-
-	uiBuilder.Finish(myUIRenderCommands);
-
-
-	if (uiBuilder.WasClicked("Btn1"))
-	{
-		SLUSH_ERROR("BTN1 CLICKED");
-	}
-	if (uiBuilder.WasClicked("Btn2"))
-	{
-		SLUSH_INFO("BTN2 CLICKED");
-	}
-	if (uiBuilder.WasClicked("Btn3"))
-	{
-		SLUSH_WARNING("BTN3 CLICKED");
-	}
+	
 }
 
 void Level::RenderGame()
 {
 	myTilemap->Render();
+}
 
+void Level::RenderUI()
+{
 	for (Slush::DynamicUIBuilder::RenderCommand& command : myUIRenderCommands)
 	{
 		if (command.myText.Empty())
@@ -241,12 +220,7 @@ void Level::RenderGame()
 			myText->Render();
 		}
 	}
-}
-
-void Level::RenderUI()
-{
-	if (myIsLevelingUp)
-		myUIManager->Render();
+	myUIRenderCommands.RemoveAll();
 }
 
 bool Level::IsPlayerDead() const

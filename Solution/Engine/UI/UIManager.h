@@ -110,6 +110,9 @@ namespace Slush
 		void Finish(FW_GrowingArray<RenderCommand>& outRenderCommands);
 
 		void OpenElement(const char* aIdentifier = nullptr);
+		void OpenElement(const UIElementStyle& aStyle);
+		void OpenElement(const char* aIdentifier, const UIElementStyle& aStyle);
+
 		void CloseElement();
 
 		void SetStyle(const UIElementStyle& aStyle);

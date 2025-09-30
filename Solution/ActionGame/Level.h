@@ -47,6 +47,8 @@ private:
 	Slush::UIManager* myUIManager;
 
 
+	Slush::UIElementStyle myUIBackgroundStyle;
+	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::RectSprite* myUISprite;
 	Slush::Text* myText;

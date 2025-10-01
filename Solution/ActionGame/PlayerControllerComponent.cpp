@@ -4,7 +4,6 @@
 #include "HealthComponent.h"
 #include "PhysicsComponent.h"
 #include "PlayerControllerComponent.h"
-#include "ProjectileShootingComponent.h"
 
 #include <Core\Engine.h>
 #include <Core\Input.h>
@@ -38,15 +37,5 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 
 		if (anim && input.WasKeyPressed(Slush::Input::V))
 			anim->PlaySpritesheetAnimation();
-
-		ProjectileShootingComponent* projShoot = myEntity.GetComponent<ProjectileShootingComponent>();
-		if (projShoot && input.WasMousePressed(Slush::Input::LEFTMB))
-		{
-			Vector2f toCursor = input.GetMousePositionf() - myEntity.myPosition;
-			projShoot->TryShoot(GetNormalized(toCursor));
-
-			if (anim)
-				anim->PlaySpritesheetAnimation();
-		}
 	}
 }

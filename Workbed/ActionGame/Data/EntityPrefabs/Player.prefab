@@ -32,13 +32,6 @@ Entity Prefab
 	animation 
 	{ 
 	} 
-	projectileshooting 
-	{ 
-		cooldown 0.100 
-		projectilespeed 1000.000 
-		projectilespawnoffset 35.000 
-		projectiletype PlayerProjectile 
-	} 
 	health 
 	{ 
 		maxhealth 50 
@@ -65,9 +58,22 @@ Entity Prefab
 	} 
 	weaponcomponent 
 	{ 
-		basecooldown 1.000 
-		baseprojectilespeed 750.000 
-		basedamage 10 
+		Weapon 
+		{ 
+			type 0 
+			basecooldown 0.500 
+			baseprojectilespeed 1500.000 
+			basedamage 10 
+			projectilePrefab PlayerProjectile 
+		} 
+		Weapon 
+		{ 
+			type 1 
+			basecooldown 0.500 
+			baseprojectilespeed 750.000 
+			basedamage 10 
+			projectilePrefab PlayerProjectileViolet 
+		} 
 	} 
 	experience 
 	{ 

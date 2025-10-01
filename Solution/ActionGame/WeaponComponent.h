@@ -15,11 +15,11 @@ public:
 	void Update();
 
 	Slush::Timer myActivationCooldown;
-	float myBaseCooldown = 0.5f;
 
 protected:
 	virtual void OnActivate() = 0;
-	virtual float GetAdditionalCooldownReduction(StatsComponent* /*aStatsComponent*/) { return 1.f; }
+	virtual float GetBaseCooldown() const = 0;
+	virtual float GetAdditionalCooldownReduction(StatsComponent* /*aStatsComponent*/) const { return 1.f; }
 
 	Entity& myEntity;
 };
@@ -30,10 +30,25 @@ public:
 	using Weapon::Weapon;
 
 	void ShootProjectile(const Vector2f& aDirection);
+	float GetBaseCooldown() const override { return myData.myBaseCooldown; }
 
-	float myBaseProjectileSpeed = 750.f;
-	int myBaseDamage = 10;
-	FW_String myProjectilePrefab;
+	// TODO: This should probably be in the base Weapon, lets figure it out when
+	// I add some non-projectileshooting weapons (orbiting weapons for example)
+	struct Data
+	{
+		enum Type
+		{
+			W_LineShooter,
+			W_SpreadShooter,
+		};
+
+		Type myType;
+		float myBaseCooldown = 0.5f;
+		float myBaseProjectileSpeed = 750.f;
+		int myBaseDamage = 10;
+		FW_String myProjectilePrefab;
+	};
+	Data myData;
 };
 
 class LineShooter : public ProjectileShooter
@@ -42,7 +57,7 @@ public:
 	using ProjectileShooter::ProjectileShooter;
 
 	void OnActivate() override;
-	float GetAdditionalCooldownReduction(StatsComponent* aStatsComponent) override;
+	float GetAdditionalCooldownReduction(StatsComponent* aStatsComponent) const override;
 };
 
 class SpreadShooter : public ProjectileShooter
@@ -62,9 +77,7 @@ public:
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
-		float myBaseCooldown = 1.f;
-		float myBaseProjectileSpeed = 750.f;
-		int myBaseDamage = 10;
+		FW_GrowingArray<ProjectileShooter::Data> myProjectileShooterDatas;
 	};
 
 public:
@@ -76,6 +89,5 @@ public:
 	void Update() override;
 
 private:
-	
-	FW_GrowingArray<Weapon*> myWeapons;
+	FW_GrowingArray<ProjectileShooter*> myProjectileShooters;
 };

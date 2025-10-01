@@ -12,6 +12,7 @@ public:
 	const char* GetName() const override { return "Entity Prefabs"; }
 
 protected:
+	void OnUpdate() override;
 	void OnBuildUI() override;
 
 private:

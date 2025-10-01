@@ -4,6 +4,7 @@
 
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
+#include "Core/Input.h"
 
 EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
 	: Dockable(true)
@@ -13,6 +14,16 @@ EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aP
 	const FW_GrowingArray<Slush::Asset*> prefabs = myPrefabStorage.GetAllAssets();
 	if (!prefabs.IsEmpty())
 		mySelectedPrefab = static_cast<EntityPrefab*>(prefabs[0]);
+
+	myShouldShowDockable = true;
+}
+
+void EntityPrefabDockable::OnUpdate()
+{
+	if (Slush::Engine::GetInstance().GetInput().WasKeyReleased(Slush::Input::_F2))
+	{
+		myShouldShowDockable = !myShouldShowDockable;
+	}
 }
 
 void EntityPrefabDockable::OnBuildUI()
@@ -85,6 +96,9 @@ void EntityPrefabDockable::OnBuildUI()
 			}
 			ImGui::EndMenu();
 		}
+
+		if (mySelectedPrefab && ImGui::Selectable("Save"))
+			mySelectedPrefab->Save();
 
 		ImGui::EndMenuBar();
 	}

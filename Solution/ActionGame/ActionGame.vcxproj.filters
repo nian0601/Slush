@@ -70,6 +70,9 @@
       <Filter>Entities\Components</Filter>
     </ClCompile>
     <ClCompile Include="Tilemap.cpp" />
+    <ClCompile Include="TimedRemovalComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -146,6 +149,9 @@
     </ClInclude>
     <ClInclude Include="ActionGameGlobals.h" />
     <ClInclude Include="Tilemap.h" />
+    <ClInclude Include="TimedRemovalComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

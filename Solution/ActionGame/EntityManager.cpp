@@ -24,6 +24,7 @@
 #include "WeaponComponent.h"
 #include "DamageDealerComponent.h"
 #include "HealthBarComponent.h"
+#include "TimedRemovalComponent.h"
 
 
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
@@ -45,6 +46,7 @@ EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
 	registry.RegisterComponent<StatsComponent, StatsComponent::Data>();
 	registry.RegisterComponent<DamageDealerComponent, DamageDealerComponent::Data>();
 	registry.RegisterComponent<HealthBarComponent>();
+	registry.RegisterComponent<TimedRemovalComponent, TimedRemovalComponent::Data>();
 }
 
 EntityManager::~EntityManager()

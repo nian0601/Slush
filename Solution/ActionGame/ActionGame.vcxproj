@@ -165,6 +165,7 @@
     </ClCompile>
     <ClCompile Include="TargetingComponent.cpp" />
     <ClCompile Include="Tilemap.cpp" />
+    <ClCompile Include="TimedRemovalComponent.cpp" />
     <ClCompile Include="WeaponComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -195,6 +196,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TargetingComponent.h" />
     <ClInclude Include="Tilemap.h" />
+    <ClInclude Include="TimedRemovalComponent.h" />
     <ClInclude Include="WeaponComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

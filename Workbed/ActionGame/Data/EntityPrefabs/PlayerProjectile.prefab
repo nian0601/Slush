@@ -48,4 +48,8 @@ Entity Prefab
 	{ 
 		damage 10 
 	} 
+	timedremoval 
+	{ 
+		duration 2.000 
+	} 
 } 

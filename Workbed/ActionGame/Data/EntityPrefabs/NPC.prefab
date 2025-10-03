@@ -39,6 +39,8 @@ Entity Prefab
 	} 
 	npccontroller 
 	{ 
+		movementspeed 250.000 
+		maxshootingdistance 800.000 
 	} 
 	physics 
 	{ 

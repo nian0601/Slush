@@ -8,6 +8,26 @@
 #include <Physics\PhysicsWorld.h>
 #include "AnimationComponent.h"
 
+void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle.ParseFloatField("movementspeed", myMovementSpeed);
+	aComponentHandle.ParseFloatField("maxshootingdistance", myMaxShootingDistance);
+}
+
+void NPCControllerComponent::Data::OnBuildUI()
+{
+	ImGui::InputFloat("Movement Speed", &myMovementSpeed);
+	ImGui::InputFloat("Shooting Distance", &myMaxShootingDistance);
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+NPCControllerComponent::NPCControllerComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab)
+	: Component(aEntity, anEntityPrefab)
+	, myData(static_cast<const Data&>(*anEntityPrefab.GetComponentBaseData<NPCControllerComponent>()))
+{
+}
+
 void NPCControllerComponent::OnEnterWorld()
 {
 	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
@@ -41,13 +61,13 @@ void NPCControllerComponent::PrePhysicsUpdate()
 
 	if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
 	{
-		phys->myObject->myVelocity = GetNormalized(toTarget) * 100.f;
+		phys->myObject->myVelocity = GetNormalized(toTarget) * myData.myMovementSpeed;
 	}
 
 	if (ProjectileShootingComponent* projShooter = myEntity.GetComponent<ProjectileShootingComponent>())
 	{
 		float distance = Length(toTarget);
-		if (distance < myMaxDistance)
+		if (distance < myData.myMaxShootingDistance)
 			projShooter->TryShoot(GetNormalized(toTarget));
 	}
 }

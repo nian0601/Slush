@@ -35,7 +35,7 @@ void EntityManager::RegisterComponents()
 	registry.RegisterComponent<ProjectileShootingComponent, ProjectileShootingComponent::Data>();
 	registry.RegisterComponent<HealthComponent, HealthComponent::Data>();
 	registry.RegisterComponent<PlayerControllerComponent>();
-	registry.RegisterComponent<NPCControllerComponent>();
+	registry.RegisterComponent<NPCControllerComponent, NPCControllerComponent::Data>();
 	registry.RegisterComponent<PhysicsComponent, PhysicsComponent::Data>();
 	registry.RegisterComponent<RemoveOnCollisionComponent>();
 	registry.RegisterComponent<TargetingComponent, TargetingComponent::Data>();

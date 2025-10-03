@@ -76,6 +76,9 @@
     <ClCompile Include="GameLayout.cpp">
       <Filter>AppLayout</Filter>
     </ClCompile>
+    <ClCompile Include="EntityEditorLayout.cpp">
+      <Filter>AppLayout</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -159,6 +162,9 @@
       <Filter>AppLayout</Filter>
     </ClInclude>
     <ClInclude Include="GameLayout.h">
+      <Filter>AppLayout</Filter>
+    </ClInclude>
+    <ClInclude Include="EntityEditorLayout.h">
       <Filter>AppLayout</Filter>
     </ClInclude>
   </ItemGroup>

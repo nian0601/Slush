@@ -11,19 +11,19 @@ EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aP
 	, myPrefabStorage(aPrefabStorage)
 	, myNewPrefabNameStorage("")
 {
-	const FW_GrowingArray<Slush::Asset*> prefabs = myPrefabStorage.GetAllAssets();
-	if (!prefabs.IsEmpty())
-		mySelectedPrefab = static_cast<EntityPrefab*>(prefabs[0]);
+	//const FW_GrowingArray<Slush::Asset*> prefabs = myPrefabStorage.GetAllAssets();
+	//if (!prefabs.IsEmpty())
+	//	mySelectedPrefab = static_cast<EntityPrefab*>(prefabs[0]);
 
 	myShouldShowDockable = true;
 }
 
 void EntityPrefabDockable::OnUpdate()
 {
-	if (Slush::Engine::GetInstance().GetInput().WasKeyReleased(Slush::Input::_F2))
-	{
-		myShouldShowDockable = !myShouldShowDockable;
-	}
+	//if (Slush::Engine::GetInstance().GetInput().WasKeyReleased(Slush::Input::_F2))
+	//{
+	//	myShouldShowDockable = !myShouldShowDockable;
+	//}
 }
 
 void EntityPrefabDockable::OnBuildUI()
@@ -97,7 +97,7 @@ void EntityPrefabDockable::OnBuildUI()
 			ImGui::EndMenu();
 		}
 
-		if (mySelectedPrefab && ImGui::Selectable("Save"))
+		if (mySelectedPrefab && ImGui::MenuItem("Save"))
 			mySelectedPrefab->Save();
 
 		ImGui::EndMenuBar();

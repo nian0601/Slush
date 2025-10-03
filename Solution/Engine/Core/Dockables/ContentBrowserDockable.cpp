@@ -7,9 +7,9 @@
 
 namespace Slush
 {
-	ContentBrowserDockable::ContentBrowserDockable()
+	ContentBrowserDockable::ContentBrowserDockable(bool aShowByDefault /*= false*/)
 	{
-		myShouldShowDockable = false;
+		myShouldShowDockable = aShowByDefault;
 	}
 
 	void ContentBrowserDockable::AddAssetStorage(IAssetStorage* aStorage)

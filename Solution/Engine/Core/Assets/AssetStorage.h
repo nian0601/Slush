@@ -3,6 +3,7 @@
 #include "Core/Assets/Asset.h"
 #include "Core/Log.h"
 
+#include "FW_FileSystem.h"
 #include "FW_GrowingArray.h"
 #include "FW_Hashmap.h"
 

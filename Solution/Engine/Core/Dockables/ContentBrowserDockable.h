@@ -13,7 +13,7 @@ namespace Slush
 	class ContentBrowserDockable : public Slush::Dockable
 	{
 	public:
-		ContentBrowserDockable();
+		ContentBrowserDockable(bool aShowByDefault = false);
 		const char* GetName() const override { return "Content Browser"; }
 
 		void AddAssetStorage(IAssetStorage* aStorage);

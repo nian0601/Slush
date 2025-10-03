@@ -32,6 +32,9 @@ namespace Slush
 		
 		ImGuiIO& imguiIO = ImGui::GetIO();
 		imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		imguiIO.IniFilename = NULL;// path.GetBuffer();
+
+		
 
 		// Having this enabled makes it tricky/impossible to have Keyboard-input for the gameview :/
 		// An option could be to have this be togglable somehow maybe?
@@ -43,6 +46,8 @@ namespace Slush
 
 	Window::~Window()
 	{
+		SaveAppLayoutConfig();
+
 		FW_SAFE_DELETE(myOffscreenBuffer);
 		FW_SAFE_DELETE(myRenderWindow);
 		myDockables.DeleteAll();
@@ -101,6 +106,7 @@ namespace Slush
 		{
 			if (ImGui::BeginMainMenuBar())
 			{
+				ImGui::Text("[ %s ]", myAppLayoutName);
 				if (ImGui::BeginMenu("Layouts.."))
 				{
 					ImGui::Selectable("Game");
@@ -163,6 +169,44 @@ namespace Slush
 	{
 		aDockable->myDockableID = myNextDockableID++;
 		myDockables.Add(aDockable);
+	}
+
+	void Window::DeleteAllDockables()
+	{
+		myDockables.DeleteAll();
+		myNextDockableID = 0;
+	}
+
+	void Window::SetAppLayout(const char* aName)
+	{
+		SaveAppLayoutConfig();
+
+		myDockables.DeleteAll();
+		myNextDockableID = 0;
+
+		myAppLayoutName = aName;
+
+		LoadAppLayoutConfig();
+	}
+
+	void Window::SaveAppLayoutConfig()
+	{
+		FW_String path;
+		FW_String settingName = "ImGUILayouts/";
+		settingName += myAppLayoutName;
+		settingName += ".ini";
+		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
+		ImGui::SaveIniSettingsToDisk(path.GetBuffer());
+	}
+
+	void Window::LoadAppLayoutConfig()
+	{
+		FW_String path;
+		FW_String settingName = "ImGUILayouts/";
+		settingName += myAppLayoutName;
+		settingName += ".ini";
+		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
+		ImGui::LoadIniSettingsFromDisk(path.GetBuffer());
 	}
 
 	Vector2f Window::GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const

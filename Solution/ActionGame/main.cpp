@@ -3,18 +3,15 @@
 #include "Core/IApp.h"
 #include "Core/Assets/AssetStorage.h"
 
-#include "Core/Dockables/GameViewDockable.h"
-#include "Core/Dockables/TextureViewerDockable.h"
-#include "Core/Dockables/LogDockable.h"
-#include "Core/Dockables/ContentBrowserDockable.h"
-
-#include "Graphics/Window.h"
 #include "Graphics/Font.h"
 
 #include "ActionGameGlobals.h"
 #include "EntityPrefabDockable.h"
 #include "EntityManager.h"
 #include "GameLayout.h"
+#include "EntityEditorLayout.h"
+#include <Core/Input.h>
+#include <Graphics/Window.h>
 
 class App : public Slush::IApp
 {
@@ -27,7 +24,7 @@ public:
 		myEntityPrefabs.LoadAllAssets();
 		myUILayouts.LoadAllAssets();
 
-		myFont.Load("Data/OpenSans-Regular.ttf");
+		myFont.Load("Data/NotoSans.ttf");
 
 		ActionGameGlobals::GetInstance().SetTextureStorage(myTextures);
 		ActionGameGlobals::GetInstance().SetEntityPrefabStorage(myEntityPrefabs);
@@ -35,38 +32,43 @@ public:
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.AddDockable(new Slush::GameViewDockable());
-		window.AddDockable(new Slush::LogDockable());
-		window.AddDockable(new ActionGameGlobals::DebugSettingsDockable());
-		//window.AddDockable(new Slush::TextureViewerDockable(myTextures));
-		//window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
-		//window.AddDockable(new EntityPrefabDockable(myEntityPrefabs));
-
-		Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
-		window.AddDockable(contentBrowser);
-
-		contentBrowser->AddAssetStorage(&myEntityPrefabs);
-		contentBrowser->AddAssetStorage(&myTextures);
-		contentBrowser->AddAssetStorage(&myUILayouts);
-
-		myGameLayout = new GameLayout();
+		window.SetAppLayout("Game");
+		myAppLayout = new GameLayout();
 	}
 
 	void Shutdown() override
 	{
-		FW_SAFE_DELETE(myGameLayout);
+		FW_SAFE_DELETE(myAppLayout);
 
 		ActionGameGlobals::Destroy();
 	}
 
 	void Update() override
 	{
-		myGameLayout->Update();
+		Slush::Engine& engine = Slush::Engine::GetInstance();
+		const Slush::Input& input = engine.GetInput();
+		if (input.WasKeyReleased(Slush::Input::KeyCode::_1))
+		{
+			FW_SAFE_DELETE(myAppLayout);
+			Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+			window.SetAppLayout("Game");
+			myAppLayout = new GameLayout();
+		}
+		else if (input.WasKeyReleased(Slush::Input::KeyCode::_2))
+		{
+			FW_SAFE_DELETE(myAppLayout);
+			Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+			window.SetAppLayout("Entity");
+			myAppLayout = new EntityEditorLayout();
+		}
+
+
+		myAppLayout->Update();
 	}
 
 	void Render() override
 	{
-		myGameLayout->Render();
+		myAppLayout->Render();
 	}
 
 private:
@@ -75,7 +77,7 @@ private:
 	Slush::AssetStorage<EntityPrefab> myEntityPrefabs;
 	Slush::AssetStorage<Slush::UILayout> myUILayouts;
 
-	GameLayout* myGameLayout;
+	AppLayout* myAppLayout;
 };
 
 #include <FW_UnitTestSuite.h>

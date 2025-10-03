@@ -5,6 +5,11 @@
 #include <UI\UIButton.h>
 #include <UI\UIManager.h>
 
+#include "Core/Dockables/GameViewDockable.h"
+#include "Core/Dockables/TextureViewerDockable.h"
+#include "Core/Dockables/LogDockable.h"
+#include "Core/Dockables/ContentBrowserDockable.h"
+
 #include "ActionGameGlobals.h"
 #include "EntityManager.h"
 #include "Level.h"
@@ -31,10 +36,26 @@ GameLayout::GameLayout()
 
 	if (Slush::UIWidget* button = myRestartGameUIManager->FindWidget("RestartGame"))
 		myRestartGameButton = static_cast<Slush::UIButton*>(button);
+
+
+	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+	window.AddDockable(new Slush::GameViewDockable());
+	window.AddDockable(new Slush::LogDockable());
+	window.AddDockable(new ActionGameGlobals::DebugSettingsDockable());
+
+	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
+	window.AddDockable(contentBrowser);
+
+	contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());
+	contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
+	contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());
 }
 
 GameLayout::~GameLayout()
 {
+	//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+	//window.DeleteAllDockables();
+
 	FW_SAFE_DELETE(myLevel);
 	FW_SAFE_DELETE(myEntityManager);
 	FW_SAFE_DELETE(myPhysicsWorld);

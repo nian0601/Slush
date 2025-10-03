@@ -29,6 +29,9 @@ namespace Slush
 		void ToggleEditorUI() { myShowEditorUI = !myShowEditorUI; }
 
 		void AddDockable(Dockable* aDockable);
+		void DeleteAllDockables();
+
+		void SetAppLayout(const char* aName);
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
 		sf::RenderTexture* GetOffscreenBuffer() const { return myOffscreenBuffer; }
@@ -39,6 +42,9 @@ namespace Slush
 		Rectf GetGameViewRect() const { return myGameViewRect; }
 
 	private:
+		void SaveAppLayoutConfig();
+		void LoadAppLayoutConfig();
+
 		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
 
 		Rectf myWindowRect;
@@ -49,6 +55,7 @@ namespace Slush
 		sf::RenderWindow* myRenderWindow = nullptr;
 		bool myShouldBeOpen = true;
 		bool myDisplayImGUIDemo = false;
+		const char* myAppLayoutName = "Default Layout";
 
 		FW_GrowingArray<Dockable*> myDockables;
 		int myNextDockableID = 0;

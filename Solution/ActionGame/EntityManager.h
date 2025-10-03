@@ -18,6 +18,8 @@ namespace Slush
 class EntityManager
 {
 public:
+	static void RegisterComponents();
+
 	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage);
 	~EntityManager();
 

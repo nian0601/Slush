@@ -99,8 +99,28 @@ namespace Slush
 	{
 		if (myShowEditorUI)
 		{
+			if (ImGui::BeginMainMenuBar())
+			{
+				if (ImGui::BeginMenu("Layouts.."))
+				{
+					ImGui::Selectable("Game");
+					ImGui::Selectable("Entity");
+					ImGui::EndMenu();
+				}
+
+				if (ImGui::BeginMenu("ImGUI.."))
+				{
+					ImGui::Checkbox("Show Demo", &myDisplayImGUIDemo);
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMainMenuBar();
+			}
+
 			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-			ImGui::ShowDemoWindow();
+
+			if (myDisplayImGUIDemo)
+				ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
 
 			for (Dockable* dockable : myDockables)
 				dockable->Update();

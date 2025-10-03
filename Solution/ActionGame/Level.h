@@ -17,7 +17,7 @@ namespace Slush
 class Level
 {
 public:
-	Level(Slush::Font& aFont);
+	Level();
 	~Level();
 
 	void Update();

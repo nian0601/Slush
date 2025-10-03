@@ -48,6 +48,7 @@ namespace Slush
 
 		sf::RenderWindow* myRenderWindow = nullptr;
 		bool myShouldBeOpen = true;
+		bool myDisplayImGUIDemo = false;
 
 		FW_GrowingArray<Dockable*> myDockables;
 		int myNextDockableID = 0;

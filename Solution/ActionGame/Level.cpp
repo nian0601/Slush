@@ -14,9 +14,9 @@
 #include <Graphics\RectSprite.h>
 #include <Graphics\Text.h>
 
-Level::Level(Slush::Font& aFont)
+Level::Level()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
-	, myFont(aFont)
+	, myFont(ActionGameGlobals::GetInstance().GetFont())
 {
 	Entity* player = myEntityManager.CreateEntity({ 400.f, 400.f }, "Player");
 	myPlayerHandle = player->myHandle;
@@ -27,7 +27,7 @@ Level::Level(Slush::Font& aFont)
 
 	myUISprite = new Slush::RectSprite();
 	myText = new Slush::Text();
-	myText->SetFont(aFont);
+	myText->SetFont(myFont);
 
 	myUIBackgroundStyle.SetPadding(16, 16);
 	myUIBackgroundStyle.SetChildGap(16);

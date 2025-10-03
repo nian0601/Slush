@@ -73,6 +73,9 @@
     <ClCompile Include="TimedRemovalComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
+    <ClCompile Include="GameLayout.cpp">
+      <Filter>AppLayout</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NPCWave.h" />
@@ -152,6 +155,12 @@
     <ClInclude Include="TimedRemovalComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
+    <ClInclude Include="AppLayout.h">
+      <Filter>AppLayout</Filter>
+    </ClInclude>
+    <ClInclude Include="GameLayout.h">
+      <Filter>AppLayout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">
@@ -159,6 +168,9 @@
     </Filter>
     <Filter Include="Entities\Components">
       <UniqueIdentifier>{9dffbc03-daab-4a9f-86a4-06fcf88d87a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AppLayout">
+      <UniqueIdentifier>{b2d580a3-e1f1-483c-adfb-6fde97309994}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

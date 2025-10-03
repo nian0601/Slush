@@ -10,14 +10,18 @@
 #include "Graphics/Texture.h"
 #include "Core/Assets/AssetParser.h"
 #include "Core/Dockables/Dockable.h"
+#include "UI/UILayout.h"
+
 class EntityManager;
 namespace Slush
 {
 	template<typename T>
 	class AssetStorage;
 
+	class Font;
 	class Texture;
 	class PhysicsWorld;
+	struct UILayout;
 }
 
 class ActionGameGlobals
@@ -48,15 +52,21 @@ public:
 	static ActionGameGlobals& GetInstance();
 	static void Destroy();
 
-	void SetEntityManager(EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
-	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
 	void SetTextureStorage(Slush::AssetStorage<Slush::Texture>& aStorage) { myTextureStorage = &aStorage; }
 	void SetEntityPrefabStorage(Slush::AssetStorage<EntityPrefab>& aStorage) { myEntityPrefabStorage = &aStorage; }
+	void SetUILayoutStorage(Slush::AssetStorage<Slush::UILayout>& aStorage) { myUILayoutStorage = &aStorage; }
+	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
+
+	void SetEntityManager(EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
+	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
+
+	Slush::AssetStorage<Slush::Texture>& GetTextureStorage();
+	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
+	Slush::AssetStorage<Slush::UILayout>& GetUILayoutStorage();
+	Slush::Font& GetFont();
 
 	EntityManager& GetEntityManager();
 	Slush::PhysicsWorld& GetPhysicsWorld();
-	Slush::AssetStorage<Slush::Texture>& GetTextureStorage();
-	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
 
 	DebugSettings myDebugSettings;
 
@@ -65,8 +75,11 @@ private:
 	~ActionGameGlobals();
 	static ActionGameGlobals* ourInstance;
 
+	Slush::AssetStorage<Slush::Texture>* myTextureStorage = nullptr;
+	Slush::AssetStorage<Slush::UILayout>* myUILayoutStorage = nullptr;
+	Slush::AssetStorage<EntityPrefab>* myEntityPrefabStorage = nullptr;
+	Slush::Font* myFont = nullptr;
+
 	EntityManager* myEntityManager = nullptr;
 	Slush::PhysicsWorld* myPhysicsWorld = nullptr;
-	Slush::AssetStorage<Slush::Texture>* myTextureStorage = nullptr;
-	Slush::AssetStorage<EntityPrefab>* myEntityPrefabStorage = nullptr;
 };

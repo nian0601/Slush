@@ -54,18 +54,6 @@ void ActionGameGlobals::Destroy()
 	FW_SAFE_DELETE(ourInstance);
 }
 
-EntityManager& ActionGameGlobals::GetEntityManager()
-{
-	FW_ASSERT(myEntityManager != nullptr, "Need to set an EntityManager");
-	return *myEntityManager;
-}
-
-Slush::PhysicsWorld& ActionGameGlobals::GetPhysicsWorld()
-{
-	FW_ASSERT(myPhysicsWorld != nullptr, "Need to set an PhysicsWorld");
-	return *myPhysicsWorld;
-}
-
 Slush::AssetStorage<Slush::Texture>& ActionGameGlobals::GetTextureStorage()
 {
 	FW_ASSERT(myTextureStorage != nullptr, "Need to set a TextureStorage");
@@ -78,6 +66,30 @@ Slush::AssetStorage<EntityPrefab>& ActionGameGlobals::GetEntityPrefabStorage()
 	return *myEntityPrefabStorage;
 }
 
+Slush::AssetStorage<Slush::UILayout>& ActionGameGlobals::GetUILayoutStorage()
+{
+	FW_ASSERT(myUILayoutStorage!= nullptr, "Need to set a UILayoutStorage");
+	return *myUILayoutStorage;
+}
+
+Slush::Font& ActionGameGlobals::GetFont()
+{
+	FW_ASSERT(myFont != nullptr, "Need to set a Font");
+	return *myFont;
+}
+
+EntityManager& ActionGameGlobals::GetEntityManager()
+{
+	FW_ASSERT(myEntityManager != nullptr, "Need to set an EntityManager");
+	return *myEntityManager;
+}
+
+Slush::PhysicsWorld& ActionGameGlobals::GetPhysicsWorld()
+{
+	FW_ASSERT(myPhysicsWorld != nullptr, "Need to set an PhysicsWorld");
+	return *myPhysicsWorld;
+}
+
 ActionGameGlobals::ActionGameGlobals()
 {
 	myDebugSettings.LoadFromDisk();
@@ -87,8 +99,11 @@ ActionGameGlobals::~ActionGameGlobals()
 {
 	myDebugSettings.SaveToDisk();
 
-	myEntityManager = nullptr;
-	myPhysicsWorld = nullptr;
 	myTextureStorage = nullptr;
 	myEntityPrefabStorage = nullptr;
+	myUILayoutStorage = nullptr;
+	myFont = nullptr;
+
+	myEntityManager = nullptr;
+	myPhysicsWorld = nullptr;
 }

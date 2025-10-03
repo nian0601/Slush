@@ -27,8 +27,7 @@
 #include "TimedRemovalComponent.h"
 
 
-EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
-	: myPrefabStorage(aPrefabStorage)
+void EntityManager::RegisterComponents()
 {
 	ComponentRegistry& registry = ComponentRegistry::GetInstance();
 	registry.RegisterComponent<SpriteComponent, SpriteComponent::Data>();
@@ -47,6 +46,11 @@ EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
 	registry.RegisterComponent<DamageDealerComponent, DamageDealerComponent::Data>();
 	registry.RegisterComponent<HealthBarComponent>();
 	registry.RegisterComponent<TimedRemovalComponent, TimedRemovalComponent::Data>();
+}
+
+EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
+	: myPrefabStorage(aPrefabStorage)
+{
 }
 
 EntityManager::~EntityManager()

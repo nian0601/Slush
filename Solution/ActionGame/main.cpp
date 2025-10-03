@@ -193,7 +193,7 @@ public:
 			break;
 		}
 		case App::LOADING_LEVEL:
-			myLevel = new Level(myFont, myUILayouts);
+			myLevel = new Level(myFont);
 			myGameState = PLAYING;
 			break;
 		case App::PLAYING:
@@ -207,8 +207,6 @@ public:
 		{
 			Slush::Engine& engine = Slush::Engine::GetInstance();
 			myRestartGameUIManager->Update(engine.GetInput());
-
-			//if (ImGui::Button("Restart Game"))
 			if (myRestartGameButton && myRestartGameButton->WasPressed())
 				myGameState = LOADING_LEVEL;
 

@@ -10,40 +10,25 @@
 
 #include <Core\Input.h>
 #include <UI\UIManager.h>
-#include <UI\UIButton.h>
 #include "Tilemap.h"
 #include <Graphics\RectSprite.h>
 #include <Graphics\Text.h>
 
-Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts)
+Level::Level(Slush::Font& aFont)
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
-	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
 	, myFont(aFont)
 {
 	Entity* player = myEntityManager.CreateEntity({ 400.f, 400.f }, "Player");
 	myPlayerHandle = player->myHandle;
 
 	myNPCWave = new NPCWave();
-
-	myUIManager = new Slush::UIManager(aFont);
-	myUIManager->SetLayout(someUILayouts.GetAsset("LevelUp"));
-
-	if (Slush::UIWidget* button = myUIManager->FindWidget("DamageUpgrade"))
-		myDamageUpgradeButton = static_cast<Slush::UIButton*>(button);
-
-	if (Slush::UIWidget* button = myUIManager->FindWidget("CooldownUpgrade"))
-		myCooldownUpgradeButton = static_cast<Slush::UIButton*>(button);
-
-	if (Slush::UIWidget* button = myUIManager->FindWidget("ProjectileUpgrade"))
-		myProjectileUpgradeButton = static_cast<Slush::UIButton*>(button);
-
 	myTilemap = new Tilemap();
+
 
 	myUISprite = new Slush::RectSprite();
 	myText = new Slush::Text();
 	myText->SetFont(aFont);
 
-	
 	myUIBackgroundStyle.SetPadding(16, 16);
 	myUIBackgroundStyle.SetChildGap(16);
 	myUIBackgroundStyle.SetColor(0xAA121212);
@@ -60,7 +45,6 @@ Level::Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILay
 Level::~Level()
 {
 	FW_SAFE_DELETE(myTilemap);
-	FW_SAFE_DELETE(myUIManager);
 	FW_SAFE_DELETE(myNPCWave);
 	myEntityManager.DeleteAllEntities();
 
@@ -122,6 +106,7 @@ void Level::Update()
 				{
 					uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
 
+					if (stats->CanUpgradeCooldownReduction())
 					{
 						uiBuilder.OpenElement("Cooldown", myUIButtonStyle);
 						uiBuilder.GetStyle().SetColor(0xFFFF3333);
@@ -134,6 +119,7 @@ void Level::Update()
 						uiBuilder.CloseElement();
 					}
 
+					if (stats->CanUpgradeDamage())
 					{
 						uiBuilder.OpenElement("Damage", myUIButtonStyle);
 						uiBuilder.GetStyle().SetColor(0xFFFFFF33);
@@ -146,6 +132,7 @@ void Level::Update()
 						uiBuilder.CloseElement();
 					}
 
+					if (stats->CanUpgradeAdditionalProjectiles())
 					{
 						uiBuilder.OpenElement("Projectile", myUIButtonStyle);
 						uiBuilder.GetStyle().SetColor(0xFF33FF33);
@@ -190,8 +177,6 @@ void Level::Update()
 			myIsLevelingUp = false;
 		}
 	}
-
-	
 }
 
 void Level::RenderGame()

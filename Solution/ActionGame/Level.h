@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EntityHandle.h"
-#include <UI\UILayout.h>
 #include <UI\UIManager.h>
 
 class EntityManager;
@@ -10,9 +9,6 @@ class Tilemap;
 
 namespace Slush
 {
-	class PhysicsWorld;
-	class UIButton;
-	class UIManager;
 	class Font;
 	class RectSprite;
 	class Text;
@@ -21,7 +17,7 @@ namespace Slush
 class Level
 {
 public:
-	Level(Slush::Font& aFont, Slush::AssetStorage<Slush::UILayout>& someUILayouts);
+	Level(Slush::Font& aFont);
 	~Level();
 
 	void Update();
@@ -33,19 +29,11 @@ public:
 	bool IsLevelingUp() const { return myIsLevelingUp; }
 
 private:
-	Slush::PhysicsWorld& myPhysicsWorld;
 	EntityManager& myEntityManager;
 	EntityHandle myPlayerHandle;
 
 	NPCWave* myNPCWave;
 	bool myIsLevelingUp = false;
-
-
-	Slush::UIButton* myDamageUpgradeButton;
-	Slush::UIButton* myCooldownUpgradeButton;
-	Slush::UIButton* myProjectileUpgradeButton;
-	Slush::UIManager* myUIManager;
-
 
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;

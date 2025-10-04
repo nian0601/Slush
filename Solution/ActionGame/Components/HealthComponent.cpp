@@ -73,3 +73,25 @@ void HealthComponent::DealDamage(int aDamageAmount)
 	}
 }
 
+void HealthComponent::RestoreHealth(int aHealAmount)
+{
+	if (IsDead())
+		return;
+
+	// TODO:
+	// Change this either to a generic EntityHealthChange-event
+	// Or split into DamageTaken vs HealthRestored events
+	EntityDamageTakenEvent damageTaken;
+	damageTaken.myDamageAmount = -aHealAmount;
+	damageTaken.myOldHealth = myCurrentHealth;
+	damageTaken.myMaxHealth = myMaxHealth;
+
+	myCurrentHealth += aHealAmount;
+	myCurrentHealth = FW_Min(myCurrentHealth, myMaxHealth);
+
+	damageTaken.myNewHealth = myCurrentHealth;
+
+	if (HealthBarComponent* healthBar = myEntity.GetComponent<HealthBarComponent>())
+		healthBar->OnDamageTaken(damageTaken);
+}
+

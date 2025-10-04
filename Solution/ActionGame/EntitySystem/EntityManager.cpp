@@ -39,7 +39,7 @@ void EntityManager::RegisterComponents()
 	registry.RegisterComponent<TargetingComponent, TargetingComponent::Data>();
 	registry.RegisterComponent<WeaponComponent, WeaponComponent::Data>();
 	registry.RegisterComponent<ExperienceComponent>();
-	registry.RegisterComponent<PickupComponent>();
+	registry.RegisterComponent<PickupComponent, PickupComponent::Data>();
 	registry.RegisterComponent<StatsComponent, StatsComponent::Data>();
 	registry.RegisterComponent<DamageDealerComponent, DamageDealerComponent::Data>();
 	registry.RegisterComponent<HealthBarComponent>();

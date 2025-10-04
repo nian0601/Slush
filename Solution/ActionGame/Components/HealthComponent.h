@@ -28,6 +28,7 @@ public:
 
 	void SetMaxHealth(int aHealth);
 	void DealDamage(int aDamageAmount);
+	void RestoreHealth(int aHealAmount);
 
 	bool IsDead() const { return myCurrentHealth <= 0; }
 

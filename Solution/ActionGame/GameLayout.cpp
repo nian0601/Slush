@@ -38,24 +38,31 @@ GameLayout::GameLayout()
 		myRestartGameButton = static_cast<Slush::UIButton*>(button);
 
 
+	bool disableEditorStuff = false;
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	window.AddDockable(new Slush::GameViewDockable());
-	window.AddDockable(new Slush::LogDockable());
-	window.AddDockable(new ActionGameGlobals::DebugSettingsDockable());
 
-	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
-	window.AddDockable(contentBrowser);
+	if (disableEditorStuff)
+	{
+		window.ToggleEditorUI();
+	}
+	else
+	{
+		window.AddDockable(new Slush::GameViewDockable());
+		window.AddDockable(new Slush::LogDockable());
+		window.AddDockable(new ActionGameGlobals::DebugSettingsDockable());
 
-	contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());
-	contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
-	contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());
+		Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
+		window.AddDockable(contentBrowser);
+
+		contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());
+		contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
+		contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());
+	}
+	
 }
 
 GameLayout::~GameLayout()
 {
-	//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	//window.DeleteAllDockables();
-
 	FW_SAFE_DELETE(myLevel);
 	FW_SAFE_DELETE(myEntityManager);
 	FW_SAFE_DELETE(myPhysicsWorld);

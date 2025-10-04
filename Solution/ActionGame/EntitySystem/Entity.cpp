@@ -69,9 +69,6 @@ void Entity::OnDeath()
 {
 	for (Component* component : myPackedComponents)
 		component->OnDeath();
-
-	if (NPCControllerComponent* npcController = GetComponent<NPCControllerComponent>())
-		myEntityManager.CreateEntity(myPosition, "ExpPickup");
 }
 
 void Entity::CreateComponents(const EntityPrefab& aPrefab)

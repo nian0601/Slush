@@ -43,6 +43,8 @@ Entity Prefab
 	} 
 	npccontroller 
 	{ 
+		movementspeed 100.000 
+		maxshootingdistance 800.000 
 	} 
 	physics 
 	{ 
@@ -63,5 +65,13 @@ Entity Prefab
 	damagedealer 
 	{ 
 		damage 10 
+	} 
+	drops 
+	{ 
+		drop 
+		{ 
+			weight 100 
+			prefab ExpPickup 
+		} 
 	} 
 } 

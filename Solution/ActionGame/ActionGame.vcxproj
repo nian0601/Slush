@@ -139,6 +139,7 @@
     <ClCompile Include="ActionGameGlobals.cpp" />
     <ClCompile Include="Components\AnimationComponent.cpp" />
     <ClCompile Include="Components\Component.cpp" />
+    <ClCompile Include="Components\DropComponent.cpp" />
     <ClCompile Include="EntitySystem\ComponentRegistry.cpp" />
     <ClCompile Include="Components\DamageDealerComponent.cpp" />
     <ClCompile Include="EntitySystem\Entity.cpp" />
@@ -176,6 +177,7 @@
     <ClInclude Include="Components\AnimationComponent.h" />
     <ClInclude Include="AppLayout.h" />
     <ClInclude Include="Components\Component.h" />
+    <ClInclude Include="Components\DropComponent.h" />
     <ClInclude Include="EntitySystem\ComponentRegistry.h" />
     <ClInclude Include="Components\DamageDealerComponent.h" />
     <ClInclude Include="EntitySystem\Entity.h" />

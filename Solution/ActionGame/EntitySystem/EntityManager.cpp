@@ -23,6 +23,7 @@
 #include "Components/DamageDealerComponent.h"
 #include "Components/HealthBarComponent.h"
 #include "Components/TimedRemovalComponent.h"
+#include "Components/DropComponent.h"
 
 
 void EntityManager::RegisterComponents()
@@ -44,6 +45,7 @@ void EntityManager::RegisterComponents()
 	registry.RegisterComponent<DamageDealerComponent, DamageDealerComponent::Data>();
 	registry.RegisterComponent<HealthBarComponent>();
 	registry.RegisterComponent<TimedRemovalComponent, TimedRemovalComponent::Data>();
+	registry.RegisterComponent<DropComponent, DropComponent::Data>();
 }
 
 EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)

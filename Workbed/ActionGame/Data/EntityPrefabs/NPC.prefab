@@ -62,4 +62,12 @@ Entity Prefab
 	{ 
 		damage 10 
 	} 
+	drops 
+	{ 
+		drop 
+		{ 
+			weight 100 
+			prefab ExpPickup 
+		} 
+	} 
 } 

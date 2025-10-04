@@ -84,6 +84,7 @@
     </ClCompile>
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="Level\LevelDataDockable.cpp" />
+    <ClCompile Include="Components\DropComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EntityPrefabDockable.h">
@@ -177,6 +178,7 @@
     </ClInclude>
     <ClInclude Include="Level\LevelData.h" />
     <ClInclude Include="Level\LevelDataDockable.h" />
+    <ClInclude Include="Components\DropComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

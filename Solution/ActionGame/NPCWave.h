@@ -8,11 +8,6 @@
 class Entity;
 class EntityManager;
 
-namespace Slush
-{
-	class PhysicsWorld;
-}
-
 class NPCWave
 {
 public:
@@ -27,7 +22,6 @@ private:
 	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);
 
 	EntityManager& myEntityManager;
-	Slush::PhysicsWorld& myPhysicsWorld;
 	Slush::Timer myWaveTimer;
 
 	FW_GrowingArray<EntityHandle> myNPCs;

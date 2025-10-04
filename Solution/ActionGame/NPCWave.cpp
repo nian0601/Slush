@@ -9,7 +9,6 @@
 
 NPCWave::NPCWave()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
-	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
 {
 	myWaveTimer.Start(1.f);
 }
@@ -68,6 +67,8 @@ void NPCWave::StartWave(int aNumberOfNPCs)
 	Vector2f spawnAreaMargin = { 75.f, 75.f };
 	while (myNPCs.Count() < aNumberOfNPCs && iterations <= iterationLimit)
 	{
+		++iterations;
+
 		float randX = FW_RandFloat(spawnAreaMargin.x, spawnArea.x - spawnAreaMargin.x);
 		float randY = FW_RandFloat(spawnAreaMargin.y, spawnArea.y - spawnAreaMargin.y);
 		Vector2f position;

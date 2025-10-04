@@ -69,13 +69,6 @@ void Level::Update()
 		expComp->AddExperience(1);
 	}
 
-	if (StatsComponent* stats = player->GetComponent<StatsComponent>())
-	{
-		Slush::Engine& engine = Slush::Engine::GetInstance();
-		if (engine.GetInput().WasKeyPressed(Slush::Input::Q))
-			stats->AddAdditionalProjectilesUpgrade();
-	}
-
 	myIsLevelingUp = expComp->NeedsLevelUp();
 	if (myIsLevelingUp)
 	{

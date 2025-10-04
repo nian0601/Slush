@@ -22,7 +22,10 @@ namespace Slush
 			{
 				ImGui::Text("File: %s", texture->GetFilePath().GetBuffer());
 				ImGui::Text("Width: %i, Height: %i", texture->GetSize().x, texture->GetSize().y);
-				ImGui::Image(*texture->GetSFMLTexture(), { 100.f, 100.f });
+
+				float displayWidth = FW_Max(static_cast<float>(texture->GetSize().x), 320.f);
+				float displayHeight = FW_Max(static_cast<float>(texture->GetSize().y), 180.f);
+				ImGui::Image(*texture->GetSFMLTexture(), { displayWidth, displayHeight });
 			}
 		}
 	}

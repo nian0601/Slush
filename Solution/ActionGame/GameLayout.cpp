@@ -14,6 +14,7 @@
 
 #include "ActionGameGlobals.h"
 #include "Level/Level.h"
+#include "Level/LevelData.h"
 #include "GameLayout.h"
 
 GameLayout::GameLayout()
@@ -59,7 +60,6 @@ GameLayout::GameLayout()
 		contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
 		contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());
 	}
-	
 }
 
 GameLayout::~GameLayout()

@@ -151,6 +151,8 @@
     <ClCompile Include="Components\HealthBarComponent.cpp" />
     <ClCompile Include="Components\HealthComponent.cpp" />
     <ClCompile Include="Level\Level.cpp" />
+    <ClCompile Include="Level\LevelData.cpp" />
+    <ClCompile Include="Level\LevelDataDockable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Components\NPCControllerComponent.cpp" />
     <ClCompile Include="Level\NPCWave.cpp" />
@@ -190,6 +192,8 @@
     <ClInclude Include="Components\HealthComponent.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Components\NPCControllerComponent.h" />
+    <ClInclude Include="Level\LevelData.h" />
+    <ClInclude Include="Level\LevelDataDockable.h" />
     <ClInclude Include="Level\NPCWave.h" />
     <ClInclude Include="Components\PhysicsComponent.h" />
     <ClInclude Include="Components\PickupComponent.h" />

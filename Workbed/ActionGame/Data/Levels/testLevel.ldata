@@ -1,0 +1,43 @@
+LevelData 
+{ 
+	playerEntityPrefab player 
+	playerStartPosition 
+	{ 
+		x 500.000 
+		y 350.000 
+	} 
+	enemyWaves 
+	{ 
+		wave 
+		{ 
+			duration 5.000 
+			minEnemyCount 3 
+			maxEnemyCount 5 
+			enemyPrefabs 
+			{ 
+				prefab NPC 
+			} 
+		} 
+		wave 
+		{ 
+			duration 5.000 
+			minEnemyCount 2 
+			maxEnemyCount 5 
+			enemyPrefabs 
+			{ 
+				prefab NPCRanged 
+				prefab NPC 
+			} 
+		} 
+		wave 
+		{ 
+			duration 5.000 
+			minEnemyCount 2 
+			maxEnemyCount 5 
+			enemyPrefabs 
+			{ 
+				prefab NPCRanged 
+			} 
+		} 
+	} 
+} 

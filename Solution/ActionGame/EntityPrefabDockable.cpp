@@ -11,19 +11,11 @@ EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aP
 	, myPrefabStorage(aPrefabStorage)
 	, myNewPrefabNameStorage("")
 {
-	//const FW_GrowingArray<Slush::Asset*> prefabs = myPrefabStorage.GetAllAssets();
-	//if (!prefabs.IsEmpty())
-	//	mySelectedPrefab = static_cast<EntityPrefab*>(prefabs[0]);
-
 	myShouldShowDockable = true;
 }
 
 void EntityPrefabDockable::OnUpdate()
 {
-	//if (Slush::Engine::GetInstance().GetInput().WasKeyReleased(Slush::Input::_F2))
-	//{
-	//	myShouldShowDockable = !myShouldShowDockable;
-	//}
 }
 
 void EntityPrefabDockable::OnBuildUI()
@@ -35,7 +27,7 @@ void EntityPrefabDockable::OnBuildUI()
 		{
 			if (ImGui::Selectable("New"))
 				ImGui::OpenPopup("New_Prefab_Popup");
-
+	
 			if (ImGui::BeginPopup("New_Prefab_Popup"))
 			{
 				if (ImGui::InputText("Name", &myNewPrefabNameStorage))
@@ -51,7 +43,7 @@ void EntityPrefabDockable::OnBuildUI()
 						}
 					}
 				}
-
+	
 				if (ImGui::Button("Create"))
 				{
 					if (!myNewPrefabNameStorage.Empty() && myHasUniquePrefabName)
@@ -61,7 +53,7 @@ void EntityPrefabDockable::OnBuildUI()
 						ImGui::CloseCurrentPopup();
 					}
 				}
-
+	
 				if (ImGui::IsItemHovered())
 				{
 					if (myNewPrefabNameStorage.Empty())
@@ -69,20 +61,20 @@ void EntityPrefabDockable::OnBuildUI()
 					else if (!myHasUniquePrefabName)
 						ImGui::SetTooltip("Prefab with that name already exists");
 				}
-
+	
 				ImGui::SameLine();
-
+	
 				if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
-
+	
 				ImGui::EndPopup();
 			}
-
+	
 			if (ImGui::Selectable("Save All"))
 			{
 				for (Slush::Asset* asset : assets)
 					asset->Save();
 			}
-
+	
 			if (ImGui::BeginMenu("Open.."))
 			{
 				for (Slush::Asset* asset : assets)
@@ -91,25 +83,25 @@ void EntityPrefabDockable::OnBuildUI()
 					if (ImGui::Selectable(prefab->myName.GetBuffer()))
 						mySelectedPrefab = prefab;
 				}
-
+	
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenu();
 		}
-
+	
 		if (mySelectedPrefab && ImGui::MenuItem("Save"))
 			mySelectedPrefab->Save();
-
+	
 		ImGui::EndMenuBar();
 	}
-
+	
 	ImGui::BeginChild("dragndropdummy");
-
+	
 	if (mySelectedPrefab)
 		mySelectedPrefab->BuildUI();
-
+	
 	ImGui::EndChild();
-
+	
 	if (ImGui::BeginDragDropTarget())
 	{
 		ImGuiDragDropFlags target_flags = 0;

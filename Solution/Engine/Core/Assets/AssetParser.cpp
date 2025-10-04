@@ -12,6 +12,15 @@ namespace Slush
 		myIsReading = aIsReading;
 	}
 
+	int AssetParser::Handle::GetNumChildElements()
+	{
+		FW_ASSERT(myIsReading, "GetNumChildElements is only valid while reading files");
+		if (!IsValid())
+			return 0;
+
+		return myElement->GetNumChildElements();
+	}
+
 	Slush::AssetParser::Handle AssetParser::Handle::GetChildElementAtIndex(int aIndex)
 	{
 		FW_ASSERT(myIsReading, "GetChildElementAtIndex is only valid while reading files");
@@ -24,13 +33,21 @@ namespace Slush
 		return Handle();
 	}
 
-	int AssetParser::Handle::GetNumChildElements()
+	int AssetParser::Handle::GetNumFields()
 	{
-		FW_ASSERT(myIsReading, "GetNumChildElements is only valid while reading files");
+		FW_ASSERT(myIsReading, "GetNumFields is only valid while reading files");
 		if (!IsValid())
 			return 0;
 
-		return myElement->GetNumChildElements();
+		return myElement->GetNumFields();
+	}
+
+	void AssetParser::Handle::GetStringFieldAtIndex(int aIndex, FW_String& aValue)
+	{
+		if (!IsValid())
+			return;
+
+		GetStringField(myElement->GetFieldByIndex(aIndex), aValue);
 	}
 
 	AssetParser::Handle AssetParser::Handle::ParseChildElement(const char* aElementName)
@@ -90,10 +107,15 @@ namespace Slush
 		if (!ValidateField(aFieldName))
 			return;
 
-		if (myIsReading)
+		/*if (myIsReading)
 			GetStringField(aFieldName, aValue);
 		else
-			WriteStringField(aFieldName, aValue);
+			WriteStringField(aFieldName, aValue);*/
+
+		if (myIsReading)
+			GetStringField(myElement->GetField(aFieldName), aValue);
+		else
+			WriteStringField(myElement->AddField(aFieldName), aValue);
 	}
 
 	void AssetParser::Handle::ParseVec2iField(const char* aFieldName, Vector2i& aValue)
@@ -172,11 +194,17 @@ namespace Slush
 		return false;
 	}
 
-	bool AssetParser::Handle::GetStringField(const char* aFieldName, FW_String& aValue) const
+	bool AssetParser::Handle::GetStringField(Field* aField, FW_String& aValue) const
 	{
-		if (Field* field = myElement->GetField(aFieldName))
+		//if (Field* field = myElement->GetField(aFieldName))
+		//{
+		//	aValue = field->myRawData;
+		//	return true;
+		//}
+
+		if (aField)
 		{
-			aValue = field->myRawData;
+			aValue = aField->myRawData;
 			return true;
 		}
 
@@ -208,13 +236,15 @@ namespace Slush
 		WriteIntField(aFieldName, aValue ? 1 : 0);
 	}
 
-	void AssetParser::Handle::WriteStringField(const char* aFieldName, FW_String& aValue)
+	void AssetParser::Handle::WriteStringField(Field* aField, FW_String& aValue)
 	{
 		if (aValue.Empty())
 			return;
 
-		Field* field = myElement->AddField(aFieldName);
-		field->myRawData += aValue;
+		//Field* field = myElement->AddField(aFieldName);
+		//field->myRawData += aValue;
+
+		aField->myRawData = aValue;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

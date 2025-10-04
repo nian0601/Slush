@@ -85,6 +85,8 @@
     <ClCompile Include="Level\Tilemap.cpp">
       <Filter>Level</Filter>
     </ClCompile>
+    <ClCompile Include="Level\LevelData.cpp" />
+    <ClCompile Include="Level\LevelDataDockable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EntityPrefabDockable.h">
@@ -179,6 +181,8 @@
     <ClInclude Include="Level\Tilemap.h">
       <Filter>Level</Filter>
     </ClInclude>
+    <ClInclude Include="Level\LevelData.h" />
+    <ClInclude Include="Level\LevelDataDockable.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

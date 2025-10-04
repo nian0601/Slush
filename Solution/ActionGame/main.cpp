@@ -13,6 +13,8 @@
 #include <Core/Input.h>
 #include <Graphics/Window.h>
 
+#include "Level/LevelData.h"
+
 class App : public Slush::IApp
 {
 public:
@@ -23,12 +25,13 @@ public:
 		myTextures.LoadAllAssets();
 		myEntityPrefabs.LoadAllAssets();
 		myUILayouts.LoadAllAssets();
+		myLevelDatas.LoadAllAssets();
 
 		myFont.Load("Data/NotoSans.ttf");
-
 		ActionGameGlobals::GetInstance().SetTextureStorage(myTextures);
 		ActionGameGlobals::GetInstance().SetEntityPrefabStorage(myEntityPrefabs);
 		ActionGameGlobals::GetInstance().SetUILayoutStorage(myUILayouts);
+		ActionGameGlobals::GetInstance().SetLevelDataStorage(myLevelDatas);
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -76,7 +79,7 @@ private:
 	Slush::AssetStorage<Slush::Texture> myTextures;
 	Slush::AssetStorage<EntityPrefab> myEntityPrefabs;
 	Slush::AssetStorage<Slush::UILayout> myUILayouts;
-
+	Slush::AssetStorage<LevelData> myLevelDatas;
 	AppLayout* myAppLayout;
 };
 

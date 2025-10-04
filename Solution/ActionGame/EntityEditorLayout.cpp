@@ -10,6 +10,7 @@
 #include "ActionGameGlobals.h"
 #include "EntityEditorLayout.h"
 #include "EntityPrefabDockable.h"
+#include <Level\LevelDataDockable.h>
 
 EntityEditorLayout::EntityEditorLayout()
 {
@@ -19,6 +20,7 @@ EntityEditorLayout::EntityEditorLayout()
 	window.AddDockable(new Slush::LogDockable());
 	window.AddDockable(new Slush::TextureViewerDockable(globals.GetTextureStorage()));
 	window.AddDockable(new EntityPrefabDockable(globals.GetEntityPrefabStorage()));
+	window.AddDockable(new LevelDataDockable());
 
 	const bool showByDefault = true;
 	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable(showByDefault);

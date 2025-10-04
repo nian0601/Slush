@@ -72,6 +72,12 @@ Slush::AssetStorage<Slush::UILayout>& ActionGameGlobals::GetUILayoutStorage()
 	return *myUILayoutStorage;
 }
 
+Slush::AssetStorage<LevelData>& ActionGameGlobals::GetLevelDataStorage()
+{
+	FW_ASSERT(myLevelDataStorage != nullptr, "Need to set a LevelDataStorage");
+	return *myLevelDataStorage;
+}
+
 Slush::Font& ActionGameGlobals::GetFont()
 {
 	FW_ASSERT(myFont != nullptr, "Need to set a Font");
@@ -102,6 +108,8 @@ ActionGameGlobals::~ActionGameGlobals()
 	myTextureStorage = nullptr;
 	myEntityPrefabStorage = nullptr;
 	myUILayoutStorage = nullptr;
+	myLevelDataStorage = nullptr;
+
 	myFont = nullptr;
 
 	myEntityManager = nullptr;

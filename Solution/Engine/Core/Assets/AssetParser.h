@@ -11,6 +11,7 @@ namespace Slush
 	class AssetParser
 	{
 		class Element;
+		struct Field;
 	public:
 		struct Handle
 		{
@@ -21,8 +22,11 @@ namespace Slush
 			bool IsValid() const { return myElement != nullptr; }
 			bool IsReading() const { return myIsReading; }
 
-			Handle GetChildElementAtIndex(int aIndex);
 			int GetNumChildElements();
+			Handle GetChildElementAtIndex(int aIndex);
+
+			int GetNumFields();
+			void GetStringFieldAtIndex(int aIndex, FW_String& aValue);
 
 			Handle ParseChildElement(const char* aElementName);
 			bool HasField(const char* aFieldName) const;
@@ -41,13 +45,13 @@ namespace Slush
 			bool GetIntField(const char* aFieldName, int& aValue) const;
 			bool GetFloatField(const char* aFieldName, float& aValue) const;
 			bool GetBoolField(const char* aFieldName, bool& aValue) const;
-			bool GetStringField(const char* aFieldName, FW_String& aValue) const;
+			bool GetStringField(Field* aField, FW_String& aValue) const;
 
 			Handle AddChildElement(const char* aElementName);
 			void WriteIntField(const char* aFieldName, int aValue);
 			void WriteFloatField(const char* aFieldName, float aValue);
 			void WriteBoolField(const char* aFieldName, bool aValue);
-			void WriteStringField(const char* aFieldName, FW_String& aValue);
+			void WriteStringField(Field* aField, FW_String& aValue);
 
 			Element* myElement = nullptr;
 			bool myIsReading = true;

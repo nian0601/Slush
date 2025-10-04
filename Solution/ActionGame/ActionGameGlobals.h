@@ -11,7 +11,7 @@
 #include "Core/Assets/AssetParser.h"
 #include "Core/Dockables/Dockable.h"
 #include "UI/UILayout.h"
-
+#include "Level/LevelData.h"
 class EntityManager;
 namespace Slush
 {
@@ -55,6 +55,8 @@ public:
 	void SetTextureStorage(Slush::AssetStorage<Slush::Texture>& aStorage) { myTextureStorage = &aStorage; }
 	void SetEntityPrefabStorage(Slush::AssetStorage<EntityPrefab>& aStorage) { myEntityPrefabStorage = &aStorage; }
 	void SetUILayoutStorage(Slush::AssetStorage<Slush::UILayout>& aStorage) { myUILayoutStorage = &aStorage; }
+	void SetLevelDataStorage(Slush::AssetStorage<LevelData>& aStorage) { myLevelDataStorage = &aStorage; }
+
 	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
 
 	void SetEntityManager(EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
@@ -63,6 +65,7 @@ public:
 	Slush::AssetStorage<Slush::Texture>& GetTextureStorage();
 	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
 	Slush::AssetStorage<Slush::UILayout>& GetUILayoutStorage();
+	Slush::AssetStorage<LevelData>& GetLevelDataStorage();
 	Slush::Font& GetFont();
 
 	EntityManager& GetEntityManager();
@@ -78,6 +81,7 @@ private:
 	Slush::AssetStorage<Slush::Texture>* myTextureStorage = nullptr;
 	Slush::AssetStorage<Slush::UILayout>* myUILayoutStorage = nullptr;
 	Slush::AssetStorage<EntityPrefab>* myEntityPrefabStorage = nullptr;
+	Slush::AssetStorage<LevelData>* myLevelDataStorage = nullptr;
 	Slush::Font* myFont = nullptr;
 
 	EntityManager* myEntityManager = nullptr;

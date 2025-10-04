@@ -6,7 +6,8 @@
 class EntityManager;
 class Tilemap;
 class LevelData;
-class EnemyWaveData;
+
+struct EnemyWaveData;
 
 namespace Slush
 {

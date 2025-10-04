@@ -77,8 +77,6 @@ void EntityPrefab::OnParse(Slush::AssetParser::Handle aRootHandle)
 
 void EntityPrefab::BuildUI()
 {
-	ImGui::SeparatorText(myName.GetBuffer());
-
 	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
 	ImGui::Combo("Entity Type", &myEntityType, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
 

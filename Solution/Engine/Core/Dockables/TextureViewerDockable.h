@@ -21,5 +21,7 @@ namespace Slush
 
 	private:
 		const Slush::AssetStorage<Slush::Texture>& myTextureStorage;
+		bool myShowTexCoordHelper = true;
+		Vector2i myTexCoordHelperSpriteSize = { 48, 48 };
 	};
 }

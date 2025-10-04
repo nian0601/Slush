@@ -8,7 +8,6 @@ LevelDataDockable::LevelDataDockable()
 	: Dockable(true)
 	//, myNewPrefabNameStorage("")
 {
-	myShouldShowDockable = true;
 }
 
 void LevelDataDockable::OnUpdate()

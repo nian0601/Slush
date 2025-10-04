@@ -24,6 +24,6 @@ namespace Slush
 
 		FW_String myUniqueIDName;
 		bool myShowMenuBar = false;
-		bool myShouldShowDockable = true;
+		bool myEnableHorizontalScrolling = false;
 	};
 }

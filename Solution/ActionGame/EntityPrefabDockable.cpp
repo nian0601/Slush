@@ -11,7 +11,6 @@ EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aP
 	, myPrefabStorage(aPrefabStorage)
 	, myNewPrefabNameStorage("")
 {
-	myShouldShowDockable = true;
 }
 
 void EntityPrefabDockable::OnUpdate()
@@ -23,6 +22,9 @@ void EntityPrefabDockable::OnBuildUI()
 	const FW_GrowingArray<Slush::Asset*> assets = myPrefabStorage.GetAllAssets();
 	if (ImGui::BeginMenuBar())
 	{
+		if (mySelectedPrefab)
+			ImGui::Text("[%s] ", mySelectedPrefab->GetAssetName().GetBuffer());
+
 		if (ImGui::BeginMenu("File.."))
 		{
 			if (ImGui::Selectable("New"))

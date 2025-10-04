@@ -18,16 +18,16 @@ namespace Slush
 
 		OnUpdate();
 
-		if (myShouldShowDockable)
-		{
-			int windowFlags = 0;
-			if (myShowMenuBar)
-				windowFlags |= ImGuiWindowFlags_MenuBar;
+		int windowFlags = 0;
+		if (myShowMenuBar)
+			windowFlags |= ImGuiWindowFlags_MenuBar;
 
-			if (ImGui::Begin(myUniqueIDName.GetBuffer(), &myShouldShowDockable, windowFlags))
-				OnBuildUI();
+		if (myEnableHorizontalScrolling)
+			windowFlags |= ImGuiWindowFlags_HorizontalScrollbar;
 
-			ImGui::End();
-		}
+		if (ImGui::Begin(myUniqueIDName.GetBuffer(), NULL, windowFlags))
+			OnBuildUI();
+
+		ImGui::End();
 	}
 }

@@ -22,8 +22,7 @@ EntityEditorLayout::EntityEditorLayout()
 	window.AddDockable(new EntityPrefabDockable(globals.GetEntityPrefabStorage()));
 	window.AddDockable(new LevelDataDockable());
 
-	const bool showByDefault = true;
-	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable(showByDefault);
+	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
 	window.AddDockable(contentBrowser);
 
 	contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());

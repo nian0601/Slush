@@ -99,8 +99,8 @@ namespace Slush
 	public:
 		struct RenderCommand
 		{
-			Vector2i myPosition;
-			Vector2i mySize;
+			Vector2f myPosition;
+			Vector2f mySize;
 			int myColor;
 			FW_String myText;
 			int myTextSize = 15;

@@ -508,8 +508,10 @@ namespace Slush
 	void DynamicUIBuilder::GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands)
 	{
 		RenderCommand& command = outRenderCommands.Add();
-		command.myPosition = anElement.myPosition;
-		command.mySize = anElement.mySize;
+		command.myPosition.x = static_cast<float>(anElement.myPosition.x);
+		command.myPosition.y = static_cast<float>(anElement.myPosition.y);
+		command.mySize.x = static_cast<float>(anElement.mySize.x);
+		command.mySize.y = static_cast<float>(anElement.mySize.y);
 		command.myColor = anElement.myStyle.myColor;
 		command.myText = anElement.myText;
 		command.myTextSize = anElement.myTextSize;

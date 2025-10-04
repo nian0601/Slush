@@ -9,7 +9,7 @@ class EntityPrefabDockable : public Slush::Dockable
 {
 public:
 	EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aPrefabStorage);
-	const char* GetName() const override { return "Entity Prefabs"; }
+	const char* GetName() const override { return "Entity Prefab Editor"; }
 
 protected:
 	void OnUpdate() override;

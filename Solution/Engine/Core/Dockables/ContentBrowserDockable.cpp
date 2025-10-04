@@ -7,9 +7,8 @@
 
 namespace Slush
 {
-	ContentBrowserDockable::ContentBrowserDockable(bool aShowByDefault /*= false*/)
+	ContentBrowserDockable::ContentBrowserDockable()
 	{
-		myShouldShowDockable = aShowByDefault;
 	}
 
 	void ContentBrowserDockable::AddAssetStorage(IAssetStorage* aStorage)
@@ -20,10 +19,6 @@ namespace Slush
 
 	void ContentBrowserDockable::OnUpdate()
 	{
-		if (Engine::GetInstance().GetInput().WasKeyReleased(Input::_F1))
-		{
-			myShouldShowDockable = !myShouldShowDockable;
-		}
 	}
 
 	void ContentBrowserDockable::OnBuildUI()

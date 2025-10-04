@@ -91,5 +91,7 @@ void DropComponent::OnDeath()
 			entityManager.CreateEntity(myEntity.myPosition, item.myPrefabName);
 			return;
 		}
+
+		pick -= item.myWeight;
 	}
 }

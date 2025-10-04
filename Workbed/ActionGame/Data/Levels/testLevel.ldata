@@ -15,7 +15,7 @@ LevelData
 			maxEnemyCount 6 
 			enemyPrefabs 
 			{ 
-				prefab NPC 
+				prefab Enemy_Melee 
 			} 
 		} 
 		wave 
@@ -25,8 +25,8 @@ LevelData
 			maxEnemyCount 9 
 			enemyPrefabs 
 			{ 
-				prefab NPCRanged 
-				prefab NPC 
+				prefab Enemy_Ranged 
+				prefab Enemy_Melee 
 			} 
 		} 
 		wave 
@@ -36,9 +36,9 @@ LevelData
 			maxEnemyCount 12 
 			enemyPrefabs 
 			{ 
-				prefab NPCRanged 
-				prefab NPC 
-				prefab NPCRanged 
+				prefab Enemy_Ranged 
+				prefab Enemy_Melee 
+				prefab Enemy_Ranged 
 			} 
 		} 
 	} 

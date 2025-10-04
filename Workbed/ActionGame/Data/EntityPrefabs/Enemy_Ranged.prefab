@@ -34,7 +34,7 @@ Entity Prefab
 		cooldown 1.000 
 		projectilespeed 600.000 
 		projectilespawnoffset 35.000 
-		projectiletype NPCProjectile 
+		projectiletype Enemy_Projectile_Basic 
 	} 
 	health 
 	{ 
@@ -71,7 +71,7 @@ Entity Prefab
 		drop 
 		{ 
 			weight 100 
-			prefab ExpPickup 
+			prefab Pickup_Exp_Small 
 		} 
 	} 
 } 

@@ -67,7 +67,7 @@ Entity Prefab
 		drop 
 		{ 
 			weight 100 
-			prefab ExpPickup 
+			prefab Pickup_Exp_Small 
 		} 
 	} 
 } 

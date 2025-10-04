@@ -46,7 +46,7 @@ private:
 	};
 
 public:
-	DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs/");
+	DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs");
 
 	EntityPrefab(const char* aName);
 	~EntityPrefab();

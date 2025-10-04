@@ -19,7 +19,6 @@ namespace Slush
 		const FW_String& GetAbsoluteFilePath() const { return myAbsoluteFilePath; }
 
 	protected:
-
 		FW_String myAssetName;
 		FW_String myFilePath;
 		FW_String myAbsoluteFilePath;

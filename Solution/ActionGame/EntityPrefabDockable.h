@@ -16,9 +16,16 @@ protected:
 	void OnBuildUI() override;
 
 private:
+	void HandleCreatingNewAsset();
+	void HandleSavingAsNewAsset();
+
+	bool VerifyUniqueNameForNewAsset() const;
 	EntityPrefab* mySelectedPrefab = nullptr;
 
 	Slush::AssetStorage<EntityPrefab>& myPrefabStorage;
 	FW_String myNewPrefabNameStorage;
 	bool myHasUniquePrefabName = false;
+
+	bool myWantToOpenNewAssetDialogue = false;
+	bool myWantToOpenSaveAsDialogue = false;
 };

@@ -5,7 +5,7 @@ namespace Slush
 {
 	struct UILayout : public DataAsset
 	{
-		DEFINE_ASSET("UI Layout", "uilayout", "data/uilayouts/");
+		DEFINE_ASSET("UI Layout", "uilayout", "data/uilayouts");
 		using DataAsset::DataAsset;
 
 		void OnParse(AssetParser::Handle aRootHandle) override;

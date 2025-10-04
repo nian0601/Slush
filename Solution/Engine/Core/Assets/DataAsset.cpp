@@ -26,6 +26,7 @@ namespace Slush
 		OnParse(rootHandle);
 
 		FW_String filepath = GetTypeFolder();
+		filepath += "/";
 		filepath += myAssetName;
 		filepath += ".";
 		filepath += GetTypeExtention();

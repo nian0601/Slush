@@ -23,6 +23,7 @@ namespace Slush
 		~AssetStorage();
 
 		AssetType& CreateNewAsset(const char* aName);
+		AssetType& CopyAsset(const char* aNewName, const AssetType& anOldAsset);
 
 		void Load(const char* aName, const char* aFilePath);
 		void LoadAllAssets();
@@ -62,6 +63,27 @@ namespace Slush
 		myAssetMap[aName] = asset;
 
 		SLUSH_INFO("%ss: Created '%s' as new asset", AssetType::GetAssetTypeName(), aName);
+
+		return *asset;
+	}
+
+	template<typename AssetType>
+	AssetType& AssetStorage<AssetType>::CopyAsset(const char* aNewName, const AssetType& anOldAsset)
+	{
+		if (myAssetMap.KeyExists(aNewName))
+		{
+			SLUSH_WARNING("%ss: '%s' already exists, returning existing one instead of creating a new copy", AssetType::GetAssetTypeName(), aNewName);
+			return *myAssetMap[aNewName];
+		}
+
+		AssetType* asset = new AssetType(aNewName);
+		asset->Load(anOldAsset.GetFilePath().GetBuffer());
+		asset->Save();
+
+		myAssets.Add(asset);
+		myAssetMap[aNewName] = asset;
+
+		SLUSH_INFO("%ss: Created '%s' as copy of %s", AssetType::GetAssetTypeName(), aNewName, anOldAsset.GetAssetName().GetBuffer());
 
 		return *asset;
 	}

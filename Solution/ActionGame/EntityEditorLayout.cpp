@@ -18,24 +18,19 @@ EntityEditorLayout::EntityEditorLayout()
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 	window.AddDockable(new Slush::LogDockable());
 	window.AddDockable(new Slush::TextureViewerDockable(globals.GetTextureStorage()));
-	//window.AddDockable(new Slush::UIEditorDockable(myUILayouts));
 	window.AddDockable(new EntityPrefabDockable(globals.GetEntityPrefabStorage()));
 
 	const bool showByDefault = true;
 	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable(showByDefault);
 	window.AddDockable(contentBrowser);
 
-	
 	contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());
 	contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
-	contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());
-	
+	contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());	
 }
 
 EntityEditorLayout::~EntityEditorLayout()
 {
-	//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	//window.DeleteAllDockables();
 }
 
 void EntityEditorLayout::Update()

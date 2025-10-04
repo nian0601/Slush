@@ -69,5 +69,10 @@ Entity Prefab
 			weight 100 
 			prefab Pickup_Exp_Small 
 		} 
+		drop 
+		{ 
+			weight 9 
+			prefab Pickup_Health_Small 
+		} 
 	} 
 } 

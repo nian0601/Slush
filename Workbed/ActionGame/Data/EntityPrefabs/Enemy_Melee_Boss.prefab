@@ -8,7 +8,7 @@ Entity Prefab
 	{ 
 		radius 20.000 
 		color -1 
-		textureID Enemy_001_A 
+		textureID Enemy_002_B 
 		size 
 		{ 
 			width 96.000 
@@ -29,21 +29,17 @@ Entity Prefab
 			height 96 
 		} 
 	} 
-	projectileshooting 
+	animation 
 	{ 
-		cooldown 1.000 
-		projectilespeed 600.000 
-		projectilespawnoffset 35.000 
-		projectiletype Enemy_Projectile_Basic 
 	} 
 	health 
 	{ 
-		maxhealth 50 
+		maxhealth 500 
 		graceperiodduration 0.000 
 	} 
 	npccontroller 
 	{ 
-		movementspeed 100.000 
+		movementspeed 150.000 
 		maxshootingdistance 800.000 
 	} 
 	physics 
@@ -71,12 +67,7 @@ Entity Prefab
 		drop 
 		{ 
 			weight 100 
-			prefab Pickup_Exp_Small 
-		} 
-		drop 
-		{ 
-			weight 24 
-			prefab Pickup_Health_Small 
+			prefab Pickup_Exp_Big 
 		} 
 	} 
 } 

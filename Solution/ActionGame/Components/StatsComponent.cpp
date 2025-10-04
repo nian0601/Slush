@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "EntityPrefab.h"
 #include "StatsComponent.h"
 
 void StatsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)

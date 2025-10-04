@@ -2,7 +2,6 @@
 
 #include "HealthComponent.h"
 #include "HealthBarComponent.h"
-#include "EntityPrefab.h"
 
 #include <Graphics/RectSprite.h>
 

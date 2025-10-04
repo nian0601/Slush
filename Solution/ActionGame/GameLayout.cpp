@@ -10,9 +10,10 @@
 #include "Core/Dockables/LogDockable.h"
 #include "Core/Dockables/ContentBrowserDockable.h"
 
+#include "EntitySystem/EntityManager.h"
+
 #include "ActionGameGlobals.h"
-#include "EntityManager.h"
-#include "Level.h"
+#include "Level/Level.h"
 #include "GameLayout.h"
 
 GameLayout::GameLayout()

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "DamageDealerComponent.h"
-#include "EntityPrefab.h"
+
 #include "HealthComponent.h"
 
 void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)

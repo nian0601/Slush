@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-#include "EntityManager.h"
-#include "EntityPrefab.h"
+#include "EntitySystem/EntityManager.h"
 #include "PhysicsComponent.h"
 #include "ProjectileShootingComponent.h"
 #include "SpriteComponent.h"

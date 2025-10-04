@@ -2,7 +2,6 @@
 
 #include "PickupComponent.h"
 #include "ExperienceComponent.h"
-#include "Entity.h"
 
 void PickupComponent::OnCollision(Entity& aOtherEntity)
 {

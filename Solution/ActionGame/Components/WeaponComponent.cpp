@@ -1,8 +1,7 @@
 #include "stdafx.h"
 
 #include "DamageDealerComponent.h"
-#include "EntityManager.h"
-#include "EntityPrefab.h"
+#include "EntitySystem/EntityManager.h"
 #include "PhysicsComponent.h"
 #include "StatsComponent.h"
 #include "TargetingComponent.h"

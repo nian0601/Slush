@@ -3,7 +3,7 @@
 #include <FW_Vector2.h>
 
 #include "EntityHandle.h"
-#include "Component.h"
+#include "Components/Component.h"
 #include <FW_TypeID.h>
 #include "EntityPrefab.h"
 

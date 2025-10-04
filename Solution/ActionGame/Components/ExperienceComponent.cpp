@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "EntityPrefab.h"
 #include "ExperienceComponent.h"
 
 #include <Graphics/RectSprite.h>

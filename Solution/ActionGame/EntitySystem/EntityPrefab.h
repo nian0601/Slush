@@ -6,14 +6,15 @@
 #include <FW_FileParser.h>
 #include <Core/Assets/AssetParser.h>
 #include <Core/Assets/DataAsset.h>
-#include "SpriteComponent.h"
-#include "ProjectileShootingComponent.h"
-#include "HealthComponent.h"
-#include "PhysicsComponent.h"
-#include "TargetingComponent.h"
-#include "WeaponComponent.h"
-#include "StatsComponent.h"
-#include "DamageDealerComponent.h"
+
+#include "Components/SpriteComponent.h"
+#include "Components/ProjectileShootingComponent.h"
+#include "Components/HealthComponent.h"
+#include "Components/PhysicsComponent.h"
+#include "Components/TargetingComponent.h"
+#include "Components/WeaponComponent.h"
+#include "Components/StatsComponent.h"
+#include "Components/DamageDealerComponent.h"
 
 
 

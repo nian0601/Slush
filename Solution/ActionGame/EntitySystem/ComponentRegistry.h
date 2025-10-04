@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "Components/Component.h"
 #include "FW_StaticArray.h"
 
 class IComponentFactory

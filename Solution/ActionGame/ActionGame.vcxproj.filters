@@ -2,162 +2,96 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="NPCWave.cpp" />
-    <ClCompile Include="HealthComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="NPCControllerComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerControllerComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="ProjectileShootingComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="RemoveOnCollisionComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="SpriteComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Entity.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityManager.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="EntityPrefab.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="EntityPrefabDockable.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="TargetingComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="WeaponComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Level.cpp" />
-    <ClCompile Include="ExperienceComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="PickupComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="StatsComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="DamageDealerComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="HealthBarComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentRegistry.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="ActionGameGlobals.cpp" />
-    <ClCompile Include="Component.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Tilemap.cpp" />
-    <ClCompile Include="TimedRemovalComponent.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
     <ClCompile Include="GameLayout.cpp">
       <Filter>AppLayout</Filter>
     </ClCompile>
     <ClCompile Include="EntityEditorLayout.cpp">
       <Filter>AppLayout</Filter>
     </ClCompile>
+    <ClCompile Include="Components\AnimationComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\Component.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\DamageDealerComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ExperienceComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\HealthBarComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\HealthComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\NPCControllerComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\PhysicsComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\PickupComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\PlayerControllerComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\ProjectileShootingComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\RemoveOnCollisionComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\SpriteComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\StatsComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\TargetingComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\TimedRemovalComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Components\WeaponComponent.cpp">
+      <Filter>Entities\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="EntitySystem\ComponentRegistry.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="EntitySystem\Entity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="EntitySystem\EntityManager.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="EntitySystem\EntityPrefab.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\NPCWave.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Tilemap.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NPCWave.h" />
-    <ClInclude Include="HealthComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="NPCControllerComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerControllerComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="ProjectileShootingComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="RemoveOnCollisionComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityHandle.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityManager.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityPrefab.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="EntityPrefabDockable.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="TargetingComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="WeaponComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="ExperienceComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="PickupComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="StatsComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="DamageDealerComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="HealthBarComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityComponentEvents.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentRegistry.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="ActionGameGlobals.h" />
-    <ClInclude Include="Tilemap.h" />
-    <ClInclude Include="TimedRemovalComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
     <ClInclude Include="AppLayout.h">
       <Filter>AppLayout</Filter>
     </ClInclude>
@@ -166,6 +100,84 @@
     </ClInclude>
     <ClInclude Include="EntityEditorLayout.h">
       <Filter>AppLayout</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\AnimationComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\Component.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\DamageDealerComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\ExperienceComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\HealthBarComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\HealthComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\NPCControllerComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\PhysicsComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\PickupComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\PlayerControllerComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\ProjectileShootingComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\RemoveOnCollisionComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\SpriteComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\StatsComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\TargetingComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\TimedRemovalComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Components\WeaponComponent.h">
+      <Filter>Entities\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySystem\ComponentRegistry.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySystem\Entity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySystem\EntityComponentEvents.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySystem\EntityHandle.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySystem\EntityManager.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySystem\EntityPrefab.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Level.h">
+      <Filter>Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\NPCWave.h">
+      <Filter>Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Tilemap.h">
+      <Filter>Level</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +189,9 @@
     </Filter>
     <Filter Include="AppLayout">
       <UniqueIdentifier>{b2d580a3-e1f1-483c-adfb-6fde97309994}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Level">
+      <UniqueIdentifier>{1f98183b-b76a-4af6-9bb6-eeee240fc3c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

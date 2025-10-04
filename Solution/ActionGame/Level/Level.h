@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityHandle.h"
+
 #include <UI\UIManager.h>
 
 class EntityManager;

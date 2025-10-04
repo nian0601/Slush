@@ -3,7 +3,7 @@
 #include "Core/Dockables/Dockable.h"
 #include "Core/Assets/AssetStorage.h"
 
-#include "EntityPrefab.h"
+#include "EntitySystem/EntityPrefab.h"
 
 class EntityPrefabDockable : public Slush::Dockable
 {

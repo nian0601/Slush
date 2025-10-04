@@ -1,12 +1,13 @@
 #include "stdafx.h"
 
-#include "EntityManager.h"
-#include "ExperienceComponent.h"
-#include "HealthComponent.h"
+#include "EntitySystem/EntityManager.h"
 #include "Level.h"
 #include "NPCWave.h"
-#include "StatsComponent.h"
 #include "ActionGameGlobals.h"
+
+#include "Components/ExperienceComponent.h"
+#include "Components/HealthComponent.h"
+#include "Components/StatsComponent.h"
 
 #include <Core\Input.h>
 #include <UI\UIManager.h>

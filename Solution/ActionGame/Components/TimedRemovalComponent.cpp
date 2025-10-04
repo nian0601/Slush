@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "EntityPrefab.h"
 #include "TimedRemovalComponent.h"
 
 void TimedRemovalComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)

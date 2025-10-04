@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Component.h"
-#include "EntityHandle.h"
-#include "Entity.h"
 
 class EntityPrefab;
 

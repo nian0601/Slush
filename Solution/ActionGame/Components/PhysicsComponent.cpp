@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "EntityPrefab.h"
 #include "PhysicsComponent.h"
 
 #include <Physics\PhysicsWorld.h>

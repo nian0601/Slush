@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-#include "EntityManager.h"
-#include "EntityPrefab.h"
-#include "NPCControllerComponent.h"
-#include "NPCWave.h"
-#include "ProjectileShootingComponent.h"
 #include "ActionGameGlobals.h"
+#include "EntitySystem/EntityManager.h"
+#include "NPCWave.h"
+
+#include "Components/NPCControllerComponent.h"
+#include "Components/ProjectileShootingComponent.h"
 
 NPCWave::NPCWave()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())

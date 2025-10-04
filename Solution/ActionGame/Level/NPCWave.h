@@ -2,7 +2,6 @@
 #include <FW_GrowingArray.h>
 #include <FW_Vector2.h>
 
-#include "EntityHandle.h"
 #include <Core\Time.h>
 
 class Entity;

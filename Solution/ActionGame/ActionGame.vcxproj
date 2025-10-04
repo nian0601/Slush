@@ -72,13 +72,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)..\Workbed\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)..\Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\ActionGame;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\SFML\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)..\Workbed\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)..\Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\ActionGame;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -137,72 +137,72 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActionGameGlobals.cpp" />
-    <ClCompile Include="AnimationComponent.cpp" />
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="ComponentRegistry.cpp" />
-    <ClCompile Include="DamageDealerComponent.cpp" />
-    <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Components\AnimationComponent.cpp" />
+    <ClCompile Include="Components\Component.cpp" />
+    <ClCompile Include="EntitySystem\ComponentRegistry.cpp" />
+    <ClCompile Include="Components\DamageDealerComponent.cpp" />
+    <ClCompile Include="EntitySystem\Entity.cpp" />
     <ClCompile Include="EntityEditorLayout.cpp" />
-    <ClCompile Include="EntityManager.cpp" />
-    <ClCompile Include="EntityPrefab.cpp" />
+    <ClCompile Include="EntitySystem\EntityManager.cpp" />
+    <ClCompile Include="EntitySystem\EntityPrefab.cpp" />
     <ClCompile Include="EntityPrefabDockable.cpp" />
-    <ClCompile Include="ExperienceComponent.cpp" />
+    <ClCompile Include="Components\ExperienceComponent.cpp" />
     <ClCompile Include="GameLayout.cpp" />
-    <ClCompile Include="HealthBarComponent.cpp" />
-    <ClCompile Include="HealthComponent.cpp" />
-    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="Components\HealthBarComponent.cpp" />
+    <ClCompile Include="Components\HealthComponent.cpp" />
+    <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="NPCControllerComponent.cpp" />
-    <ClCompile Include="NPCWave.cpp" />
-    <ClCompile Include="PhysicsComponent.cpp" />
-    <ClCompile Include="PickupComponent.cpp" />
-    <ClCompile Include="PlayerControllerComponent.cpp" />
-    <ClCompile Include="ProjectileShootingComponent.cpp" />
-    <ClCompile Include="RemoveOnCollisionComponent.cpp" />
-    <ClCompile Include="SpriteComponent.cpp" />
-    <ClCompile Include="StatsComponent.cpp" />
+    <ClCompile Include="Components\NPCControllerComponent.cpp" />
+    <ClCompile Include="Level\NPCWave.cpp" />
+    <ClCompile Include="Components\PhysicsComponent.cpp" />
+    <ClCompile Include="Components\PickupComponent.cpp" />
+    <ClCompile Include="Components\PlayerControllerComponent.cpp" />
+    <ClCompile Include="Components\ProjectileShootingComponent.cpp" />
+    <ClCompile Include="Components\RemoveOnCollisionComponent.cpp" />
+    <ClCompile Include="Components\SpriteComponent.cpp" />
+    <ClCompile Include="Components\StatsComponent.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TargetingComponent.cpp" />
-    <ClCompile Include="Tilemap.cpp" />
-    <ClCompile Include="TimedRemovalComponent.cpp" />
-    <ClCompile Include="WeaponComponent.cpp" />
+    <ClCompile Include="Components\TargetingComponent.cpp" />
+    <ClCompile Include="Level\Tilemap.cpp" />
+    <ClCompile Include="Components\TimedRemovalComponent.cpp" />
+    <ClCompile Include="Components\WeaponComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionGameGlobals.h" />
-    <ClInclude Include="AnimationComponent.h" />
+    <ClInclude Include="Components\AnimationComponent.h" />
     <ClInclude Include="AppLayout.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="ComponentRegistry.h" />
-    <ClInclude Include="DamageDealerComponent.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="EntityComponentEvents.h" />
+    <ClInclude Include="Components\Component.h" />
+    <ClInclude Include="EntitySystem\ComponentRegistry.h" />
+    <ClInclude Include="Components\DamageDealerComponent.h" />
+    <ClInclude Include="EntitySystem\Entity.h" />
+    <ClInclude Include="EntitySystem\EntityComponentEvents.h" />
     <ClInclude Include="EntityEditorLayout.h" />
-    <ClInclude Include="EntityHandle.h" />
-    <ClInclude Include="EntityManager.h" />
-    <ClInclude Include="EntityPrefab.h" />
+    <ClInclude Include="EntitySystem\EntityHandle.h" />
+    <ClInclude Include="EntitySystem\EntityManager.h" />
+    <ClInclude Include="EntitySystem\EntityPrefab.h" />
     <ClInclude Include="EntityPrefabDockable.h" />
-    <ClInclude Include="ExperienceComponent.h" />
+    <ClInclude Include="Components\ExperienceComponent.h" />
     <ClInclude Include="GameLayout.h" />
-    <ClInclude Include="HealthBarComponent.h" />
-    <ClInclude Include="HealthComponent.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="NPCControllerComponent.h" />
-    <ClInclude Include="NPCWave.h" />
-    <ClInclude Include="PhysicsComponent.h" />
-    <ClInclude Include="PickupComponent.h" />
-    <ClInclude Include="PlayerControllerComponent.h" />
-    <ClInclude Include="ProjectileShootingComponent.h" />
-    <ClInclude Include="RemoveOnCollisionComponent.h" />
-    <ClInclude Include="SpriteComponent.h" />
-    <ClInclude Include="StatsComponent.h" />
+    <ClInclude Include="Components\HealthBarComponent.h" />
+    <ClInclude Include="Components\HealthComponent.h" />
+    <ClInclude Include="Level\Level.h" />
+    <ClInclude Include="Components\NPCControllerComponent.h" />
+    <ClInclude Include="Level\NPCWave.h" />
+    <ClInclude Include="Components\PhysicsComponent.h" />
+    <ClInclude Include="Components\PickupComponent.h" />
+    <ClInclude Include="Components\PlayerControllerComponent.h" />
+    <ClInclude Include="Components\ProjectileShootingComponent.h" />
+    <ClInclude Include="Components\RemoveOnCollisionComponent.h" />
+    <ClInclude Include="Components\SpriteComponent.h" />
+    <ClInclude Include="Components\StatsComponent.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="TargetingComponent.h" />
-    <ClInclude Include="Tilemap.h" />
-    <ClInclude Include="TimedRemovalComponent.h" />
-    <ClInclude Include="WeaponComponent.h" />
+    <ClInclude Include="Components\TargetingComponent.h" />
+    <ClInclude Include="Level\Tilemap.h" />
+    <ClInclude Include="Components\TimedRemovalComponent.h" />
+    <ClInclude Include="Components\WeaponComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

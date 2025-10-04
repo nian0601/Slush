@@ -5,4 +5,6 @@
 #include "imgui/imgui-SFML.h"
 #include "Core/Log.h"
 
-#include "Entity.h"
+#include "EntitySystem/Entity.h"
+#include "EntitySystem/EntityPrefab.h"
+#include "EntitySystem/EntityHandle.h"

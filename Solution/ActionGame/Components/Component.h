@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EntityComponentEvents.h"
+#include "EntitySystem/EntityComponentEvents.h"
 #include <FW_TypeID.h>
 #include <Core/Assets/AssetParser.h>
 

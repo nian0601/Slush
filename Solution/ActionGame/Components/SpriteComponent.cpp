@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "EntityPrefab.h"
 #include "SpriteComponent.h"
 
 #include <Graphics/CircleSprite.h>

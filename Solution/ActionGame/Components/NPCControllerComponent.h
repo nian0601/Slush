@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Component.h"
-#include "EntityHandle.h"
 
 class NPCControllerComponent : public Component
 {

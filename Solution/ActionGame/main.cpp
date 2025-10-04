@@ -7,7 +7,7 @@
 
 #include "ActionGameGlobals.h"
 #include "EntityPrefabDockable.h"
-#include "EntityManager.h"
+#include "EntitySystem/EntityManager.h"
 #include "GameLayout.h"
 #include "EntityEditorLayout.h"
 #include <Core/Input.h>

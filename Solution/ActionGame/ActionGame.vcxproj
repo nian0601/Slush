@@ -155,7 +155,6 @@
     <ClCompile Include="Level\LevelDataDockable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Components\NPCControllerComponent.cpp" />
-    <ClCompile Include="Level\NPCWave.cpp" />
     <ClCompile Include="Components\PhysicsComponent.cpp" />
     <ClCompile Include="Components\PickupComponent.cpp" />
     <ClCompile Include="Components\PlayerControllerComponent.cpp" />
@@ -194,7 +193,6 @@
     <ClInclude Include="Components\NPCControllerComponent.h" />
     <ClInclude Include="Level\LevelData.h" />
     <ClInclude Include="Level\LevelDataDockable.h" />
-    <ClInclude Include="Level\NPCWave.h" />
     <ClInclude Include="Components\PhysicsComponent.h" />
     <ClInclude Include="Components\PickupComponent.h" />
     <ClInclude Include="Components\PlayerControllerComponent.h" />

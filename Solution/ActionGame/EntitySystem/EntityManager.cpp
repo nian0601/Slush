@@ -91,6 +91,11 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPref
 	return CreateEmptyEntity();
 }
 
+Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const FW_String& aPrefabName)
+{
+	return CreateEntity(aPosition, aPrefabName.GetBuffer());
+}
+
 void EntityManager::DeleteAllEntities()
 {
 	for (Entity* entity : myEntities)

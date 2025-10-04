@@ -1,6 +1,6 @@
 LevelData 
 { 
-	playerEntityPrefab player 
+	playerEntityPrefab Player 
 	playerStartPosition 
 	{ 
 		x 500.000 
@@ -11,8 +11,8 @@ LevelData
 		wave 
 		{ 
 			duration 5.000 
-			minEnemyCount 3 
-			maxEnemyCount 5 
+			minEnemyCount 5 
+			maxEnemyCount 6 
 			enemyPrefabs 
 			{ 
 				prefab NPC 
@@ -21,8 +21,8 @@ LevelData
 		wave 
 		{ 
 			duration 5.000 
-			minEnemyCount 2 
-			maxEnemyCount 5 
+			minEnemyCount 7 
+			maxEnemyCount 9 
 			enemyPrefabs 
 			{ 
 				prefab NPCRanged 
@@ -32,10 +32,12 @@ LevelData
 		wave 
 		{ 
 			duration 5.000 
-			minEnemyCount 2 
-			maxEnemyCount 5 
+			minEnemyCount 10 
+			maxEnemyCount 12 
 			enemyPrefabs 
 			{ 
+				prefab NPCRanged 
+				prefab NPC 
 				prefab NPCRanged 
 			} 
 		} 

@@ -1,18 +1,17 @@
 #pragma once
 #include <Core\Assets\DataAsset.h>
 
+struct EnemyWaveData
+{
+	float myDuration = 5.f;
+	int myMinEnemyCount = 2;
+	int myMaxEnemyCount = 5;
+
+	FW_GrowingArray<FW_String> myEnemyPrefabs;
+};
+
 class LevelData : public Slush::DataAsset
 {
-public:
-	struct EnemyWaveData
-	{
-		float myDuration = 5.f;
-		int myMinEnemyCount = 2;
-		int myMaxEnemyCount = 5;
-
-		FW_GrowingArray<FW_String> myEnemyPrefabs;
-	};
-
 public:
 	DEFINE_ASSET("LevelData", "ldata", "data/levels/");
 

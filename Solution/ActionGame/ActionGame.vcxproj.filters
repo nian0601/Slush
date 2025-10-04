@@ -79,9 +79,6 @@
     <ClCompile Include="Level\Level.cpp">
       <Filter>Level</Filter>
     </ClCompile>
-    <ClCompile Include="Level\NPCWave.cpp">
-      <Filter>Level</Filter>
-    </ClCompile>
     <ClCompile Include="Level\Tilemap.cpp">
       <Filter>Level</Filter>
     </ClCompile>
@@ -173,9 +170,6 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="Level\Level.h">
-      <Filter>Level</Filter>
-    </ClInclude>
-    <ClInclude Include="Level\NPCWave.h">
       <Filter>Level</Filter>
     </ClInclude>
     <ClInclude Include="Level\Tilemap.h">

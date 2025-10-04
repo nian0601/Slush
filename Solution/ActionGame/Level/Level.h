@@ -4,8 +4,9 @@
 #include <UI\UIManager.h>
 
 class EntityManager;
-class NPCWave;
 class Tilemap;
+class LevelData;
+class EnemyWaveData;
 
 namespace Slush
 {
@@ -29,11 +30,23 @@ public:
 	bool IsLevelingUp() const { return myIsLevelingUp; }
 
 private:
+	void HandleLevlingUp();
+	void HandleEnemyWaves();
+
+	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);	
+
+	LevelData* myLevelData = nullptr;
+	EnemyWaveData* myEnemyWaveData = nullptr;
 	EntityManager& myEntityManager;
 	EntityHandle myPlayerHandle;
-
-	NPCWave* myNPCWave;
 	bool myIsLevelingUp = false;
+
+	Tilemap* myTilemap;
+
+	Slush::Timer myWaveTimer;
+	int myWaveCounter = 0;
+	float myPlayerClearanceRadius = 350.f;
+	float myEnemyClearanceRadius = 100.f;
 
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;
@@ -41,5 +54,5 @@ private:
 	Slush::RectSprite* myUISprite;
 	Slush::Text* myText;
 	Slush::Font& myFont;
-	Tilemap* myTilemap;
+
 };

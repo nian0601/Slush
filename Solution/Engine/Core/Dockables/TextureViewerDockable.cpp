@@ -37,21 +37,40 @@ namespace Slush
 				float displayHeight = FW_Max(static_cast<float>(texture->GetSize().y), 180.f);
 				ImGui::Image(*texture->GetSFMLTexture(), { displayWidth, displayHeight });
 
-				if (myShowTexCoordHelper && ImGui::IsItemHovered() && ImGui::BeginTooltip())
+				const float localX = io.MousePos.x - pos.x;
+				const float localY = io.MousePos.y - pos.y;
+
+				const int tileX = static_cast<int>(localX / myTexCoordHelperSpriteSize.x);
+				const int tileY = static_cast<int>(localY / myTexCoordHelperSpriteSize.y);
+
+				Vector2i texCoord = { tileX * myTexCoordHelperSpriteSize.x , tileY * myTexCoordHelperSpriteSize.y };
+				
+				ImGuiDragDropFlags src_flags = ImGuiDragDropFlags_SourceAllowNullID;
+				if (ImGui::BeginDragDropSource(src_flags))
 				{
-					float localX = io.MousePos.x - pos.x;
-					float localY = io.MousePos.y - pos.y;
+					if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
+						ImGui::Text("Dragging TextureRect");
 
-					//ImGui::Text("Pos (%.2f, %.2f)", pos.x, pos.y);
-					//ImGui::Text("Mouse (%.2f, %.2f)", io.MousePos.x, io.MousePos.y);
-					//ImGui::Text("Local (%.2f, %.2f)", localX, localY);
+					Recti texRect = MakeRectFromTopLeft(texCoord, myTexCoordHelperSpriteSize);
+					ImGui::SetDragDropPayload("TextureRect", &texRect, sizeof(Recti), ImGuiCond_Once);
+					ImGui::EndDragDropSource();
+				}
 
-					int tileX = static_cast<int>(localX / myTexCoordHelperSpriteSize.x);
-					int tileY = static_cast<int>(localY / myTexCoordHelperSpriteSize.y);
-					ImGui::Text("Tile (%i, %i)", tileX, tileY);
-					ImGui::Text("Tex (%i, %i)", tileX * myTexCoordHelperSpriteSize.x, tileY * myTexCoordHelperSpriteSize.y);
+				if (ImGui::IsItemHovered())
+				{
+					sf::FloatRect texRect;
+					texRect.left = static_cast<float>(texCoord.x);
+					texRect.top = static_cast<float>(texCoord.y);
+					texRect.width = static_cast<float>(myTexCoordHelperSpriteSize.x);
+					texRect.height = static_cast<float>(myTexCoordHelperSpriteSize.y);
 
-					ImGui::EndTooltip();
+					if (myShowTexCoordHelper && ImGui::BeginTooltip())
+					{
+						ImGui::Text("Tex (%i, %i)", static_cast<int>(texRect.left), static_cast<int>(texRect.top));
+						ImGui::Image(*texture->GetSFMLTexture(), { texRect.width, texRect.height }, texRect);
+
+						ImGui::EndTooltip();
+					}
 				}
 			}
 		}

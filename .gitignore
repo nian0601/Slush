@@ -57,3 +57,4 @@
 *.iobj
 Application/Raytracer/Data/Video
 *.lib
+/ProgressTracking

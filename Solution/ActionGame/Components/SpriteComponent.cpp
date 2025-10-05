@@ -51,8 +51,7 @@ void SpriteComponent::Data::OnBuildUI()
 
 	if (ImGui::BeginDragDropTarget())
 	{
-		ImGuiDragDropFlags target_flags = 0;
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(Slush::Texture::GetAssetTypeName(), target_flags))
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(Slush::Texture::GetAssetTypeName()))
 		{
 			int textureIndex = *(const int*)payload->Data;
 			const Slush::Texture* texture = static_cast<Slush::Texture*>(ActionGameGlobals::GetInstance().GetTextureStorage().GetAllAssets()[textureIndex]);
@@ -62,9 +61,42 @@ void SpriteComponent::Data::OnBuildUI()
 	}
 
 	ImGui::InputInt2("TextureRectPos", &myTextureRectPos.x);
-	ImGui::InputInt2("TextureRectSize", &myTextureRectSize.x);
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TextureRect"))
+		{
+			Recti texRect = *static_cast<Recti*>(payload->Data);
+			myTextureRectPos = texRect.myTopLeft;
+			myTextureRectSize = texRect.myExtents;
+		}
+		ImGui::EndDragDropTarget();
+	}
 
+	ImGui::InputInt2("TextureRectSize", &myTextureRectSize.x);
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TextureRect"))
+		{
+			Recti texRect = *static_cast<Recti*>(payload->Data);
+			myTextureRectPos = texRect.myTopLeft;
+			myTextureRectSize = texRect.myExtents;
+		}
+		ImGui::EndDragDropTarget();
+	}
 	
+	if (!myTextureID.Empty())
+	{
+		if (const Slush::Texture* texture = ActionGameGlobals::GetInstance().GetTextureStorage().GetAsset(myTextureID))
+		{
+			sf::FloatRect texRect;
+			texRect.left = static_cast<float>(myTextureRectPos.x);
+			texRect.top = static_cast<float>(myTextureRectPos.y);
+			texRect.width = static_cast<float>(mySize.x);
+			texRect.height = static_cast<float>(mySize.y);
+
+			ImGui::Image(*texture->GetSFMLTexture(), { texRect.width, texRect.height }, texRect);
+		}
+	}
 
 	myColor = FW_Float_To_ARGB(myFloatColor[3], myFloatColor[0], myFloatColor[1], myFloatColor[2]);
 }

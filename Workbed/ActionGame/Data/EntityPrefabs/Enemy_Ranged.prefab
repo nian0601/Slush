@@ -29,6 +29,9 @@ Entity Prefab
 			height 96 
 		} 
 	} 
+	animation 
+	{ 
+	} 
 	projectileshooting 
 	{ 
 		cooldown 1.000 

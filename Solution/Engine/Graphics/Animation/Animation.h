@@ -78,6 +78,7 @@ namespace Slush
 		AnimationTrack& Wait(float aDuration);
 
 		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData);
+		bool HasClips() const { return !myClips.IsEmpty(); }
 
 	protected:
 		AnimationClip& AddClip(float aDuration);
@@ -95,6 +96,7 @@ namespace Slush
 		SpritesheetTrack& Frame(const Vector2i& aFramePosition, Texture* aTexture = nullptr);
 
 		bool Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData);
+		bool HasClips() const { return !myClips.IsEmpty(); }
 
 	private:
 		SpritesheetClip& AddClip(float aDuration);

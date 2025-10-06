@@ -12,7 +12,7 @@
 void PlayerControllerComponent::PrePhysicsUpdate()
 {
 	AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>();
-	if (!anim || !anim->AnimationIsPlaying())
+	if (!anim || !anim->IsPlayingDash())
 	{
 		myDirection = { 0.f, 0.f };
 
@@ -34,6 +34,9 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 
 		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
 			anim->PlayDash(myEntity.myPosition + myDirection * 500.f);
+
+		if (anim && input.WasKeyPressed(Slush::Input::Q))
+			anim->PlayBlink();
 
 		if (anim && input.WasKeyPressed(Slush::Input::V))
 			anim->PlaySpritesheetAnimation();

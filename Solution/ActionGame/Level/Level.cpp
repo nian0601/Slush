@@ -227,6 +227,9 @@ void Level::HandleLevlingUp()
 
 void Level::HandleEnemyWaves()
 {
+	if (ActionGameGlobals::GetInstance().myDebugSettings.myPauseEnemySpawning)
+		return;
+
 	if (myWaveTimer.IsStarted() && !myWaveTimer.HasExpired())
 		return;
 

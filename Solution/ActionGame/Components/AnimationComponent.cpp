@@ -40,83 +40,123 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	mySpritesheetAnimation->mySpritesheetTrack.SetFrameSize({ 96, 96 });
 	for (int i = 0; i < 6; ++i)
 		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 });
-	
-	
 }
 
 AnimationComponent::~AnimationComponent()
 {
 	FW_SAFE_DELETE(myDashAnimation);
-	FW_SAFE_DELETE(myRuntime);
+	FW_SAFE_DELETE(myBlinkAnimation);
+	FW_SAFE_DELETE(mySpawnAnimation);
+	FW_SAFE_DELETE(mySpritesheetAnimation);
+
+	for (int i = 0; i < myRunningAnimations.Count(); ++i)
+		FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
 }
 
 void AnimationComponent::OnEnterWorld()
 {
-	SpriteComponent* sprite = myEntity.GetComponent<SpriteComponent>();
-	if (!sprite)
-	{
-		SLUSH_WARNING("Updating AnimationComponent without a SpriteComponent");
-		return;
-	}
-
-	myRuntime = new Slush::AnimationRuntime(sprite->GetSprite());
 }
 
 void AnimationComponent::Update()
 {
-	if (!myRuntime)
+	for (int i = 0; i < myRunningAnimations.Count();)
 	{
-		SLUSH_WARNING("Updating AnimationComponent without a Runtime");
-		return;
+		Slush::Animation* anim = myRunningAnimations[i].myAnimation;
+		Slush::AnimationRuntime* runtime = myRunningAnimations[i].myRuntime;
+
+		anim->Update(*runtime);
+		if (runtime->myPositionData.myIsActive)
+		{
+			myEntity.myPosition = runtime->myCurrentPosition;
+			if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
+				phys->myObject->SetPosition(myEntity.myPosition);
+		}
+
+		if (runtime->IsFinished())
+		{
+			FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
+			myRunningAnimations[i].myAnimation = nullptr;
+			myRunningAnimations[i].myRuntime = nullptr;
+			myRunningAnimations.RemoveCyclicAtIndex(i);
+		}
+		else
+		{
+			++i;
+		}
 	}
-
-	if (!myCurrentAnimation)
-		return;
-
-	myCurrentAnimation->Update(*myRuntime);
-	if (myRuntime->myPositionData.myIsActive)
-	{
-		myEntity.myPosition = myRuntime->myCurrentPosition;
-		if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
-			phys->myObject->SetPosition(myEntity.myPosition);
-	}
-
-	if (myRuntime->IsFinished())
-		myCurrentAnimation = nullptr;
 }
 
-bool AnimationComponent::AnimationIsPlaying() const
+bool AnimationComponent::IsPlayingDash() const
 {
-	return myRuntime->myState == Slush::AnimationClip::Running && myCurrentAnimation == myDashAnimation;
+	for (const RunningAnimation& anim : myRunningAnimations)
+	{
+		if (anim.myAnimation == myDashAnimation)
+			return true;
+	}
+
+	return false;
 }
+
+bool AnimationComponent::IsPlayingSpawn() const
+{
+	for (const RunningAnimation& anim : myRunningAnimations)
+	{
+		if (anim.myAnimation == mySpawnAnimation)
+			return true;
+	}
+
+	return false;
+}
+
+
 
 void AnimationComponent::PlayDash(const Vector2f& aTargetPosition)
 {
-	myRuntime->myStartPosition = myEntity.myPosition;
-	myRuntime->myEndPosition = aTargetPosition;
-	myRuntime->Start();
-
-	myCurrentAnimation = myDashAnimation;
+	RunningAnimation& anim = myRunningAnimations.Add();
+	anim.myAnimation = myDashAnimation;
+	anim.myRuntime = new Slush::AnimationRuntime(myEntity.GetComponent<SpriteComponent>()->GetSprite());
+	anim.myRuntime->myStartPosition = myEntity.myPosition;
+	anim.myRuntime->myEndPosition = aTargetPosition;
+	anim.myRuntime->Start();
 }
 
 void AnimationComponent::PlayBlink()
 {
-	myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
-	myRuntime->myEndColor = 0xFFFFFFFF;
-	myRuntime->Start();
-
-	myCurrentAnimation = myBlinkAnimation;
+	RunningAnimation& anim = myRunningAnimations.Add();
+	anim.myAnimation = myBlinkAnimation;
+	anim.myRuntime = new Slush::AnimationRuntime(myEntity.GetComponent<SpriteComponent>()->GetSprite());
+	anim.myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
+	anim.myRuntime->myEndColor = 0xFFFF0000;
+	anim.myRuntime->Start();
 }
 
 void AnimationComponent::PlaySpawn()
 {
-	myRuntime->Start();
-
-	myCurrentAnimation = mySpawnAnimation;
+	RunningAnimation& anim = myRunningAnimations.Add();
+	anim.myAnimation = mySpawnAnimation;
+	anim.myRuntime = new Slush::AnimationRuntime(myEntity.GetComponent<SpriteComponent>()->GetSprite());
+	anim.myRuntime->Start();
 }
 
 void AnimationComponent::PlaySpritesheetAnimation()
 {
-	myRuntime->Start();
-	myCurrentAnimation = mySpritesheetAnimation;
+	for (int i = 0; i < myRunningAnimations.Count(); ++i)
+	{
+		if (myRunningAnimations[i].myAnimation == mySpritesheetAnimation)
+		{
+			myRunningAnimations[i].myRuntime->Stop();
+
+			FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
+			myRunningAnimations[i].myAnimation = nullptr;
+			myRunningAnimations[i].myRuntime = nullptr;
+			myRunningAnimations.RemoveCyclicAtIndex(i);
+			break;
+		}
+	}
+
+	RunningAnimation& anim = myRunningAnimations.Add();
+	anim.myAnimation = mySpritesheetAnimation;
+	anim.myRuntime = new Slush::AnimationRuntime(myEntity.GetComponent<SpriteComponent>()->GetSprite());
+	
+	anim.myRuntime->Start();
 }

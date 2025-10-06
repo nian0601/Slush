@@ -6,6 +6,7 @@
 namespace Slush
 {
 	class Animation;
+	class BaseSprite;
 	
 	struct AnimationRuntime;
 }
@@ -21,21 +22,28 @@ public:
 
 	void OnEnterWorld() override;
 	void Update() override;
-	bool AnimationIsPlaying() const;
+	bool IsPlayingDash() const;
+	bool IsPlayingSpawn() const;
 
 	void PlayDash(const Vector2f& aTargetPosition);
 	void PlayBlink();
 	void PlaySpawn();
 	void PlaySpritesheetAnimation();
 
-	bool IsPlayingSpawn() const { return myCurrentAnimation == mySpawnAnimation; }
-
 private:
+	struct RunningAnimation
+	{
+		Slush::Animation* myAnimation = nullptr;
+		Slush::AnimationRuntime* myRuntime = nullptr;
+	};
+
+	FW_GrowingArray<RunningAnimation> myRunningAnimations;
+
 	Slush::Animation* myDashAnimation = nullptr;
 	Slush::Animation* myBlinkAnimation = nullptr;
 	Slush::Animation* mySpawnAnimation = nullptr;
 	Slush::Animation* mySpritesheetAnimation = nullptr;
 
-	Slush::Animation* myCurrentAnimation = nullptr;
-	Slush::AnimationRuntime* myRuntime = nullptr;
+	//Slush::Animation* myCurrentAnimation = nullptr;
+	//Slush::AnimationRuntime* myRuntime = nullptr;
 };

@@ -174,36 +174,5 @@ namespace Slush
 
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
-
-		ApplyAnimation(aRuntimeData);
-
-		if (aRuntimeData.myState == AnimationRuntime::Finished)
-		{
-			aRuntimeData.Stop();
-
-			if (myIsLooping)
-				aRuntimeData.Start();
-		}
-	}
-
-	void Animation::ApplyAnimation(AnimationRuntime& aRuntimeData)
-	{
-		if (aRuntimeData.myOutlineData.myIsActive)
-			aRuntimeData.mySprite.SetOutlineThickness(aRuntimeData.myOutlineData.myValue);
-
-		if (aRuntimeData.myScaleData.myIsActive)
-			aRuntimeData.mySprite.SetScale(aRuntimeData.myScaleData.myValue);
-
-		if (aRuntimeData.myPositionData.myIsActive)
-			aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, aRuntimeData.myPositionData.myValue);
-
-		if (aRuntimeData.myColorData.myIsActive)
-			aRuntimeData.mySprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, aRuntimeData.myColorData.myValue));
-
-		if (aRuntimeData.mySpritesheetData.myIsActive)
-		{
-			const Recti& texRect = aRuntimeData.mySpritesheetData.myFrameRect;
-			aRuntimeData.mySprite.SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
-		}
 	}
 }

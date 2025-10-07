@@ -34,30 +34,25 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	AnimationRuntime::AnimationRuntime(BaseSprite& aSprite)
-		: mySprite(aSprite)
-	{
-	}
-
-	void AnimationRuntime::Start()
+	void AnimationRuntime::Start(BaseSprite& aSprite)
 	{
 		if (myState == Running)
-			Stop();	
+			Stop(aSprite);	
 
 		myState = Running;
 		myElapsedTime = 0.f;
 
-		myOutlineData.Start(mySprite);
+		myOutlineData.Start(aSprite);
 		myOutlineData.myValue = 1.f;
-		myScaleData.Start(mySprite);
+		myScaleData.Start(aSprite);
 		myScaleData.myValue = 1.f;
-		myPositionData.Start(mySprite);
-		myColorData.Start(mySprite);
-		mySpritesheetData.Start(mySprite);
+		myPositionData.Start(aSprite);
+		myColorData.Start(aSprite);
+		mySpritesheetData.Start(aSprite);
 	}
 
-	void AnimationRuntime::Stop()
+	void AnimationRuntime::Stop(BaseSprite& aSprite)
 	{
-		mySpritesheetData.End(mySprite);
+		mySpritesheetData.End(aSprite);
 	}
 }

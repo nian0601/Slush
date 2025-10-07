@@ -38,12 +38,10 @@ private:
 	};
 
 	FW_GrowingArray<RunningAnimation> myRunningAnimations;
+	void ApplyAnimation(Slush::AnimationRuntime& aRuntimeData);
 
 	Slush::Animation* myDashAnimation = nullptr;
 	Slush::Animation* myBlinkAnimation = nullptr;
 	Slush::Animation* mySpawnAnimation = nullptr;
 	Slush::Animation* mySpritesheetAnimation = nullptr;
-
-	//Slush::Animation* myCurrentAnimation = nullptr;
-	//Slush::AnimationRuntime* myRuntime = nullptr;
 };

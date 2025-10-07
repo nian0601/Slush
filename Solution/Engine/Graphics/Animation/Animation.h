@@ -115,17 +115,10 @@ namespace Slush
 	public:
 		void Update(AnimationRuntime& aRuntimeData);
 
-		void MakeOneShot() { myIsLooping = false; }
-
 		AnimationTrack myOutlineTrack;
 		AnimationTrack myScaleTrack;
 		AnimationTrack myPositionTrack;
 		AnimationTrack myColorTrack;
 		SpritesheetTrack mySpritesheetTrack;
-
-	private:
-		void ApplyAnimation(AnimationRuntime& aRuntimeData);
-
-		bool myIsLooping = true;
 	};
 }

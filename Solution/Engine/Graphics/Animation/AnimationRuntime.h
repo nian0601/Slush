@@ -37,14 +37,11 @@ namespace Slush
 			Finished,
 		};
 
-		AnimationRuntime(BaseSprite& aSprite);
-
-		void Start();
-		void Stop();
+		void Start(BaseSprite& aSprite);
+		void Stop(BaseSprite& aSprite);
 
 		bool IsFinished() const { return myState == Finished; }
 
-		BaseSprite& mySprite;
 		State myState = NotStarted;
 		float myElapsedTime = 0.f;
 

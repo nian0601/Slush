@@ -107,14 +107,14 @@ namespace Slush
 			if (ImGui::BeginMainMenuBar())
 			{
 				ImGui::Text("[ %s ]", myAppLayoutName);
-				if (ImGui::BeginMenu("Layouts.."))
+				if (ImGui::BeginMenu("Layouts"))
 				{
 					ImGui::Selectable("Game");
 					ImGui::Selectable("Entity");
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu("ImGUI.."))
+				if (ImGui::BeginMenu("ImGUI"))
 				{
 					ImGui::Checkbox("Show Demo", &myDisplayImGUIDemo);
 					ImGui::EndMenu();

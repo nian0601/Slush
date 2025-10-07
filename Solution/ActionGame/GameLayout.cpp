@@ -52,13 +52,6 @@ GameLayout::GameLayout()
 		window.AddDockable(new Slush::GameViewDockable());
 		window.AddDockable(new Slush::LogDockable());
 		window.AddDockable(new ActionGameGlobals::DebugSettingsDockable());
-
-		//Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
-		//window.AddDockable(contentBrowser);
-		//
-		//contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());
-		//contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
-		//contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());
 	}
 }
 

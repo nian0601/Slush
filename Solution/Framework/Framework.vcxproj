@@ -157,6 +157,9 @@
     <ClCompile Include="FW_UnitTestSuite.cpp" />
     <ClCompile Include="FW_XMLParser.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Framework_Natvis.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

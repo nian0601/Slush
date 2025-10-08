@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="FW_GrowingArray&lt;*&gt;">
+    <DisplayString>{{size={myCurrentSize}}}</DisplayString>
+    <Expand>
+      <Item Name="CurrentSize">myCurrentSize</Item>
+      <Item Name="MaxSize">myMaxSize</Item>
+      <ArrayItems>
+        <Size>myCurrentSize</Size>
+        <ValuePointer>myData</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="FW_String">
+    <DisplayString>{myData}</DisplayString>
+    <Expand>
+      <Item Name="CurrentSize">myCurrentSize</Item>
+      <Item Name="MaxSize">myMaxSize</Item>
+      <Item Name="Hash">myHash</Item>
+      <ArrayItems>
+        <Size>myCurrentSize</Size>
+        <ValuePointer>myData</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+  <Type Name="FW_Matrix22">
+    <DisplayString>{v}</DisplayString>
+    <Expand>
+      <Item Name="[0]">m[0]</Item>
+      <Item Name="[1]">m[1]</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

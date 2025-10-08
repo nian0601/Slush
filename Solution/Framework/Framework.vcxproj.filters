@@ -34,4 +34,7 @@
     <ClCompile Include="FW_XMLParser.cpp" />
     <ClCompile Include="FW_UnitTestSuite.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Framework_Natvis.natvis" />
+  </ItemGroup>
 </Project>

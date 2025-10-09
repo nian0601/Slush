@@ -25,6 +25,8 @@ namespace Slush
 		void SetOutlineColor(float a, float r, float g, float b);
 		void SetOutlineThickness(float aThickness);
 
+		void SetHorizontalFlip(bool aEnableFlip);
+
 		const Texture* GetTexture() const { return myTexture; }
 		const Recti& GetTextureRect() const { return myTextureRect; }
 		const Vector2f& GetPosition() const { return myPosition; }
@@ -34,6 +36,8 @@ namespace Slush
 		int GetFillColor() const { return myFillColor; }
 		int GetOutlineColor() const { return myOutlineColor; }
 		float GetOutlineThickness() const;
+
+		bool GetHorizontalFlip() const { return myEnableHorizontalFlip; }
 
 		void Render();
 		void Render(float x, float y);
@@ -50,5 +54,6 @@ namespace Slush
 		float myScale = 1.f;
 		int myFillColor = 0xFFFFFFFF;
 		int myOutlineColor = 0xFFFFFFFF;
+		bool myEnableHorizontalFlip = false;
 	};
 }

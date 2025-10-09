@@ -8,6 +8,8 @@
 #include <Core\Engine.h>
 #include <Core\Input.h>
 #include <Physics\PhysicsWorld.h>
+#include "SpriteComponent.h"
+#include <Graphics\BaseSprite.h>
 
 void PlayerControllerComponent::PrePhysicsUpdate()
 {
@@ -31,6 +33,14 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 
 		if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
 			phys->myObject->myVelocity = myDirection * mySpeed;
+
+		if (SpriteComponent* sprite = myEntity.GetComponent<SpriteComponent>())
+		{
+			if (myDirection.x > 0.f)
+				sprite->GetSprite().SetHorizontalFlip(false);
+			else if (myDirection.x < 0.f)
+				sprite->GetSprite().SetHorizontalFlip(true);
+		}
 
 		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
 			anim->PlayDash(myEntity.myPosition + myDirection * 500.f);

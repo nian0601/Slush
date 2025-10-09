@@ -36,7 +36,13 @@ namespace Slush
 	void BaseSprite::SetTextureRect(int x, int y, int aWidth, int aHeight)
 	{
 		myTextureRect = MakeRectFromTopLeft<int>({ x, y }, { aWidth, aHeight });
-		sf::IntRect rect = { x, y, aWidth, aHeight };
+		sf::IntRect rect = { myTextureRect.myTopLeft.x, myTextureRect.myTopLeft.y, myTextureRect.myExtents.x, myTextureRect.myExtents.y };
+		if (myEnableHorizontalFlip)
+		{
+			rect.left += rect.width;
+			rect.width = -rect.width;
+		}
+
 		myShape->setTextureRect(rect);
 	}
 
@@ -65,6 +71,15 @@ namespace Slush
 	void BaseSprite::SetOutlineThickness(float aThickness)
 	{
 		myShape->setOutlineThickness(aThickness);
+	}
+
+	void BaseSprite::SetHorizontalFlip(bool aEnableFlip)
+	{
+		if (myEnableHorizontalFlip == aEnableFlip)
+			return;
+
+		myEnableHorizontalFlip = aEnableFlip;
+		SetTextureRect(myTextureRect.myTopLeft.x, myTextureRect.myTopLeft.y, myTextureRect.myExtents.x, myTextureRect.myExtents.y);
 	}
 
 	void BaseSprite::SetPosition(float x, float y)

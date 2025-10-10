@@ -12,6 +12,8 @@ namespace Slush
 	class IAssetStorage
 	{
 	public:
+		virtual Asset& CreateNewAsset(const char* aName) = 0;
+		virtual Asset& CopyAsset(const char* aNewName, const Asset& anOldAsset) = 0;
 		virtual const char* GetAssetTypeName() const = 0;
 		virtual const FW_GrowingArray<Asset*>& GetAllAssets() const = 0;
 	};
@@ -22,8 +24,8 @@ namespace Slush
 	public:
 		~AssetStorage();
 
-		AssetType& CreateNewAsset(const char* aName);
-		AssetType& CopyAsset(const char* aNewName, const AssetType& anOldAsset);
+		AssetType& CreateNewAsset(const char* aName) override;
+		AssetType& CopyAsset(const char* aNewName, const Asset& anOldAsset) override;
 
 		void Load(const char* aName, const char* aFilePath);
 		void LoadAllAssets();
@@ -68,7 +70,7 @@ namespace Slush
 	}
 
 	template<typename AssetType>
-	AssetType& AssetStorage<AssetType>::CopyAsset(const char* aNewName, const AssetType& anOldAsset)
+	AssetType& AssetStorage<AssetType>::CopyAsset(const char* aNewName, const Asset& anOldAsset)
 	{
 		if (myAssetMap.KeyExists(aNewName))
 		{

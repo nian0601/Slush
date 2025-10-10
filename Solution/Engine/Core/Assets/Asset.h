@@ -9,6 +9,7 @@ namespace Slush
 		virtual ~Asset() {}
 		virtual void Load(const char* aFilePath);
 		virtual void Save();
+		virtual void BuildUI() {};
 
 		virtual const char* GetTypeName() = 0;
 		virtual const char* GetTypeExtention() = 0;

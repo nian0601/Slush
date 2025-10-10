@@ -146,14 +146,13 @@
     <ClCompile Include="EntityEditorLayout.cpp" />
     <ClCompile Include="EntitySystem\EntityManager.cpp" />
     <ClCompile Include="EntitySystem\EntityPrefab.cpp" />
-    <ClCompile Include="EntityPrefabDockable.cpp" />
+    <ClCompile Include="AssetEditorDockable.cpp" />
     <ClCompile Include="Components\ExperienceComponent.cpp" />
     <ClCompile Include="GameLayout.cpp" />
     <ClCompile Include="Components\HealthBarComponent.cpp" />
     <ClCompile Include="Components\HealthComponent.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
-    <ClCompile Include="Level\LevelDataDockable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Components\NPCControllerComponent.cpp" />
     <ClCompile Include="Components\PhysicsComponent.cpp" />
@@ -186,7 +185,7 @@
     <ClInclude Include="EntitySystem\EntityHandle.h" />
     <ClInclude Include="EntitySystem\EntityManager.h" />
     <ClInclude Include="EntitySystem\EntityPrefab.h" />
-    <ClInclude Include="EntityPrefabDockable.h" />
+    <ClInclude Include="AssetEditorDockable.h" />
     <ClInclude Include="Components\ExperienceComponent.h" />
     <ClInclude Include="GameLayout.h" />
     <ClInclude Include="Components\HealthBarComponent.h" />
@@ -194,7 +193,6 @@
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Components\NPCControllerComponent.h" />
     <ClInclude Include="Level\LevelData.h" />
-    <ClInclude Include="Level\LevelDataDockable.h" />
     <ClInclude Include="Components\PhysicsComponent.h" />
     <ClInclude Include="Components\PickupComponent.h" />
     <ClInclude Include="Components\PlayerControllerComponent.h" />

@@ -53,7 +53,7 @@ public:
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle) override;
 
-	void BuildUI();
+	void BuildUI() override;
 	void BuildMissingComponentsUI(const FW_GrowingArray<MissingComponent>& someMissingComponents);
 
 	template <typename ComponentType>

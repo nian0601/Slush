@@ -42,9 +42,13 @@ namespace Slush
 			ImGui::TableHeadersRow();
 
 
+			bool isFilterEnabled = false;
+			for (StorageData& storageData : myAssetStorages)
+				isFilterEnabled |= storageData.myShouldShowAssets;
+
 			for (StorageData& storageData : myAssetStorages)
 			{
-				if (!storageData.myShouldShowAssets)
+				if (isFilterEnabled && !storageData.myShouldShowAssets)
 					continue;
 
 				const FW_GrowingArray<Asset*> assets = storageData.myAssetStorage->GetAllAssets();

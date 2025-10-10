@@ -18,7 +18,7 @@ public:
 	LevelData(const char* aName);
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle) override;
-	void BuildUI();
+	void BuildUI() override;
 
 	Vector2f myPlayerStartPosition;
 	FW_String myPlayerEntityPrefab;

@@ -2,9 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="EntityPrefabDockable.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="ActionGameGlobals.cpp" />
     <ClCompile Include="GameLayout.cpp">
@@ -83,13 +80,12 @@
       <Filter>Level</Filter>
     </ClCompile>
     <ClCompile Include="Level\LevelData.cpp" />
-    <ClCompile Include="Level\LevelDataDockable.cpp" />
     <ClCompile Include="Components\DropComponent.cpp" />
+    <ClCompile Include="AssetEditorDockable.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EntityPrefabDockable.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="ActionGameGlobals.h" />
     <ClInclude Include="AppLayout.h">
@@ -177,8 +173,10 @@
       <Filter>Level</Filter>
     </ClInclude>
     <ClInclude Include="Level\LevelData.h" />
-    <ClInclude Include="Level\LevelDataDockable.h" />
     <ClInclude Include="Components\DropComponent.h" />
+    <ClInclude Include="AssetEditorDockable.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

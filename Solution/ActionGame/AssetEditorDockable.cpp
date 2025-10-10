@@ -1,36 +1,37 @@
 #include "stdafx.h"
 
-#include "EntityPrefabDockable.h"
+#include "AssetEditorDockable.h"
 
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
 #include "Core/Input.h"
 
-EntityPrefabDockable::EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
+AssetEditorDockable::AssetEditorDockable(Slush::IAssetStorage& aAssetStorage, const char* aDockableName)
 	: Dockable(true)
-	, myPrefabStorage(aPrefabStorage)
-	, myNewPrefabNameStorage("")
+	, myAssetStorage(aAssetStorage)
+	, myDockableName(aDockableName)
+	, myNewAssetNameStorage("")
 {
 }
 
-void EntityPrefabDockable::OnUpdate()
+void AssetEditorDockable::OnUpdate()
 {
 }
 
-void EntityPrefabDockable::OnBuildUI()
+void AssetEditorDockable::OnBuildUI()
 {
-	const FW_GrowingArray<Slush::Asset*> assets = myPrefabStorage.GetAllAssets();
+	const FW_GrowingArray<Slush::Asset*> assets = myAssetStorage.GetAllAssets();
 	if (ImGui::BeginMenuBar())
 	{
-		if (mySelectedPrefab)
-			ImGui::Text("[%s] ", mySelectedPrefab->GetAssetName().GetBuffer());
+		if (mySelectedAsset)
+			ImGui::Text("[%s] ", mySelectedAsset->GetAssetName().GetBuffer());
 
 		if (ImGui::BeginMenu("File.."))
 		{
 			if (ImGui::MenuItem("New"))
 				myWantToOpenNewAssetDialogue = true;
 			
-			if (mySelectedPrefab)
+			if (mySelectedAsset)
 			{
 				if (ImGui::MenuItem("Save As"))
 					myWantToOpenSaveAsDialogue = true;
@@ -46,9 +47,8 @@ void EntityPrefabDockable::OnBuildUI()
 			{
 				for (Slush::Asset* asset : assets)
 				{
-					EntityPrefab* prefab = static_cast<EntityPrefab*>(asset);
-					if (ImGui::Selectable(prefab->myName.GetBuffer()))
-						mySelectedPrefab = prefab;
+					if (ImGui::Selectable(asset->GetAssetName().GetBuffer()))
+						mySelectedAsset = asset;
 				}
 	
 				ImGui::EndMenu();
@@ -59,32 +59,32 @@ void EntityPrefabDockable::OnBuildUI()
 		HandleCreatingNewAsset();
 		HandleSavingAsNewAsset();
 
-		if (mySelectedPrefab && ImGui::MenuItem("Save"))
-			mySelectedPrefab->Save();
+		if (mySelectedAsset && ImGui::MenuItem("Save"))
+			mySelectedAsset->Save();
 	
 		ImGui::EndMenuBar();
 	}
 	
 	ImGui::BeginChild("dragndropdummy");
 	
-	if (mySelectedPrefab)
-		mySelectedPrefab->BuildUI();
+	if (mySelectedAsset)
+		mySelectedAsset->BuildUI();
 	
 	ImGui::EndChild();
 	
 	if (ImGui::BeginDragDropTarget())
 	{
 		ImGuiDragDropFlags target_flags = 0;
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(EntityPrefab::GetAssetTypeName(), target_flags))
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(myAssetStorage.GetAssetTypeName(), target_flags))
 		{
 			int assetIndex = *(const int*)payload->Data;
-			mySelectedPrefab = static_cast<EntityPrefab*>(myPrefabStorage.GetAllAssets()[assetIndex]);
+			mySelectedAsset = myAssetStorage.GetAllAssets()[assetIndex];
 		}
 		ImGui::EndDragDropTarget();
 	}
 }
 
-void EntityPrefabDockable::HandleCreatingNewAsset()
+void AssetEditorDockable::HandleCreatingNewAsset()
 {
 	if (myWantToOpenNewAssetDialogue)
 	{
@@ -94,24 +94,24 @@ void EntityPrefabDockable::HandleCreatingNewAsset()
 
 	if (ImGui::BeginPopupModal("New_Prefab_Popup"))
 	{
-		if (ImGui::InputText("Name", &myNewPrefabNameStorage))
-			myHasUniquePrefabName = VerifyUniqueNameForNewAsset();
+		if (ImGui::InputText("Name", &myNewAssetNameStorage))
+			myHasUniqueAssetName = VerifyUniqueNameForNewAsset();
 
 		if (ImGui::Button("Create"))
 		{
-			if (!myNewPrefabNameStorage.Empty() && myHasUniquePrefabName)
+			if (!myNewAssetNameStorage.Empty() && myHasUniqueAssetName)
 			{
-				myPrefabStorage.CreateNewAsset(myNewPrefabNameStorage.GetBuffer());
-				myNewPrefabNameStorage.Clear();
+				myAssetStorage.CreateNewAsset(myNewAssetNameStorage.GetBuffer());
+				myNewAssetNameStorage.Clear();
 				ImGui::CloseCurrentPopup();
 			}
 		}
 
 		if (ImGui::IsItemHovered())
 		{
-			if (myNewPrefabNameStorage.Empty())
+			if (myNewAssetNameStorage.Empty())
 				ImGui::SetTooltip("Invalid name");
-			else if (!myHasUniquePrefabName)
+			else if (!myHasUniqueAssetName)
 				ImGui::SetTooltip("Prefab with that name already exists");
 		}
 
@@ -123,7 +123,7 @@ void EntityPrefabDockable::HandleCreatingNewAsset()
 	}
 }
 
-void EntityPrefabDockable::HandleSavingAsNewAsset()
+void AssetEditorDockable::HandleSavingAsNewAsset()
 {
 	if (myWantToOpenSaveAsDialogue)
 	{
@@ -133,24 +133,24 @@ void EntityPrefabDockable::HandleSavingAsNewAsset()
 
 	if (ImGui::BeginPopupModal("Save_As_Popup"))
 	{
-		if (ImGui::InputText("Name", &myNewPrefabNameStorage))
-			myHasUniquePrefabName = VerifyUniqueNameForNewAsset();
+		if (ImGui::InputText("Name", &myNewAssetNameStorage))
+			myHasUniqueAssetName = VerifyUniqueNameForNewAsset();
 
 		if (ImGui::Button("Save"))
 		{
-			if (!myNewPrefabNameStorage.Empty() && myHasUniquePrefabName)
+			if (!myNewAssetNameStorage.Empty() && myHasUniqueAssetName)
 			{
-				mySelectedPrefab = &myPrefabStorage.CopyAsset(myNewPrefabNameStorage.GetBuffer(), *mySelectedPrefab);
-				myNewPrefabNameStorage.Clear();
+				mySelectedAsset = &myAssetStorage.CopyAsset(myNewAssetNameStorage.GetBuffer(), *mySelectedAsset);
+				myNewAssetNameStorage.Clear();
 				ImGui::CloseCurrentPopup();
 			}
 		}
 
 		if (ImGui::IsItemHovered())
 		{
-			if (myNewPrefabNameStorage.Empty())
+			if (myNewAssetNameStorage.Empty())
 				ImGui::SetTooltip("Invalid name");
-			else if (!myHasUniquePrefabName)
+			else if (!myHasUniqueAssetName)
 				ImGui::SetTooltip("Prefab with that name already exists");
 		}
 
@@ -162,13 +162,13 @@ void EntityPrefabDockable::HandleSavingAsNewAsset()
 	}
 }
 
-bool EntityPrefabDockable::VerifyUniqueNameForNewAsset() const
+bool AssetEditorDockable::VerifyUniqueNameForNewAsset() const
 {
-	const FW_GrowingArray<Slush::Asset*> assets = myPrefabStorage.GetAllAssets();
+	const FW_GrowingArray<Slush::Asset*> assets = myAssetStorage.GetAllAssets();
 	for (Slush::Asset* asset : assets)
 	{
 		EntityPrefab* prefab = static_cast<EntityPrefab*>(asset);
-		if (prefab->myName == myNewPrefabNameStorage.GetBuffer())
+		if (prefab->myName == myNewAssetNameStorage.GetBuffer())
 			return false;
 	}
 

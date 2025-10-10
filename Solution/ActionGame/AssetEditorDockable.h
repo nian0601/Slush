@@ -5,11 +5,11 @@
 
 #include "EntitySystem/EntityPrefab.h"
 
-class EntityPrefabDockable : public Slush::Dockable
+class AssetEditorDockable : public Slush::Dockable
 {
 public:
-	EntityPrefabDockable(Slush::AssetStorage<EntityPrefab>& aPrefabStorage);
-	const char* GetName() const override { return "Entity Prefab Editor"; }
+	AssetEditorDockable(Slush::IAssetStorage& aAssetStorage, const char* aDockableName);
+	const char* GetName() const override { return myDockableName.GetBuffer(); }
 
 protected:
 	void OnUpdate() override;
@@ -20,11 +20,14 @@ private:
 	void HandleSavingAsNewAsset();
 
 	bool VerifyUniqueNameForNewAsset() const;
-	EntityPrefab* mySelectedPrefab = nullptr;
 
-	Slush::AssetStorage<EntityPrefab>& myPrefabStorage;
-	FW_String myNewPrefabNameStorage;
-	bool myHasUniquePrefabName = false;
+	FW_String myDockableName;
+
+	Slush::IAssetStorage& myAssetStorage;
+	Slush::Asset* mySelectedAsset = nullptr;
+
+	FW_String myNewAssetNameStorage;
+	bool myHasUniqueAssetName = false;
 
 	bool myWantToOpenNewAssetDialogue = false;
 	bool myWantToOpenSaveAsDialogue = false;

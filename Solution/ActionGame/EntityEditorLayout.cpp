@@ -9,8 +9,7 @@
 
 #include "ActionGameGlobals.h"
 #include "EntityEditorLayout.h"
-#include "EntityPrefabDockable.h"
-#include <Level\LevelDataDockable.h>
+#include "AssetEditorDockable.h"
 
 EntityEditorLayout::EntityEditorLayout()
 {
@@ -19,8 +18,8 @@ EntityEditorLayout::EntityEditorLayout()
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 	window.AddDockable(new Slush::LogDockable());
 	window.AddDockable(new Slush::TextureViewerDockable(globals.GetTextureStorage()));
-	window.AddDockable(new EntityPrefabDockable(globals.GetEntityPrefabStorage()));
-	window.AddDockable(new LevelDataDockable());
+	window.AddDockable(new AssetEditorDockable(globals.GetEntityPrefabStorage(), "EntityPrefab Editor"));
+	window.AddDockable(new AssetEditorDockable(globals.GetLevelDataStorage(), "LevelData Editor"));
 
 	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
 	window.AddDockable(contentBrowser);
@@ -28,6 +27,7 @@ EntityEditorLayout::EntityEditorLayout()
 	contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());
 	contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
 	contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());	
+	contentBrowser->AddAssetStorage(&globals.GetLevelDataStorage());
 }
 
 EntityEditorLayout::~EntityEditorLayout()

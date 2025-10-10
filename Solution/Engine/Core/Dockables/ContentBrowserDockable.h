@@ -26,7 +26,7 @@ namespace Slush
 		struct StorageData
 		{
 			IAssetStorage* myAssetStorage = nullptr;
-			bool myShouldShowAssets = true;
+			bool myShouldShowAssets = false;
 		};
 		FW_GrowingArray<StorageData> myAssetStorages;
 	};

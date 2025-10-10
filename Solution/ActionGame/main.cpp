@@ -6,7 +6,7 @@
 #include "Graphics/Font.h"
 
 #include "ActionGameGlobals.h"
-#include "EntityPrefabDockable.h"
+#include "AssetEditorDockable.h"
 #include "EntitySystem/EntityManager.h"
 #include "GameLayout.h"
 #include "EntityEditorLayout.h"

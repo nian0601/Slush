@@ -7,7 +7,7 @@
 #include "Core/Input.h"
 
 AssetEditorDockable::AssetEditorDockable(Slush::IAssetStorage& aAssetStorage, const char* aDockableName)
-	: Dockable(true)
+	: Dockable(false)
 	, myAssetStorage(aAssetStorage)
 	, myDockableName(aDockableName)
 	, myNewAssetNameStorage("")
@@ -20,7 +20,7 @@ void AssetEditorDockable::OnUpdate()
 
 void AssetEditorDockable::OnBuildUI()
 {
-	const FW_GrowingArray<Slush::Asset*> assets = myAssetStorage.GetAllAssets();
+	/*const FW_GrowingArray<Slush::Asset*> assets = myAssetStorage.GetAllAssets();
 	if (ImGui::BeginMenuBar())
 	{
 		if (mySelectedAsset)
@@ -62,7 +62,7 @@ void AssetEditorDockable::OnBuildUI()
 		if (mySelectedAsset && ImGui::MenuItem("Save"))
 			mySelectedAsset->Save();
 	
-		ImGui::EndMenuBar();
+		
 	}
 	
 	ImGui::BeginChild("dragndropdummy");
@@ -81,7 +81,81 @@ void AssetEditorDockable::OnBuildUI()
 			mySelectedAsset = myAssetStorage.GetAllAssets()[assetIndex];
 		}
 		ImGui::EndDragDropTarget();
+	}*/
+
+	
+
+	ImGui::BeginChild("dragndropdummy", ImVec2(0, 0), false, ImGuiWindowFlags_MenuBar);
+
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::MenuItem("Save All"))
+		{
+			for (AssetData& assetData : myAssets)
+				assetData.myAsset->Save();
+		}
+
+		ImGui::EndMenuBar();
 	}
+
+	if (!myAssets.IsEmpty())
+	{
+		if (ImGui::BeginTabBar("AssetTabs"))
+		{
+			for (AssetData& assetData : myAssets)
+			{
+				if (ImGui::BeginTabItem(assetData.myAsset->GetAssetName().GetBuffer(), &assetData.myShouldKeep))
+				{
+					if (ImGui::BeginMenuBar())
+					{
+						if (ImGui::MenuItem("Save"))
+							assetData.myAsset->Save();
+
+						ImGui::EndMenuBar();
+					}
+
+					assetData.myAsset->BuildUI();
+
+					ImGui::EndTabItem();
+				}
+			}
+
+			ImGui::EndTabBar();
+		}
+	}
+
+	ImGui::EndChild();
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		const FW_GrowingArray<Slush::IAssetStorage*>& assetStorages = Slush::AssetRegistry::GetInstance().GetAllAssetStorages();
+		for (Slush::IAssetStorage* storage : assetStorages)
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(storage->GetAssetTypeName(), 0))
+			{
+				bool alreadyOpenedAsset = false;
+				int assetIndex = *(const int*)payload->Data;
+				Slush::Asset* asset = storage->GetAllAssets()[assetIndex];
+				for (AssetData& data : myAssets)
+				{
+					if (data.myAsset == asset)
+					{
+						alreadyOpenedAsset = true;
+						break;
+					}
+				}
+
+				if (!alreadyOpenedAsset)
+				{
+					AssetData& data = myAssets.Add();
+					data.myAsset = asset;
+				}
+			}
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+
 }
 
 void AssetEditorDockable::HandleCreatingNewAsset()

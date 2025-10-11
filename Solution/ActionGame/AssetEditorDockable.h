@@ -26,6 +26,13 @@ private:
 	Slush::IAssetStorage& myAssetStorage;
 	Slush::Asset* mySelectedAsset = nullptr;
 
+	struct AssetData
+	{
+		Slush::Asset* myAsset = nullptr;
+		bool myShouldKeep = true;
+	};
+	FW_GrowingArray<AssetData> myAssets;
+
 	FW_String myNewAssetNameStorage;
 	bool myHasUniqueAssetName = false;
 

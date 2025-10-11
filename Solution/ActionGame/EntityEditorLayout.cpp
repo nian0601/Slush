@@ -28,6 +28,7 @@ EntityEditorLayout::EntityEditorLayout()
 	contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
 	contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());	
 	contentBrowser->AddAssetStorage(&globals.GetLevelDataStorage());
+	contentBrowser->AddAssetStorage(&globals.GetAnimationStorage());
 }
 
 EntityEditorLayout::~EntityEditorLayout()

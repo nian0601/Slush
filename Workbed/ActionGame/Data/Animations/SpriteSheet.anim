@@ -1,0 +1,126 @@
+Animation 
+{ 
+	outlinetrack 
+	{ 
+	} 
+	scaletrack 
+	{ 
+	} 
+	postiontrack 
+	{ 
+	} 
+	colortrack 
+	{ 
+	} 
+	spritesheettrack 
+	{ 
+		fps 15.000 
+		framesize 
+		{ 
+			x 96 
+			y 96 
+		} 
+		clip 
+		{ 
+			starttime 0.000 
+			endtime 0.067 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+			framepos 
+			{ 
+				x 0 
+				y 5 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.067 
+			endtime 0.133 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+			framepos 
+			{ 
+				x 1 
+				y 5 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.133 
+			endtime 0.200 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+			framepos 
+			{ 
+				x 2 
+				y 5 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.200 
+			endtime 0.267 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+			framepos 
+			{ 
+				x 3 
+				y 5 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.267 
+			endtime 0.333 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+			framepos 
+			{ 
+				x 4 
+				y 5 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.333 
+			endtime 0.400 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+			framepos 
+			{ 
+				x 5 
+				y 5 
+			} 
+		} 
+	} 
+} 

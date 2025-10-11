@@ -12,6 +12,7 @@
 #include "Core/Dockables/Dockable.h"
 #include "UI/UILayout.h"
 #include "Level/LevelData.h"
+#include <Graphics/Animation/Animation.h>
 class EntityManager;
 namespace Slush
 {
@@ -53,8 +54,9 @@ public:
 	static void Destroy();
 
 	void SetTextureStorage(Slush::AssetStorage<Slush::Texture>& aStorage) { myTextureStorage = &aStorage; }
-	void SetEntityPrefabStorage(Slush::AssetStorage<EntityPrefab>& aStorage) { myEntityPrefabStorage = &aStorage; }
 	void SetUILayoutStorage(Slush::AssetStorage<Slush::UILayout>& aStorage) { myUILayoutStorage = &aStorage; }
+	void SetAnimationStorage(Slush::AssetStorage<Slush::Animation>& aStorage) { myAnimationStorage = &aStorage; }
+	void SetEntityPrefabStorage(Slush::AssetStorage<EntityPrefab>& aStorage) { myEntityPrefabStorage = &aStorage; }
 	void SetLevelDataStorage(Slush::AssetStorage<LevelData>& aStorage) { myLevelDataStorage = &aStorage; }
 
 	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
@@ -63,8 +65,10 @@ public:
 	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
 
 	Slush::AssetStorage<Slush::Texture>& GetTextureStorage();
-	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
 	Slush::AssetStorage<Slush::UILayout>& GetUILayoutStorage();
+	Slush::AssetStorage<Slush::Animation>& GetAnimationStorage();
+
+	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
 	Slush::AssetStorage<LevelData>& GetLevelDataStorage();
 	Slush::Font& GetFont();
 
@@ -80,6 +84,7 @@ private:
 
 	Slush::AssetStorage<Slush::Texture>* myTextureStorage = nullptr;
 	Slush::AssetStorage<Slush::UILayout>* myUILayoutStorage = nullptr;
+	Slush::AssetStorage<Slush::Animation>* myAnimationStorage = nullptr;
 	Slush::AssetStorage<EntityPrefab>* myEntityPrefabStorage = nullptr;
 	Slush::AssetStorage<LevelData>* myLevelDataStorage = nullptr;
 	Slush::Font* myFont = nullptr;

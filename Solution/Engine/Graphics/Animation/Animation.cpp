@@ -31,6 +31,17 @@ namespace Slush
 		myEndValue = aValue;
 	}
 
+	void Interpolator::OnParse(AssetParser::Handle aHandle)
+	{
+		AssetParser::Handle interpolatorHandle = aHandle.ParseChildElement("interpolator");
+		interpolatorHandle.ParseFloatField("startvalue", myStartValue);
+		interpolatorHandle.ParseFloatField("endvalue", myEndValue);
+
+		int typeAsInt = myType;
+		interpolatorHandle.ParseIntField("type", typeAsInt);
+		myType = static_cast<Type>(typeAsInt);
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 
 	void AnimationClip::SetStartTimeAndDuration(float aStartTime, float aDuration)
@@ -63,6 +74,21 @@ namespace Slush
 		}
 
 		return State::Running;
+	}
+
+	void AnimationClip::OnParse(AssetParser::Handle aHandle)
+	{
+		aHandle.ParseFloatField("starttime", myStartTime);
+		aHandle.ParseFloatField("endtime", myEndTime);
+		aHandle.ParseBoolField("iswaitingclip", myIsWaitingClip);
+		myInterpolator.OnParse(aHandle);
+	}
+
+
+	void SpritesheetClip::OnParse(AssetParser::Handle aHandle)
+	{
+		AnimationClip::OnParse(aHandle);
+		aHandle.ParseVec2iField("framepos", myFramePos);
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -107,6 +133,31 @@ namespace Slush
 		return true;
 	}
 
+	void AnimationTrack::OnParse(const char* aTrackName, AssetParser::Handle aHandle)
+	{
+		AssetParser::Handle trackHandle = aHandle.ParseChildElement(aTrackName);
+
+		if (trackHandle.IsReading())
+		{
+			int numClips = trackHandle.GetNumChildElements();
+			myClips.Reserve(numClips);
+		}
+
+		for (int i = 0; i < myClips.Count(); ++i)
+		{
+			AssetParser::Handle clipHandle;
+			if (trackHandle.IsReading())
+				clipHandle = trackHandle.GetChildElementAtIndex(i);
+			else
+				clipHandle = trackHandle.ParseChildElement("clip");
+
+			AnimationClip& clip = myClips[i];
+			
+			clip.OnParse(clipHandle);
+		}
+		
+	}
+
 	AnimationClip& AnimationTrack::AddClip(float aDuration)
 	{
 		AnimationClip& clip = myClips.Add();
@@ -118,11 +169,10 @@ namespace Slush
 	}
 
 
-	SpritesheetTrack& SpritesheetTrack::Frame(const Vector2i& aFramePosition, Texture* aTexture /*= nullptr*/)
+	SpritesheetTrack& SpritesheetTrack::Frame(const Vector2i& aFramePosition)
 	{
 		SpritesheetClip& clip = AddClip(1.f / myFPS);
 		clip.myFramePos = aFramePosition;
-		clip.myTexture = aTexture;
 
 		return *this;
 	}
@@ -148,6 +198,34 @@ namespace Slush
 		return true;
 	}
 
+	void SpritesheetTrack::OnParse(const char* aTrackName, AssetParser::Handle aHandle)
+	{
+		AssetParser::Handle trackHandle = aHandle.ParseChildElement(aTrackName);
+
+		trackHandle.ParseFloatField("fps", myFPS);
+		trackHandle.ParseVec2iField("framesize", myFrameSize);
+
+		if (trackHandle.IsReading())
+		{
+			// Do -1 because of the 'framesize'-child
+			int numClips = trackHandle.GetNumChildElements() - 1;
+			myClips.Reserve(numClips);
+		}
+
+		for (int i = 0; i < myClips.Count(); ++i)
+		{
+			AssetParser::Handle clipHandle;
+			if (trackHandle.IsReading())
+				clipHandle = trackHandle.GetChildElementAtIndex(i+1);
+			else
+				clipHandle = trackHandle.ParseChildElement("clip");
+
+			SpritesheetClip& clip = myClips[i];
+
+			clip.OnParse(clipHandle);
+		}
+	}
+
 	SpritesheetClip& SpritesheetTrack::AddClip(float aDuration)
 	{
 		SpritesheetClip& clip = myClips.Add();
@@ -158,6 +236,26 @@ namespace Slush
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+
+	Animation::Animation(const char* aName)
+		: DataAsset(aName)
+	{
+	}
+
+	void Animation::OnParse(AssetParser::Handle aRootHandle)
+	{
+		myOutlineTrack.OnParse("outlinetrack", aRootHandle);
+		myScaleTrack.OnParse("scaletrack", aRootHandle);
+		myPositionTrack.OnParse("postiontrack", aRootHandle);
+		myColorTrack.OnParse("colortrack", aRootHandle);
+		mySpritesheetTrack.OnParse("spritesheettrack", aRootHandle);
+	}
+
+	void Animation::BuildUI()
+	{
+
+	}
+
 	void Animation::Update(AnimationRuntime& aRuntimeData)
 	{
 		if (aRuntimeData.myState != AnimationClip::Running)

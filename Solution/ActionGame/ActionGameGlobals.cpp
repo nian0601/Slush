@@ -60,16 +60,22 @@ Slush::AssetStorage<Slush::Texture>& ActionGameGlobals::GetTextureStorage()
 	return *myTextureStorage;
 }
 
+Slush::AssetStorage<Slush::UILayout>& ActionGameGlobals::GetUILayoutStorage()
+{
+	FW_ASSERT(myUILayoutStorage != nullptr, "Need to set a UILayoutStorage");
+	return *myUILayoutStorage;
+}
+
+Slush::AssetStorage<Slush::Animation>& ActionGameGlobals::GetAnimationStorage()
+{
+	FW_ASSERT(myAnimationStorage != nullptr, "Need to set a AnimationStorage");
+	return *myAnimationStorage;
+}
+
 Slush::AssetStorage<EntityPrefab>& ActionGameGlobals::GetEntityPrefabStorage()
 {
 	FW_ASSERT(myEntityPrefabStorage != nullptr, "Need to set a EntityPrefabStorage");
 	return *myEntityPrefabStorage;
-}
-
-Slush::AssetStorage<Slush::UILayout>& ActionGameGlobals::GetUILayoutStorage()
-{
-	FW_ASSERT(myUILayoutStorage!= nullptr, "Need to set a UILayoutStorage");
-	return *myUILayoutStorage;
 }
 
 Slush::AssetStorage<LevelData>& ActionGameGlobals::GetLevelDataStorage()
@@ -106,8 +112,10 @@ ActionGameGlobals::~ActionGameGlobals()
 	myDebugSettings.SaveToDisk();
 
 	myTextureStorage = nullptr;
-	myEntityPrefabStorage = nullptr;
 	myUILayoutStorage = nullptr;
+	myAnimationStorage = nullptr;
+
+	myEntityPrefabStorage = nullptr;
 	myLevelDataStorage = nullptr;
 
 	myFont = nullptr;

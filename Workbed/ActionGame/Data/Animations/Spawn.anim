@@ -1,0 +1,36 @@
+Animation 
+{ 
+	outlinetrack 
+	{ 
+	} 
+	scaletrack 
+	{ 
+		clip 
+		{ 
+			starttime 0.000 
+			endtime 0.250 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 1.000 
+				type 1 
+			} 
+		} 
+	} 
+	postiontrack 
+	{ 
+	} 
+	colortrack 
+	{ 
+	} 
+	spritesheettrack 
+	{ 
+		fps 0.000 
+		framesize 
+		{ 
+			x 0 
+			y 0 
+		} 
+	} 
+} 

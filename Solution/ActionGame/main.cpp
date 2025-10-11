@@ -25,12 +25,14 @@ public:
 		myTextures.LoadAllAssets();
 		myEntityPrefabs.LoadAllAssets();
 		myUILayouts.LoadAllAssets();
+		myAnimations.LoadAllAssets();
 		myLevelDatas.LoadAllAssets();
 
 		myFont.Load("Data/NotoSans.ttf");
 		ActionGameGlobals::GetInstance().SetTextureStorage(myTextures);
-		ActionGameGlobals::GetInstance().SetEntityPrefabStorage(myEntityPrefabs);
 		ActionGameGlobals::GetInstance().SetUILayoutStorage(myUILayouts);
+		ActionGameGlobals::GetInstance().SetAnimationStorage(myAnimations);
+		ActionGameGlobals::GetInstance().SetEntityPrefabStorage(myEntityPrefabs);
 		ActionGameGlobals::GetInstance().SetLevelDataStorage(myLevelDatas);
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
@@ -79,6 +81,7 @@ private:
 	Slush::AssetStorage<Slush::Texture> myTextures;
 	Slush::AssetStorage<EntityPrefab> myEntityPrefabs;
 	Slush::AssetStorage<Slush::UILayout> myUILayouts;
+	Slush::AssetStorage<Slush::Animation> myAnimations;
 	Slush::AssetStorage<LevelData> myLevelDatas;
 	AppLayout* myAppLayout;
 };

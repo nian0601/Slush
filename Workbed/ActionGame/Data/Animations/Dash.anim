@@ -1,0 +1,84 @@
+Animation 
+{ 
+	outlinetrack 
+	{ 
+	} 
+	scaletrack 
+	{ 
+		clip 
+		{ 
+			starttime 0.000 
+			endtime 0.100 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 1.000 
+				endvalue 0.200 
+				type 1 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.100 
+			endtime 0.200 
+			iswaitingclip 1 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.200 
+			endtime 0.300 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.200 
+				endvalue 1.000 
+				type 1 
+			} 
+		} 
+	} 
+	postiontrack 
+	{ 
+		clip 
+		{ 
+			starttime 0.000 
+			endtime 0.100 
+			iswaitingclip 1 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 0.000 
+				type 0 
+			} 
+		} 
+		clip 
+		{ 
+			starttime 0.100 
+			endtime 0.350 
+			iswaitingclip 0 
+			interpolator 
+			{ 
+				startvalue 0.000 
+				endvalue 1.000 
+				type 1 
+			} 
+		} 
+	} 
+	colortrack 
+	{ 
+	} 
+	spritesheettrack 
+	{ 
+		fps 0.000 
+		framesize 
+		{ 
+			x 0 
+			y 0 
+		} 
+	} 
+} 

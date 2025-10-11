@@ -9,11 +9,23 @@
 #include <Graphics\Animation\Animation.h>
 #include <Graphics\Animation\AnimationRuntime.h>
 #include <Graphics\BaseSprite.h>
+#include <ActionGameGlobals.h>
+#include <Core\Assets\AssetStorage.h>
 
+
+#define USE_ANIMATION_ASSETS 1
 AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	myDashAnimation = new Slush::Animation();
+#if USE_ANIMATION_ASSETS
+	Slush::AssetStorage<Slush::Animation>& animations = ActionGameGlobals::GetInstance().GetAnimationStorage();
+
+	myDashAnimation = animations.GetAsset("Dash");
+	myBlinkAnimation = animations.GetAsset("Blink");
+	mySpawnAnimation = animations.GetAsset("Spawn");
+	mySpritesheetAnimation = animations.GetAsset("SpriteSheet");
+#else
+	myDashAnimation = new Slush::Animation("Dash");
 	myDashAnimation->myScaleTrack
 		.Linear(0.1f, 1.f, 0.2f)
 		.Wait(0.1f)
@@ -21,30 +33,37 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	myDashAnimation->myPositionTrack
 		.Wait(0.1f)
 		.Linear(0.25f, 0.f, 1.f);
-
-	myBlinkAnimation = new Slush::Animation();
+	
+	myBlinkAnimation = new Slush::Animation("Blink");
 	myBlinkAnimation->myColorTrack
 		.Linear(0.1f, 0.f, 1.f)
 		.Linear(0.1f, 1.f, 0.f);
-
-	mySpawnAnimation = new Slush::Animation();
+	
+	mySpawnAnimation = new Slush::Animation("Spawn");
 	mySpawnAnimation->myScaleTrack
 		.Linear(0.25f, 0.f, 1.f);
-
-	mySpritesheetAnimation = new Slush::Animation();
+	
+	mySpritesheetAnimation = new Slush::Animation("SpriteSheet");
 	mySpritesheetAnimation->mySpritesheetTrack.SetFPS(15.f);
 	mySpritesheetAnimation->mySpritesheetTrack.SetFrameSize({ 96, 96 });
 	for (int i = 0; i < 6; ++i)
 		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 });
+	
+	myDashAnimation->Save();
+	myBlinkAnimation->Save();
+	mySpawnAnimation->Save();
+	mySpritesheetAnimation->Save();
+#endif
 }
 
 AnimationComponent::~AnimationComponent()
 {
+#if !USE_ANIMATION_ASSETS
 	FW_SAFE_DELETE(myDashAnimation);
 	FW_SAFE_DELETE(myBlinkAnimation);
 	FW_SAFE_DELETE(mySpawnAnimation);
 	FW_SAFE_DELETE(mySpritesheetAnimation);
-
+#endif
 	for (int i = 0; i < myRunningAnimations.Count(); ++i)
 		FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
 }

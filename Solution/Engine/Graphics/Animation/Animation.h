@@ -1,6 +1,7 @@
 #pragma once
 #include <FW_GrowingArray.h>
 #include <float.h>
+#include "Core\Assets\DataAsset.h"
 
 namespace Slush
 {
@@ -21,6 +22,8 @@ namespace Slush
 
 		void MakeLinear(float aStart, float aEnd);
 		void MakeConstant(float aValue);
+
+		void OnParse(AssetParser::Handle aHandle);
 
 	private:
 		enum Type
@@ -51,6 +54,8 @@ namespace Slush
 
 		State Update(float anElapsedTime, float& outValue);
 
+		virtual void OnParse(AssetParser::Handle aHandle);
+
 		Interpolator myInterpolator;
 
 	protected:
@@ -64,8 +69,9 @@ namespace Slush
 	class SpritesheetClip : public AnimationClip
 	{
 	public:
+		void OnParse(AssetParser::Handle aHandle) override;
+
 		Vector2i myFramePos;
-		Texture* myTexture = nullptr;
 	};
 
 	//////////////////////////////////////////////////////////////////////////
@@ -80,6 +86,8 @@ namespace Slush
 		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData);
 		bool HasClips() const { return !myClips.IsEmpty(); }
 
+		void OnParse(const char* aTrackName, AssetParser::Handle aHandle);
+
 	protected:
 		AnimationClip& AddClip(float aDuration);
 
@@ -93,10 +101,12 @@ namespace Slush
 		void SetFPS(float aFPS) { myFPS = aFPS; }
 		void SetFrameSize(const Vector2i& aFrameSize) { myFrameSize = aFrameSize; }
 
-		SpritesheetTrack& Frame(const Vector2i& aFramePosition, Texture* aTexture = nullptr);
+		SpritesheetTrack& Frame(const Vector2i& aFramePosition);
 
 		bool Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData);
 		bool HasClips() const { return !myClips.IsEmpty(); }
+
+		void OnParse(const char* aTrackName, AssetParser::Handle aHandle);
 
 	private:
 		SpritesheetClip& AddClip(float aDuration);
@@ -110,9 +120,15 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	class Animation
+	class Animation : public DataAsset
 	{
 	public:
+		DEFINE_ASSET("Animation", "anim", "data/animations");
+		Animation(const char* aName);
+
+		void OnParse(AssetParser::Handle aRootHandle);
+		void BuildUI();
+
 		void Update(AnimationRuntime& aRuntimeData);
 
 		AnimationTrack myOutlineTrack;

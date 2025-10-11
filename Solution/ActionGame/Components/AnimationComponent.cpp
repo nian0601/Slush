@@ -18,12 +18,11 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	: Component(anEntity, anEntityPrefab)
 {
 #if USE_ANIMATION_ASSETS
-	Slush::AssetStorage<Slush::Animation>& animations = ActionGameGlobals::GetInstance().GetAnimationStorage();
-
-	myDashAnimation = animations.GetAsset("Dash");
-	myBlinkAnimation = animations.GetAsset("Blink");
-	mySpawnAnimation = animations.GetAsset("Spawn");
-	mySpritesheetAnimation = animations.GetAsset("SpriteSheet");
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	myDashAnimation = assets.GetAsset<Slush::Animation>("Dash");
+	myBlinkAnimation = assets.GetAsset<Slush::Animation>("Blink");
+	mySpawnAnimation = assets.GetAsset<Slush::Animation>("Spawn");
+	mySpritesheetAnimation = assets.GetAsset<Slush::Animation>("SpriteSheet");
 #else
 	myDashAnimation = new Slush::Animation("Dash");
 	myDashAnimation->myScaleTrack

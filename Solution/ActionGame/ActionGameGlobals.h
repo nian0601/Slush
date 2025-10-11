@@ -9,15 +9,10 @@
 // casted into the actual asset, but maybe thats fine?
 #include "Core/Assets/AssetParser.h"
 #include "Core/Dockables/Dockable.h"
-#include "Level/LevelData.h"
-#include <Graphics/Animation/Animation.h>
 
 class EntityManager;
 namespace Slush
 {
-	template<typename T>
-	class AssetStorage;
-
 	class Font;
 	class PhysicsWorld;
 }
@@ -50,19 +45,11 @@ public:
 	static ActionGameGlobals& GetInstance();
 	static void Destroy();
 
-	void SetAnimationStorage(Slush::AssetStorage<Slush::Animation>& aStorage) { myAnimationStorage = &aStorage; }
-	void SetEntityPrefabStorage(Slush::AssetStorage<EntityPrefab>& aStorage) { myEntityPrefabStorage = &aStorage; }
-	void SetLevelDataStorage(Slush::AssetStorage<LevelData>& aStorage) { myLevelDataStorage = &aStorage; }
-
 	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
 
 	void SetEntityManager(EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
 	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
 
-	Slush::AssetStorage<Slush::Animation>& GetAnimationStorage();
-
-	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
-	Slush::AssetStorage<LevelData>& GetLevelDataStorage();
 	Slush::Font& GetFont();
 
 	EntityManager& GetEntityManager();
@@ -75,9 +62,6 @@ private:
 	~ActionGameGlobals();
 	static ActionGameGlobals* ourInstance;
 
-	Slush::AssetStorage<Slush::Animation>* myAnimationStorage = nullptr;
-	Slush::AssetStorage<EntityPrefab>* myEntityPrefabStorage = nullptr;
-	Slush::AssetStorage<LevelData>* myLevelDataStorage = nullptr;
 	Slush::Font* myFont = nullptr;
 
 	EntityManager* myEntityManager = nullptr;

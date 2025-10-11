@@ -29,7 +29,8 @@ void LevelData::BuildUI()
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(EntityPrefab::GetAssetTypeName()))
 		{
 			int assetIndex = *(const int*)payload->Data;
-			if (EntityPrefab* playerPrefab = static_cast<EntityPrefab*>(globals.GetEntityPrefabStorage().GetAllAssets()[assetIndex]))
+			Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+			if (const EntityPrefab* playerPrefab = assets.GetAsset<EntityPrefab>(assetIndex))
 				myPlayerEntityPrefab = playerPrefab->GetAssetName();
 		}
 		ImGui::EndDragDropTarget();
@@ -68,7 +69,8 @@ void LevelData::BuildUI()
 							if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(EntityPrefab::GetAssetTypeName()))
 							{
 								int assetIndex = *(const int*)payload->Data;
-								if (EntityPrefab* enemyPrefab = static_cast<EntityPrefab*>(globals.GetEntityPrefabStorage().GetAllAssets()[assetIndex]))
+								Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+								if (const EntityPrefab* enemyPrefab = assets.GetAsset<EntityPrefab>(assetIndex))
 									waveData.myEnemyPrefabs[j] = enemyPrefab->GetAssetName();
 							}
 							ImGui::EndDragDropTarget();

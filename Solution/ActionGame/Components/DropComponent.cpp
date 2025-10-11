@@ -53,9 +53,10 @@ void DropComponent::Data::OnBuildUI()
 				ImGuiDragDropFlags target_flags = 0;
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(EntityPrefab::GetAssetTypeName(), target_flags))
 				{
-					int prefabIndex = *(const int*)payload->Data;
-					const EntityPrefab* prefab = static_cast<EntityPrefab*>(ActionGameGlobals::GetInstance().GetEntityPrefabStorage().GetAllAssets()[prefabIndex]);
-					drop.myPrefabName = prefab->GetAssetName();
+					int assetIndex = *(const int*)payload->Data;
+					Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+					if (const EntityPrefab* prefab = assets.GetAsset<EntityPrefab>(assetIndex))
+						drop.myPrefabName = prefab->GetAssetName();
 				}
 				ImGui::EndDragDropTarget();
 			}

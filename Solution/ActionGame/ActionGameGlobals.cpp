@@ -54,24 +54,6 @@ void ActionGameGlobals::Destroy()
 	FW_SAFE_DELETE(ourInstance);
 }
 
-Slush::AssetStorage<Slush::Animation>& ActionGameGlobals::GetAnimationStorage()
-{
-	FW_ASSERT(myAnimationStorage != nullptr, "Need to set a AnimationStorage");
-	return *myAnimationStorage;
-}
-
-Slush::AssetStorage<EntityPrefab>& ActionGameGlobals::GetEntityPrefabStorage()
-{
-	FW_ASSERT(myEntityPrefabStorage != nullptr, "Need to set a EntityPrefabStorage");
-	return *myEntityPrefabStorage;
-}
-
-Slush::AssetStorage<LevelData>& ActionGameGlobals::GetLevelDataStorage()
-{
-	FW_ASSERT(myLevelDataStorage != nullptr, "Need to set a LevelDataStorage");
-	return *myLevelDataStorage;
-}
-
 Slush::Font& ActionGameGlobals::GetFont()
 {
 	FW_ASSERT(myFont != nullptr, "Need to set a Font");
@@ -98,11 +80,6 @@ ActionGameGlobals::ActionGameGlobals()
 ActionGameGlobals::~ActionGameGlobals()
 {
 	myDebugSettings.SaveToDisk();
-
-	myAnimationStorage = nullptr;
-
-	myEntityPrefabStorage = nullptr;
-	myLevelDataStorage = nullptr;
 
 	myFont = nullptr;
 

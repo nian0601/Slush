@@ -48,8 +48,7 @@ void EntityManager::RegisterComponents()
 	registry.RegisterComponent<DropComponent, DropComponent::Data>();
 }
 
-EntityManager::EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage)
-	: myPrefabStorage(aPrefabStorage)
+EntityManager::EntityManager()
 {
 }
 
@@ -86,7 +85,8 @@ Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefa
 
 Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const char* aPrefabName)
 {
-	if (const EntityPrefab* prefab = myPrefabStorage.GetAsset(aPrefabName))
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	if (const EntityPrefab* prefab = assets.GetAsset<EntityPrefab>(aPrefabName))
 		return CreateEntity(aPosition, *prefab);
 	
 	SLUSH_ERROR("Found no EntityPrefab called %s, creating a empty entity", aPrefabName);

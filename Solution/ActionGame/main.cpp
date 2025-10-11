@@ -17,6 +17,7 @@
 #include <EntitySystem/EntityPrefab.h>
 #include <UI/UILayout.h>
 #include <Graphics/Texture.h>
+#include <Graphics/Animation/Animation.h>
 
 class App : public Slush::IApp
 {
@@ -34,14 +35,7 @@ public:
 
 		assets.LoadAllAssets();
 
-		myEntityPrefabs.LoadAllAssets();
-		myAnimations.LoadAllAssets();
-		myLevelDatas.LoadAllAssets();
-
 		myFont.Load("Data/NotoSans.ttf");
-		ActionGameGlobals::GetInstance().SetAnimationStorage(myAnimations);
-		ActionGameGlobals::GetInstance().SetEntityPrefabStorage(myEntityPrefabs);
-		ActionGameGlobals::GetInstance().SetLevelDataStorage(myLevelDatas);
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -86,9 +80,6 @@ public:
 
 private:
 	Slush::Font myFont;
-	Slush::AssetStorage<EntityPrefab> myEntityPrefabs;
-	Slush::AssetStorage<Slush::Animation> myAnimations;
-	Slush::AssetStorage<LevelData> myLevelDatas;
 	AppLayout* myAppLayout;
 };
 

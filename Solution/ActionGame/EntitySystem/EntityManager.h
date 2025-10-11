@@ -20,7 +20,7 @@ class EntityManager
 public:
 	static void RegisterComponents();
 
-	EntityManager(Slush::AssetStorage<EntityPrefab>& aPrefabStorage);
+	EntityManager();
 	~EntityManager();
 
 	Entity* CreateEmptyEntity();
@@ -46,6 +46,4 @@ private:
 	FW_GrowingArray<Entity*> myEntities;
 
 	FW_GrowingArray<Entity*> myAddQueue;
-
-	Slush::AssetStorage<EntityPrefab>& myPrefabStorage;
 };

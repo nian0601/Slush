@@ -13,13 +13,14 @@
 #include "Tilemap.h"
 #include <Graphics\RectSprite.h>
 #include <Graphics\Text.h>
+#include "LevelData.h"
 
 Level::Level()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
 	, myFont(ActionGameGlobals::GetInstance().GetFont())
 {
-	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
-	myLevelData = globals.GetLevelDataStorage().GetAsset("testLevel");
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	myLevelData = assets.GetAsset<LevelData>("testLevel");
 	myEnemyWaveData = &myLevelData->myEnemyWaves[0];
 	myWaveTimer.Start(3.f);
 

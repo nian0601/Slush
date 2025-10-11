@@ -23,7 +23,7 @@ GameLayout::GameLayout()
 	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
 
 	myPhysicsWorld = new Slush::PhysicsWorld();
-	myEntityManager = new EntityManager(globals.GetEntityPrefabStorage());
+	myEntityManager = new EntityManager();
 
 	ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
 	ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);

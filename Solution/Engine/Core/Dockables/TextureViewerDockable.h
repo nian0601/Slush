@@ -13,14 +13,13 @@ namespace Slush
 	class TextureViewerDockable : public Slush::Dockable
 	{
 	public:
-		TextureViewerDockable(const Slush::AssetStorage<Slush::Texture>& aTextureStorage);
+		TextureViewerDockable();
 		const char* GetName() const override { return "Texture Viewer"; }
 
 	protected:
 		void OnBuildUI() override;
 
 	private:
-		const Slush::AssetStorage<Slush::Texture>& myTextureStorage;
 		bool myShowTexCoordHelper = true;
 		Vector2i myTexCoordHelperSpriteSize = { 48, 48 };
 	};

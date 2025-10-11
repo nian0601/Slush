@@ -14,6 +14,9 @@
 #include <Graphics/Window.h>
 
 #include "Level/LevelData.h"
+#include <EntitySystem/EntityPrefab.h>
+#include <UI/UILayout.h>
+#include <Graphics/Texture.h>
 
 class App : public Slush::IApp
 {
@@ -21,16 +24,21 @@ public:
 	void Initialize() override
 	{
 		EntityManager::RegisterComponents();
+	
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		assets.RegisterAssetType<EntityPrefab>();
+		assets.RegisterAssetType<Slush::UILayout>();
+		assets.RegisterAssetType<Slush::Texture>();
+		assets.RegisterAssetType<Slush::Animation>();
+		assets.RegisterAssetType<LevelData>();
 
-		myTextures.LoadAllAssets();
+		assets.LoadAllAssets();
+
 		myEntityPrefabs.LoadAllAssets();
-		myUILayouts.LoadAllAssets();
 		myAnimations.LoadAllAssets();
 		myLevelDatas.LoadAllAssets();
 
 		myFont.Load("Data/NotoSans.ttf");
-		ActionGameGlobals::GetInstance().SetTextureStorage(myTextures);
-		ActionGameGlobals::GetInstance().SetUILayoutStorage(myUILayouts);
 		ActionGameGlobals::GetInstance().SetAnimationStorage(myAnimations);
 		ActionGameGlobals::GetInstance().SetEntityPrefabStorage(myEntityPrefabs);
 		ActionGameGlobals::GetInstance().SetLevelDataStorage(myLevelDatas);
@@ -78,9 +86,7 @@ public:
 
 private:
 	Slush::Font myFont;
-	Slush::AssetStorage<Slush::Texture> myTextures;
 	Slush::AssetStorage<EntityPrefab> myEntityPrefabs;
-	Slush::AssetStorage<Slush::UILayout> myUILayouts;
 	Slush::AssetStorage<Slush::Animation> myAnimations;
 	Slush::AssetStorage<LevelData> myLevelDatas;
 	AppLayout* myAppLayout;

@@ -83,7 +83,8 @@ void Card::Load(const char* aFilePath, const Slush::AssetStorage<Slush::Texture>
 		}
 		else if (fieldName == "#texture")
 		{
-			if(const Slush::Texture* texture = someTextureStorage.GetAsset(line.GetBuffer()))
+			const Slush::Asset* asset = someTextureStorage.GetAsset(line.GetBuffer());
+			if(const Slush::Texture* texture = static_cast<const Slush::Texture*>(asset))
 				myImage->SetTexture(*texture);
 		}
 		else if (fieldName == "#title")

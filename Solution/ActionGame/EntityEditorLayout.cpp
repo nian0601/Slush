@@ -17,18 +17,12 @@ EntityEditorLayout::EntityEditorLayout()
 
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 	window.AddDockable(new Slush::LogDockable());
-	window.AddDockable(new Slush::TextureViewerDockable(globals.GetTextureStorage()));
+	window.AddDockable(new Slush::TextureViewerDockable());
 	window.AddDockable(new AssetEditorDockable(globals.GetEntityPrefabStorage(), "EntityPrefab Editor"));
 	window.AddDockable(new AssetEditorDockable(globals.GetLevelDataStorage(), "LevelData Editor"));
 
 	Slush::ContentBrowserDockable* contentBrowser = new Slush::ContentBrowserDockable();
 	window.AddDockable(contentBrowser);
-
-	contentBrowser->AddAssetStorage(&globals.GetEntityPrefabStorage());
-	contentBrowser->AddAssetStorage(&globals.GetTextureStorage());
-	contentBrowser->AddAssetStorage(&globals.GetUILayoutStorage());	
-	contentBrowser->AddAssetStorage(&globals.GetLevelDataStorage());
-	contentBrowser->AddAssetStorage(&globals.GetAnimationStorage());
 }
 
 EntityEditorLayout::~EntityEditorLayout()

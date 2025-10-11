@@ -4,33 +4,31 @@
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Graphics/Window.h"
+#include <UI/UILayout.h>
 
 namespace Slush
 {
 	ContentBrowserDockable::ContentBrowserDockable()
 	{
-	}
-
-	void ContentBrowserDockable::AddAssetStorage(IAssetStorage* aStorage)
-	{
-		StorageData& data = myAssetStorages.Add();
-		data.myAssetStorage = aStorage;
-	}
-
-	void ContentBrowserDockable::OnUpdate()
-	{
+		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
+		const FW_GrowingArray<IAssetStorage*>& storages = assetRegistry.GetAllAssetStorages();
+		for (int i = 0; i < storages.Count(); ++i)
+			myAssetFilters.Add(false);
 	}
 
 	void ContentBrowserDockable::OnBuildUI()
 	{
-		for (StorageData& storageData : myAssetStorages)
+		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
+		const FW_GrowingArray<IAssetStorage*>& storages = assetRegistry.GetAllAssetStorages();
+		FW_ASSERT(myAssetFilters.Count() == storages.Count(), "New AssetType was registered after opening ContentBrowser, we dont handle that yet");
+
+		for (int i = 0; i < storages.Count(); ++i)
 		{
 			ImGui::SameLine();
-			ImGui::Checkbox(storageData.myAssetStorage->GetAssetTypeName(), &storageData.myShouldShowAssets);
+			ImGui::Checkbox(storages[i]->GetAssetTypeName(), &myAssetFilters[i]);
 		}
 
 		ImGui::Separator();
-
 
 		static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable;
 		if (ImGui::BeginTable("table_scrolly", 3, flags))
@@ -41,20 +39,21 @@ namespace Slush
 			ImGui::TableSetupColumn("Filepath", ImGuiTableColumnFlags_WidthStretch);
 			ImGui::TableHeadersRow();
 
-
 			bool isFilterEnabled = false;
-			for (StorageData& storageData : myAssetStorages)
-				isFilterEnabled |= storageData.myShouldShowAssets;
+			for (bool& filter : myAssetFilters)
+				isFilterEnabled |= filter;
 
-			for (StorageData& storageData : myAssetStorages)
+			for (int i = 0; i < storages.Count(); ++i)
 			{
-				if (isFilterEnabled && !storageData.myShouldShowAssets)
+				IAssetStorage* storage = storages[i];
+
+				if (isFilterEnabled && !myAssetFilters[i])
 					continue;
 
-				const FW_GrowingArray<Asset*> assets = storageData.myAssetStorage->GetAllAssets();
-				for (int i = 0; i < assets.Count(); ++i)
+				const FW_GrowingArray<Asset*> assets = storage->GetAllAssets();
+				for (int j = 0; j < assets.Count(); ++j)
 				{
-					Slush::Asset* asset = assets[i];
+					Slush::Asset* asset = assets[j];
 
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0);
@@ -66,7 +65,7 @@ namespace Slush
 					{
 						if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
 							ImGui::Text("Dragging \"%s\"", asset->GetAssetName().GetBuffer());
-						ImGui::SetDragDropPayload(asset->GetTypeName(), &i, sizeof(int));
+						ImGui::SetDragDropPayload(asset->GetTypeName(), &j, sizeof(int));
 						ImGui::EndDragDropSource();
 					}
 
@@ -76,7 +75,6 @@ namespace Slush
 					ImGui::TableSetColumnIndex(2);
 					ImGui::Text("%s", asset->GetFilePath().GetBuffer());
 				}
-				
 			}
 
 			ImGui::EndTable();

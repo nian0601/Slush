@@ -14,7 +14,14 @@ namespace Slush
 	public:
 		virtual Asset& CreateNewAsset(const char* aName) = 0;
 		virtual Asset& CopyAsset(const char* aNewName, const Asset& anOldAsset) = 0;
+
+		virtual void LoadAllAssets() = 0;
+
 		virtual const char* GetAssetTypeName() const = 0;
+
+		virtual const Asset* GetAsset(const char* aName) const = 0;
+		virtual Asset* GetAsset(const char* aName) = 0;
+
 		virtual const FW_GrowingArray<Asset*>& GetAllAssets() const = 0;
 	};
 
@@ -24,13 +31,13 @@ namespace Slush
 	public:
 		~AssetStorage();
 
-		AssetType& CreateNewAsset(const char* aName) override;
-		AssetType& CopyAsset(const char* aNewName, const Asset& anOldAsset) override;
+		Asset& CreateNewAsset(const char* aName) override;
+		Asset& CopyAsset(const char* aNewName, const Asset& anOldAsset) override;
 
 		void Load(const char* aName, const char* aFilePath);
 		void LoadAllAssets();
 
-		const AssetType* GetAsset(const char* aName) const;
+		const Asset* GetAsset(const char* aName) const;
 		const AssetType* GetAsset(const FW_String& aName) const;
 		AssetType* GetAsset(const char* aName);
 		AssetType* GetAsset(const FW_String& aName);
@@ -51,7 +58,7 @@ namespace Slush
 	}
 
 	template<typename AssetType>
-	AssetType& AssetStorage<AssetType>::CreateNewAsset(const char* aName)
+	Asset& AssetStorage<AssetType>::CreateNewAsset(const char* aName)
 	{
 		if (myAssetMap.KeyExists(aName))
 		{
@@ -70,7 +77,7 @@ namespace Slush
 	}
 
 	template<typename AssetType>
-	AssetType& AssetStorage<AssetType>::CopyAsset(const char* aNewName, const Asset& anOldAsset)
+	Asset& AssetStorage<AssetType>::CopyAsset(const char* aNewName, const Asset& anOldAsset)
 	{
 		if (myAssetMap.KeyExists(aNewName))
 		{
@@ -120,7 +127,7 @@ namespace Slush
 	}
 
 	template<typename AssetType>
-	const AssetType* AssetStorage<AssetType>::GetAsset(const char* aName) const
+	const Asset* AssetStorage<AssetType>::GetAsset(const char* aName) const
 	{
 		if (const AssetType* const* asset = myAssetMap.GetIfExists(aName))
 			return *asset;
@@ -149,5 +156,84 @@ namespace Slush
 	AssetType* AssetStorage<AssetType>::GetAsset(const FW_String& aName)
 	{
 		return GetAsset(aName.GetBuffer());
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	class AssetRegistry
+	{
+	public:
+		static AssetRegistry& GetInstance();
+		static void Destroy();
+
+		template <typename AssetType>
+		void RegisterAssetType();
+
+		void LoadAllAssets();
+
+		template <typename AssetType>
+		const FW_GrowingArray<Asset*>& GetAllAssets() const;
+		
+		template <typename AssetType>
+		AssetType* GetAsset(const char* aAssetName);
+
+		template <typename AssetType>
+		const AssetType* GetAsset(const char* aAssetName) const;
+
+		template <typename AssetType>
+		const AssetType* GetAsset(int aAssetIndex) const;
+
+		const FW_GrowingArray<IAssetStorage*>& GetAllAssetStorages() const { return myAssetStorages; }
+		
+	private:
+		AssetRegistry();
+		~AssetRegistry();
+		static AssetRegistry* ourInstance;
+
+		FW_GrowingArray<IAssetStorage*> myAssetStorages;
+	};
+
+	template <typename AssetType>
+	inline void AssetRegistry::RegisterAssetType()
+	{
+		int assetID = GetAssetID<AssetType>();
+		FW_ASSERT(assetID == myAssetStorages.Count(), "AssetType got registered more than once");
+		myAssetStorages.Add(new AssetStorage<AssetType>());
+	}
+
+	template <typename AssetType>
+	inline const FW_GrowingArray<Asset*>& AssetRegistry::GetAllAssets() const
+	{
+		int assetID = GetAssetID<AssetType>();
+		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
+		return myAssetStorages[assetID]->GetAllAssets();
+	}
+
+	template <typename AssetType>
+	inline AssetType* AssetRegistry::GetAsset(const char* aAssetName)
+	{
+		int assetID = GetAssetID<AssetType>();
+		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
+		return static_cast<AssetType*>(myAssetStorages[assetID]->GetAsset(aAssetName));
+	}
+
+	template <typename AssetType>
+	inline const AssetType* AssetRegistry::GetAsset(const char* aAssetName) const
+	{
+		int assetID = GetAssetID<AssetType>();
+		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
+		return static_cast<const AssetType*>(myAssetStorages[assetID]->GetAsset(aAssetName));
+	}
+
+	template <typename AssetType>
+	inline const AssetType* AssetRegistry::GetAsset(int aAssetIndex) const
+	{
+		int assetID = GetAssetID<AssetType>();
+		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
+
+		const FW_GrowingArray<Asset*> assets = myAssetStorages[assetID]->GetAllAssets();
+		FW_ASSERT(aAssetIndex >= 0 && aAssetIndex < assets.Count(), "Invalid AssetID");
+
+		return static_cast<const AssetType*>(assets[aAssetIndex]);
 	}
 }

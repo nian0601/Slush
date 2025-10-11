@@ -54,18 +54,6 @@ void ActionGameGlobals::Destroy()
 	FW_SAFE_DELETE(ourInstance);
 }
 
-Slush::AssetStorage<Slush::Texture>& ActionGameGlobals::GetTextureStorage()
-{
-	FW_ASSERT(myTextureStorage != nullptr, "Need to set a TextureStorage");
-	return *myTextureStorage;
-}
-
-Slush::AssetStorage<Slush::UILayout>& ActionGameGlobals::GetUILayoutStorage()
-{
-	FW_ASSERT(myUILayoutStorage != nullptr, "Need to set a UILayoutStorage");
-	return *myUILayoutStorage;
-}
-
 Slush::AssetStorage<Slush::Animation>& ActionGameGlobals::GetAnimationStorage()
 {
 	FW_ASSERT(myAnimationStorage != nullptr, "Need to set a AnimationStorage");
@@ -111,8 +99,6 @@ ActionGameGlobals::~ActionGameGlobals()
 {
 	myDebugSettings.SaveToDisk();
 
-	myTextureStorage = nullptr;
-	myUILayoutStorage = nullptr;
 	myAnimationStorage = nullptr;
 
 	myEntityPrefabStorage = nullptr;

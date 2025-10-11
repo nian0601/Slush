@@ -183,6 +183,7 @@
   <ItemGroup>
     <ClCompile Include="Core\Assets\Asset.cpp" />
     <ClCompile Include="Core\Assets\AssetParser.cpp" />
+    <ClCompile Include="Core\Assets\AssetStorage.cpp" />
     <ClCompile Include="Core\Assets\DataAsset.cpp" />
     <ClCompile Include="Core\Dockables\ContentBrowserDockable.cpp" />
     <ClCompile Include="Core\Dockables\Dockable.cpp" />

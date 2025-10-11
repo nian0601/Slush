@@ -6,9 +6,7 @@
 
 namespace Slush
 {
-
-	TextureViewerDockable::TextureViewerDockable(const Slush::AssetStorage<Slush::Texture>& aTextureStorage)
-		: myTextureStorage(aTextureStorage)
+	TextureViewerDockable::TextureViewerDockable()
 	{
 		myEnableHorizontalScrolling = true;
 	}
@@ -21,7 +19,8 @@ namespace Slush
 		ImGui::InputInt2("Sprite Size", &myTexCoordHelperSpriteSize.x);
 		ImGui::Separator();
 
-		const FW_GrowingArray<Slush::Asset*> assets = myTextureStorage.GetAllAssets();
+		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
+		const FW_GrowingArray<Slush::Asset*> assets = assetRegistry.GetAllAssets<Slush::Texture>();
 		for (Slush::Asset* asset : assets)
 		{
 			Slush::Texture* texture = static_cast<Slush::Texture*>(asset);

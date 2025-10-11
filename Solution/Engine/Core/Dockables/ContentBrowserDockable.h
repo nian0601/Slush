@@ -16,18 +16,10 @@ namespace Slush
 		ContentBrowserDockable();
 		const char* GetName() const override { return "Content Browser"; }
 
-		void AddAssetStorage(IAssetStorage* aStorage);
-
 	protected:
-		void OnUpdate() override;
 		void OnBuildUI() override;
 
 	private:
-		struct StorageData
-		{
-			IAssetStorage* myAssetStorage = nullptr;
-			bool myShouldShowAssets = false;
-		};
-		FW_GrowingArray<StorageData> myAssetStorages;
+		FW_GrowingArray<bool> myAssetFilters;
 	};
 }

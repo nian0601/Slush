@@ -55,7 +55,8 @@ void SpriteComponent::Data::OnBuildUI()
 	
 	if (!myTextureID.Empty())
 	{
-		if (const Slush::Texture* texture = ActionGameGlobals::GetInstance().GetTextureStorage().GetAsset(myTextureID))
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(myTextureID.GetBuffer()))
 		{
 			sf::FloatRect texRect;
 			texRect.left = static_cast<float>(myTextureRectPos.x);
@@ -76,7 +77,10 @@ void SpriteComponent::Data::OnBuildUI()
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(Slush::Texture::GetAssetTypeName()))
 		{
 			int textureIndex = *(const int*)payload->Data;
-			const Slush::Texture* texture = static_cast<Slush::Texture*>(ActionGameGlobals::GetInstance().GetTextureStorage().GetAllAssets()[textureIndex]);
+
+			Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+			const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(textureIndex);
+
 			myTextureID = texture->GetAssetName();
 		}
 
@@ -103,8 +107,8 @@ SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityP
 
 	if (!spriteData.myTextureID.Empty())
 	{
-		const Slush::Texture* texture = ActionGameGlobals::GetInstance().GetTextureStorage().GetAsset(spriteData.myTextureID);
-		if (texture)
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(spriteData.myTextureID.GetBuffer()))
 		{
 			mySprite->SetTexture(*texture);
 			mySprite->SetOutlineColor(0x00000000);

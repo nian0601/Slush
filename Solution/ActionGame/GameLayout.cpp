@@ -16,6 +16,7 @@
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "GameLayout.h"
+#include <UI\UILayout.h>
 
 GameLayout::GameLayout()
 {
@@ -27,14 +28,16 @@ GameLayout::GameLayout()
 	ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
 	ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);
 
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+
 	myStartGameUIManager = new Slush::UIManager(globals.GetFont());
-	myStartGameUIManager->SetLayout(globals.GetUILayoutStorage().GetAsset("StartGame"));
+	myStartGameUIManager->SetLayout(assets.GetAsset<Slush::UILayout>("StartGame"));
 
 	if (Slush::UIWidget* button = myStartGameUIManager->FindWidget("StartGame"))
 		myStartGameButton = static_cast<Slush::UIButton*>(button);
 
 	myRestartGameUIManager = new Slush::UIManager(globals.GetFont());
-	myRestartGameUIManager->SetLayout(globals.GetUILayoutStorage().GetAsset("GameOver"));
+	myRestartGameUIManager->SetLayout(assets.GetAsset<Slush::UILayout>("GameOver"));
 
 	if (Slush::UIWidget* button = myRestartGameUIManager->FindWidget("RestartGame"))
 		myRestartGameButton = static_cast<Slush::UIButton*>(button);

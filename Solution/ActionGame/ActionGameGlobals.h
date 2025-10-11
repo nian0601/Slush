@@ -7,12 +7,11 @@
 // It will make it a bit more cumbersome to use in the places that grabs the storage
 // from here, since IAssetStorage will return base Asset*, so it needs to be
 // casted into the actual asset, but maybe thats fine?
-#include "Graphics/Texture.h"
 #include "Core/Assets/AssetParser.h"
 #include "Core/Dockables/Dockable.h"
-#include "UI/UILayout.h"
 #include "Level/LevelData.h"
 #include <Graphics/Animation/Animation.h>
+
 class EntityManager;
 namespace Slush
 {
@@ -20,9 +19,7 @@ namespace Slush
 	class AssetStorage;
 
 	class Font;
-	class Texture;
 	class PhysicsWorld;
-	struct UILayout;
 }
 
 class ActionGameGlobals
@@ -53,8 +50,6 @@ public:
 	static ActionGameGlobals& GetInstance();
 	static void Destroy();
 
-	void SetTextureStorage(Slush::AssetStorage<Slush::Texture>& aStorage) { myTextureStorage = &aStorage; }
-	void SetUILayoutStorage(Slush::AssetStorage<Slush::UILayout>& aStorage) { myUILayoutStorage = &aStorage; }
 	void SetAnimationStorage(Slush::AssetStorage<Slush::Animation>& aStorage) { myAnimationStorage = &aStorage; }
 	void SetEntityPrefabStorage(Slush::AssetStorage<EntityPrefab>& aStorage) { myEntityPrefabStorage = &aStorage; }
 	void SetLevelDataStorage(Slush::AssetStorage<LevelData>& aStorage) { myLevelDataStorage = &aStorage; }
@@ -64,8 +59,6 @@ public:
 	void SetEntityManager(EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
 	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
 
-	Slush::AssetStorage<Slush::Texture>& GetTextureStorage();
-	Slush::AssetStorage<Slush::UILayout>& GetUILayoutStorage();
 	Slush::AssetStorage<Slush::Animation>& GetAnimationStorage();
 
 	Slush::AssetStorage<EntityPrefab>& GetEntityPrefabStorage();
@@ -82,8 +75,6 @@ private:
 	~ActionGameGlobals();
 	static ActionGameGlobals* ourInstance;
 
-	Slush::AssetStorage<Slush::Texture>* myTextureStorage = nullptr;
-	Slush::AssetStorage<Slush::UILayout>* myUILayoutStorage = nullptr;
 	Slush::AssetStorage<Slush::Animation>* myAnimationStorage = nullptr;
 	Slush::AssetStorage<EntityPrefab>* myEntityPrefabStorage = nullptr;
 	Slush::AssetStorage<LevelData>* myLevelDataStorage = nullptr;

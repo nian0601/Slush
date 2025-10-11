@@ -9,8 +9,8 @@
 
 Tilemap::Tilemap()
 {
-	const Slush::AssetStorage<Slush::Texture>& textures = ActionGameGlobals::GetInstance().GetTextureStorage();
-	const Slush::Texture* groundTexture = textures.GetAsset("RA_Ground_Tiles");
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	const Slush::Texture* groundTexture = assets.GetAsset<Slush::Texture>("RA_Ground_Tiles");
 
 	Layer& grassLayer = myLayers.Add();
 	grassLayer.SetupGroundSprites(groundTexture, 1, 1);
@@ -29,7 +29,7 @@ Tilemap::Tilemap()
 	grassLayer.CalculateSubTypes();
 	dirtLayer.CalculateSubTypes();
 
-	const Slush::Texture* cryptTexture = textures.GetAsset("RA_Crypt");
+	const Slush::Texture* cryptTexture = assets.GetAsset<Slush::Texture>("RA_Crypt");
 	Layer& wallLayer = myLayers.Add();
 	wallLayer.FillWith(0);
 	wallLayer.AddSprite(cryptTexture, 1, 3, 8); // TopLeft

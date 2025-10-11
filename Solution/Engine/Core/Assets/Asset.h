@@ -1,4 +1,5 @@
 #pragma once
+#include <FW_TypeID.h>
 
 namespace Slush
 {
@@ -33,4 +34,10 @@ namespace Slush
 	const char* GetTypeExtention() override { return GetAssetTypeExtention(); }\
 	const char* GetTypeFolder() override { return GetAssetTypeFolder(); }\
 
+
+	template <typename AssetType>
+	unsigned int GetAssetID()
+	{
+		return FW_TypeID<Asset>::GetID<AssetType>();
+	}
 }

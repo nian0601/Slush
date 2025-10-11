@@ -30,6 +30,9 @@ public:
 	void Initialize() override
 	{
 		myTextures.LoadAllAssets();
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		assets.RegisterAssetType<Slush::Texture>();
+		assets.LoadAllAssets();
 
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
@@ -48,7 +51,7 @@ public:
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddDockable(new CardEditorDockable(myTextures));
 		window.AddDockable(new Slush::GameViewDockable());
-		window.AddDockable(new Slush::TextureViewerDockable(myTextures));
+		window.AddDockable(new Slush::TextureViewerDockable());
 		window.AddDockable(new Slush::LogDockable());
 	}
 

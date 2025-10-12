@@ -62,6 +62,7 @@
     <ClInclude Include="Core\Assets\DataAsset.h" />
     <ClInclude Include="UI\UIRect.h" />
     <ClInclude Include="Core\Dockables\ContentBrowserDockable.h" />
+    <ClInclude Include="imgui\imgui_user.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -117,6 +118,7 @@
     <ClCompile Include="UI\UIRect.cpp" />
     <ClCompile Include="Core\Dockables\ContentBrowserDockable.cpp" />
     <ClCompile Include="Core\Assets\AssetStorage.cpp" />
+    <ClCompile Include="imgui\imgui_user.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

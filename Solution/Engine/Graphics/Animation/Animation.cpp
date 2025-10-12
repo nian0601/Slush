@@ -46,16 +46,16 @@ namespace Slush
 
 	void AnimationClip::SetStartTimeAndDuration(float aStartTime, float aDuration)
 	{
-		myStartTime = aStartTime;
-		myEndTime = myStartTime + aDuration;
+		myStartEndTime.x = aStartTime;
+		myStartEndTime.y = myStartEndTime.x + aDuration;
 	}
 
 	AnimationClip::State AnimationClip::Update(float anElapsedTime, float& outValue)
 	{
-		if (anElapsedTime < myStartTime)
+		if (anElapsedTime < myStartEndTime.x)
 			return State::NotStarted;
 
-		if (anElapsedTime >= myEndTime)
+		if (anElapsedTime >= myStartEndTime.y)
 		{
 			if (!myIsWaitingClip)
 			{
@@ -68,7 +68,7 @@ namespace Slush
 
 		if (!myIsWaitingClip)
 		{
-			float progress = FW_UnLerp(myStartTime, myEndTime, anElapsedTime);
+			float progress = FW_UnLerp(myStartEndTime.x, myStartEndTime.y, anElapsedTime);
 			outValue = myInterpolator.GetValue(progress);
 			OnUpdate();
 		}
@@ -78,8 +78,8 @@ namespace Slush
 
 	void AnimationClip::OnParse(AssetParser::Handle aHandle)
 	{
-		aHandle.ParseFloatField("starttime", myStartTime);
-		aHandle.ParseFloatField("endtime", myEndTime);
+		aHandle.ParseFloatField("starttime", myStartEndTime.x);
+		aHandle.ParseFloatField("endtime", myStartEndTime.y);
 		aHandle.ParseBoolField("iswaitingclip", myIsWaitingClip);
 		myInterpolator.OnParse(aHandle);
 	}
@@ -156,6 +156,27 @@ namespace Slush
 			clip.OnParse(clipHandle);
 		}
 		
+	}
+
+	void AnimationTrack::BuildUI(const char* aTrackName, AnimationClip*& outSelectedClip)
+	{
+		if (ImGui::BeginTimelineTrack(aTrackName))
+		{
+			if (myClips.Count() > 0)
+			{
+				for (int i = 0; i < myClips.Count(); ++i)
+				{
+					ImGui::PushID(i);
+					if (ImGui::TimelineEvent("clip", &myClips[i].myStartEndTime.x, &myClips[i] == outSelectedClip))
+					{
+						outSelectedClip = &myClips[i];
+					}
+					ImGui::PopID();
+				}
+			}
+
+			ImGui::EndTimelineTrack();
+		}
 	}
 
 	AnimationClip& AnimationTrack::AddClip(float aDuration)
@@ -253,7 +274,58 @@ namespace Slush
 
 	void Animation::BuildUI()
 	{
+		if (ImGui::BeginTimeline("AnimTimeline", 1.f))
+		{
+			myOutlineTrack.BuildUI("Outline", mySelectedClip);
+			myScaleTrack.BuildUI("Scale", mySelectedClip);
+			myPositionTrack.BuildUI("Position", mySelectedClip);
+			myColorTrack.BuildUI("Color", mySelectedClip);
+			ImGui::EndTimeline();
+		}
 
+		if (mySelectedClip)
+		{
+			static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable;
+			if (ImGui::BeginTable("table_scrolly", 2, flags))
+			{
+				ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+				ImGui::TableSetupColumn("Field", ImGuiTableColumnFlags_None);
+				ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_None);
+				ImGui::TableHeadersRow();
+
+
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("Start Time");
+
+				ImGui::TableSetColumnIndex(1);
+				ImGui::DragFloat("##StartTime", &mySelectedClip->myStartEndTime.x, 0.01f, 0.f, 1.f);
+
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("End Time");
+
+				ImGui::TableSetColumnIndex(1);
+				ImGui::DragFloat("##EndTime", &mySelectedClip->myStartEndTime.y, 0.01f, 0.f, 1.f);
+
+
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+				ImGui::Text("Interpolator");
+
+				ImGui::TableSetColumnIndex(1);
+				ImGui::SetNextItemWidth(50);
+				ImGui::DragFloat("##InterpolatorStart", &mySelectedClip->myInterpolator.myStartValue, 0.01f, 0.f, 1.f);
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(50);
+				ImGui::DragFloat("##InterpolatorEnd", &mySelectedClip->myInterpolator.myEndValue, 0.01f, 0.f, 1.f);
+				ImGui::SameLine();
+				const char* interpolatorTypes[] = { "None", "Linear", "Constant" };
+				ImGui::Combo("##Interpolator", &mySelectedClip->myInterpolator.myType, interpolatorTypes, IM_ARRAYSIZE(interpolatorTypes));
+
+				ImGui::EndTable();
+			}
+		}
 	}
 
 	void Animation::Update(AnimationRuntime& aRuntimeData)

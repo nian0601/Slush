@@ -25,14 +25,13 @@ namespace Slush
 
 		void OnParse(AssetParser::Handle aHandle);
 
-	private:
 		enum Type
 		{
 			None,
 			Linear,
 			Constant,
 		};
-		Type myType = None;
+		int myType = None;
 		float myStartValue = 0.f;
 		float myEndValue = 0.f;
 	};
@@ -58,11 +57,11 @@ namespace Slush
 
 		Interpolator myInterpolator;
 
+		Vector2f myStartEndTime{ FLT_MAX, FLT_MAX };
+		bool myIsSelected = false;
 	protected:
 		virtual void OnUpdate() {}
 
-		float myStartTime = FLT_MAX;
-		float myEndTime = FLT_MAX;
 		bool myIsWaitingClip = false;
 	};
 
@@ -87,6 +86,7 @@ namespace Slush
 		bool HasClips() const { return !myClips.IsEmpty(); }
 
 		void OnParse(const char* aTrackName, AssetParser::Handle aHandle);
+		void BuildUI(const char* aTrackName, AnimationClip*& outSelectedClip);
 
 	protected:
 		AnimationClip& AddClip(float aDuration);
@@ -136,5 +136,7 @@ namespace Slush
 		AnimationTrack myPositionTrack;
 		AnimationTrack myColorTrack;
 		SpritesheetTrack mySpritesheetTrack;
+
+		AnimationClip* mySelectedClip = nullptr;
 	};
 }

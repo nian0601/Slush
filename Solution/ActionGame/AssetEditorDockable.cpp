@@ -5,102 +5,56 @@
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
 #include "Core/Input.h"
+#include <Graphics/Animation/Animation.h>
 
-AssetEditorDockable::AssetEditorDockable(Slush::IAssetStorage& aAssetStorage, const char* aDockableName)
+AssetEditorDockable::AssetEditorDockable()
 	: Dockable(false)
-	, myAssetStorage(aAssetStorage)
-	, myDockableName(aDockableName)
 	, myNewAssetNameStorage("")
 {
+	Slush::Animation* anim = Slush::AssetRegistry::GetInstance().GetAsset<Slush::Animation>("Dash");
+	myAssets.Add({ anim, true });
 }
 
 void AssetEditorDockable::OnUpdate()
 {
+	for (int i = 0; i < myAssets.Count();)
+	{
+		if (!myAssets[i].myShouldKeep)
+		{
+			myAssets.RemoveNonCyclicAtIndex(i);
+		}
+		else
+		{
+			++i;
+		}
+	}
 }
 
 void AssetEditorDockable::OnBuildUI()
 {
-	/*const FW_GrowingArray<Slush::Asset*> assets = myAssetStorage.GetAllAssets();
-	if (ImGui::BeginMenuBar())
-	{
-		if (mySelectedAsset)
-			ImGui::Text("[%s] ", mySelectedAsset->GetAssetName().GetBuffer());
-
-		if (ImGui::BeginMenu("File.."))
-		{
-			if (ImGui::MenuItem("New"))
-				myWantToOpenNewAssetDialogue = true;
-			
-			if (mySelectedAsset)
-			{
-				if (ImGui::MenuItem("Save As"))
-					myWantToOpenSaveAsDialogue = true;
-			}
-
-			if (ImGui::Selectable("Save All"))
-			{
-				for (Slush::Asset* asset : assets)
-					asset->Save();
-			}
-	
-			if (ImGui::BeginMenu("Open.."))
-			{
-				for (Slush::Asset* asset : assets)
-				{
-					if (ImGui::Selectable(asset->GetAssetName().GetBuffer()))
-						mySelectedAsset = asset;
-				}
-	
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenu();
-		}
-	
-		HandleCreatingNewAsset();
-		HandleSavingAsNewAsset();
-
-		if (mySelectedAsset && ImGui::MenuItem("Save"))
-			mySelectedAsset->Save();
-	
-		
-	}
-	
-	ImGui::BeginChild("dragndropdummy");
-	
-	if (mySelectedAsset)
-		mySelectedAsset->BuildUI();
-	
-	ImGui::EndChild();
-	
-	if (ImGui::BeginDragDropTarget())
-	{
-		ImGuiDragDropFlags target_flags = 0;
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(myAssetStorage.GetAssetTypeName(), target_flags))
-		{
-			int assetIndex = *(const int*)payload->Data;
-			mySelectedAsset = myAssetStorage.GetAllAssets()[assetIndex];
-		}
-		ImGui::EndDragDropTarget();
-	}*/
-
-	
-
 	ImGui::BeginChild("dragndropdummy", ImVec2(0, 0), false, ImGuiWindowFlags_MenuBar);
 
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::MenuItem("Save All"))
+		if (ImGui::BeginMenu("File"))
 		{
-			for (AssetData& assetData : myAssets)
-				assetData.myAsset->Save();
-		}
+			if (ImGui::MenuItem("New"))
+				myWantToOpenNewAssetDialogue = true;
 
-		ImGui::EndMenuBar();
+			if (ImGui::MenuItem("Save All"))
+			{
+				for (AssetData& assetData : myAssets)
+					assetData.myAsset->Save();
+			}
+
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();	
 	}
 
 	if (!myAssets.IsEmpty())
 	{
-		if (ImGui::BeginTabBar("AssetTabs"))
+		if (ImGui::BeginTabBar("AssetTabs", ImGuiTabBarFlags_AutoSelectNewTabs))
 		{
 			for (AssetData& assetData : myAssets)
 			{
@@ -110,6 +64,12 @@ void AssetEditorDockable::OnBuildUI()
 					{
 						if (ImGui::MenuItem("Save"))
 							assetData.myAsset->Save();
+
+						if (ImGui::MenuItem("Save As"))
+						{
+							myWantToOpenSaveAsDialogue = true;
+							mySelectedAsset = assetData.myAsset;
+						}
 
 						ImGui::EndMenuBar();
 					}
@@ -125,6 +85,9 @@ void AssetEditorDockable::OnBuildUI()
 	}
 
 	ImGui::EndChild();
+
+	HandleCreatingNewAsset();
+	HandleSavingAsNewAsset();
 
 	if (ImGui::BeginDragDropTarget())
 	{
@@ -149,6 +112,7 @@ void AssetEditorDockable::OnBuildUI()
 				{
 					AssetData& data = myAssets.Add();
 					data.myAsset = asset;
+					data.myShouldKeep = true;
 				}
 			}
 		}
@@ -162,39 +126,40 @@ void AssetEditorDockable::HandleCreatingNewAsset()
 {
 	if (myWantToOpenNewAssetDialogue)
 	{
-		ImGui::OpenPopup("New_Prefab_Popup");
+		//ImGui::OpenPopup("New_Prefab_Popup");
+		SLUSH_ERROR("'New' is not implemented yet!");
 		myWantToOpenNewAssetDialogue = false;
 	}
-
-	if (ImGui::BeginPopupModal("New_Prefab_Popup"))
-	{
-		if (ImGui::InputText("Name", &myNewAssetNameStorage))
-			myHasUniqueAssetName = VerifyUniqueNameForNewAsset();
-
-		if (ImGui::Button("Create"))
-		{
-			if (!myNewAssetNameStorage.Empty() && myHasUniqueAssetName)
-			{
-				myAssetStorage.CreateNewAsset(myNewAssetNameStorage.GetBuffer());
-				myNewAssetNameStorage.Clear();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-
-		if (ImGui::IsItemHovered())
-		{
-			if (myNewAssetNameStorage.Empty())
-				ImGui::SetTooltip("Invalid name");
-			else if (!myHasUniqueAssetName)
-				ImGui::SetTooltip("Prefab with that name already exists");
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
-
-		ImGui::EndPopup();
-	}
+	//
+	//if (ImGui::BeginPopupModal("New_Prefab_Popup"))
+	//{
+	//	if (ImGui::InputText("Name", &myNewAssetNameStorage))
+	//		myHasUniqueAssetName = VerifyUniqueNameForNewAsset();
+	//
+	//	if (ImGui::Button("Create"))
+	//	{
+	//		if (!myNewAssetNameStorage.Empty() && myHasUniqueAssetName)
+	//		{
+	//			myAssetStorage.CreateNewAsset(myNewAssetNameStorage.GetBuffer());
+	//			myNewAssetNameStorage.Clear();
+	//			ImGui::CloseCurrentPopup();
+	//		}
+	//	}
+	//
+	//	if (ImGui::IsItemHovered())
+	//	{
+	//		if (myNewAssetNameStorage.Empty())
+	//			ImGui::SetTooltip("Invalid name");
+	//		else if (!myHasUniqueAssetName)
+	//			ImGui::SetTooltip("Prefab with that name already exists");
+	//	}
+	//
+	//	ImGui::SameLine();
+	//
+	//	if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
+	//
+	//	ImGui::EndPopup();
+	//}
 }
 
 void AssetEditorDockable::HandleSavingAsNewAsset()
@@ -214,8 +179,13 @@ void AssetEditorDockable::HandleSavingAsNewAsset()
 		{
 			if (!myNewAssetNameStorage.Empty() && myHasUniqueAssetName)
 			{
-				mySelectedAsset = &myAssetStorage.CopyAsset(myNewAssetNameStorage.GetBuffer(), *mySelectedAsset);
+				Slush::IAssetStorage& assetStorage = Slush::AssetRegistry::GetInstance().GetAssetStorage(mySelectedAsset->GetAssetTypeID());
+				AssetData& newAsset = myAssets.Add();
+				newAsset.myAsset = &assetStorage.CopyAsset(myNewAssetNameStorage.GetBuffer(), *mySelectedAsset);
+				newAsset.myShouldKeep = true;
+
 				myNewAssetNameStorage.Clear();
+				mySelectedAsset = nullptr;
 				ImGui::CloseCurrentPopup();
 			}
 		}
@@ -238,11 +208,13 @@ void AssetEditorDockable::HandleSavingAsNewAsset()
 
 bool AssetEditorDockable::VerifyUniqueNameForNewAsset() const
 {
-	const FW_GrowingArray<Slush::Asset*> assets = myAssetStorage.GetAllAssets();
+	// This will only work for 'Save As', but not for 'New'.
+	// The entire 'New'-flow needs updating now that this dockable handles all AssetTypes; the user needs to select what kind of asset that should be created etc
+	Slush::IAssetStorage& assetStorage = Slush::AssetRegistry::GetInstance().GetAssetStorage(mySelectedAsset->GetAssetTypeID());
+	const FW_GrowingArray<Slush::Asset*> assets = assetStorage.GetAllAssets();
 	for (Slush::Asset* asset : assets)
 	{
-		EntityPrefab* prefab = static_cast<EntityPrefab*>(asset);
-		if (prefab->myName == myNewAssetNameStorage.GetBuffer())
+		if (asset->GetAssetName() == myNewAssetNameStorage.GetBuffer())
 			return false;
 	}
 

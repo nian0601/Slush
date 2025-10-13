@@ -8,8 +8,8 @@
 class AssetEditorDockable : public Slush::Dockable
 {
 public:
-	AssetEditorDockable(Slush::IAssetStorage& aAssetStorage, const char* aDockableName);
-	const char* GetName() const override { return myDockableName.GetBuffer(); }
+	AssetEditorDockable();
+	const char* GetName() const override { return "Asset Editor"; }
 
 protected:
 	void OnUpdate() override;
@@ -21,9 +21,6 @@ private:
 
 	bool VerifyUniqueNameForNewAsset() const;
 
-	FW_String myDockableName;
-
-	Slush::IAssetStorage& myAssetStorage;
 	Slush::Asset* mySelectedAsset = nullptr;
 
 	struct AssetData

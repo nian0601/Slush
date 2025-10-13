@@ -15,7 +15,7 @@ class LevelData : public Slush::DataAsset
 public:
 	DEFINE_ASSET("LevelData", "ldata", "data/levels/");
 
-	LevelData(const char* aName);
+	LevelData(const char* aName, unsigned int aAssetID);
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle) override;
 	void BuildUI() override;

@@ -6,7 +6,7 @@ namespace Slush
 	class Asset
 	{
 	public:
-		Asset(const char* aName);
+		Asset(const char* aName, unsigned int aAssetID);
 		virtual ~Asset() {}
 		virtual void Load(const char* aFilePath);
 		virtual void Save();
@@ -19,11 +19,13 @@ namespace Slush
 		const FW_String& GetAssetName() const { return myAssetName; }
 		const FW_String& GetFilePath() const { return myFilePath; }
 		const FW_String& GetAbsoluteFilePath() const { return myAbsoluteFilePath; }
+		unsigned int GetAssetTypeID() const { return myAssetTypeID; }
 
 	protected:
 		FW_String myAssetName;
 		FW_String myFilePath;
 		FW_String myAbsoluteFilePath;
+		unsigned int myAssetTypeID = INT_MAX;
 	};
 
 #define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder)\

@@ -258,11 +258,6 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	Animation::Animation(const char* aName)
-		: DataAsset(aName)
-	{
-	}
-
 	void Animation::OnParse(AssetParser::Handle aRootHandle)
 	{
 		myOutlineTrack.OnParse("outlinetrack", aRootHandle);

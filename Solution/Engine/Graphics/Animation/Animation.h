@@ -124,7 +124,7 @@ namespace Slush
 	{
 	public:
 		DEFINE_ASSET("Animation", "anim", "data/animations");
-		Animation(const char* aName);
+		using DataAsset::DataAsset;
 
 		void OnParse(AssetParser::Handle aRootHandle);
 		void BuildUI();

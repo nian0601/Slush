@@ -8,7 +8,7 @@ namespace Slush
 	class DataAsset : public Asset
 	{
 	public:
-		DataAsset(const char* aName);
+		using Asset::Asset;
 		virtual ~DataAsset() {}
 		void Load(const char* aFilePath) final;
 		void Save() final;

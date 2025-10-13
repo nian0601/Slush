@@ -4,10 +4,6 @@
 
 namespace Slush
 {
-	DataAsset::DataAsset(const char* aName)
-		: Asset(aName)
-	{}
-
 	void DataAsset::Load(const char* aFilePath)
 	{
 		Asset::Load(aFilePath);

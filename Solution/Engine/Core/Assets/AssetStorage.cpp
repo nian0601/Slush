@@ -24,6 +24,18 @@ namespace Slush
 			storage->LoadAllAssets();
 	}
 
+	Slush::IAssetStorage& AssetRegistry::GetAssetStorage(unsigned int aAssetTypeID)
+	{
+		for (IAssetStorage* storage : myAssetStorages)
+		{
+			if (storage->GetAssetTypeID() == aAssetTypeID)
+				return *storage;
+		}
+			
+		FW_ASSERT("Failed to find storage for assettype");
+		return *myAssetStorages[0];
+	}
+
 	AssetRegistry::AssetRegistry()
 	{
 	}

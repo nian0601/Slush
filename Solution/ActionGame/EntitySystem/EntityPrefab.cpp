@@ -43,8 +43,8 @@ void EntityPrefab::ComponentData::BuildUI()
 	}
 }
 
-EntityPrefab::EntityPrefab(const char* aName)
-	: DataAsset(aName)
+EntityPrefab::EntityPrefab(const char* aName, unsigned int aAssetID)
+	: DataAsset(aName, aAssetID)
 	, myName(aName)
 {
 	myComponentBaseDatas.Fill(nullptr);

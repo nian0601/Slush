@@ -18,6 +18,7 @@ namespace Slush
 		virtual void LoadAllAssets() = 0;
 
 		virtual const char* GetAssetTypeName() const = 0;
+		unsigned virtual int GetAssetTypeID() const = 0;
 
 		virtual const Asset* GetAsset(const char* aName) const = 0;
 		virtual Asset* GetAsset(const char* aName) = 0;
@@ -29,6 +30,7 @@ namespace Slush
 	class AssetStorage : public IAssetStorage
 	{
 	public:
+		AssetStorage();
 		~AssetStorage();
 
 		Asset& CreateNewAsset(const char* aName) override;
@@ -43,12 +45,20 @@ namespace Slush
 		AssetType* GetAsset(const FW_String& aName);
 
 		const char* GetAssetTypeName() const override { return AssetType::GetAssetTypeName(); }
+		unsigned int GetAssetTypeID() const override { return myAssetTypeID; }
 		const FW_GrowingArray<Asset*>& GetAllAssets() const override { return myAssets; }
 
 	private:
 		FW_Hashmap<FW_String, AssetType*> myAssetMap;
 		FW_GrowingArray<Asset*> myAssets;
+		unsigned int myAssetTypeID = -1;
 	};
+
+	template<typename AssetType>
+	AssetStorage<AssetType>::AssetStorage()
+	{
+		myAssetTypeID = GetAssetID<AssetType>();
+	}
 
 	template<typename AssetType>
 	AssetStorage<AssetType>::~AssetStorage()
@@ -66,7 +76,7 @@ namespace Slush
 			return *myAssetMap[aName];
 		}
 
-		AssetType* asset = new AssetType(aName);
+		AssetType* asset = new AssetType(aName, GetAssetID<AssetType>());
 
 		myAssets.Add(asset);
 		myAssetMap[aName] = asset;
@@ -85,7 +95,7 @@ namespace Slush
 			return *myAssetMap[aNewName];
 		}
 
-		AssetType* asset = new AssetType(aNewName);
+		AssetType* asset = new AssetType(aNewName, GetAssetID<AssetType>());
 		asset->Load(anOldAsset.GetFilePath().GetBuffer());
 		asset->Save();
 
@@ -106,7 +116,7 @@ namespace Slush
 			return;
 		}
 
-		AssetType* asset = new AssetType(aName);
+		AssetType* asset = new AssetType(aName, GetAssetID<AssetType>());
 		asset->Load(aFilePath);
 
 		myAssets.Add(asset);
@@ -187,6 +197,7 @@ namespace Slush
 		
 		template <typename AssetType>
 		IAssetStorage& GetAssetStorage();
+		IAssetStorage& GetAssetStorage(unsigned int aAssetTypeID);
 
 	private:
 		AssetRegistry();

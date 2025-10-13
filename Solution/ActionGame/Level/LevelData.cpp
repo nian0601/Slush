@@ -4,8 +4,8 @@
 #include <ActionGameGlobals.h>
 #include <Core\Assets\AssetStorage.h>
 
-LevelData::LevelData(const char* aName)
-	: DataAsset(aName)
+LevelData::LevelData(const char* aName, unsigned int aAssetID)
+	: DataAsset(aName, aAssetID)
 {
 }
 

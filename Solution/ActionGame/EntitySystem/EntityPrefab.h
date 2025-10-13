@@ -48,7 +48,7 @@ private:
 public:
 	DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs");
 
-	EntityPrefab(const char* aName);
+	EntityPrefab(const char* aName, unsigned int aAssetID);
 	~EntityPrefab();
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle) override;

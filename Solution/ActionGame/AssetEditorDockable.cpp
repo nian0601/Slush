@@ -58,6 +58,12 @@ void AssetEditorDockable::OnBuildUI()
 		{
 			for (AssetData& assetData : myAssets)
 			{
+				if (!assetData.myAsset)
+				{
+					SLUSH_ERROR("Invalid asset in AssetEditor");
+					continue;
+				}
+
 				if (ImGui::BeginTabItem(assetData.myAsset->GetAssetName().GetBuffer(), &assetData.myShouldKeep))
 				{
 					if (ImGui::BeginMenuBar())

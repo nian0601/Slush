@@ -15,7 +15,6 @@ Animation
 		{ 
 			starttime 0.000 
 			endtime 0.100 
-			iswaitingclip 0 
 			interpolator 
 			{ 
 				startvalue 0.000 
@@ -27,7 +26,6 @@ Animation
 		{ 
 			starttime 0.100 
 			endtime 0.200 
-			iswaitingclip 0 
 			interpolator 
 			{ 
 				startvalue 1.000 
@@ -38,11 +36,5 @@ Animation
 	} 
 	spritesheettrack 
 	{ 
-		fps 0.000 
-		framesize 
-		{ 
-			x 0 
-			y 0 
-		} 
 	} 
 } 

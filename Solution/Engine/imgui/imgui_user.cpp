@@ -7,7 +7,7 @@ namespace ImGui
 {
 	static float s_max_timeline_value;
 	static const float TIMELINE_RADIUS = 6;
-	static const float TIMELINE_LABEL_MAX_WIDTH = 80.f;
+	static const float TIMELINE_LABEL_MAX_WIDTH = 100.f;
 
 	bool BeginTimeline(const char* str_id, float max_value)
 	{
@@ -27,6 +27,7 @@ namespace ImGui
 		win->DrawList->AddText(cursor_pos, textColor, str_id);
 		
 		cursor_pos.x += TIMELINE_LABEL_MAX_WIDTH;
+		cursor_pos.y += TIMELINE_RADIUS;
 		SetCursorScreenPos(cursor_pos);
 		return true;
 	}

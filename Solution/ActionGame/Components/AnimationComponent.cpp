@@ -24,7 +24,7 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	mySpawnAnimation = assets.GetAsset<Slush::Animation>("Spawn");
 	mySpritesheetAnimation = assets.GetAsset<Slush::Animation>("SpriteSheet");
 #else
-	myDashAnimation = new Slush::Animation("Dash");
+	myDashAnimation = new Slush::Animation("Dash", Slush::GetAssetID<Slush::Animation>());
 	myDashAnimation->myScaleTrack
 		.Linear(0.1f, 1.f, 0.2f)
 		.Wait(0.1f)
@@ -33,20 +33,18 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 		.Wait(0.1f)
 		.Linear(0.25f, 0.f, 1.f);
 	
-	myBlinkAnimation = new Slush::Animation("Blink");
+	myBlinkAnimation = new Slush::Animation("Blink", Slush::GetAssetID<Slush::Animation>());
 	myBlinkAnimation->myColorTrack
 		.Linear(0.1f, 0.f, 1.f)
 		.Linear(0.1f, 1.f, 0.f);
 	
-	mySpawnAnimation = new Slush::Animation("Spawn");
+	mySpawnAnimation = new Slush::Animation("Spawn", Slush::GetAssetID<Slush::Animation>());
 	mySpawnAnimation->myScaleTrack
 		.Linear(0.25f, 0.f, 1.f);
 	
-	mySpritesheetAnimation = new Slush::Animation("SpriteSheet");
-	mySpritesheetAnimation->mySpritesheetTrack.SetFPS(15.f);
-	mySpritesheetAnimation->mySpritesheetTrack.SetFrameSize({ 96, 96 });
+	mySpritesheetAnimation = new Slush::Animation("SpriteSheet", Slush::GetAssetID<Slush::Animation>());
 	for (int i = 0; i < 6; ++i)
-		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 });
+		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 }, { 96, 96 }, 15.f);
 	
 	myDashAnimation->Save();
 	myBlinkAnimation->Save();

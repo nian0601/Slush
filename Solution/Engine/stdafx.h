@@ -5,3 +5,4 @@
 #include "imgui/imgui-SFML.h"
 #include "imgui/imgui_user.h"
 #include "Core/Log.h"
+#include "Core/Assets/AssetParser.h"

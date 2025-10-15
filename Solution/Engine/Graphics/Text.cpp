@@ -11,9 +11,9 @@
 
 namespace Slush
 {
-	Text::Text()
+	Text::Text(const Font& aFont)
 	{
-		myText = new sf::Text();
+		myText = new sf::Text(*aFont.GetSFMLFont());
 		myText->setCharacterSize(15);
 	}
 
@@ -46,7 +46,7 @@ namespace Slush
 		{
 			myText->setString(sf::String(tempText.GetBuffer()) + sf::String(word.GetBuffer()));
 
-			float width = myText->getGlobalBounds().width;
+			float width = myText->getGlobalBounds().size.x;
 			if (width > myMaxWidth)
 			{
 				myString += tempText;
@@ -105,24 +105,24 @@ namespace Slush
 		switch (myHorizontalAlignment)
 		{
 		case HorizontalAlignment::CENTER:
-			alignedPosition.x -= bounds.width * 0.5f;
+			alignedPosition.x -= bounds.size.x * 0.5f;
 			break;
 		case HorizontalAlignment::RIGHT:
-			alignedPosition.x -= bounds.width;
+			alignedPosition.x -= bounds.size.x;
 			break;
 		}
 
 		switch (myVerticalAlignment)
 		{
 		case VerticalAlignment::CENTER:
-			alignedPosition.y -= bounds.height * 0.5f;
+			alignedPosition.y -= bounds.size.y * 0.5f;
 			break;
 		case VerticalAlignment::BOTTOM:
-			alignedPosition.y -= bounds.height;
+			alignedPosition.y -= bounds.size.y;
 			break;
 		}
 
-		myText->setPosition(alignedPosition.x, alignedPosition.y);
+		myText->setPosition({ alignedPosition.x, alignedPosition.y });
 	}
 
 	void Text::SetHorizontalAlignment(HorizontalAlignment anAlignment)
@@ -155,7 +155,7 @@ namespace Slush
 	{
 		myText->setString(aText);
 		sf::FloatRect bounds = myText->getGlobalBounds();
-		return { bounds.width, bounds.height };
+		return { bounds.size.x, bounds.size.y};
 	}
 
 	void Text::Render(float x, float y)

@@ -16,7 +16,7 @@ namespace Slush
 		myFilePath += aFilePath;
 
 		mySFMLFont = new sf::Font();
-		if (!mySFMLFont->loadFromFile(myFilePath.GetBuffer()))
+		if (!mySFMLFont->openFromFile(myFilePath.GetBuffer()))
 		{
 			SLUSH_ERROR("Font: Failed to load %s", aFilePath);
 			FW_SAFE_DELETE(mySFMLFont);

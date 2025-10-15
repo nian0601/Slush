@@ -30,17 +30,18 @@ public:
 		assets.RegisterAssetType<EntityPrefab>();
 		assets.RegisterAssetType<Slush::UILayout>();
 		assets.RegisterAssetType<Slush::Texture>();
-		assets.RegisterAssetType<Slush::Animation>();
 		assets.RegisterAssetType<LevelData>();
-
+		assets.RegisterAssetType<Slush::Animation>();
 		assets.LoadAllAssets();
 
 		myFont.Load("Data/NotoSans.ttf");
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.SetAppLayout("Game");
-		myAppLayout = new GameLayout();
+		//window.SetAppLayout("Game");
+		//myAppLayout = new GameLayout();
+		window.SetAppLayout("Entity");
+		myAppLayout = new EntityEditorLayout();
 	}
 
 	void Shutdown() override
@@ -80,7 +81,7 @@ public:
 
 private:
 	Slush::Font myFont;
-	AppLayout* myAppLayout;
+	AppLayout* myAppLayout = nullptr;
 };
 
 #include <FW_UnitTestSuite.h>

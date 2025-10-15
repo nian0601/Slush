@@ -8,8 +8,7 @@
 BossCard::BossCard(const Slush::Font* aFont)
 	: Card(aFont)
 {
-	myXPText = new Slush::Text();
-	myXPText->SetFont(*aFont);
+	myXPText = new Slush::Text(*aFont);
 	myXPText->SetText("-");
 	myXPText->SetColor(0xFFFFFFFF);
 }

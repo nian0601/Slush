@@ -6,6 +6,8 @@ namespace Slush
 	{
 		friend class Window;
 	public:
+		virtual ~Dockable() {}
+
 		void Update();
 
 		virtual const char* GetName() const = 0;

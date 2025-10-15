@@ -32,9 +32,9 @@ namespace Slush
 		~Engine() {};
 		static Engine* ourInstance;
 
-		Window* myWindow;
-		Input* myInput;
-		Logger* myLogger;
+		Window* myWindow = nullptr;
+		Input* myInput = nullptr;
+		Logger* myLogger = nullptr;
 
 		FW_String myDataFolder;
 	};

@@ -7,6 +7,68 @@
 
 namespace Slush
 {
+	sf::Keyboard::Key GetSFMLKey(Input::KeyCode aEngineKeyCode)
+	{
+		switch (aEngineKeyCode)
+		{
+		case Input::KeyCode::LEFT: return sf::Keyboard::Key::Left;
+		case Input::KeyCode::RIGHT: return sf::Keyboard::Key::Right;
+		case Input::KeyCode::UP: return sf::Keyboard::Key::Up;
+		case Input::KeyCode::DOWN: return sf::Keyboard::Key::Down;
+		case Input::KeyCode::Q: return sf::Keyboard::Key::Q;
+		case Input::KeyCode::W: return sf::Keyboard::Key::W;
+		case Input::KeyCode::E: return sf::Keyboard::Key::E;
+		case Input::KeyCode::A: return sf::Keyboard::Key::A;
+		case Input::KeyCode::S: return sf::Keyboard::Key::S;
+		case Input::KeyCode::D: return sf::Keyboard::Key::D;
+		case Input::KeyCode::Z: return sf::Keyboard::Key::Z;
+		case Input::KeyCode::X: return sf::Keyboard::Key::X;
+		case Input::KeyCode::V: return sf::Keyboard::Key::V;
+		case Input::KeyCode::SPACE: return sf::Keyboard::Key::Space;
+		case Input::KeyCode::ESC: return sf::Keyboard::Key::Escape;
+		case Input::KeyCode::DEL: return sf::Keyboard::Key::Delete;
+		case Input::KeyCode::HYPHEN: return sf::Keyboard::Key::Hyphen;
+		case Input::KeyCode::_1: return sf::Keyboard::Key::Num1;
+		case Input::KeyCode::_2: return sf::Keyboard::Key::Num2;
+		case Input::KeyCode::_3: return sf::Keyboard::Key::Num3;
+		case Input::KeyCode::_4: return sf::Keyboard::Key::Num4;
+		case Input::KeyCode::_5: return sf::Keyboard::Key::Num5;
+		case Input::KeyCode::_6: return sf::Keyboard::Key::Num6;
+		case Input::KeyCode::_7: return sf::Keyboard::Key::Num7;
+		case Input::KeyCode::_8: return sf::Keyboard::Key::Num8;
+		case Input::KeyCode::_9: return sf::Keyboard::Key::Num9;
+		case Input::KeyCode::_0: return sf::Keyboard::Key::Num0;
+		case Input::KeyCode::_F1: return sf::Keyboard::Key::F1;
+		case Input::KeyCode::_F2: return sf::Keyboard::Key::F2;
+		case Input::KeyCode::_F3: return sf::Keyboard::Key::F3;
+		case Input::KeyCode::_F4: return sf::Keyboard::Key::F4;
+		case Input::KeyCode::_F5: return sf::Keyboard::Key::F5;
+		case Input::KeyCode::_F6: return sf::Keyboard::Key::F6;
+		case Input::KeyCode::_F7: return sf::Keyboard::Key::F7;
+		case Input::KeyCode::_F8: return sf::Keyboard::Key::F8;
+		case Input::KeyCode::_F9: return sf::Keyboard::Key::F9;
+		case Input::KeyCode::_F10: return sf::Keyboard::Key::F10;
+		case Input::KeyCode::_F11: return sf::Keyboard::Key::F11;
+		case Input::KeyCode::_F12: return sf::Keyboard::Key::F12;
+		default:
+			break;
+		}
+
+		return sf::Keyboard::Key::Escape;
+	}
+	sf::Mouse::Button GetSFMLMouseButton(Input::MouseButton aEngineMouseButton)
+	{
+		switch (aEngineMouseButton)
+		{
+		case Input::MouseButton::LEFTMB: return sf::Mouse::Button::Left;
+		case Input::MouseButton::MIDDLEMB: return sf::Mouse::Button::Middle;
+		case Input::MouseButton::RIGHTMB: return sf::Mouse::Button::Right;
+		default:
+			break;
+		}
+
+		return sf::Mouse::Button::Left;
+	}
 
 	Input::Input()
 	{
@@ -24,7 +86,7 @@ namespace Slush
 
 		for (int i = 0; i < MouseButton::___COUNT; ++i)
 		{
-			sf::Mouse::Button sfmlKey = sf::Mouse::Button(GetSFMLMouseButton(MouseButton(i)));
+			sf::Mouse::Button sfmlKey = GetSFMLMouseButton(MouseButton(i));
 
 			State prevState = myMouseStates[i];
 			bool isCurrentlyPressed = sf::Mouse::isButtonPressed(sfmlKey);
@@ -50,7 +112,7 @@ namespace Slush
 
 		for (int i = 0; i < KeyCode::__COUNT; ++i)
 		{
-			sf::Keyboard::Key sfmlKey = sf::Keyboard::Key(GetSFMLKey(KeyCode(i)));
+			sf::Keyboard::Key sfmlKey = GetSFMLKey(KeyCode(i));
 
 			State prevState = myKeyStates[i];
 			bool isCurrentlyPressed = sf::Keyboard::isKeyPressed(sfmlKey);
@@ -89,69 +151,5 @@ namespace Slush
 			// Dont do anything
 			break;
 		}
-	}
-
-	int Input::GetSFMLKey(KeyCode aEngineKeyCode)
-	{
-		switch (aEngineKeyCode)
-		{
-		case LEFT: return sf::Keyboard::Left;
-		case RIGHT: return sf::Keyboard::Right;
-		case UP: return sf::Keyboard::Up;
-		case DOWN: return sf::Keyboard::Down;
-		case Q: return sf::Keyboard::Q;
-		case W: return sf::Keyboard::W;
-		case E: return sf::Keyboard::E;
-		case A: return sf::Keyboard::A;
-		case S: return sf::Keyboard::S;
-		case D: return sf::Keyboard::D;
-		case Z: return sf::Keyboard::Z;
-		case X: return sf::Keyboard::X;
-		case V: return sf::Keyboard::V;
-		case SPACE: return sf::Keyboard::Space;
-		case ESC: return sf::Keyboard::Escape;
-		case DEL: return sf::Keyboard::Delete;
-		case HYPHEN: return sf::Keyboard::Hyphen;
-		case _1: return sf::Keyboard::Num1;
-		case _2: return sf::Keyboard::Num2;
-		case _3: return sf::Keyboard::Num3;
-		case _4: return sf::Keyboard::Num4;
-		case _5: return sf::Keyboard::Num5;
-		case _6: return sf::Keyboard::Num6;
-		case _7: return sf::Keyboard::Num7;
-		case _8: return sf::Keyboard::Num8;
-		case _9: return sf::Keyboard::Num9;
-		case _0: return sf::Keyboard::Num0;
-		case _F1: return sf::Keyboard::F1;
-		case _F2: return sf::Keyboard::F2;
-		case _F3: return sf::Keyboard::F3;
-		case _F4: return sf::Keyboard::F4;
-		case _F5: return sf::Keyboard::F5;
-		case _F6: return sf::Keyboard::F6;
-		case _F7: return sf::Keyboard::F7;
-		case _F8: return sf::Keyboard::F8;
-		case _F9: return sf::Keyboard::F9;
-		case _F10: return sf::Keyboard::F10;
-		case _F11: return sf::Keyboard::F11;
-		case _F12: return sf::Keyboard::F12;
-		default:
-			break;
-		}
-
-		return sf::Keyboard::Escape;
-	}
-
-	int Input::GetSFMLMouseButton(MouseButton aEngineMouseButton)
-	{
-		switch (aEngineMouseButton)
-		{
-		case LEFTMB: return sf::Mouse::Left;
-		case MIDDLEMB: return sf::Mouse::Middle;
-		case RIGHTMB: return sf::Mouse::Right;
-		default:
-			break;
-		}
-
-		return sf::Mouse::Left;
 	}
 }

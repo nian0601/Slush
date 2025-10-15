@@ -91,8 +91,6 @@ namespace Slush
 		};
 
 		void UpdateState(State& aState);
-		int GetSFMLKey(KeyCode aEngineKeyCode);
-		int GetSFMLMouseButton(MouseButton aEngineMouseButton);
 
 		State myKeyStates[KeyCode::__COUNT + 1];
 		State myMouseStates[MouseButton::___COUNT];

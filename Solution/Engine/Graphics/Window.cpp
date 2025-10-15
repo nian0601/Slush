@@ -16,15 +16,14 @@
 
 namespace Slush
 {
-	Window::Window(int aWidth, int aHeight)
+	Window::Window(unsigned int aWidth, unsigned int aHeight)
 		: myAspectRatio(16.f/9.f)
 	{
 		myWindowRect = MakeRectFromTopLeft<float>({ 0.f, 0.f }, { static_cast<float>(aWidth), static_cast<float>(aHeight) });
 		myGameViewRect = MakeRectFromTopLeft<float>({ 0.f, 0.f }, GetSizeThatRespectsAspectRatio(aWidth, aHeight));
 
-		myRenderWindow = new sf::RenderWindow(sf::VideoMode(aWidth, aHeight), "Slush Engine");
-		myOffscreenBuffer = new sf::RenderTexture();
-		myOffscreenBuffer->create(1920, 1080);
+		myRenderWindow = new sf::RenderWindow(sf::VideoMode({ aWidth, aHeight }), "Slush Engine");
+		myOffscreenBuffer = new sf::RenderTexture({ 1920, 1080 });
 
 		myActiveRenderTarget = myRenderWindow;
 
@@ -58,27 +57,45 @@ namespace Slush
 		if (!myShouldBeOpen)
 			return false;
 
-		sf::Event event;
-		while (myRenderWindow->pollEvent(event))
-		{
-			ImGui::SFML::ProcessEvent(event);
+		//sf::Event event;
+		//while (myRenderWindow->pollEvent(event))
+		//{
+		//	ImGui::SFML::ProcessEvent(*myRenderWindow, event);
+		//
+		//	if (event.type == sf::Event::Closed)
+		//	{
+		//		return false;
+		//	}
+		//	else if (event.type == sf::Event::Resized)
+		//	{
+		//		SetRectSize(myWindowRect, { static_cast<float>(event.size.width), static_cast<float>(event.size.height) });
+		//		//myGameViewRect = MakeRectFromTopLeft<float>({ 0.f, 0.f }, GetSizeThatRespectsAspectRatio(aWidth, aHeight));
+		//		//myRenderWindow->setSize({ event.size.width, event.size.height });
+		//		sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
+		//		myRenderWindow->setView(sf::View(visibleArea));
+		//	}
+		//}
 
-			if (event.type == sf::Event::Closed)
+		while (const std::optional event = myRenderWindow->pollEvent())
+		{
+			ImGui::SFML::ProcessEvent(*myRenderWindow, *event);
+
+			if (event->is<sf::Event::Closed>())
 			{
 				return false;
 			}
-			else if (event.type == sf::Event::Resized)
+			else if (const auto* resized = event->getIf<sf::Event::Resized>())
 			{
-				SetRectSize(myWindowRect, { static_cast<float>(event.size.width), static_cast<float>(event.size.height) });
+				SetRectSize(myWindowRect, { static_cast<float>(resized->size.x), static_cast<float>(resized->size.y) });
 				//myGameViewRect = MakeRectFromTopLeft<float>({ 0.f, 0.f }, GetSizeThatRespectsAspectRatio(aWidth, aHeight));
 				//myRenderWindow->setSize({ event.size.width, event.size.height });
-				sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
+				sf::FloatRect visibleArea({ 0.f, 0.f }, { static_cast<float>(resized->size.x), static_cast<float>(resized->size.y) });
 				myRenderWindow->setView(sf::View(visibleArea));
 			}
 		}
 
 		if (myShowEditorUI)
-			ImGui::SFML::Update(*myRenderWindow , Time::GetDelta());
+			ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());
 
 		return true;
 	}
@@ -123,7 +140,8 @@ namespace Slush
 				ImGui::EndMainMenuBar();
 			}
 
-			ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+			//ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+			ImGui::DockSpaceOverViewport();
 
 			if (myDisplayImGUIDemo)
 				ImGui::ShowDemoWindow(&myDisplayImGUIDemo);

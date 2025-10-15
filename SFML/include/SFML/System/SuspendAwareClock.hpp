@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2018 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -22,49 +22,55 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef SFML_ALRESOURCE_HPP
-#define SFML_ALRESOURCE_HPP
+
+#pragma once
 
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Audio/Export.hpp>
+#include <SFML/System/Export.hpp>
+
+#include <chrono>
 
 
 namespace sf
 {
 ////////////////////////////////////////////////////////////
-/// \brief Base class for classes that require an OpenAL context
+/// \brief Android, chrono-compatible, suspend-aware clock
+///
+/// Linux steady clock is represented by `CLOCK_MONOTONIC`.
+/// However, this implementation does not work properly for
+/// long-running clocks that work in the background when the
+/// system is suspended.
+///
+/// `SuspendAwareClock` uses `CLOCK_BOOTTIME` which is identical
+/// to `CLOCK_MONOTONIC`, except that it also includes any time
+/// that the system is suspended.
+///
+/// Note: In most cases, `CLOCK_MONOTONIC` is a better choice.
+/// Make sure this implementation is required for your use case.
 ///
 ////////////////////////////////////////////////////////////
-class SFML_AUDIO_API AlResource
+struct SFML_SYSTEM_API SuspendAwareClock
 {
-protected:
-
     ////////////////////////////////////////////////////////////
-    /// \brief Default constructor
+    /// \brief Type traits and static members
+    ///
+    /// These type traits and static members meet the requirements
+    /// of a Clock concept in the C++ Standard. More specifically,
+    /// TrivialClock requirements are met. Thus, naming convention
+    /// has been kept consistent to allow for extended use e.g.
+    /// https://en.cppreference.com/w/cpp/chrono/is_clock
     ///
     ////////////////////////////////////////////////////////////
-    AlResource();
+    using duration   = std::chrono::nanoseconds;
+    using rep        = duration::rep;
+    using period     = duration::period;
+    using time_point = std::chrono::time_point<SuspendAwareClock, duration>;
 
-    ////////////////////////////////////////////////////////////
-    /// \brief Destructor
-    ///
-    ////////////////////////////////////////////////////////////
-    ~AlResource();
+    static constexpr bool is_steady = true; // NOLINT(readability-identifier-naming)
+
+    static time_point now() noexcept;
 };
 
 } // namespace sf
-
-
-#endif // SFML_ALRESOURCE_HPP
-
-////////////////////////////////////////////////////////////
-/// \class sf::AlResource
-/// \ingroup audio
-///
-/// This class is for internal use only, it must be the base
-/// of every class that requires a valid OpenAL context in
-/// order to work.
-///
-////////////////////////////////////////////////////////////

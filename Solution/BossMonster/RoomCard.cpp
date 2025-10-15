@@ -9,8 +9,7 @@
 RoomCard::RoomCard(const Slush::Font* aFont)
 	: Card(aFont)
 {
-	myDamageText = new Slush::Text();
-	myDamageText->SetFont(*aFont);
+	myDamageText = new Slush::Text(*aFont);
 	myDamageText->SetText("-");
 	myDamageText->SetColor(0xFFFFFFFF);
 

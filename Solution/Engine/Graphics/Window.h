@@ -13,7 +13,7 @@ namespace Slush
 	class Window
 	{
 	public:
-		Window(int aWidth, int aHeight);
+		Window(unsigned int aWidth, unsigned int aHeight);
 		~Window();
 
 		bool PumpEvents();

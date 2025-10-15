@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2018 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2007-2025 Laurent Gomila (laurent@sfml-dev.org)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -22,32 +22,22 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef SFML_WINDOWSTYLE_HPP
-#define SFML_WINDOWSTYLE_HPP
-
+#pragma once
 
 namespace sf
 {
-namespace Style
-{
-    ////////////////////////////////////////////////////////////
-    /// \ingroup window
-    /// \brief Enumeration of the window styles
-    ///
-    ////////////////////////////////////////////////////////////
-    enum
-    {
-        None       = 0,      ///< No border / title bar (this flag and all others are mutually exclusive)
-        Titlebar   = 1 << 0, ///< Title bar + fixed border
-        Resize     = 1 << 1, ///< Title bar + resizable border + maximize button
-        Close      = 1 << 2, ///< Title bar + close button
-        Fullscreen = 1 << 3, ///< Fullscreen mode (this flag and all others are mutually exclusive)
 
-        Default = Titlebar | Resize | Close ///< Default window style
-    };
-}
+////////////////////////////////////////////////////////////
+/// \ingroup graphics
+/// \brief Types of texture coordinates that can be used for rendering
+///
+/// \see `sf::Texture::bind`
+///
+////////////////////////////////////////////////////////////
+enum class CoordinateType
+{
+    Normalized, //!< Texture coordinates in range [0 .. 1]
+    Pixels      //!< Texture coordinates in range [0 .. size]
+};
 
 } // namespace sf
-
-
-#endif // SFML_WINDOWSTYLE_HPP

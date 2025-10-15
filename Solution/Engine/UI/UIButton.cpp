@@ -42,8 +42,7 @@ namespace Slush
 	{
 		if (!myText)
 		{
-			myText = new Text();
-			myText->SetFont(aFont);
+			myText = new Text(aFont);
 			myText->SetHorizontalAlignment(Text::HorizontalAlignment::CENTER);
 			myText->SetVerticalAlignment(Text::VerticalAlignment::CENTER);
 			myText->SetCharacterSize(45);

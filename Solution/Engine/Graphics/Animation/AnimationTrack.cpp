@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AnimationTrack.h"
 #include "AnimationRuntime.h"
+#include "..\Texture.h"
 
 namespace Slush
 {

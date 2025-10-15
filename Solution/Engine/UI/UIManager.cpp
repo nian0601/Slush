@@ -284,8 +284,7 @@ namespace Slush
 		myCurrentElement->myText = someText;
 		myCurrentElement->myTextSize = aTextSize;
 
-		Slush::Text tempText;
-		tempText.SetFont(aFont);
+		Slush::Text tempText(aFont);
 		tempText.SetCharacterSize(aTextSize);
 
 		Vector2f textSize = tempText.CalculateBounds(someText);

@@ -3,6 +3,7 @@
 
 #include <imgui/imgui.h>
 #include <imgui/imgui-SFML.h>
+#include <imgui/imgui_user.h>
 
 #include <Core/Engine.h>
 #include "FW_FileProcessor.h"

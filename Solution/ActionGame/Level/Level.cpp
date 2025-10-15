@@ -30,8 +30,7 @@ Level::Level()
 	myTilemap = new Tilemap();
 
 	myUISprite = new Slush::RectSprite();
-	myText = new Slush::Text();
-	myText->SetFont(myFont);
+	myText = new Slush::Text(myFont);
 
 	myUIBackgroundStyle.SetPadding(16, 16);
 	myUIBackgroundStyle.SetChildGap(16);

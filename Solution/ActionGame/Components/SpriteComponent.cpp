@@ -7,6 +7,7 @@
 #include "ActionGameGlobals.h"
 #include <Core/Assets/AssetStorage.h>
 #include <Graphics/Texture.h>
+#include "EntitySystem/EntityPrefab.h"
 
 void SpriteComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -59,12 +60,12 @@ void SpriteComponent::Data::OnBuildUI()
 		if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(myTextureID.GetBuffer()))
 		{
 			sf::FloatRect texRect;
-			texRect.left = static_cast<float>(myTextureRectPos.x);
-			texRect.top = static_cast<float>(myTextureRectPos.y);
-			texRect.width = static_cast<float>(mySize.x);
-			texRect.height = static_cast<float>(mySize.y);
+			texRect.position.x = static_cast<float>(myTextureRectPos.x);
+			texRect.position.x = static_cast<float>(myTextureRectPos.y);
+			texRect.size.x = static_cast<float>(mySize.x);
+			texRect.size.y = static_cast<float>(mySize.y);
 
-			ImGui::Image(*texture->GetSFMLTexture(), { texRect.width, texRect.height }, texRect);
+			ImGui::Image(*texture->GetSFMLTexture(), { texRect.size.x, texRect.size.y }, texRect);
 		}
 	}
 

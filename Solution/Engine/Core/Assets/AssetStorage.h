@@ -12,6 +12,7 @@ namespace Slush
 	class IAssetStorage
 	{
 	public:
+		virtual ~IAssetStorage() {};
 		virtual Asset& CreateNewAsset(const char* aName) = 0;
 		virtual Asset& CopyAsset(const char* aNewName, const Asset& anOldAsset) = 0;
 

@@ -63,8 +63,8 @@ public:
 private:
 	struct KeyValuePair
 	{
-		Key myKey;
-		Value myValue;
+		Key myKey = Key();
+		Value myValue = Value();
 	};
 
 	int FindKeyInBucket(int aBucketIndex, const Key& aKey) const;

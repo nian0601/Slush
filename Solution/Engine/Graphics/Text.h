@@ -27,7 +27,7 @@ namespace Slush
 			BOTTOM,
 		};
 
-		Text();
+		Text(const Font& aFont);
 		~Text();
 
 		void SetText(const char* aText);

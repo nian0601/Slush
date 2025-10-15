@@ -58,3 +58,5 @@
 Application/Raytracer/Data/Video
 *.lib
 /ProgressTracking
+/Solution/.vs/Solution
+*.recipe

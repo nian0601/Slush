@@ -4,6 +4,7 @@
 #include "Graphics/Animation/AnimationRuntime.h"
 #include "Graphics/BaseSprite.h"
 #include "Core/Time.h"
+#include "../Texture.h"
 
 namespace Slush
 {
@@ -28,6 +29,19 @@ namespace Slush
 			ImGui::EndTimeline();
 		}
 
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Texture>()))
+			{
+				myWantToImportTexture = true;
+				myTextureToImport = static_cast<const Texture*>(asset);
+			}
+
+			ImGui::EndDragDropTarget();
+		}
+
+		HandleTextureImport();
+
 		if (mySelectedClip)
 		{
 			mySelectedClip->BuildUI();
@@ -36,7 +50,7 @@ namespace Slush
 
 	void Animation::Update(AnimationRuntime& aRuntimeData)
 	{
-		if (aRuntimeData.myState != AnimationClip::Running)
+		if (aRuntimeData.myState != AnimationRuntime::Running)
 			return;
 
 		aRuntimeData.myElapsedTime += Time::GetDelta();
@@ -51,4 +65,25 @@ namespace Slush
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
 	}
+
+	void Animation::HandleTextureImport()
+	{
+		if (myWantToImportTexture)
+		{
+			ImGui::OpenPopup("Import_Texture");
+			myWantToImportTexture = false;
+		}
+
+		if (ImGui::BeginPopupModal("Import_Texture"))
+		{
+			const float textureWidth = static_cast<float>(myTextureToImport->GetSize().x);
+			const float textureHeight = static_cast<float>(myTextureToImport->GetSize().y);
+			ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+
+			if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
+
+			ImGui::EndPopup();
+		}
+	}
+
 }

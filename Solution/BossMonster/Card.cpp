@@ -36,17 +36,15 @@ Card::Card(const Slush::Font* aFont)
 	myDescriptionBackground->SetSize(90.f * myScale, 35.f * myScale);
 	myDescriptionBackground->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
 
-	myTitleText = new Slush::Text();
+	myTitleText = new Slush::Text(*aFont);
 	myTitleText->SetText("Unknown");
-	myTitleText->SetFont(*aFont);
 	myTitleText->SetColor(0xFF000000);
 	myTitleText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::CENTER);
 	myTitleText->SetVerticalAlignment(Slush::Text::VerticalAlignment::CENTER);
 	myTitleText->SetMaxWidth(myTitleBackground->GetSize().x);
 
-	myDescriptionText = new Slush::Text();
+	myDescriptionText = new Slush::Text(*aFont);
 	myDescriptionText->SetText("Unknown");
-	myDescriptionText->SetFont(*aFont);
 	myDescriptionText->SetColor(0xFF000000);
 	myDescriptionText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::CENTER);
 	myDescriptionText->SetVerticalAlignment(Slush::Text::VerticalAlignment::CENTER);

@@ -37,7 +37,7 @@ namespace Slush
 		if (myOrigin == Origin::CENTER)
 			myShape->setOrigin({ mySize.x * 0.5f, mySize.y * 0.5f });
 		else
-			myShape->setOrigin(0.f, 0.f);
+			myShape->setOrigin({ 0.f, 0.f });
 	}
 
 	void RectSprite::SetWidth(float aWidth)

@@ -19,7 +19,7 @@ namespace FW_FileSystem
 	// goes out of scope, be careful if you allocated temporary FileContents
 	struct FileContent
 	{
-		FileContent(bool aAutoFreeContents = true) : myContents(nullptr), myAutoFreeContents(aAutoFreeContents) {}
+		FileContent(bool aAutoFreeContents = true) : myContents(nullptr), myFileSize(0), myAutoFreeContents(aAutoFreeContents) {}
 		~FileContent() { if (myAutoFreeContents) delete myContents; }
 		unsigned char* myContents;
 		long myFileSize;

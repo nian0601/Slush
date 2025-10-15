@@ -8,6 +8,7 @@
 namespace Slush
 {
 	struct AnimationRuntime;
+	class Texture;
 
 	class Animation : public DataAsset
 	{
@@ -27,5 +28,11 @@ namespace Slush
 		SpritesheetTrack mySpritesheetTrack;
 
 		AnimationClip* mySelectedClip = nullptr;
+
+	private:
+		void HandleTextureImport();
+
+		bool myWantToImportTexture = false;
+		const Texture* myTextureToImport = nullptr;
 	};
 }

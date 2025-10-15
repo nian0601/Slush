@@ -36,11 +36,11 @@ namespace Slush
 	void BaseSprite::SetTextureRect(int x, int y, int aWidth, int aHeight)
 	{
 		myTextureRect = MakeRectFromTopLeft<int>({ x, y }, { aWidth, aHeight });
-		sf::IntRect rect = { myTextureRect.myTopLeft.x, myTextureRect.myTopLeft.y, myTextureRect.myExtents.x, myTextureRect.myExtents.y };
+		sf::IntRect rect = sf::IntRect({ myTextureRect.myTopLeft.x, myTextureRect.myTopLeft.y }, { myTextureRect.myExtents.x, myTextureRect.myExtents.y });
 		if (myEnableHorizontalFlip)
 		{
-			rect.left += rect.width;
-			rect.width = -rect.width;
+			rect.position.x += rect.size.x;
+			rect.size.x = -rect.size.x;
 		}
 
 		myShape->setTextureRect(rect);
@@ -91,7 +91,7 @@ namespace Slush
 	void BaseSprite::SetRotation(float aRadians)
 	{
 		myRotation = aRadians;
-		myShape->setRotation(FW_RadiansToDegrees(aRadians));
+		myShape->setRotation(sf::radians(aRadians));
 	}
 
 	void BaseSprite::SetScale(float aScale)

@@ -8,19 +8,16 @@
 HeroCard::HeroCard(const Slush::Font* aFont)
 	: Card(aFont)
 {
-	myHealthText = new Slush::Text();
-	myHealthText->SetFont(*aFont);
+	myHealthText = new Slush::Text(*aFont);
 	myHealthText->SetColor(0xFFFF0000);
 	myHealthText->SetText("-");
 
-	mySoulText = new Slush::Text();
-	mySoulText->SetFont(*aFont);
+	mySoulText = new Slush::Text(*aFont);
 	mySoulText->SetColor(0xFF00FF00);
 	mySoulText->SetText("-");
 	mySoulText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::CENTER);
 
-	myWoundText = new Slush::Text();
-	myWoundText->SetFont(*aFont);
+	myWoundText = new Slush::Text(*aFont);
 	myWoundText->SetColor(0xFF0000FF);
 	myWoundText->SetText("-");
 	myWoundText->SetHorizontalAlignment(Slush::Text::HorizontalAlignment::RIGHT);

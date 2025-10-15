@@ -13,6 +13,9 @@ namespace ImGui
 
 	bool BeginTimeline(const char* str_id, float max_value)
 	{
+		// There appears to be ChildWindow-flags in more recent versions of ImGui that allows it to resize to fit content.
+		// Lets try to update ImGui at some point, i'm on a very old version at this point anyway.
+		// https://github.com/ocornut/imgui/issues/1496#issuecomment-1799778862
 		s_max_timeline_value = max_value;
 		return BeginChild(str_id, ImVec2(0, 200));
 	}

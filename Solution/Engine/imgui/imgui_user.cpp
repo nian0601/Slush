@@ -2,6 +2,8 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imgui_user.h"
+#include <Core\Assets\AssetStorage.h>
+#include <Core\Assets\Asset.h>
 
 namespace ImGui
 {
@@ -16,7 +18,7 @@ namespace ImGui
 	}
 
 
-	IMGUI_API bool BeginTimelineTrack(const char* str_id)
+	bool BeginTimelineTrack(const char* str_id)
 	{
 		const ImU32 textColor = ColorConvertFloat4ToU32(GImGui->Style.Colors[ImGuiCol_Text]);
 
@@ -126,7 +128,7 @@ namespace ImGui
 	}
 
 
-	IMGUI_API void EndTimelineTrack()
+	void EndTimelineTrack()
 	{
 		ImGui::PopID();
 
@@ -191,4 +193,29 @@ namespace ImGui
 
 		EndChild();
 	}
+
+	void BeingDraggedAsset(const Slush::Asset& anAsset, int anAssetIndex)
+	{
+		ImGuiDragDropFlags src_flags = 0;
+		if (ImGui::BeginDragDropSource(src_flags))
+		{
+			if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
+				ImGui::Text("Dragging \"%s\"", anAsset.GetAssetName().GetBuffer());
+			ImGui::SetDragDropPayload(anAsset.GetTypeName(), &anAssetIndex, sizeof(int));
+			ImGui::EndDragDropSource();
+		}
+	}
+
+	Slush::Asset* AcceptDraggedAsset(const int aAssetTypeID)
+	{
+		Slush::IAssetStorage& assetStorage = Slush::AssetRegistry::GetInstance().GetAssetStorage(aAssetTypeID);
+		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(assetStorage.GetAssetTypeName(), 0))
+		{
+			int assetIndex = *(const int*)payload->Data;
+			return assetStorage.GetAllAssets()[assetIndex];
+		}
+
+		return nullptr;
+	}
+
 }

@@ -32,14 +32,9 @@ void ProjectileShootingComponent::Data::OnBuildUI()
 
 	if (ImGui::BeginDragDropTarget())
 	{
-		ImGuiDragDropFlags target_flags = 0;
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(EntityPrefab::GetAssetTypeName(), target_flags))
-		{
-			int assetIndex = *(const int*)payload->Data;
-			Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-			if (const EntityPrefab* prefab = assets.GetAsset<EntityPrefab>(assetIndex))
-				myProjectileEntityPrefab = prefab->GetAssetName();
-		}
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+			myProjectileEntityPrefab = asset->GetAssetName();
+
 		ImGui::EndDragDropTarget();
 	}
 }

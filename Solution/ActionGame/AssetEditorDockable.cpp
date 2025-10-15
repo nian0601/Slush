@@ -100,11 +100,9 @@ void AssetEditorDockable::OnBuildUI()
 		const FW_GrowingArray<Slush::IAssetStorage*>& assetStorages = Slush::AssetRegistry::GetInstance().GetAllAssetStorages();
 		for (Slush::IAssetStorage* storage : assetStorages)
 		{
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(storage->GetAssetTypeName(), 0))
+			if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(storage->GetAssetTypeID()))
 			{
 				bool alreadyOpenedAsset = false;
-				int assetIndex = *(const int*)payload->Data;
-				Slush::Asset* asset = storage->GetAllAssets()[assetIndex];
 				for (AssetData& data : myAssets)
 				{
 					if (data.myAsset == asset)

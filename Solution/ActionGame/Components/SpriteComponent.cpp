@@ -74,15 +74,8 @@ void SpriteComponent::Data::OnBuildUI()
 
 	if (ImGui::BeginDragDropTarget())
 	{
-		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(Slush::Texture::GetAssetTypeName()))
-		{
-			int textureIndex = *(const int*)payload->Data;
-
-			Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-			const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(textureIndex);
-
-			myTextureID = texture->GetAssetName();
-		}
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::Texture>()))
+			myTextureID = asset->GetAssetName();
 
 		if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TextureRect"))
 		{

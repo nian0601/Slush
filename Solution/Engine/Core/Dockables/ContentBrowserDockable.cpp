@@ -59,15 +59,8 @@ namespace Slush
 					ImGui::TableSetColumnIndex(0);
 
 					ImGui::Selectable(asset->GetAssetName().GetBuffer(), false, ImGuiSelectableFlags_SpanAllColumns);
+					ImGui::BeingDraggedAsset(*asset, j);
 
-					ImGuiDragDropFlags src_flags = 0;
-					if (ImGui::BeginDragDropSource(src_flags))
-					{
-						if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
-							ImGui::Text("Dragging \"%s\"", asset->GetAssetName().GetBuffer());
-						ImGui::SetDragDropPayload(asset->GetTypeName(), &j, sizeof(int));
-						ImGui::EndDragDropSource();
-					}
 
 					ImGui::TableSetColumnIndex(1);
 					ImGui::Text("%s", asset->GetTypeName());

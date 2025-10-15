@@ -48,16 +48,12 @@ void DropComponent::Data::OnBuildUI()
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(200.f);
 			ImGui::InputText("Prefab", &drop.myPrefabName);
+
 			if (ImGui::BeginDragDropTarget())
 			{
-				ImGuiDragDropFlags target_flags = 0;
-				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(EntityPrefab::GetAssetTypeName(), target_flags))
-				{
-					int assetIndex = *(const int*)payload->Data;
-					Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-					if (const EntityPrefab* prefab = assets.GetAsset<EntityPrefab>(assetIndex))
-						drop.myPrefabName = prefab->GetAssetName();
-				}
+				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+					drop.myPrefabName = asset->GetAssetName();
+
 				ImGui::EndDragDropTarget();
 			}
 		}

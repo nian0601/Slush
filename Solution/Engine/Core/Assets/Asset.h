@@ -12,9 +12,9 @@ namespace Slush
 		virtual void Save();
 		virtual void BuildUI() {};
 
-		virtual const char* GetTypeName() = 0;
-		virtual const char* GetTypeExtention() = 0;
-		virtual const char* GetTypeFolder() = 0;
+		virtual const char* GetTypeName() const = 0;
+		virtual const char* GetTypeExtention() const = 0;
+		virtual const char* GetTypeFolder() const = 0;
 
 		const FW_String& GetAssetName() const { return myAssetName; }
 		const FW_String& GetFilePath() const { return myFilePath; }
@@ -32,9 +32,9 @@ namespace Slush
 	static const char* GetAssetTypeName() { return AssetName; }\
 	static const char* GetAssetTypeExtention() { return AssetExtention; }\
 	static const char* GetAssetTypeFolder() { return AssetFolder; }\
-	const char* GetTypeName() override { return GetAssetTypeName(); }\
-	const char* GetTypeExtention() override { return GetAssetTypeExtention(); }\
-	const char* GetTypeFolder() override { return GetAssetTypeFolder(); }\
+	const char* GetTypeName() const override { return GetAssetTypeName(); }\
+	const char* GetTypeExtention() const override { return GetAssetTypeExtention(); }\
+	const char* GetTypeFolder() const override { return GetAssetTypeFolder(); }\
 
 
 	template <typename AssetType>

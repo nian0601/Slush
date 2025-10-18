@@ -92,7 +92,8 @@ namespace ImGui
 	{
 		const ImU32 textColor = ColorConvertFloat4ToU32(GImGui->Style.Colors[ImGuiCol_Text]);
 
-		ImGui::PushID(str_id);
+		BeginChild(str_id, { 0, 0 }, ImGuiChildFlags_AutoResizeY);
+		//ImGui::PushID(str_id);
 
 		ImGuiWindow* win = GetCurrentWindow();
 		ImVec2 cursor_pos = win->DC.CursorPos;
@@ -200,14 +201,15 @@ namespace ImGui
 
 	void EndTimelineTrack()
 	{
-		ImGui::PopID();
-
+		//ImGui::PopID();
 		ImGuiWindow* win = GetCurrentWindow();
 		ImVec2 cursor_pos = win->DC.CursorPos;
 		cursor_pos.x = win->Pos.x;
 		cursor_pos.y += GetTextLineHeightWithSpacing();
 		
 		SetCursorScreenPos(cursor_pos);
+		Dummy({0, 0});
+		ImGui::EndChild();
 	}
 
 	void EndTimeline()

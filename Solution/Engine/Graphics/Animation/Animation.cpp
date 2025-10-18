@@ -26,19 +26,21 @@ namespace Slush
 			myPositionTrack.BuildUI("Position", mySelectedClip);
 			myColorTrack.BuildUI("Color", mySelectedClip);
 			mySpritesheetTrack.BuildUI("SpriteSheet", mySelectedClip);
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Texture>()))
+				{
+					myWantToImportTexture = true;
+					myTextureToImport = static_cast<const Texture*>(asset);
+				}
+
+				ImGui::EndDragDropTarget();
+			}
 			ImGui::EndTimeline();
 		}
 
-		if (ImGui::BeginDragDropTarget())
-		{
-			if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Texture>()))
-			{
-				myWantToImportTexture = true;
-				myTextureToImport = static_cast<const Texture*>(asset);
-			}
-
-			ImGui::EndDragDropTarget();
-		}
+		
 
 		HandleTextureImport();
 
@@ -68,21 +70,28 @@ namespace Slush
 
 	void Animation::HandleTextureImport()
 	{
+		static bool modalOpenstate = true;
 		if (myWantToImportTexture)
 		{
 			ImGui::OpenPopup("Import_Texture");
+			modalOpenstate = true;
 			myWantToImportTexture = false;
 		}
 
-		if (ImGui::BeginPopupModal("Import_Texture"))
+		if (myTextureToImport)
 		{
-			const float textureWidth = static_cast<float>(myTextureToImport->GetSize().x);
-			const float textureHeight = static_cast<float>(myTextureToImport->GetSize().y);
-			ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+			ImGui::SetNextWindowSize({800, 600 });
+			if (ImGui::BeginPopupModal("Import_Texture", &modalOpenstate))
+			{
+				const float textureWidth = static_cast<float>(myTextureToImport->GetSize().x);
+				const float textureHeight = static_cast<float>(myTextureToImport->GetSize().y);
+				//ImGui::SetNextWindowSize({ FW_Min(textureWidth, 500.f), FW_Min(textureHeight, 300.f) + 60 });
+				ImGui::BeginChild("texture_helper", { 0, -200 }, ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
+				ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+				ImGui::EndChild();
 
-			if (ImGui::Button("Cancel")) { ImGui::CloseCurrentPopup(); }
-
-			ImGui::EndPopup();
+				ImGui::EndPopup();
+			}
 		}
 	}
 

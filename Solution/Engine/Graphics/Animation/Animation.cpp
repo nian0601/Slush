@@ -83,11 +83,36 @@ namespace Slush
 			ImGui::SetNextWindowSize({800, 600 });
 			if (ImGui::BeginPopupModal("Import_Texture", &modalOpenstate))
 			{
-				const float textureWidth = static_cast<float>(myTextureToImport->GetSize().x);
-				const float textureHeight = static_cast<float>(myTextureToImport->GetSize().y);
+				const Vector2i& textureSize = myTextureToImport->GetSize();
 				//ImGui::SetNextWindowSize({ FW_Min(textureWidth, 500.f), FW_Min(textureHeight, 300.f) + 60 });
 				ImGui::BeginChild("texture_helper", { 0, -200 }, ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
-				ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+				
+				//const float textureWidth = static_cast<float>(textureSize.x);
+				//const float textureHeight = static_cast<float>(textureSize.y);
+				//ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+
+				const Vector2f& tileSize = { 48.f, 48.f };
+				const int xCount = static_cast<int>(textureSize.x / tileSize.x);
+				const int yCount = static_cast<int>(textureSize.y / tileSize.y);
+				for (int y = 0; y < yCount; ++y)
+				{
+					ImGui::PushID(y);
+					for (int x = 0; x < xCount; ++x)
+					{
+						ImGui::PushID(x);
+						const float xPos = x * tileSize.x;
+						const float yPos = y * tileSize.y;
+						sf::FloatRect rect = { {xPos, yPos}, {tileSize.x, tileSize.y} };
+						ImGui::ImageButton("tileButton", *myTextureToImport->GetSFMLTexture(), { tileSize.x, tileSize.y }, rect);
+
+						ImGui::PopID();
+						ImGui::SameLine();
+					}
+					ImGui::PopID();
+					ImGui::NewLine();
+				}
+
+
 				ImGui::EndChild();
 
 				ImGui::EndPopup();

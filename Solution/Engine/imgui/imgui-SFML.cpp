@@ -841,6 +841,24 @@ bool ImageButton(const char*         id,
     return ImGui::ImageButton(id, textureID, toImVec2(size), ImVec2(0, 0), ImVec2(1, 1), toImColor(bgColor), toImColor(tintColor));
 }
 
+bool ImageButton(const char* id,
+	const sf::Texture& texture,
+	const sf::Vector2f& size,
+    const sf::FloatRect& textureRect,
+	const sf::Color& bgColor,
+	const sf::Color& tintColor)
+{
+	ImTextureID textureID = convertGLTextureHandleToImTextureID(texture.getNativeHandle());
+
+	sf::Vector2f textureSize = static_cast<sf::Vector2f>(texture.getSize());
+	ImVec2 uv0(textureRect.position.x / textureSize.x,
+		textureRect.position.y / textureSize.y);
+	ImVec2 uv1((textureRect.position.x + textureRect.size.x) / textureSize.x,
+		(textureRect.position.y + textureRect.size.x) / textureSize.y);
+
+	return ImGui::ImageButton(id, textureID, toImVec2(size), uv0, uv1, toImColor(bgColor), toImColor(tintColor));
+}
+
 /////////////// Image Button Overloads for sf::RenderTexture
 
 bool ImageButton(const char*              id,

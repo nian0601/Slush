@@ -70,70 +70,93 @@ IMGUI_SFML_API void SetRTriggerAxis(sf::Joystick::Axis rTriggerAxis);
 // custom SFML overloads for ImGui widgets
 
 // Image overloads for sf::Texture
-IMGUI_SFML_API void Image(const sf::Texture& texture,
-                          const sf::Color&   tintColor   = sf::Color::White,
-                          const sf::Color&   borderColor = sf::Color::Transparent);
-IMGUI_SFML_API void Image(const sf::Texture&  texture,
-                          const sf::Vector2f& size,
-                          const sf::Color&    tintColor   = sf::Color::White,
-                          const sf::Color&    borderColor = sf::Color::Transparent);
-IMGUI_SFML_API void Image(const sf::Texture& texture,
+IMGUI_SFML_API void Image(
+    const sf::Texture& texture,
+	const sf::Color& tintColor = sf::Color::White,
+	const sf::Color& borderColor = sf::Color::Transparent);
+IMGUI_SFML_API void Image(
+    const sf::Texture&  texture,
 	const sf::Vector2f& size,
-    const sf::FloatRect& textureRect,
+	const sf::Color& tintColor = sf::Color::White,
+	const sf::Color& borderColor = sf::Color::Transparent);
+IMGUI_SFML_API void Image(
+    const sf::Texture& texture,
+	const sf::Vector2f& size,
+	const sf::FloatRect& textureRect,
 	const sf::Color& tintColor = sf::Color::White,
 	const sf::Color& borderColor = sf::Color::Transparent);
 
 // Image overloads for sf::RenderTexture
-IMGUI_SFML_API void Image(const sf::RenderTexture& texture,
-                          const sf::Color&         tintColor   = sf::Color::White,
-                          const sf::Color&         borderColor = sf::Color::Transparent);
-IMGUI_SFML_API void Image(const sf::RenderTexture& texture,
-                          const sf::Vector2f&      size,
-                          const sf::Color&         tintColor   = sf::Color::White,
-                          const sf::Color&         borderColor = sf::Color::Transparent);
+IMGUI_SFML_API void Image(
+    const sf::RenderTexture& texture,
+	const sf::Color& tintColor = sf::Color::White,
+	const sf::Color& borderColor = sf::Color::Transparent);
+IMGUI_SFML_API void Image(
+    const sf::RenderTexture& texture,
+	const sf::Vector2f& size,
+	const sf::Color& tintColor = sf::Color::White,
+	const sf::Color& borderColor = sf::Color::Transparent);
 
 // Image overloads for sf::Sprite
-IMGUI_SFML_API void Image(const sf::Sprite& sprite,
-                          const sf::Color&  tintColor   = sf::Color::White,
-                          const sf::Color&  borderColor = sf::Color::Transparent);
-IMGUI_SFML_API void Image(const sf::Sprite&   sprite,
-                          const sf::Vector2f& size,
-                          const sf::Color&    tintColor   = sf::Color::White,
-                          const sf::Color&    borderColor = sf::Color::Transparent);
+IMGUI_SFML_API void Image(
+    const sf::Sprite& sprite,
+	const sf::Color& tintColor = sf::Color::White,
+	const sf::Color& borderColor = sf::Color::Transparent);
+IMGUI_SFML_API void Image(
+    const sf::Sprite&   sprite,
+	const sf::Vector2f& size,
+	const sf::Color& tintColor = sf::Color::White,
+	const sf::Color& borderColor = sf::Color::Transparent);
 
 // ImageButton overloads for sf::Texture
-IMGUI_SFML_API bool ImageButton(const char*         id,
-                                const sf::Texture&  texture,
-                                const sf::Vector2f& size,
-                                const sf::Color&    bgColor   = sf::Color::Transparent,
-                                const sf::Color&    tintColor = sf::Color::White);
+IMGUI_SFML_API bool ImageButton(
+	const char* id,
+	const sf::Texture& texture,
+	const sf::Vector2f& size,
+	const sf::Color& bgColor = sf::Color::Transparent,
+	const sf::Color& tintColor = sf::Color::White);
+IMGUI_SFML_API bool ImageButton(
+	const char* id,
+	const sf::Texture& texture,
+	const sf::Vector2f& size,
+	const sf::FloatRect& textureRect,
+	const sf::Color& bgColor = sf::Color::Transparent,
+	const sf::Color& tintColor = sf::Color::White);
 
 // ImageButton overloads for sf::RenderTexture
-IMGUI_SFML_API bool ImageButton(const char*              id,
-                                const sf::RenderTexture& texture,
-                                const sf::Vector2f&      size,
-                                const sf::Color&         bgColor   = sf::Color::Transparent,
-                                const sf::Color&         tintColor = sf::Color::White);
+IMGUI_SFML_API bool ImageButton(
+	const char* id,
+	const sf::RenderTexture& texture,
+	const sf::Vector2f& size,
+	const sf::Color& bgColor = sf::Color::Transparent,
+	const sf::Color& tintColor = sf::Color::White);
 
 // ImageButton overloads for sf::Sprite
-IMGUI_SFML_API bool ImageButton(const char*         id,
-                                const sf::Sprite&   sprite,
-                                const sf::Vector2f& size,
-                                const sf::Color&    bgColor   = sf::Color::Transparent,
-                                const sf::Color&    tintColor = sf::Color::White);
+IMGUI_SFML_API bool ImageButton(
+    const char* id,
+	const sf::Sprite& sprite,
+	const sf::Vector2f& size,
+	const sf::Color& bgColor = sf::Color::Transparent,
+	const sf::Color& tintColor = sf::Color::White);
 
 // Draw_list overloads. All positions are in relative coordinates (relative to top-left of the
 // current window)
-IMGUI_SFML_API void DrawLine(const sf::Vector2f& a, const sf::Vector2f& b, const sf::Color& col, float thickness = 1.0f);
-IMGUI_SFML_API void DrawRect(const sf::FloatRect& rect,
-                             const sf::Color&     color,
-                             float                rounding         = 0.0f,
-                             int                  rounding_corners = 0x0F,
-                             float                thickness        = 1.0f);
-IMGUI_SFML_API void DrawRectFilled(const sf::FloatRect& rect,
-                                   const sf::Color&     color,
-                                   float                rounding         = 0.0f,
-                                   int                  rounding_corners = 0x0F);
+IMGUI_SFML_API void DrawLine(
+	const sf::Vector2f& a, 
+	const sf::Vector2f& b,
+	const sf::Color& col, 
+	float thickness = 1.0f);
+IMGUI_SFML_API void DrawRect(
+	const sf::FloatRect& rect,
+	const sf::Color& color,
+	float rounding = 0.0f,
+	int rounding_corners = 0x0F,
+	float thickness = 1.0f);
+IMGUI_SFML_API void DrawRectFilled(
+	const sf::FloatRect& rect,
+	const sf::Color& color,
+	float rounding = 0.0f,
+	int rounding_corners = 0x0F);
 } // end of namespace ImGui
 
 #endif // # IMGUI_SFML_H

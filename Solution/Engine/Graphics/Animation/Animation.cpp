@@ -71,11 +71,16 @@ namespace Slush
 	void Animation::HandleTextureImport()
 	{
 		static bool modalOpenstate = true;
+		static Vector2i startFrameIndex = { -1, -1 };
+		static Vector2i endFrameIndex = { -1, -1 };
 		if (myWantToImportTexture)
 		{
 			ImGui::OpenPopup("Import_Texture");
 			modalOpenstate = true;
 			myWantToImportTexture = false;
+
+			startFrameIndex = { -1, -1 };
+			endFrameIndex = { -1, -1 };
 		}
 
 		if (myTextureToImport)
@@ -84,36 +89,99 @@ namespace Slush
 			if (ImGui::BeginPopupModal("Import_Texture", &modalOpenstate))
 			{
 				const Vector2i& textureSize = myTextureToImport->GetSize();
-				//ImGui::SetNextWindowSize({ FW_Min(textureWidth, 500.f), FW_Min(textureHeight, 300.f) + 60 });
 				ImGui::BeginChild("texture_helper", { 0, -200 }, ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
 				
-				//const float textureWidth = static_cast<float>(textureSize.x);
-				//const float textureHeight = static_cast<float>(textureSize.y);
-				//ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+				static Vector2f frameSize = { 48.f, 48.f };
+				static Vector2i frameCount = { 8, 8 };
+				static bool useFrameSize = true;
+				static bool showFullTexture = false;
 
-				const Vector2f& tileSize = { 48.f, 48.f };
-				const int xCount = static_cast<int>(textureSize.x / tileSize.x);
-				const int yCount = static_cast<int>(textureSize.y / tileSize.y);
-				for (int y = 0; y < yCount; ++y)
+				if (showFullTexture)
 				{
-					ImGui::PushID(y);
-					for (int x = 0; x < xCount; ++x)
-					{
-						ImGui::PushID(x);
-						const float xPos = x * tileSize.x;
-						const float yPos = y * tileSize.y;
-						sf::FloatRect rect = { {xPos, yPos}, {tileSize.x, tileSize.y} };
-						ImGui::ImageButton("tileButton", *myTextureToImport->GetSFMLTexture(), { tileSize.x, tileSize.y }, rect);
+					ImVec2 pos = ImGui::GetCursorScreenPos(); // Needs to be BEFORE we render the image, else the cursor-position is wrong
+					ImGuiIO& io = ImGui::GetIO();
+					const float localX = io.MousePos.x - pos.x;
+					const float localY = io.MousePos.y - pos.y;
 
-						ImGui::PopID();
-						ImGui::SameLine();
+					const float textureWidth = static_cast<float>(textureSize.x);
+					const float textureHeight = static_cast<float>(textureSize.y);
+					ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+
+					if (ImGui::IsItemHovered() && ImGui::BeginTooltip())
+					{
+						ImGui::Text("(%i, %i)", static_cast<int>(localX), static_cast<int>(localY));
+						ImGui::EndTooltip();
 					}
-					ImGui::PopID();
-					ImGui::NewLine();
+				}
+				else
+				{
+					int xCount = frameCount.x;
+					int yCount = frameCount.y;
+					if (useFrameSize)
+					{
+						xCount = static_cast<int>(textureSize.x / frameSize.x);
+						yCount = static_cast<int>(textureSize.y / frameSize.y);
+					}
+					else
+					{
+						frameCount.x = FW_Max(1, frameCount.x);
+						frameCount.y = FW_Max(1, frameCount.y);
+						frameSize.x = static_cast<float>(textureSize.x / frameCount.x);
+						frameSize.y = static_cast<float>(textureSize.y / frameCount.y);
+					}
+
+					for (int y = 0; y < yCount; ++y)
+					{
+						ImGui::PushID(y);
+						for (int x = 0; x < xCount; ++x)
+						{
+							ImGui::PushID(x);
+							const float xPos = x * frameSize.x;
+							const float yPos = y * frameSize.y;
+							sf::FloatRect rect = { {xPos, yPos}, {frameSize.x, frameSize.y} };
+							sf::Color color = sf::Color::Transparent;
+
+							if (x == startFrameIndex.x && y == startFrameIndex.y)
+								color = sf::Color::Yellow;
+							if (x == endFrameIndex.x && y == endFrameIndex.y)
+								color = sf::Color::Yellow;
+
+							if (ImGui::ImageButton("frameButton", *myTextureToImport->GetSFMLTexture(), { frameSize.x, frameSize.y }, rect, color))
+							{
+								if (startFrameIndex.x == -1)
+								{
+									startFrameIndex.x = x;
+									startFrameIndex.y = y;
+								}
+								else
+								{
+									endFrameIndex.x = x;
+									endFrameIndex.y = y;
+								}
+							}
+
+							ImGui::PopID();
+							ImGui::SameLine();
+						}
+						ImGui::PopID();
+						ImGui::NewLine();
+					}
 				}
 
-
 				ImGui::EndChild();
+
+				ImGui::Checkbox("Show Full texture", &showFullTexture);
+				ImGui::Checkbox("Use FrameSize", &useFrameSize);
+				if (useFrameSize)
+				{
+					ImGui::DragFloat("X Size", &frameSize.x);
+					ImGui::DragFloat("Y Size", &frameSize.y);
+				}
+				else
+				{
+					ImGui::DragInt("X Count", &frameCount.x);
+					ImGui::DragInt("Y Count", &frameCount.y);
+				}
 
 				ImGui::EndPopup();
 			}

@@ -130,9 +130,25 @@ namespace Slush
 						frameSize.y = static_cast<float>(textureSize.y / frameCount.y);
 					}
 
+					Vector2i minMaxHighlightX = { 0, frameCount.x };
 					for (int y = 0; y < yCount; ++y)
 					{
 						ImGui::PushID(y);
+
+						minMaxHighlightX = { INT_MAX, -1};
+						if (y == startFrameIndex.y)
+						{
+							minMaxHighlightX.x = startFrameIndex.x;
+						}
+						else if (y == endFrameIndex.y)
+						{
+							minMaxHighlightX.y = endFrameIndex.x;
+						}
+						else if (y > startFrameIndex.y && y < endFrameIndex.y)
+						{
+							minMaxHighlightX = { 0, xCount };
+						}
+
 						for (int x = 0; x < xCount; ++x)
 						{
 							ImGui::PushID(x);
@@ -141,9 +157,11 @@ namespace Slush
 							sf::FloatRect rect = { {xPos, yPos}, {frameSize.x, frameSize.y} };
 							sf::Color color = sf::Color::Transparent;
 
-							if (x == startFrameIndex.x && y == startFrameIndex.y)
-								color = sf::Color::Yellow;
-							if (x == endFrameIndex.x && y == endFrameIndex.y)
+							bool useHighlight = false;
+							if (x >= minMaxHighlightX.x || x <= minMaxHighlightX.y)
+								useHighlight = true;
+
+							if (useHighlight)
 								color = sf::Color::Yellow;
 
 							if (ImGui::ImageButton("frameButton", *myTextureToImport->GetSFMLTexture(), { frameSize.x, frameSize.y }, rect, color))

@@ -30,9 +30,21 @@ namespace Slush
 		AnimationClip* mySelectedClip = nullptr;
 
 	private:
-		void HandleTextureImport();
+		void HandleSpritesheetImport();
+		void HandleTextureInteraction();
 
-		bool myWantToImportTexture = false;
-		const Texture* myTextureToImport = nullptr;
+		struct ToolData
+		{
+			bool myWantToImportTexture = false;
+			const Texture* myTextureToImport = nullptr;
+			Vector2i myFrameSize = { 48, 48 };
+			Vector2i myFrameCount = { 8, 8 };
+			bool myUseFrameSize = true;
+			bool myShowFullTexture = false;
+			Vector2i myStartFrameIndex = { -1, -1 };
+			Vector2i myEndFrameIndex = { -1, -1 };
+		};
+		ToolData myToolData;
+		
 	};
 }

@@ -3,8 +3,9 @@
 #include "Graphics/Animation/Animation.h"
 #include "Graphics/Animation/AnimationRuntime.h"
 #include "Graphics/BaseSprite.h"
+#include "Graphics/Texture.h"
+#include "Core/Assets/AssetStorage.h"
 #include "Core/Time.h"
-#include "../Texture.h"
 
 namespace Slush
 {
@@ -15,6 +16,29 @@ namespace Slush
 		myPositionTrack.OnParse("postiontrack", aRootHandle);
 		myColorTrack.OnParse("colortrack", aRootHandle);
 		mySpritesheetTrack.OnParse("spritesheettrack", aRootHandle);
+
+		if (aRootHandle.IsReading())
+		{
+			if (aRootHandle.HasField("spritesheettexture"))
+			{
+				FW_String texID;
+				aRootHandle.ParseStringField("spritesheettexture", texID);
+				Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+
+				// This texture should be saved in something thats not meant to be tool-specific.
+				// And update how animations are updated, to make it apply this texture when this animation is started etc
+				myToolData.myTextureToImport = assets.GetAsset<Slush::Texture>(texID.GetBuffer());
+				FW_ASSERT(myToolData.myTextureToImport != nullptr, "Invalid texture used for spritesheet-animation");
+			}
+		}
+		else
+		{
+			if (myToolData.myTextureToImport)
+			{
+				FW_String texID = myToolData.myTextureToImport->GetAssetName();
+				aRootHandle.ParseStringField("spritesheettexture", texID);
+			}
+		}
 	}
 
 	void Animation::BuildUI()
@@ -31,8 +55,8 @@ namespace Slush
 			{
 				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Texture>()))
 				{
-					myWantToImportTexture = true;
-					myTextureToImport = static_cast<const Texture*>(asset);
+					myToolData.myWantToImportTexture = true;
+					myToolData.myTextureToImport = static_cast<const Texture*>(asset);
 				}
 
 				ImGui::EndDragDropTarget();
@@ -40,9 +64,7 @@ namespace Slush
 			ImGui::EndTimeline();
 		}
 
-		
-
-		HandleTextureImport();
+		HandleSpritesheetImport();
 
 		if (mySelectedClip)
 		{
@@ -68,137 +90,72 @@ namespace Slush
 			aRuntimeData.myState = AnimationRuntime::Finished;
 	}
 
-	void Animation::HandleTextureImport()
+	void Animation::HandleSpritesheetImport()
 	{
 		static bool modalOpenstate = true;
-		static Vector2i startFrameIndex = { -1, -1 };
-		static Vector2i endFrameIndex = { -1, -1 };
-		if (myWantToImportTexture)
+		if (myToolData.myWantToImportTexture)
 		{
 			ImGui::OpenPopup("Import_Texture");
 			modalOpenstate = true;
-			myWantToImportTexture = false;
+			myToolData.myWantToImportTexture = false;
 
-			startFrameIndex = { -1, -1 };
-			endFrameIndex = { -1, -1 };
+			myToolData.myStartFrameIndex = { -1, -1 };
+			myToolData.myEndFrameIndex = { -1, -1 };
 		}
 
-		if (myTextureToImport)
+		if (myToolData.myTextureToImport)
 		{
-			ImGui::SetNextWindowSize({800, 600 });
+			ImGui::SetNextWindowSize({ 800, 600 });
 			if (ImGui::BeginPopupModal("Import_Texture", &modalOpenstate))
 			{
-				const Vector2i& textureSize = myTextureToImport->GetSize();
 				ImGui::BeginChild("texture_helper", { 0, -200 }, ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
-				
-				static Vector2f frameSize = { 48.f, 48.f };
-				static Vector2i frameCount = { 8, 8 };
-				static bool useFrameSize = true;
-				static bool showFullTexture = false;
 
-				if (showFullTexture)
-				{
-					ImVec2 pos = ImGui::GetCursorScreenPos(); // Needs to be BEFORE we render the image, else the cursor-position is wrong
-					ImGuiIO& io = ImGui::GetIO();
-					const float localX = io.MousePos.x - pos.x;
-					const float localY = io.MousePos.y - pos.y;
-
-					const float textureWidth = static_cast<float>(textureSize.x);
-					const float textureHeight = static_cast<float>(textureSize.y);
-					ImGui::Image(*myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
-
-					if (ImGui::IsItemHovered() && ImGui::BeginTooltip())
-					{
-						ImGui::Text("(%i, %i)", static_cast<int>(localX), static_cast<int>(localY));
-						ImGui::EndTooltip();
-					}
-				}
-				else
-				{
-					int xCount = frameCount.x;
-					int yCount = frameCount.y;
-					if (useFrameSize)
-					{
-						xCount = static_cast<int>(textureSize.x / frameSize.x);
-						yCount = static_cast<int>(textureSize.y / frameSize.y);
-					}
-					else
-					{
-						frameCount.x = FW_Max(1, frameCount.x);
-						frameCount.y = FW_Max(1, frameCount.y);
-						frameSize.x = static_cast<float>(textureSize.x / frameCount.x);
-						frameSize.y = static_cast<float>(textureSize.y / frameCount.y);
-					}
-
-					Vector2i minMaxHighlightX = { 0, frameCount.x };
-					for (int y = 0; y < yCount; ++y)
-					{
-						ImGui::PushID(y);
-
-						minMaxHighlightX = { INT_MAX, -1};
-						if (y == startFrameIndex.y)
-						{
-							minMaxHighlightX.x = startFrameIndex.x;
-						}
-						else if (y == endFrameIndex.y)
-						{
-							minMaxHighlightX.y = endFrameIndex.x;
-						}
-						else if (y > startFrameIndex.y && y < endFrameIndex.y)
-						{
-							minMaxHighlightX = { 0, xCount };
-						}
-
-						for (int x = 0; x < xCount; ++x)
-						{
-							ImGui::PushID(x);
-							const float xPos = x * frameSize.x;
-							const float yPos = y * frameSize.y;
-							sf::FloatRect rect = { {xPos, yPos}, {frameSize.x, frameSize.y} };
-							sf::Color color = sf::Color::Transparent;
-
-							bool useHighlight = false;
-							if (x >= minMaxHighlightX.x || x <= minMaxHighlightX.y)
-								useHighlight = true;
-
-							if (useHighlight)
-								color = sf::Color::Yellow;
-
-							if (ImGui::ImageButton("frameButton", *myTextureToImport->GetSFMLTexture(), { frameSize.x, frameSize.y }, rect, color))
-							{
-								if (startFrameIndex.x == -1)
-								{
-									startFrameIndex.x = x;
-									startFrameIndex.y = y;
-								}
-								else
-								{
-									endFrameIndex.x = x;
-									endFrameIndex.y = y;
-								}
-							}
-
-							ImGui::PopID();
-							ImGui::SameLine();
-						}
-						ImGui::PopID();
-						ImGui::NewLine();
-					}
-				}
+				HandleTextureInteraction();
 
 				ImGui::EndChild();
 
-				ImGui::Checkbox("Show Full texture", &showFullTexture);
-				ImGui::Checkbox("Use FrameSize", &useFrameSize);
-				if (useFrameSize)
+				const bool cantImport  = myToolData.myEndFrameIndex.x == -1;
+				ImGui::BeginDisabled(cantImport);
+				if (ImGui::Button("Import"))
 				{
-					ImGui::DragFloat("X Size", &frameSize.x);
-					ImGui::DragFloat("Y Size", &frameSize.y);
+					for (int y = myToolData.myStartFrameIndex.y; y <= myToolData.myEndFrameIndex.y; ++y)
+					{
+						Vector2i startEndX;
+						if (y == myToolData.myStartFrameIndex.y)
+							startEndX.x = myToolData.myStartFrameIndex.x;
+						else if (y > myToolData.myStartFrameIndex.y)
+							startEndX.x = 0;
+
+						if (y == myToolData.myEndFrameIndex.y)
+							startEndX.y = myToolData.myEndFrameIndex.x;
+						else if (y < myToolData.myEndFrameIndex.y)
+							startEndX.y = myToolData.myFrameCount.x;
+
+						for (int x = startEndX.x; x < startEndX.y; ++x)
+							mySpritesheetTrack.Frame({ x, y }, myToolData.myFrameSize, 15.f);
+					}
+
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (cantImport)
+					ImGui::SetItemTooltip("Select Start and EndFrame to import");
+
+				ImGui::EndDisabled();
+
+				ImGui::Separator();
+
+				ImGui::Checkbox("Show Full texture", &myToolData.myShowFullTexture);
+				ImGui::Checkbox("Use FrameSize", &myToolData.myUseFrameSize);
+				if (myToolData.myUseFrameSize)
+				{
+					ImGui::DragInt("X Size", &myToolData.myFrameSize.x);
+					ImGui::DragInt("Y Size", &myToolData.myFrameSize.y);
 				}
 				else
 				{
-					ImGui::DragInt("X Count", &frameCount.x);
-					ImGui::DragInt("Y Count", &frameCount.y);
+					ImGui::DragInt("X Count", &myToolData.myFrameCount.x);
+					ImGui::DragInt("Y Count", &myToolData.myFrameCount.y);
 				}
 
 				ImGui::EndPopup();
@@ -206,4 +163,96 @@ namespace Slush
 		}
 	}
 
+	void Animation::HandleTextureInteraction()
+	{
+		const Vector2i& textureSize = myToolData.myTextureToImport->GetSize();
+
+		if (myToolData.myShowFullTexture)
+		{
+			ImVec2 pos = ImGui::GetCursorScreenPos(); // Needs to be BEFORE we render the image, else the cursor-position is wrong
+			ImGuiIO& io = ImGui::GetIO();
+			const float localX = io.MousePos.x - pos.x;
+			const float localY = io.MousePos.y - pos.y;
+
+			const float textureWidth = static_cast<float>(textureSize.x);
+			const float textureHeight = static_cast<float>(textureSize.y);
+			ImGui::Image(*myToolData.myTextureToImport->GetSFMLTexture(), { textureWidth, textureHeight });
+
+			if (ImGui::IsItemHovered() && ImGui::BeginTooltip())
+			{
+				ImGui::Text("(%i, %i)", static_cast<int>(localX), static_cast<int>(localY));
+				ImGui::EndTooltip();
+			}
+		}
+		else
+		{
+			if (myToolData.myUseFrameSize)
+			{
+				myToolData.myFrameCount.x = textureSize.x / myToolData.myFrameSize.x;
+				myToolData.myFrameCount.y = textureSize.y / myToolData.myFrameSize.y;
+			}
+			else
+			{
+				myToolData.myFrameCount.x = FW_Max(1, myToolData.myFrameCount.x);
+				myToolData.myFrameCount.y = FW_Max(1, myToolData.myFrameCount.y);
+				myToolData.myFrameSize.x = textureSize.x / myToolData.myFrameCount.x;
+				myToolData.myFrameSize.y = textureSize.y / myToolData.myFrameCount.y;
+			}
+
+			for (int y = 0; y < myToolData.myFrameCount.y; ++y)
+			{
+				ImGui::PushID(y);
+
+				Vector2i minMaxHighlightX = { INT_MAX, -1 };
+				if (y == myToolData.myStartFrameIndex.y)
+					minMaxHighlightX.x = myToolData.myStartFrameIndex.x;
+				else if (y > myToolData.myStartFrameIndex.y)
+					minMaxHighlightX.x = 0;
+
+				if (y == myToolData.myEndFrameIndex.y)
+					minMaxHighlightX.y = myToolData.myEndFrameIndex.x;
+				else if (y < myToolData.myEndFrameIndex.y)
+					minMaxHighlightX.y = myToolData.myFrameCount.x;
+
+				for (int x = 0; x < myToolData.myFrameCount.x; ++x)
+				{
+					ImGui::PushID(x);
+					const float width = static_cast<float>(myToolData.myFrameSize.x);
+					const float height = static_cast<float>(myToolData.myFrameSize.y);
+
+					const float xPos = x * width;
+					const float yPos = y * height;
+					sf::FloatRect rect = { {xPos, yPos}, {width, height} };
+					sf::Color color = sf::Color::Transparent;
+
+					bool useHighlight = false;
+					if (x >= minMaxHighlightX.x && x <= minMaxHighlightX.y)
+						useHighlight = true;
+
+					if (useHighlight)
+						color = sf::Color::Yellow;
+
+					if (ImGui::ImageButton("frameButton", *myToolData.myTextureToImport->GetSFMLTexture(), { width, height }, rect, color))
+					{
+						if (myToolData.myStartFrameIndex.x == -1)
+						{
+							myToolData.myStartFrameIndex.x = x;
+							myToolData.myStartFrameIndex.y = y;
+							myToolData.myEndFrameIndex = myToolData.myStartFrameIndex;
+						}
+						else
+						{
+							myToolData.myEndFrameIndex.x = x;
+							myToolData.myEndFrameIndex.y = y;
+						}
+					}
+
+					ImGui::PopID();
+					ImGui::SameLine();
+				}
+				ImGui::PopID();
+				ImGui::NewLine();
+			}
+		}
+	}
 }

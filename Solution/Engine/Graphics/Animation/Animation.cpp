@@ -27,8 +27,8 @@ namespace Slush
 
 				// This texture should be saved in something thats not meant to be tool-specific.
 				// And update how animations are updated, to make it apply this texture when this animation is started etc
-				myToolData.myTextureToImport = assets.GetAsset<Slush::Texture>(texID.GetBuffer());
-				FW_ASSERT(myToolData.myTextureToImport != nullptr, "Invalid texture used for spritesheet-animation");
+				myTexture = assets.GetAsset<Slush::Texture>(texID.GetBuffer());
+				FW_ASSERT(myTexture != nullptr, "Invalid texture used for spritesheet-animation");
 			}
 		}
 		else
@@ -45,11 +45,11 @@ namespace Slush
 	{
 		if (ImGui::BeginTimeline("AnimTimeline", 1.f))
 		{
-			myOutlineTrack.BuildUI("Outline", mySelectedClip);
-			myScaleTrack.BuildUI("Scale", mySelectedClip);
-			myPositionTrack.BuildUI("Position", mySelectedClip);
-			myColorTrack.BuildUI("Color", mySelectedClip);
-			mySpritesheetTrack.BuildUI("SpriteSheet", mySelectedClip);
+			myOutlineTrack.BuildUI("Outline", myToolData.mySelectedClip);
+			myScaleTrack.BuildUI("Scale", myToolData.mySelectedClip);
+			myPositionTrack.BuildUI("Position", myToolData.mySelectedClip);
+			myColorTrack.BuildUI("Color", myToolData.mySelectedClip);
+			mySpritesheetTrack.BuildUI("SpriteSheet", myToolData.mySelectedClip);
 
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -66,9 +66,9 @@ namespace Slush
 
 		HandleSpritesheetImport();
 
-		if (mySelectedClip)
+		if (myToolData.mySelectedClip)
 		{
-			mySelectedClip->BuildUI();
+			myToolData.mySelectedClip->BuildUI();
 		}
 	}
 
@@ -118,6 +118,8 @@ namespace Slush
 				ImGui::BeginDisabled(cantImport);
 				if (ImGui::Button("Import"))
 				{
+					mySpritesheetTrack.RemoveAllClips();
+
 					for (int y = myToolData.myStartFrameIndex.y; y <= myToolData.myEndFrameIndex.y; ++y)
 					{
 						Vector2i startEndX;
@@ -135,6 +137,7 @@ namespace Slush
 							mySpritesheetTrack.Frame({ x, y }, myToolData.myFrameSize, 15.f);
 					}
 
+					myTexture = myToolData.myTextureToImport;
 					ImGui::CloseCurrentPopup();
 				}
 

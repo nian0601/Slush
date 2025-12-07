@@ -26,8 +26,7 @@ namespace Slush
 		AnimationTrack myPositionTrack;
 		AnimationTrack myColorTrack;
 		SpritesheetTrack mySpritesheetTrack;
-
-		AnimationClip* mySelectedClip = nullptr;
+		const Texture* myTexture = nullptr;
 
 	private:
 		void HandleSpritesheetImport();
@@ -43,6 +42,7 @@ namespace Slush
 			bool myShowFullTexture = false;
 			Vector2i myStartFrameIndex = { -1, -1 };
 			Vector2i myEndFrameIndex = { -1, -1 };
+			AnimationClip* mySelectedClip = nullptr;
 		};
 		ToolData myToolData;
 		

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "Graphics/Animation/Animation.h"
 #include "Graphics/Animation/AnimationRuntime.h"
 #include "Graphics/BaseSprite.h"
 
@@ -34,10 +35,10 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	void AnimationRuntime::Start(BaseSprite& aSprite)
+	void AnimationRuntime::Start(BaseSprite& aSprite, const Animation& anAnimation)
 	{
 		if (myState == Running)
-			Stop(aSprite);	
+			Stop(aSprite, anAnimation);	
 
 		myState = Running;
 		myElapsedTime = 0.f;
@@ -49,9 +50,12 @@ namespace Slush
 		myPositionData.Start(aSprite);
 		myColorData.Start(aSprite);
 		mySpritesheetData.Start(aSprite);
+
+		if (anAnimation.myTexture)
+			aSprite.SetTexture(*anAnimation.myTexture);
 	}
 
-	void AnimationRuntime::Stop(BaseSprite& aSprite)
+	void AnimationRuntime::Stop(BaseSprite& aSprite, const Animation& /*anAnimation*/)
 	{
 		mySpritesheetData.End(aSprite);
 	}

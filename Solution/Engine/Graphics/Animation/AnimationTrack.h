@@ -41,6 +41,7 @@ namespace Slush
 
 		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData);
 		bool HasClips() const { return !myClips.IsEmpty(); }
+		void RemoveAllClips() { myClips.RemoveAll(); }
 
 		void OnParse(const char* aTrackName, AssetParser::Handle aHandle);
 		void BuildUI(const char* aTrackName, AnimationClip*& outSelectedClip);

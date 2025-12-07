@@ -1,5 +1,6 @@
 Animation 
 { 
+	spritesheettexture Hero_01 
 	outlinetrack 
 	{ 
 	} 
@@ -99,24 +100,6 @@ Animation
 			frameRect 
 			{ 
 				x 384 
-				y 480 
-				width 96 
-				height 96 
-			} 
-		} 
-		clip 
-		{ 
-			starttime 0.333 
-			endtime 0.400 
-			interpolator 
-			{ 
-				startvalue 0.000 
-				endvalue 0.000 
-				type 0 
-			} 
-			frameRect 
-			{ 
-				x 480 
 				y 480 
 				width 96 
 				height 96 

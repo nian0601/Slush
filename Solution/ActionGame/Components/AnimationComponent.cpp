@@ -84,7 +84,7 @@ void AnimationComponent::Update()
 
 		if (runtime->IsFinished())
 		{
-			runtime->Stop(sprite);
+			runtime->Stop(sprite, *anim);
 
 			FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
 			myRunningAnimations[i].myAnimation = nullptr;
@@ -127,7 +127,7 @@ void AnimationComponent::PlayDash(const Vector2f& aTargetPosition)
 	anim.myRuntime = new Slush::AnimationRuntime();
 	anim.myRuntime->myStartPosition = myEntity.myPosition;
 	anim.myRuntime->myEndPosition = aTargetPosition;
-	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite());
+	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
 }
 
 void AnimationComponent::PlayBlink()
@@ -137,7 +137,7 @@ void AnimationComponent::PlayBlink()
 	anim.myRuntime = new Slush::AnimationRuntime();
 	anim.myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
 	anim.myRuntime->myEndColor = 0xFFFF0000;
-	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite());
+	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
 }
 
 void AnimationComponent::PlaySpawn()
@@ -145,7 +145,7 @@ void AnimationComponent::PlaySpawn()
 	RunningAnimation& anim = myRunningAnimations.Add();
 	anim.myAnimation = mySpawnAnimation;
 	anim.myRuntime = new Slush::AnimationRuntime();
-	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite());
+	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
 }
 
 void AnimationComponent::PlaySpritesheetAnimation()
@@ -156,7 +156,7 @@ void AnimationComponent::PlaySpritesheetAnimation()
 	{
 		if (myRunningAnimations[i].myAnimation == mySpritesheetAnimation)
 		{
-			myRunningAnimations[i].myRuntime->Stop(sprite);
+			myRunningAnimations[i].myRuntime->Stop(sprite, *myRunningAnimations[i].myAnimation);
 
 			FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
 			myRunningAnimations[i].myAnimation = nullptr;
@@ -170,7 +170,7 @@ void AnimationComponent::PlaySpritesheetAnimation()
 	anim.myAnimation = mySpritesheetAnimation;
 	anim.myRuntime = new Slush::AnimationRuntime();
 	
-	anim.myRuntime->Start(sprite);
+	anim.myRuntime->Start(sprite, *anim.myAnimation);
 }
 
 void AnimationComponent::ApplyAnimation(Slush::AnimationRuntime& aRuntimeData)

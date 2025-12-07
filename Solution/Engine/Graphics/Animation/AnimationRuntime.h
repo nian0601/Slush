@@ -4,6 +4,7 @@
 
 namespace Slush
 {
+	class Animation;
 	class BaseSprite;
 	class Texture;
 
@@ -37,8 +38,8 @@ namespace Slush
 			Finished,
 		};
 
-		void Start(BaseSprite& aSprite);
-		void Stop(BaseSprite& aSprite);
+		void Start(BaseSprite& aSprite, const Animation& anAnimation);
+		void Stop(BaseSprite& aSprite, const Animation& anAnimation);
 
 		bool IsFinished() const { return myState == Finished; }
 

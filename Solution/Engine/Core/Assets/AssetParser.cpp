@@ -342,7 +342,11 @@ namespace Slush
 		aFileProcessor.Process(myElementName);
 		aFileProcessor.AddNewline();
 
-		aFileProcessor.Process("{");
+		// Process() ends up calling the bool-version if I dont explicitly store the
+		// braces in a FW_String, resulting in '1' being written.
+		// Why? I have no idea.....
+		const FW_String openBrace = "{";
+		aFileProcessor.Process(openBrace);
 		aFileProcessor.IncreaseIndentDepth();
 		
 		for (Field* field : myFields)
@@ -360,7 +364,9 @@ namespace Slush
 
 		aFileProcessor.DecreaseIndentDepth();
 		aFileProcessor.AddNewline();
-		aFileProcessor.Process("}");
+
+		const FW_String closeBrace = "}";
+		aFileProcessor.Process(closeBrace);
 	}
 
 	AssetParser::Field* AssetParser::Element::AddField(const FW_String& aFieldName)

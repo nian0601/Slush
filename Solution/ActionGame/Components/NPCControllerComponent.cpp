@@ -7,17 +7,30 @@
 
 #include <Physics\PhysicsWorld.h>
 #include "AnimationComponent.h"
+#include "Core\Assets\AssetStorage.h"
+#include "Graphics\Animation\Animation.h"
 
 void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
 	aComponentHandle.ParseFloatField("movementspeed", myMovementSpeed);
 	aComponentHandle.ParseFloatField("maxshootingdistance", myMaxShootingDistance);
+	aComponentHandle.ParseStringField("spawnanimation", mySpawnAnimationID);
+
 }
 
 void NPCControllerComponent::Data::OnBuildUI()
 {
 	ImGui::InputFloat("Movement Speed", &myMovementSpeed);
 	ImGui::InputFloat("Shooting Distance", &myMaxShootingDistance);
+	ImGui::InputText("Spawning Animation", &mySpawnAnimationID);
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::Animation>()))
+			mySpawnAnimationID = asset->GetAssetName();
+
+		ImGui::EndDragDropTarget();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -26,18 +39,24 @@ NPCControllerComponent::NPCControllerComponent(Entity& aEntity, const EntityPref
 	: Component(aEntity, anEntityPrefab)
 	, myData(static_cast<const Data&>(*anEntityPrefab.GetComponentBaseData<NPCControllerComponent>()))
 {
+	if (!myData.mySpawnAnimationID.Empty())
+	{
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		mySpawnAnimation = assets.GetAsset<Slush::Animation>(myData.mySpawnAnimationID.GetBuffer());
+	}
 }
 
 void NPCControllerComponent::OnEnterWorld()
 {
+	myHasFinishedSpawning = true;
+
 	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
 	{
-		anim->PlaySpawn();
-		myHasFinishedSpawning = !anim->IsPlayingSpawn();
-	}
-	else
-	{
-		myHasFinishedSpawning = true;
+		if (mySpawnAnimation)
+		{
+			Slush::AnimationRuntime* runtime = anim->PlayAnimation(*mySpawnAnimation);
+			myHasFinishedSpawning = runtime == nullptr;
+		}
 	}
 }
 
@@ -79,6 +98,7 @@ void NPCControllerComponent::Update()
 
 	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
 	{
-		myHasFinishedSpawning = !anim->IsPlayingSpawn();
+		if (mySpawnAnimation)
+			myHasFinishedSpawning = !anim->IsAnimationPlaying(*mySpawnAnimation);
 	}
 }

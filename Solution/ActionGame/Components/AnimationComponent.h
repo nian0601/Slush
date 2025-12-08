@@ -23,17 +23,19 @@ public:
 	void OnEnterWorld() override;
 	void Update() override;
 	bool IsPlayingDash() const;
-	bool IsPlayingSpawn() const;
 
 	void PlayDash(const Vector2f& aTargetPosition);
 	void PlayBlink();
-	void PlaySpawn();
 	void PlaySpritesheetAnimation();
+
+
+	Slush::AnimationRuntime* PlayAnimation(const Slush::Animation& anAnimation);
+	bool IsAnimationPlaying(const Slush::Animation& anAnimation) const;
 
 private:
 	struct RunningAnimation
 	{
-		Slush::Animation* myAnimation = nullptr;
+		const Slush::Animation* myAnimation = nullptr;
 		Slush::AnimationRuntime* myRuntime = nullptr;
 	};
 
@@ -42,6 +44,5 @@ private:
 
 	Slush::Animation* myDashAnimation = nullptr;
 	Slush::Animation* myBlinkAnimation = nullptr;
-	Slush::Animation* mySpawnAnimation = nullptr;
 	Slush::Animation* mySpritesheetAnimation = nullptr;
 };

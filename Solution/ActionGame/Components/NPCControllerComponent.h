@@ -2,6 +2,11 @@
 
 #include "Component.h"
 
+namespace Slush
+{
+	class Animation;
+}
+
 class NPCControllerComponent : public Component
 {
 public:
@@ -12,6 +17,7 @@ public:
 
 		float myMovementSpeed = 100.f;
 		float myMaxShootingDistance = 800.f;
+		FW_String mySpawnAnimationID;
 	};
 
 	COMPONENT_HELPER("NPC Controller", "npccontroller");
@@ -23,7 +29,8 @@ public:
 	void Update() override;
 
 private:
-	bool myHasFinishedSpawning = false;
 	const Data& myData;
+	bool myHasFinishedSpawning = false;
 	float myMaxDistance = 800.f;
+	const Slush::Animation* mySpawnAnimation = nullptr;
 };

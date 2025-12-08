@@ -21,7 +21,6 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	myDashAnimation = assets.GetAsset<Slush::Animation>("Dash");
 	myBlinkAnimation = assets.GetAsset<Slush::Animation>("Blink");
-	mySpawnAnimation = assets.GetAsset<Slush::Animation>("Spawn");
 	mySpritesheetAnimation = assets.GetAsset<Slush::Animation>("SpriteSheet");
 #else
 	myDashAnimation = new Slush::Animation("Dash", Slush::GetAssetID<Slush::Animation>());
@@ -38,17 +37,12 @@ AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anE
 		.Linear(0.1f, 0.f, 1.f)
 		.Linear(0.1f, 1.f, 0.f);
 	
-	mySpawnAnimation = new Slush::Animation("Spawn", Slush::GetAssetID<Slush::Animation>());
-	mySpawnAnimation->myScaleTrack
-		.Linear(0.25f, 0.f, 1.f);
-	
 	mySpritesheetAnimation = new Slush::Animation("SpriteSheet", Slush::GetAssetID<Slush::Animation>());
 	for (int i = 0; i < 6; ++i)
 		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 }, { 96, 96 }, 15.f);
 	
 	myDashAnimation->Save();
 	myBlinkAnimation->Save();
-	mySpawnAnimation->Save();
 	mySpritesheetAnimation->Save();
 #endif
 }
@@ -75,7 +69,7 @@ void AnimationComponent::Update()
 
 	for (int i = 0; i < myRunningAnimations.Count();)
 	{
-		Slush::Animation* anim = myRunningAnimations[i].myAnimation;
+		const Slush::Animation* anim = myRunningAnimations[i].myAnimation;
 		Slush::AnimationRuntime* runtime = myRunningAnimations[i].myRuntime;
 
 		anim->Update(*runtime);
@@ -109,17 +103,6 @@ bool AnimationComponent::IsPlayingDash() const
 	return false;
 }
 
-bool AnimationComponent::IsPlayingSpawn() const
-{
-	for (const RunningAnimation& anim : myRunningAnimations)
-	{
-		if (anim.myAnimation == mySpawnAnimation)
-			return true;
-	}
-
-	return false;
-}
-
 void AnimationComponent::PlayDash(const Vector2f& aTargetPosition)
 {
 	RunningAnimation& anim = myRunningAnimations.Add();
@@ -137,14 +120,6 @@ void AnimationComponent::PlayBlink()
 	anim.myRuntime = new Slush::AnimationRuntime();
 	anim.myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
 	anim.myRuntime->myEndColor = 0xFFFF0000;
-	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
-}
-
-void AnimationComponent::PlaySpawn()
-{
-	RunningAnimation& anim = myRunningAnimations.Add();
-	anim.myAnimation = mySpawnAnimation;
-	anim.myRuntime = new Slush::AnimationRuntime();
 	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
 }
 
@@ -171,6 +146,27 @@ void AnimationComponent::PlaySpritesheetAnimation()
 	anim.myRuntime = new Slush::AnimationRuntime();
 	
 	anim.myRuntime->Start(sprite, *anim.myAnimation);
+}
+
+Slush::AnimationRuntime* AnimationComponent::PlayAnimation(const Slush::Animation& anAnimation)
+{
+	RunningAnimation& anim = myRunningAnimations.Add();
+	anim.myAnimation = &anAnimation;
+	anim.myRuntime = new Slush::AnimationRuntime();
+	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
+
+	return anim.myRuntime;
+}
+
+bool AnimationComponent::IsAnimationPlaying(const Slush::Animation& anAnimation) const
+{
+	for (const RunningAnimation& runningAnim : myRunningAnimations)
+	{
+		if (runningAnim.myAnimation == &anAnimation)
+			return true;
+	}
+
+	return false;
 }
 
 void AnimationComponent::ApplyAnimation(Slush::AnimationRuntime& aRuntimeData)

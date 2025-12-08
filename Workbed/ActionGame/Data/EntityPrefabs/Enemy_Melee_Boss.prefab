@@ -41,6 +41,7 @@ Entity Prefab
 	{ 
 		movementspeed 150.000 
 		maxshootingdistance 800.000 
+		spawnanimation Spawn 
 	} 
 	physics 
 	{ 

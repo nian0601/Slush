@@ -11,7 +11,7 @@ namespace Slush
 		myStartEndTime.y = myStartEndTime.x + aDuration;
 	}
 
-	AnimationClip::State AnimationClip::Update(float anElapsedTime, float& outValue)
+	AnimationClip::State AnimationClip::Update(float anElapsedTime, float& outValue) const
 	{
 		if (anElapsedTime < myStartEndTime.x)
 			return State::NotStarted;
@@ -147,7 +147,7 @@ namespace Slush
 		return *this;
 	}
 
-	bool AnimationTrack::Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData)
+	bool AnimationTrack::Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData) const
 	{
 		if (aTrackData.myCurrentClip >= myClips.Count())
 		{
@@ -220,7 +220,7 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	bool SpritesheetTrack::Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData)
+	bool SpritesheetTrack::Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData) const
 	{
 		if (aTrackData.myCurrentClip >= myClips.Count())
 		{

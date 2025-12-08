@@ -3,7 +3,7 @@
 
 namespace Slush
 {
-	float Interpolator::GetValue(float aProgress)
+	float Interpolator::GetValue(float aProgress) const
 	{
 		if (myType == Linear)
 			return FW_Lerp(myStartValue, myEndValue, aProgress);

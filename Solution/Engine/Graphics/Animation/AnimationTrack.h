@@ -19,7 +19,7 @@ namespace Slush
 
 		void SetStartTimeAndDuration(float aStartTime, float aDuration);
 
-		State Update(float anElapsedTime, float& outValue);
+		State Update(float anElapsedTime, float& outValue) const;
 
 		virtual void OnParse(AssetParser::Handle aHandle);
 		void BuildUI();
@@ -39,7 +39,7 @@ namespace Slush
 		AnimationTrack& Wait(float aDuration);
 		AnimationTrack& Frame(const Vector2i& aFramePosition, const Vector2i& aFrameSize, float aFPS);
 
-		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData);
+		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData) const;
 		bool HasClips() const { return !myClips.IsEmpty(); }
 		void RemoveAllClips() { myClips.RemoveAll(); }
 
@@ -56,6 +56,6 @@ namespace Slush
 	class SpritesheetTrack : public AnimationTrack
 	{
 	public:
-		bool Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData);
+		bool Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData) const;
 	};
 }

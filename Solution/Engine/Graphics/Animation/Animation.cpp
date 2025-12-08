@@ -72,7 +72,7 @@ namespace Slush
 		}
 	}
 
-	void Animation::Update(AnimationRuntime& aRuntimeData)
+	void Animation::Update(AnimationRuntime& aRuntimeData) const
 	{
 		if (aRuntimeData.myState != AnimationRuntime::Running)
 			return;

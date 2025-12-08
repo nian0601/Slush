@@ -4,7 +4,7 @@ namespace Slush
 {
 	struct Interpolator
 	{
-		float GetValue(float aProgress);
+		float GetValue(float aProgress) const;
 
 		void MakeLinear(float aStart, float aEnd);
 		void MakeConstant(float aValue);

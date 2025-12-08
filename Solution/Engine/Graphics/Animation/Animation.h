@@ -19,7 +19,7 @@ namespace Slush
 		void OnParse(AssetParser::Handle aRootHandle);
 		void BuildUI();
 
-		void Update(AnimationRuntime& aRuntimeData);
+		void Update(AnimationRuntime& aRuntimeData) const;
 
 		AnimationTrack myOutlineTrack;
 		AnimationTrack myScaleTrack;

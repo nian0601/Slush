@@ -5,6 +5,7 @@
 
 namespace Slush
 {
+	class Animation;
 	class RectSprite;
 }
 
@@ -26,6 +27,8 @@ public:
 public:
 	HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
+	void OnEnterWorld() override;
+
 	void SetMaxHealth(int aHealth);
 	void DealDamage(int aDamageAmount);
 	void RestoreHealth(int aHealAmount);
@@ -44,4 +47,6 @@ private:
 	float myPadding = 2.f;
 
 	Slush::Timer myGracePeriodTimer;
+
+	const Slush::Animation* myDamageAnimation;
 };

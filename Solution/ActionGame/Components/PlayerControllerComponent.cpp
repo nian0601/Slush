@@ -4,12 +4,24 @@
 #include "HealthComponent.h"
 #include "PhysicsComponent.h"
 #include "PlayerControllerComponent.h"
-
-#include <Core\Engine.h>
-#include <Core\Input.h>
-#include <Physics\PhysicsWorld.h>
 #include "SpriteComponent.h"
-#include <Graphics\BaseSprite.h>
+
+#include "Core\Engine.h"
+#include "Core\Input.h"
+#include "Core\Assets\AssetStorage.h"
+#include "Physics\PhysicsWorld.h"
+#include "Graphics\BaseSprite.h"
+#include "Graphics\Animation\Animation.h"
+#include "Graphics\Animation\AnimationRuntime.h"
+
+
+void PlayerControllerComponent::OnEnterWorld()
+{
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	myDashAnimation = assets.GetAsset<Slush::Animation>("Dash");
+	myBlinkAnimation = assets.GetAsset<Slush::Animation>("Blink");
+	mySpriteSheetAnimation = assets.GetAsset<Slush::Animation>("SpriteSheet");
+}
 
 void PlayerControllerComponent::PrePhysicsUpdate()
 {
@@ -43,12 +55,18 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 		}
 
 		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
-			anim->PlayDash(myEntity.myPosition + myDirection * 500.f);
-
+		{
+			Slush::AnimationRuntime* animData = anim->PlayAnimation(*myDashAnimation);
+			animData->myEndPosition = myEntity.myPosition + myDirection * 500.f;
+		}
+		
 		if (anim && input.WasKeyPressed(Slush::Input::Q))
-			anim->PlayBlink();
-
+		{
+			Slush::AnimationRuntime* animData = anim->PlayAnimation(*myBlinkAnimation);
+			animData->myEndColor = 0xFFFF0000;
+		}
+			
 		if (anim && input.WasKeyPressed(Slush::Input::V))
-			anim->PlaySpritesheetAnimation();
+			anim->PlayAnimation(*mySpriteSheetAnimation);
 	}
 }

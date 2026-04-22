@@ -31,6 +31,12 @@ HealthComponent::HealthComponent(Entity& anEntity, const EntityPrefab& anEntityP
 		myGracePeriodTimer.Start(0.f);
 }
 
+void HealthComponent::OnEnterWorld()
+{
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	myDamageAnimation = assets.GetAsset<Slush::Animation>("Blink");
+}
+
 void HealthComponent::SetMaxHealth(int aHealth)
 {
 	myMaxHealth = aHealth;
@@ -61,7 +67,10 @@ void HealthComponent::DealDamage(int aDamageAmount)
 	damageTaken.myNewHealth = myCurrentHealth;
 
 	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
-		anim->PlayBlink();
+	{
+		Slush::AnimationRuntime* animData = anim->PlayAnimation(*myDamageAnimation);
+		animData->myEndColor = 0xFFFF0000;
+	}
 
 	if (HealthBarComponent* healthBar = myEntity.GetComponent<HealthBarComponent>())
 		healthBar->OnDamageTaken(damageTaken);

@@ -103,56 +103,39 @@ bool AnimationComponent::IsPlayingDash() const
 	return false;
 }
 
-void AnimationComponent::PlayDash(const Vector2f& aTargetPosition)
-{
-	RunningAnimation& anim = myRunningAnimations.Add();
-	anim.myAnimation = myDashAnimation;
-	anim.myRuntime = new Slush::AnimationRuntime();
-	anim.myRuntime->myStartPosition = myEntity.myPosition;
-	anim.myRuntime->myEndPosition = aTargetPosition;
-	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
-}
-
-void AnimationComponent::PlayBlink()
-{
-	RunningAnimation& anim = myRunningAnimations.Add();
-	anim.myAnimation = myBlinkAnimation;
-	anim.myRuntime = new Slush::AnimationRuntime();
-	anim.myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
-	anim.myRuntime->myEndColor = 0xFFFF0000;
-	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
-}
-
 void AnimationComponent::PlaySpritesheetAnimation()
 {
-	Slush::BaseSprite& sprite = myEntity.GetComponent<SpriteComponent>()->GetSprite();
-
-	for (int i = 0; i < myRunningAnimations.Count(); ++i)
-	{
-		if (myRunningAnimations[i].myAnimation == mySpritesheetAnimation)
-		{
-			myRunningAnimations[i].myRuntime->Stop(sprite, *myRunningAnimations[i].myAnimation);
-
-			FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
-			myRunningAnimations[i].myAnimation = nullptr;
-			myRunningAnimations[i].myRuntime = nullptr;
-			myRunningAnimations.RemoveCyclicAtIndex(i);
-			break;
-		}
-	}
-
-	RunningAnimation& anim = myRunningAnimations.Add();
-	anim.myAnimation = mySpritesheetAnimation;
-	anim.myRuntime = new Slush::AnimationRuntime();
-	
-	anim.myRuntime->Start(sprite, *anim.myAnimation);
+	PlayAnimation(*mySpritesheetAnimation);
 }
 
 Slush::AnimationRuntime* AnimationComponent::PlayAnimation(const Slush::Animation& anAnimation)
 {
+	Slush::BaseSprite& sprite = myEntity.GetComponent<SpriteComponent>()->GetSprite();
+
+	if (anAnimation.mySpritesheetTrack.HasClips())
+	{
+		for (int i = 0; i < myRunningAnimations.Count(); ++i)
+		{
+			if (myRunningAnimations[i].myAnimation->mySpritesheetTrack.HasClips())
+			{
+				myRunningAnimations[i].myRuntime->Stop(sprite, *myRunningAnimations[i].myAnimation);
+
+				FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
+				myRunningAnimations[i].myAnimation = nullptr;
+				myRunningAnimations[i].myRuntime = nullptr;
+				myRunningAnimations.RemoveCyclicAtIndex(i);
+				break;
+			}
+		}
+	}
+
 	RunningAnimation& anim = myRunningAnimations.Add();
 	anim.myAnimation = &anAnimation;
 	anim.myRuntime = new Slush::AnimationRuntime();
+	anim.myRuntime->myStartPosition = myEntity.myPosition;
+	anim.myRuntime->myEndPosition = myEntity.myPosition;
+	anim.myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
+	anim.myRuntime->myEndColor = anim.myRuntime->myStartColor;
 	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
 
 	return anim.myRuntime;

@@ -24,8 +24,6 @@ public:
 	void Update() override;
 	bool IsPlayingDash() const;
 
-	void PlayDash(const Vector2f& aTargetPosition);
-	void PlayBlink();
 	void PlaySpritesheetAnimation();
 
 

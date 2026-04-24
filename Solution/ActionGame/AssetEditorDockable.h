@@ -19,7 +19,7 @@ private:
 	void HandleCreatingNewAsset();
 	void HandleSavingAsNewAsset();
 
-	bool VerifyUniqueNameForNewAsset() const;
+	bool VerifyUniqueNameForNewAsset(bool aIsSaveAsNew) const;
 
 	Slush::Asset* mySelectedAsset = nullptr;
 
@@ -31,6 +31,7 @@ private:
 	FW_GrowingArray<AssetData> myAssets;
 
 	FW_String myNewAssetNameStorage;
+	int myNewAssetStorageIndex = 0;
 	bool myHasUniqueAssetName = false;
 
 	bool myWantToOpenNewAssetDialogue = false;

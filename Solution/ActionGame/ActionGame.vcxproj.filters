@@ -84,6 +84,8 @@
     <ClCompile Include="AssetEditorDockable.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="CharacterAnimationSet.cpp" />
+    <ClCompile Include="Components\CharacterAnimationComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -177,6 +179,8 @@
     <ClInclude Include="AssetEditorDockable.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="CharacterAnimationSet.h" />
+    <ClInclude Include="Components\CharacterAnimationComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

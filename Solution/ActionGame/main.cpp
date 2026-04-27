@@ -1,23 +1,26 @@
 #include "stdafx.h"
 
-#include "Core/IApp.h"
 #include "Core/Assets/AssetStorage.h"
+#include "Core/IApp.h"
+#include "Core/Input.h"
 
+#include "EntitySystem/EntityManager.h"
+#include "EntitySystem/EntityPrefab.h"
+
+#include "Graphics/Animation/Animation.h"
 #include "Graphics/Font.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Window.h"
+
+#include "Level/LevelData.h"
+
+#include "UI/UILayout.h"
 
 #include "ActionGameGlobals.h"
 #include "AssetEditorDockable.h"
-#include "EntitySystem/EntityManager.h"
-#include "GameLayout.h"
+#include "CharacterAnimationSet.h"
 #include "EntityEditorLayout.h"
-#include <Core/Input.h>
-#include <Graphics/Window.h>
-
-#include "Level/LevelData.h"
-#include <EntitySystem/EntityPrefab.h>
-#include <UI/UILayout.h>
-#include <Graphics/Texture.h>
-#include <Graphics/Animation/Animation.h>
+#include "GameLayout.h"
 
 class App : public Slush::IApp
 {
@@ -25,13 +28,14 @@ public:
 	void Initialize() override
 	{
 		EntityManager::RegisterComponents();
-	
+
 		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 		assets.RegisterAssetType<EntityPrefab>();
 		assets.RegisterAssetType<Slush::UILayout>();
 		assets.RegisterAssetType<Slush::Texture>();
 		assets.RegisterAssetType<LevelData>();
 		assets.RegisterAssetType<Slush::Animation>();
+		assets.RegisterAssetType<CharacterAnimationSet>();
 		assets.LoadAllAssets();
 
 		myFont.Load("Data/NotoSans.ttf");

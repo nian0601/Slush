@@ -8,6 +8,7 @@
 #include "FW_TypeID.h"
 
 #include "Components/AnimationComponent.h"
+#include "Components/CharacterAnimationComponent.h"
 #include "Components/ExperienceComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/NPCControllerComponent.h"
@@ -46,6 +47,7 @@ void EntityManager::RegisterComponents()
 	registry.RegisterComponent<HealthBarComponent>();
 	registry.RegisterComponent<TimedRemovalComponent, TimedRemovalComponent::Data>();
 	registry.RegisterComponent<DropComponent, DropComponent::Data>();
+	registry.RegisterComponent<CharacterAnimationComponent, CharacterAnimationComponent::Data>();
 }
 
 EntityManager::EntityManager()

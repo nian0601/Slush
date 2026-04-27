@@ -43,7 +43,9 @@ namespace Slush
 
 	void Animation::BuildUI()
 	{
-		if (ImGui::BeginTimeline("AnimTimeline", 1.f))
+		FW_String timelineLable = "AnimTimeLine##";
+		timelineLable += GetAssetName();
+		if (ImGui::BeginTimeline(timelineLable.GetBuffer(), 1.f))
 		{
 			myOutlineTrack.BuildUI("Outline", myToolData.mySelectedClip);
 			myScaleTrack.BuildUI("Scale", myToolData.mySelectedClip);

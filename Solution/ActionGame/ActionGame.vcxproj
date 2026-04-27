@@ -139,7 +139,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ActionGameGlobals.cpp" />
+    <ClCompile Include="CharacterAnimationSet.cpp" />
     <ClCompile Include="Components\AnimationComponent.cpp" />
+    <ClCompile Include="Components\CharacterAnimationComponent.cpp" />
     <ClCompile Include="Components\Component.cpp" />
     <ClCompile Include="Components\DropComponent.cpp" />
     <ClCompile Include="EntitySystem\ComponentRegistry.cpp" />
@@ -175,8 +177,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ActionGameGlobals.h" />
+    <ClInclude Include="CharacterAnimationSet.h" />
     <ClInclude Include="Components\AnimationComponent.h" />
     <ClInclude Include="AppLayout.h" />
+    <ClInclude Include="Components\CharacterAnimationComponent.h" />
     <ClInclude Include="Components\Component.h" />
     <ClInclude Include="Components\DropComponent.h" />
     <ClInclude Include="EntitySystem\ComponentRegistry.h" />

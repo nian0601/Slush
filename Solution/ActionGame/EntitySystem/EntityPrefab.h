@@ -64,6 +64,9 @@ public:
 	template <typename ComponentType>
 	const Component::BaseData* GetComponentBaseData() const;
 
+	template <typename ComponentType>
+	const ComponentType::Data& GetComponentData() const;
+
 	const SpriteComponent::Data& GetSpriteData() const;
 	const ProjectileShootingComponent::Data& GetProjectileShootingData() const;
 	const HealthComponent::Data& GetHealthData() const;
@@ -91,4 +94,11 @@ const Component::BaseData* EntityPrefab::GetComponentBaseData() const
 {
 	unsigned int id = GetComponentID<ComponentType>();
 	return myComponentBaseDatas[id];
+}
+
+template <typename ComponentType>
+const ComponentType::Data& EntityPrefab::GetComponentData() const
+{
+	const Component::BaseData* data = GetComponentBaseData<ComponentType>();
+	return reinterpret_cast<const ComponentType::Data&>(*data);
 }

@@ -114,6 +114,47 @@ namespace FW_FileSystem
 		return true;
 	}
 
+	void CreateFolderIfNecessary(const FW_String aFilePath)
+	{
+		FW_GrowingArray<FW_String> words;
+		SplitLine(aFilePath, "/", words);
+
+		// If the last word is a filename, then remove it so we dont make a folder out of it
+		FW_String extention;
+		GetFileExtention(words.GetLast(), extention);
+		if (!extention.Empty())
+			words.RemoveLast();
+
+		int dataFolderIndex = -1;
+		for (int i = words.Count() - 1; i >= 0; i--)
+		{
+			if (words[i] == "data")
+			{
+				dataFolderIndex = i;
+				break;
+			}
+		}
+
+		FW_ASSERT(dataFolderIndex != -1, "Failed to find Data-folder, where are you trying to create folders?");
+
+		FW_String pathToCreate;
+		GetAbsoluteFilePath(words[dataFolderIndex], pathToCreate);
+
+		bool success = CreateDirectoryA(pathToCreate.GetBuffer(), NULL);
+		if (!success && GetLastError() != ERROR_ALREADY_EXISTS)
+			FW_ASSERT_ALWAYS;
+
+		for (int i = dataFolderIndex + 1; i < words.Count(); ++i)
+		{
+			pathToCreate += "/";
+			pathToCreate += words[i];
+			success = CreateDirectoryA(pathToCreate.GetBuffer(), NULL);
+
+			if (!success && GetLastError() != ERROR_ALREADY_EXISTS)
+				FW_ASSERT_ALWAYS;
+		}
+	}
+
 	void GetFileName(const FW_String& aFilePath, FW_String& aNameOut)
 	{
 		int findIndex = aFilePath.RFind("/");
@@ -136,6 +177,9 @@ namespace FW_FileSystem
 	void GetFileExtention(const FW_String& aFilePath, FW_String& aExtentionOut)
 	{
 		int findIndex = aFilePath.RFind(".");
+		if (findIndex == -1)
+			return;
+
 		aExtentionOut = aFilePath.SubStr(findIndex + 1, aFilePath.Length());
 	}
 

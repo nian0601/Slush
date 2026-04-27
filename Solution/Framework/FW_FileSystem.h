@@ -33,6 +33,8 @@ namespace FW_FileSystem
 	bool GetAllFilesFromRelativeDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);
 	bool GetAllFilesFromAbsoluteDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);
 
+	void CreateFolderIfNecessary(const FW_String aFilePath);
+
 	void GetFileName(const FW_String& aFilePath, FW_String& aNameOut);
 	void GetFileNameNoExtention(const FW_String& aFilePath, FW_String& aNameOut);
 	void RemoveFileName(const FW_String& aFilePath, FW_String& aFilePathOut);

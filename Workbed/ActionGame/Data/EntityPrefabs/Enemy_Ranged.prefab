@@ -8,7 +8,7 @@ Entity Prefab
 	{ 
 		radius 20.000 
 		color -1 
-		textureID Enemy_001_A 
+		textureID Enemy_003_A 
 		size 
 		{ 
 			width 96.000 
@@ -82,5 +82,9 @@ Entity Prefab
 			weight 24 
 			prefab Pickup_Health_Small 
 		} 
+	} 
+	characteranimation 
+	{ 
+		animationSetID ranged_enemy_animations 
 	} 
 } 

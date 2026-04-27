@@ -76,4 +76,8 @@ Entity Prefab
 			prefab Pickup_Health_Small 
 		} 
 	} 
+	characteranimation 
+	{ 
+		animationSetID melee_enemy_animation_b 
+	} 
 } 

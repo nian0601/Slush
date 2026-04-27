@@ -231,7 +231,7 @@ namespace Slush
 	{
 		int assetID = GetAssetID<AssetType>();
 		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
-		return static_cast<AssetType*>(myAssetStorages[assetID]->GetAsset(aAssetName));
+		return reinterpret_cast<AssetType*>(myAssetStorages[assetID]->GetAsset(aAssetName));
 	}
 
 	template <typename AssetType>

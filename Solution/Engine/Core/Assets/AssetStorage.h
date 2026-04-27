@@ -58,6 +58,8 @@ namespace Slush
 	template<typename AssetType>
 	AssetStorage<AssetType>::AssetStorage()
 	{
+		FW_FileSystem::CreateFolderIfNecessary(AssetType::GetAssetTypeFolder());
+
 		myAssetTypeID = GetAssetID<AssetType>();
 	}
 

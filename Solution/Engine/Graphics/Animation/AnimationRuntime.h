@@ -44,6 +44,8 @@ namespace Slush
 		bool IsFinished() const { return myState == Finished; }
 
 		State myState = NotStarted;
+		bool myIsLooping = false;
+
 		float myElapsedTime = 0.f;
 
 		AnimationRuntimeTrackData myOutlineData;

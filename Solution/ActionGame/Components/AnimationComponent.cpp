@@ -80,10 +80,18 @@ void AnimationComponent::Update()
 		{
 			runtime->Stop(sprite, *anim);
 
-			FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
-			myRunningAnimations[i].myAnimation = nullptr;
-			myRunningAnimations[i].myRuntime = nullptr;
-			myRunningAnimations.RemoveCyclicAtIndex(i);
+			if (runtime->myIsLooping)
+			{
+				InitRuntime(myRunningAnimations[i]);
+				++i;
+			}
+			else
+			{
+				FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
+				myRunningAnimations[i].myAnimation = nullptr;
+				myRunningAnimations[i].myRuntime = nullptr;
+				myRunningAnimations.RemoveCyclicAtIndex(i);
+			}
 		}
 		else
 		{
@@ -108,7 +116,7 @@ void AnimationComponent::PlaySpritesheetAnimation()
 	PlayAnimation(*mySpritesheetAnimation);
 }
 
-Slush::AnimationRuntime* AnimationComponent::PlayAnimation(const Slush::Animation& anAnimation)
+Slush::AnimationRuntime* AnimationComponent::PlayAnimation(const Slush::Animation& anAnimation, bool aOverrideSpriteSheetAnimation /*= true*/)
 {
 	Slush::BaseSprite& sprite = myEntity.GetComponent<SpriteComponent>()->GetSprite();
 
@@ -118,6 +126,9 @@ Slush::AnimationRuntime* AnimationComponent::PlayAnimation(const Slush::Animatio
 		{
 			if (myRunningAnimations[i].myAnimation->mySpritesheetTrack.HasClips())
 			{
+				if (!aOverrideSpriteSheetAnimation)
+					return nullptr;
+
 				myRunningAnimations[i].myRuntime->Stop(sprite, *myRunningAnimations[i].myAnimation);
 
 				FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
@@ -132,11 +143,7 @@ Slush::AnimationRuntime* AnimationComponent::PlayAnimation(const Slush::Animatio
 	RunningAnimation& anim = myRunningAnimations.Add();
 	anim.myAnimation = &anAnimation;
 	anim.myRuntime = new Slush::AnimationRuntime();
-	anim.myRuntime->myStartPosition = myEntity.myPosition;
-	anim.myRuntime->myEndPosition = myEntity.myPosition;
-	anim.myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
-	anim.myRuntime->myEndColor = anim.myRuntime->myStartColor;
-	anim.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *anim.myAnimation);
+	InitRuntime(anim);
 
 	return anim.myRuntime;
 }
@@ -178,4 +185,13 @@ void AnimationComponent::ApplyAnimation(Slush::AnimationRuntime& aRuntimeData)
 		const Recti& texRect = aRuntimeData.mySpritesheetData.myFrameRect;
 		sprite.SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
 	}
+}
+
+void AnimationComponent::InitRuntime(RunningAnimation& aRunningAnimation) const
+{
+	aRunningAnimation.myRuntime->myStartPosition = myEntity.myPosition;
+	aRunningAnimation.myRuntime->myEndPosition = myEntity.myPosition;
+	aRunningAnimation.myRuntime->myStartColor = myEntity.GetComponent<SpriteComponent>()->GetSprite().GetFillColor();
+	aRunningAnimation.myRuntime->myEndColor = aRunningAnimation.myRuntime->myStartColor;
+	aRunningAnimation.myRuntime->Start(myEntity.GetComponent<SpriteComponent>()->GetSprite(), *aRunningAnimation.myAnimation);
 }

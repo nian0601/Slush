@@ -27,7 +27,7 @@ public:
 	void PlaySpritesheetAnimation();
 
 
-	Slush::AnimationRuntime* PlayAnimation(const Slush::Animation& anAnimation);
+	Slush::AnimationRuntime* PlayAnimation(const Slush::Animation& anAnimation, bool aOverrideSpriteSheetAnimation = true);
 	bool IsAnimationPlaying(const Slush::Animation& anAnimation) const;
 
 private:
@@ -39,6 +39,8 @@ private:
 
 	FW_GrowingArray<RunningAnimation> myRunningAnimations;
 	void ApplyAnimation(Slush::AnimationRuntime& aRuntimeData);
+
+	void InitRuntime(RunningAnimation& aRunningAnimation) const;
 
 	Slush::Animation* myDashAnimation = nullptr;
 	Slush::Animation* myBlinkAnimation = nullptr;

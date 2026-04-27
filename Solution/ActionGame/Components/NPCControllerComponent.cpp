@@ -9,6 +9,9 @@
 #include "AnimationComponent.h"
 #include "Core\Assets\AssetStorage.h"
 #include "Graphics\Animation\Animation.h"
+#include "CharacterAnimationComponent.h"
+#include "SpriteComponent.h"
+#include "Graphics\BaseSprite.h"
 
 void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -76,18 +79,39 @@ void NPCControllerComponent::PrePhysicsUpdate()
 	if (!target.IsValid())
 		return;
 
+	CharacterAnimationComponent* characterAnimation = myEntity.GetComponent<CharacterAnimationComponent>();
+
 	Vector2f toTarget = target.Get()->myPosition - myEntity.myPosition;
 
 	if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
 	{
-		phys->myObject->myVelocity = GetNormalized(toTarget) * myData.myMovementSpeed;
+		Vector2f direction = GetNormalized(toTarget);
+		phys->myObject->myVelocity = direction * myData.myMovementSpeed;
+
+		if (characterAnimation)
+			characterAnimation->PlayMovementAnimation();
+
+		if (SpriteComponent* sprite = myEntity.GetComponent<SpriteComponent>())
+		{
+			if (direction.x > 0.f)
+				sprite->GetSprite().SetHorizontalFlip(false);
+			else if (direction.x < 0.f)
+				sprite->GetSprite().SetHorizontalFlip(true);
+		}
 	}
 
 	if (ProjectileShootingComponent* projShooter = myEntity.GetComponent<ProjectileShootingComponent>())
 	{
 		float distance = Length(toTarget);
-		if (distance < myData.myMaxShootingDistance)
-			projShooter->TryShoot(GetNormalized(toTarget));
+		if (distance > myData.myMaxShootingDistance)
+			return;
+
+		bool success = projShooter->TryShoot(GetNormalized(toTarget));
+		if (!success)
+			return;
+
+		if (characterAnimation)
+			characterAnimation->PlayAttackAnimation();
 	}
 }
 

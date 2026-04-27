@@ -26,7 +26,7 @@ public:
 
 	ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
-	void TryShoot(const Vector2f& aDirection);
+	bool TryShoot(const Vector2f& aDirection);
 	void TriggerCooldown();
 
 private:

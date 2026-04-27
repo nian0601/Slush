@@ -46,10 +46,10 @@ ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const
 {
 }
 
-void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
+bool ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 {
 	if (Slush::Time::GetCurrentExactTime() < myShootingReadyTimestamp)
-		return;
+		return false;
 
 	TriggerCooldown();
 
@@ -59,6 +59,8 @@ void ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 	Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, shootingData.myProjectileEntityPrefab.GetBuffer());
 	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
 	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+
+	return true;
 }
 
 void ProjectileShootingComponent::TriggerCooldown()

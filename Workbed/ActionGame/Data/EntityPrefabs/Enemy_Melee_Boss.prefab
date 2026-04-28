@@ -71,4 +71,8 @@ Entity Prefab
 			prefab Pickup_Exp_Big 
 		} 
 	} 
+	characteranimation 
+	{ 
+		animationSetID enemy_melee_boss_animations 
+	} 
 } 

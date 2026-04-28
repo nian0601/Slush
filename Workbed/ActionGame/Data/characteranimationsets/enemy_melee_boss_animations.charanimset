@@ -2,7 +2,7 @@ CharacterAnimationSet
 { 
 	walkanimation 
 	{ 
-		spritesheettexture Enemy_001_A 
+		spritesheettexture Enemy_002_B 
 		outlinetrack 
 		{ 
 		} 

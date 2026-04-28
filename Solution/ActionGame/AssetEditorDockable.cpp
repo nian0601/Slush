@@ -11,8 +11,6 @@ AssetEditorDockable::AssetEditorDockable()
 	: Dockable(false)
 	, myNewAssetNameStorage("")
 {
-	Slush::Animation* anim = Slush::AssetRegistry::GetInstance().GetAsset<Slush::Animation>("Dash");
-	myAssets.Add({ anim, true });
 }
 
 void AssetEditorDockable::OnUpdate()

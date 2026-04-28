@@ -8,13 +8,15 @@
 namespace Slush
 {
 	struct AnimationRuntime;
+	class RectSprite;
 	class Texture;
 
 	class Animation : public DataAsset
 	{
 	public:
 		DEFINE_ASSET("Animation", "anim", "data/animations");
-		using DataAsset::DataAsset;
+		Animation(const char* aName, unsigned int aAssetID);
+		~Animation();
 
 		void OnParse(AssetParser::Handle aRootHandle);
 		void BuildUI();
@@ -31,6 +33,7 @@ namespace Slush
 	private:
 		void HandleSpritesheetImport();
 		void HandleTextureInteraction();
+		void HandlePreview();
 
 		struct ToolData
 		{
@@ -42,7 +45,11 @@ namespace Slush
 			bool myShowFullTexture = false;
 			Vector2i myStartFrameIndex = { -1, -1 };
 			Vector2i myEndFrameIndex = { -1, -1 };
+			int myFPS = 15;
 			AnimationClip* mySelectedClip = nullptr;
+
+			AnimationRuntime* myRuntime = nullptr;
+			RectSprite* myPreviewSprite = nullptr;
 		};
 		ToolData myToolData;
 		

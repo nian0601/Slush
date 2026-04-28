@@ -3,12 +3,28 @@
 #include "Graphics/Animation/Animation.h"
 #include "Graphics/Animation/AnimationRuntime.h"
 #include "Graphics/BaseSprite.h"
+#include "Graphics/RectSprite.h"
 #include "Graphics/Texture.h"
 #include "Core/Assets/AssetStorage.h"
 #include "Core/Time.h"
 
 namespace Slush
 {
+
+	Animation::Animation(const char* aName, unsigned int aAssetID)
+		: DataAsset(aName, aAssetID)
+	{
+		myToolData.myRuntime = new AnimationRuntime();
+		myToolData.myPreviewSprite = new RectSprite();
+		myToolData.myPreviewSprite->SetSize(98.f, 98.f);
+	}
+
+	Animation::~Animation()
+	{
+		FW_SAFE_DELETE(myToolData.myPreviewSprite);
+		FW_SAFE_DELETE(myToolData.myRuntime);
+	}
+
 	void Animation::OnParse(AssetParser::Handle aRootHandle)
 	{
 		myOutlineTrack.OnParse("outlinetrack", aRootHandle);
@@ -43,6 +59,8 @@ namespace Slush
 
 	void Animation::BuildUI()
 	{
+		HandlePreview();
+
 		FW_String timelineLable = "AnimTimeLine##";
 		timelineLable += GetAssetName();
 		if (ImGui::BeginTimeline(timelineLable.GetBuffer(), 1.f))
@@ -136,7 +154,7 @@ namespace Slush
 							startEndX.y = myToolData.myFrameCount.x;
 
 						for (int x = startEndX.x; x < startEndX.y; ++x)
-							mySpritesheetTrack.Frame({ x, y }, myToolData.myFrameSize, 15.f);
+							mySpritesheetTrack.Frame({ x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
 					}
 
 					myTexture = myToolData.myTextureToImport;
@@ -147,6 +165,9 @@ namespace Slush
 					ImGui::SetItemTooltip("Select Start and EndFrame to import");
 
 				ImGui::EndDisabled();
+
+				ImGui::SetNextItemWidth(150.f);
+				ImGui::DragInt("FPS", &myToolData.myFPS, 1, 1);
 
 				ImGui::Separator();
 
@@ -260,4 +281,60 @@ namespace Slush
 			}
 		}
 	}
+
+	void Animation::HandlePreview()
+	{
+		if (!mySpritesheetTrack.HasClips())
+			return;
+
+		FW_ASSERT(myTexture);
+
+		ImGui::BeginDisabled(myToolData.myRuntime->myState != AnimationRuntime::NotStarted);
+		if (ImGui::Button("Start"))
+		{
+			myToolData.myRuntime->Start(*myToolData.myPreviewSprite, *this);
+			myToolData.myRuntime->myIsLooping = true;
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+
+		ImGui::BeginDisabled(myToolData.myRuntime->myState == AnimationRuntime::NotStarted);
+		if (ImGui::Button("Stop"))
+		{
+			myToolData.myRuntime->Stop(*myToolData.myPreviewSprite, *this);
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+
+		ImGui::Checkbox("Loop", &myToolData.myRuntime->myIsLooping);
+
+		
+
+		Recti frameRect = mySpritesheetTrack.GetFirstClip()->myFrameRect;
+
+		if (myToolData.myRuntime->myState != AnimationRuntime::NotStarted)
+		{
+			frameRect = myToolData.myRuntime->mySpritesheetData.myFrameRect;
+
+			if (myToolData.myRuntime->IsFinished() && myToolData.myRuntime->myIsLooping)
+			{
+				myToolData.myRuntime->Start(*myToolData.myPreviewSprite, *this);
+			}
+		}
+
+		Update(*myToolData.myRuntime);
+
+		const float width = static_cast<float>(myToolData.myPreviewSprite->GetSize().x);
+		const float height = static_cast<float>(myToolData.myPreviewSprite->GetSize().y);
+
+		sf::FloatRect rect;
+		rect.position.x = static_cast<float>(frameRect.myTopLeft.x);
+		rect.position.y = static_cast<float>(frameRect.myTopLeft.y);
+		rect.size.y = static_cast<float>(frameRect.myExtents.x);
+		rect.size.x = static_cast<float>(frameRect.myExtents.y);
+		ImGui::Image(*myTexture->GetSFMLTexture(), { width, height }, rect);
+	}
+
 }

@@ -163,6 +163,12 @@ namespace Slush
 		return true;
 	}
 
+	void AnimationTrack::RemoveAllClips()
+	{
+		myClips.RemoveAll();
+		myEndTime = 0.f;
+	}
+
 	void AnimationTrack::OnParse(const char* aTrackName, AssetParser::Handle aHandle)
 	{
 		AssetParser::Handle trackHandle = aHandle.ParseChildElement(aTrackName);
@@ -238,4 +244,13 @@ namespace Slush
 		aTrackData.myIsActive = state != AnimationClip::State::NotStarted;
 		return true;
 	}
+
+	const Slush::AnimationClip* SpritesheetTrack::GetFirstClip() const
+	{
+		if (myClips.IsEmpty())
+			return nullptr;
+
+		return &myClips[0];
+	}
+
 }

@@ -57,6 +57,7 @@ namespace Slush
 
 	void AnimationRuntime::Stop(BaseSprite& aSprite, const Animation& /*anAnimation*/)
 	{
+		myState = NotStarted;
 		mySpritesheetData.End(aSprite);
 	}
 }

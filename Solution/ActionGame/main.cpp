@@ -73,6 +73,23 @@ public:
 			window.SetAppLayout("Entity");
 			myAppLayout = new EntityEditorLayout();
 		}
+		else if (input.WasKeyReleased(Slush::Input::KeyCode::_3))
+		{
+			SLUSH_INFO("SOME INFO");
+		}
+		else if (input.WasKeyReleased(Slush::Input::KeyCode::_4))
+		{
+			SLUSH_DEBUG("SOME DEBUG");
+		}
+		else if (input.WasKeyReleased(Slush::Input::KeyCode::_5))
+		{
+			SLUSH_WARNING("SOME WARNING");
+		}
+		else if (input.WasKeyReleased(Slush::Input::KeyCode::_6))
+		{
+			SLUSH_ERROR("SOME ERROR");
+		}
+
 
 
 		myAppLayout->Update();

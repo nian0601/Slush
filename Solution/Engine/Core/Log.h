@@ -27,7 +27,7 @@ namespace Slush
 			case Slush::Logger::INFO:
 				return 0xFF10E07C;
 			case Slush::Logger::DEBUG:
-				return 0xFFFFFF;
+				return 0xFFFFFFFF;
 			case Slush::Logger::WARNING:
 				return 0xFFE6D30B;
 			case Slush::Logger::ERROR:
@@ -41,6 +41,23 @@ namespace Slush
 		{
 			int color = GetSeverityColor(aSeverity);
 			return FW_ARGB_To_Vector(color);
+		}
+
+		static const char* GetSeverityText(Severity aSeverity)
+		{
+			switch (aSeverity)
+			{
+			case Slush::Logger::INFO:
+				return "INFO";
+			case Slush::Logger::DEBUG:
+				return "DEBUG";
+			case Slush::Logger::WARNING:
+				return "WARN";
+			case Slush::Logger::ERROR:
+				return "ERROR";
+			}
+
+			return "UNKNOWN";
 		}
 
 		struct LogEntry

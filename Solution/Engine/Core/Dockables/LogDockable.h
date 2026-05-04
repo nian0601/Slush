@@ -11,5 +11,11 @@ namespace Slush
 
 	protected:
 		void OnBuildUI() override;
+		bool myShowInfo = false;
+		bool myShowDebug = true;
+		bool myShowWarning = true;
+		bool myShowError = true;
+
+		bool myTrackLatestMessage = true;
 	};
 }

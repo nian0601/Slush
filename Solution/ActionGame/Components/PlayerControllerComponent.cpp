@@ -13,6 +13,8 @@
 #include "Graphics\BaseSprite.h"
 #include "Graphics\Animation\Animation.h"
 #include "Graphics\Animation\AnimationRuntime.h"
+#include "ActionGameGlobals.h"
+#include "EntitySystem\EntityManager.h"
 
 
 void PlayerControllerComponent::OnEnterWorld()
@@ -62,8 +64,10 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 		
 		if (anim && input.WasKeyPressed(Slush::Input::Q))
 		{
-			Slush::AnimationRuntime* animData = anim->PlayAnimation(*myBlinkAnimation);
-			animData->myEndColor = 0xFFFF0000;
+			//Slush::AnimationRuntime* animData = anim->PlayAnimation(*myBlinkAnimation);
+			//animData->myEndColor = 0xFFFF0000;
+
+			ActionGameGlobals::GetInstance().GetEntityManager().CreateEntity(myEntity.myPosition, "Magic_Spawn_Large");
 		}
 			
 		if (anim && input.WasKeyPressed(Slush::Input::V))

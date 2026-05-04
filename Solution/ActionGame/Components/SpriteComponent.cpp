@@ -75,6 +75,8 @@ void SpriteComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 	else if (mySpriteType == SpriteType::Animated)
 	{
 		Slush::AssetParser::Handle animationHandle = aComponentHandle.ParseChildElement("animation");
+		animationHandle.ParseBoolField("islooping", myLoopAnimation);
+		animationHandle.ParseBoolField("removeentityafteranimation", myRemoveEntityAfterAnimation);
 		myAnimation->OnParse(animationHandle);
 	}
 }
@@ -188,6 +190,16 @@ SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityP
 		Slush::RectSprite* rect = static_cast<Slush::RectSprite*>(mySprite);
 		rect->SetOutlineColor(0xFF000000);
 		rect->SetOutlineThickness(0.f);
+
+		if (const Slush::AnimationClip* clip = myAnimation->mySpritesheetTrack.GetFirstClip())
+		{
+			Recti texRect = clip->myFrameRect;
+			mySprite->SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
+		}
+		else
+		{
+			SLUSH_ERROR("%s uses a Animated SpriteComponent without a SpriteSheet-clip, expect weird first-frame texturing", myEntityPrefab.GetAssetName().GetBuffer());
+		}
 	}
 	else
 	{
@@ -228,7 +240,7 @@ void SpriteComponent::Update()
 		myAnimationRuntime->myIsLooping = myEntityPrefab.GetSpriteData().myLoopAnimation;
 	}
 
-	if (myAnimationRuntime->IsFinished() && myEntityPrefab.GetSpriteData().myRemoveEntityAfterAnimation)
+	if (!animComponent->IsAnimationPlaying(*myAnimation) && myEntityPrefab.GetSpriteData().myRemoveEntityAfterAnimation)
 	{
 		myEntity.myIsMarkedForRemoval = true;
 	}

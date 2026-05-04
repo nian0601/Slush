@@ -171,6 +171,9 @@ namespace Slush
 
 	void AnimationTrack::OnParse(const char* aTrackName, AssetParser::Handle aHandle)
 	{
+		if (aHandle.IsWriting() && myClips.IsEmpty())
+			return;
+
 		AssetParser::Handle trackHandle = aHandle.ParseChildElement(aTrackName);
 
 		if (trackHandle.IsReading())

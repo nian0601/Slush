@@ -4,7 +4,10 @@
 
 namespace Slush
 {
+	class Animation;
 	class BaseSprite;
+
+	struct AnimationRuntime;
 }
 
 class SpriteComponent : public Component
@@ -14,25 +17,42 @@ public:
 
 	struct Data : public Component::BaseData
 	{
+		Data();
+		~Data();
+
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
-		float myRadius = 10.f;
 		Vector2f mySize;
 		int myColor = 0xFFFF3399;
+		float myFloatColor[4] = { 1.f, 51.f / 255.f, 153.f / 255.f, 1.f };
+
+		enum SpriteType
+		{
+			None,
+			Static,
+			Animated,
+		};
+		SpriteType mySpriteType = None;
+
+		Slush::Animation* myAnimation;
+		bool myLoopAnimation = true;
+		bool myRemoveEntityAfterAnimation = true;
+
 		FW_String myTextureID;
 		Vector2i myTextureRectPos;
 		Vector2i myTextureRectSize;
-		float myFloatColor[4] = { 1.f, 51.f / 255.f, 153.f / 255.f, 1.f };
+
+		
 	};
 
 public:
 	SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 	~SpriteComponent();
 
-	void MakeCircle(float aRadius, int aColor);
 	void MakeRect(float aWidth, float aHeight, int aColor);
 
+	void Update() override;
 	void Render() override;
 
 	Slush::BaseSprite& GetSprite() { return *mySprite; }
@@ -40,4 +60,6 @@ public:
 
 private:
 	Slush::BaseSprite* mySprite = nullptr;
+	Slush::Animation* myAnimation = nullptr;
+	Slush::AnimationRuntime* myAnimationRuntime = nullptr;
 };

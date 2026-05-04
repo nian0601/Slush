@@ -35,6 +35,8 @@ public:
 			, myComponentDataName("UNKNOWN")
 		{}
 
+		virtual ~BaseData() {}
+
 		void Parse(Slush::AssetParser::Handle aRootHandle);
 		virtual void OnParse(Slush::AssetParser::Handle aComponentHandle) { aComponentHandle; }
 		

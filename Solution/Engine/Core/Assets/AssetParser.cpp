@@ -61,6 +61,14 @@ namespace Slush
 		return AddChildElement(aElementName);
 	}
 
+	bool AssetParser::Handle::HasChildElement(const char* aElementName)
+	{
+		if (!IsValid())
+			return false;
+
+		return GetChildElement(aElementName).IsValid();
+	}
+
 	bool AssetParser::Handle::HasField(const char* aFieldName) const
 	{
 		if (!IsValid())

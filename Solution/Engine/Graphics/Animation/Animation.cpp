@@ -45,6 +45,14 @@ namespace Slush
 				// And update how animations are updated, to make it apply this texture when this animation is started etc
 				myTexture = assets.GetAsset<Slush::Texture>(texID.GetBuffer());
 				FW_ASSERT(myTexture != nullptr, "Invalid texture used for spritesheet-animation");
+
+				if (const AnimationClip* clip = mySpritesheetTrack.GetFirstClip())
+				{
+					Recti frameRect = clip->myFrameRect;
+
+					myToolData.myFrameSize = frameRect.myExtents;
+					myToolData.myPreviewSprite->SetSize(static_cast<float>(myToolData.myFrameSize.x), static_cast<float>(myToolData.myFrameSize.y));
+				}
 			}
 		}
 		else
@@ -157,6 +165,7 @@ namespace Slush
 							mySpritesheetTrack.Frame({ x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
 					}
 
+					myToolData.myPreviewSprite->SetSize(static_cast<float>(myToolData.myFrameSize.x), static_cast<float>(myToolData.myFrameSize.y));
 					myTexture = myToolData.myTextureToImport;
 					ImGui::CloseCurrentPopup();
 				}
@@ -291,29 +300,27 @@ namespace Slush
 
 		ImGui::BeginDisabled(myToolData.myRuntime->myState != AnimationRuntime::NotStarted);
 		if (ImGui::Button("Start"))
-		{
 			myToolData.myRuntime->Start(*myToolData.myPreviewSprite, *this);
-			myToolData.myRuntime->myIsLooping = true;
-		}
 		ImGui::EndDisabled();
 
 		ImGui::SameLine();
 
 		ImGui::BeginDisabled(myToolData.myRuntime->myState == AnimationRuntime::NotStarted);
 		if (ImGui::Button("Stop"))
-		{
 			myToolData.myRuntime->Stop(*myToolData.myPreviewSprite, *this);
-		}
 		ImGui::EndDisabled();
 
 		ImGui::SameLine();
 
 		ImGui::Checkbox("Loop", &myToolData.myRuntime->myIsLooping);
 
-		
+		ImGui::SameLine();
+
+		ImGui::SetNextItemWidth(150.f);
+		ImGui::DragFloat("Preview Scale", &myToolData.myPreviewScale, 1.f, 0.1f, 10.f, "%.1f");
+
 
 		Recti frameRect = mySpritesheetTrack.GetFirstClip()->myFrameRect;
-
 		if (myToolData.myRuntime->myState != AnimationRuntime::NotStarted)
 		{
 			frameRect = myToolData.myRuntime->mySpritesheetData.myFrameRect;
@@ -332,9 +339,9 @@ namespace Slush
 		sf::FloatRect rect;
 		rect.position.x = static_cast<float>(frameRect.myTopLeft.x);
 		rect.position.y = static_cast<float>(frameRect.myTopLeft.y);
-		rect.size.y = static_cast<float>(frameRect.myExtents.x);
-		rect.size.x = static_cast<float>(frameRect.myExtents.y);
-		ImGui::Image(*myTexture->GetSFMLTexture(), { width, height }, rect);
+		rect.size.x = static_cast<float>(frameRect.myExtents.x);
+		rect.size.y = static_cast<float>(frameRect.myExtents.y);
+		ImGui::Image(*myTexture->GetSFMLTexture(), { width * myToolData.myPreviewScale, height * myToolData.myPreviewScale }, rect);
 	}
 
 }

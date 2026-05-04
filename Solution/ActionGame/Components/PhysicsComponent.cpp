@@ -67,7 +67,6 @@ void PhysicsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle
 	aComponentHandle.ParseBoolField("isStatic", myStatic);
 	aComponentHandle.ParseBoolField("isSensor", mySensor);
 	aComponentHandle.ParseBoolField("matchSprite", myMatchSprite);
-
 	aComponentHandle.ParseFloatField("radius", myRadius);
 
 	Slush::AssetParser::Handle sizeHandle = aComponentHandle.ParseChildElement("size");
@@ -104,8 +103,6 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 			const SpriteComponent::Data& spriteData = anEntityPrefab.GetSpriteData();
 			if (spriteData.mySize.x > 0.f)
 				shape = new Slush::AABBShape(spriteData.mySize);
-			else
-				shape = new Slush::CircleShape(spriteData.myRadius);
 		}
 		else
 		{

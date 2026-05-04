@@ -30,12 +30,12 @@ public:
 		EntityManager::RegisterComponents();
 
 		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-		assets.RegisterAssetType<EntityPrefab>();
 		assets.RegisterAssetType<Slush::UILayout>();
 		assets.RegisterAssetType<Slush::Texture>();
 		assets.RegisterAssetType<LevelData>();
 		assets.RegisterAssetType<Slush::Animation>();
 		assets.RegisterAssetType<CharacterAnimationSet>();
+		assets.RegisterAssetType<EntityPrefab>();
 		assets.LoadAllAssets();
 
 		myFont.Load("Data/NotoSans.ttf");

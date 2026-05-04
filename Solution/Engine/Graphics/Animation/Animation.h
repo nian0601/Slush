@@ -50,6 +50,7 @@ namespace Slush
 
 			AnimationRuntime* myRuntime = nullptr;
 			RectSprite* myPreviewSprite = nullptr;
+			float myPreviewScale = 1.f;
 		};
 		ToolData myToolData;
 		

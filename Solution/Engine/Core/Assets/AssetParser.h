@@ -21,6 +21,7 @@ namespace Slush
 
 			bool IsValid() const { return myElement != nullptr; }
 			bool IsReading() const { return myIsReading; }
+			bool IsWriting() const { return !myIsReading; }
 
 			int GetNumChildElements();
 			Handle GetChildElementAtIndex(int aIndex);
@@ -29,6 +30,8 @@ namespace Slush
 			void GetStringFieldAtIndex(int aIndex, FW_String& aValue);
 
 			Handle ParseChildElement(const char* aElementName);
+			bool HasChildElement(const char* aElementName);
+
 			bool HasField(const char* aFieldName) const;
 			void ParseIntField(const char* aFieldName, int& aValue);
 			void ParseFloatField(const char* aFieldName, float& aValue);

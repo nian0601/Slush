@@ -6,9 +6,7 @@ Entity Prefab
 	} 
 	sprite 
 	{ 
-		radius 5.000 
 		color -1 
-		textureID Small_Fireball_Blue 
 		size 
 		{ 
 			width 36.000 
@@ -21,19 +19,196 @@ Entity Prefab
 			b 1.000 
 			a 1.000 
 		} 
-		textureRect 
+		animation 
 		{ 
-			x 0 
-			y 0 
-			width 0 
-			height 0 
+			spritesheettexture Small_Fireball_Blue_Sheet 
+			outlinetrack 
+			{ 
+			} 
+			scaletrack 
+			{ 
+			} 
+			postiontrack 
+			{ 
+			} 
+			colortrack 
+			{ 
+			} 
+			spritesheettrack 
+			{ 
+				clip 
+				{ 
+					starttime 0.000 
+					endtime 0.067 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 0 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.067 
+					endtime 0.133 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 36 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.133 
+					endtime 0.200 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 72 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.200 
+					endtime 0.267 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 108 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.267 
+					endtime 0.333 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 144 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.333 
+					endtime 0.400 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 180 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.400 
+					endtime 0.467 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 216 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.467 
+					endtime 0.533 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 252 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.533 
+					endtime 0.600 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 288 
+						y 0 
+						width 36 
+						height 16 
+					} 
+				} 
+			} 
 		} 
+	} 
+	animation 
+	{ 
 	} 
 	physics 
 	{ 
 		isStatic 0 
 		isSensor 0 
-		matchSprite 1 
+		matchSprite 0 
 		radius 8.000 
 		size 
 		{ 

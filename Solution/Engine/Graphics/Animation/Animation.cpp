@@ -57,9 +57,9 @@ namespace Slush
 		}
 		else
 		{
-			if (myToolData.myTextureToImport)
+			if (myTexture)
 			{
-				FW_String texID = myToolData.myTextureToImport->GetAssetName();
+				FW_String texID = myTexture->GetAssetName();
 				aRootHandle.ParseStringField("spritesheettexture", texID);
 			}
 		}

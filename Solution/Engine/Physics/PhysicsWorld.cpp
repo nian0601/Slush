@@ -3,6 +3,7 @@
 #include "PhysicsWorld.h"
 #include <FW_Vector2.h>
 #include <FW_Math.h>
+#include "Graphics\Window.h"
 
 namespace Slush
 {
@@ -232,14 +233,15 @@ namespace Slush
 
 	void PhysicsWorld::RenderContacts()
 	{
-		//for (const Manifold& contact : myContacts)
-		//{
-		//	for (int i = 0; i < contact.myContactCount; ++i)
-		//	{
-		//		FW_Renderer::RenderLine(contact.myContacts[i], contact.myContacts[i] + contact.myHitNormal * contact.myPenetrationDepth, 0xFFFF0000);
-		//		FW_Renderer::RenderCircle(contact.myContacts[i], 3.f);
-		//	}
-		//}
+		Window& window = Engine::GetInstance().GetWindow();
+		for (const Manifold& manifold : myManifolds)
+		{
+			for (int i = 0; i < manifold.myContactCount; ++i)
+			{
+				window.RenderLine(manifold.myContacts[i], manifold.myContacts[i] + manifold.myHitNormal * manifold.myPenetrationDepth, 0xFFFF0000);
+				window.RenderCircle(manifold.myContacts[i], 3.f);
+			}
+		}
 	}
 
 	void PhysicsWorld::ApplyForceInRadius(const Vector2f& aCenter, float aRadius, float aMinForce, float aMaxForce)

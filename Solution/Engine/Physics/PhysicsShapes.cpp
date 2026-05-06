@@ -6,6 +6,7 @@
 #include <float.h>
 #include <FW_Assert.h>
 #include <FW_String.h>
+#include "Graphics\Window.h"
 
 namespace Slush
 {
@@ -147,15 +148,16 @@ namespace Slush
 
 	void CircleShape::Render() const
 	{
-		//FW_Renderer::RenderCircle(myObject->myPosition, myRadius, myObject->myColor);
-		//
-		//FW_Matrix22 orientation(myObject->myOrientation);
-		//
-		//Vector2f endPoint(0.f, 1.f);
-		//endPoint = orientation * endPoint;
-		//endPoint *= myRadius;
-		//endPoint += myObject->myPosition;
-		//FW_Renderer::RenderLine(myObject->myPosition, endPoint, 0xFF000000);
+		Window& window = Engine::GetInstance().GetWindow();
+		window.RenderCircle(myObject->myPosition, myRadius, myObject->myColor);
+		
+		FW_Matrix22 orientation(myObject->myOrientation);
+		
+		Vector2f endPoint(0.f, 1.f);
+		endPoint = orientation * endPoint;
+		endPoint *= myRadius;
+		endPoint += myObject->myPosition;
+		window.RenderLine(myObject->myPosition, endPoint, 0xFF000000);
 	}
 
 	void CircleShape::ComputeMass(float aDensity)
@@ -366,30 +368,32 @@ namespace Slush
 
 	void PolygonShape::Render() const
 	{
-		//FW_Matrix22 space;
-		//space.Set(myObject->myPreviousOrientation);
-		//
-		//Vector2f p1 = myObject->myPreviousPosition + space * myVertices[0];
+		Window& window = Engine::GetInstance().GetWindow();
+
+		FW_Matrix22 space;
+		space.Set(myObject->myPreviousOrientation);
+		
+		Vector2f p1 = myObject->myPreviousPosition + space * myVertices[0];
+		for (int i = 1; i < myVertexCount; ++i)
+		{
+			Vector2f p2 = myObject->myPreviousPosition + space * myVertices[i];
+			window.RenderLine(p1, p2, myObject->myColor);
+			p1 = p2;
+		}
+		
+		Vector2f p2 = myObject->myPreviousPosition + space * myVertices[0];
+		window.RenderLine(p1, p2, myObject->myColor);
+
+		//Vector2f p1 = myObject->myPosition + myModelSpace * myVertices[0];
 		//for (int i = 1; i < myVertexCount; ++i)
 		//{
-		//	Vector2f p2 = myObject->myPreviousPosition + space * myVertices[i];
-		//	FW_Renderer::RenderLine(p1, p2, myObject->myColor);
+		//	Vector2f p2 = myObject->myPosition + myModelSpace * myVertices[i];
+		//	window.RenderLine(p1, p2, myObject->myColor);
 		//	p1 = p2;
 		//}
 		//
-		//Vector2f p2 = myObject->myPreviousPosition + space * myVertices[0];
-		//FW_Renderer::RenderLine(p1, p2, myObject->myColor);
-
-		/*Vector2f p1 = myObject->myPosition + myModelSpace * myVertices[0];
-		for (int i = 1; i < myVertexCount; ++i)
-		{
-			Vector2f p2 = myObject->myPosition + myModelSpace * myVertices[i];
-			FW_Renderer::RenderLine(p1, p2, myObject->myColor);
-			p1 = p2;
-		}
-
-		Vector2f p2 = myObject->myPosition + myModelSpace * myVertices[0];
-		FW_Renderer::RenderLine(p1, p2, myObject->myColor);*/
+		//Vector2f p2 = myObject->myPosition + myModelSpace * myVertices[0];
+		//window.RenderLine(p1, p2, myObject->myColor);
 	}
 
 	void PolygonShape::SetOrientation(float aRadians)
@@ -475,7 +479,7 @@ namespace Slush
 
 	void AABBShape::Render() const
 	{
-		//myRect.myCenterPos = myObject->myPreviousPosition;
-		//FW_Renderer::RenderRect(myRect, myObject->myColor, myObject->myPreviousOrientation);
+		myRect.myCenterPos = myObject->myPreviousPosition;
+		Engine::GetInstance().GetWindow().RenderRect(myRect, myObject->myColor, myObject->myPreviousOrientation);
 	}
 }

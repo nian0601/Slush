@@ -24,8 +24,8 @@ public:
 		void OnBuildUI() override;
 
 		Vector2f mySize;
-		int myColor = 0xFFFF3399;
-		float myFloatColor[4] = { 1.f, 51.f / 255.f, 153.f / 255.f, 1.f };
+		int myColor = 0xFFFFFFFF;
+		float myFloatColor[4] = { 1.f, 1.f, 1.f, 1.f };
 
 		enum SpriteType
 		{

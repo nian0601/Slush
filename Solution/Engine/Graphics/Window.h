@@ -5,6 +5,9 @@ namespace sf
 	class RenderWindow;
 	class RenderTexture;
 	class RenderTarget;
+
+	class CircleShape;
+	class RectangleShape;
 }
 
 namespace Slush
@@ -38,6 +41,11 @@ namespace Slush
 
 		sf::RenderTarget* GetActiveRenderTarget() const { return myActiveRenderTarget; }
 
+		void RenderLine(const Vector2i& aStart, const Vector2i& aEnd, int aColor = 0xFFFFFFFF);
+		void RenderLine(const Vector2f& aStart, const Vector2f& aEnd, int aColor = 0xFFFFFFFF);
+		void RenderRect(const Rectf& aRect, int aColor = 0xFFFFFFFF, float aRotationInRadians = 0.f);
+		void RenderCircle(const Vector2f& aCenter, float aRadius, int aColor = 0xFFFFFFFF);
+
 		Rectf GetWindowRect() const { return myWindowRect; }
 		Rectf GetGameViewRect() const { return myGameViewRect; }
 
@@ -62,5 +70,7 @@ namespace Slush
 
 		sf::RenderTarget* myActiveRenderTarget = nullptr;
 		sf::RenderTexture* myOffscreenBuffer = nullptr;
+		sf::CircleShape* myCircleShape = nullptr;
+		sf::RectangleShape* myRectShape = nullptr;
 	};
 }

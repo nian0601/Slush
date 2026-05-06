@@ -9,13 +9,26 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
 #include <FW_FileSystem.h>
+#include <SFML/Graphics/VertexArray.hpp>
 
 namespace Slush
 {
+	sf::Color GetSFMLColor(int aHexColor)
+	{
+		return{
+			unsigned char((aHexColor >> 16) & 255),
+			unsigned char((aHexColor >> 8) & 255),
+			unsigned char((aHexColor >> 0) & 255),
+			unsigned char((aHexColor >> 24) & 255)
+		};
+	}
+
 	Window::Window(unsigned int aWidth, unsigned int aHeight)
 		: myAspectRatio(16.f/9.f)
 	{
@@ -24,6 +37,9 @@ namespace Slush
 
 		myRenderWindow = new sf::RenderWindow(sf::VideoMode({ aWidth, aHeight }), "Slush Engine");
 		myOffscreenBuffer = new sf::RenderTexture({ 1920, 1080 });
+
+		myCircleShape = new sf::CircleShape();
+		myRectShape = new sf::RectangleShape();
 
 		myActiveRenderTarget = myRenderWindow;
 
@@ -49,6 +65,8 @@ namespace Slush
 
 		FW_SAFE_DELETE(myOffscreenBuffer);
 		FW_SAFE_DELETE(myRenderWindow);
+		FW_SAFE_DELETE(myCircleShape);
+		FW_SAFE_DELETE(myRectShape);
 		myDockables.DeleteAll();
 	}
 
@@ -205,6 +223,59 @@ namespace Slush
 		myAppLayoutName = aName;
 
 		LoadAppLayoutConfig();
+	}
+
+	void Window::RenderLine(const Vector2i& aStart, const Vector2i& aEnd, int aColor)
+	{
+		sf::VertexArray line(sf::PrimitiveType::Lines, 2);
+		line[0].position = { float(aStart.x), float(aStart.y) };
+		line[0].color = GetSFMLColor(aColor);
+
+		line[1].position = { float(aEnd.x), float(aEnd.y) };
+		line[1].color = GetSFMLColor(aColor);
+
+		GetActiveRenderTarget()->draw(line);
+	}
+
+	void Window::RenderLine(const Vector2f& aStart, const Vector2f& aEnd, int aColor)
+	{
+		sf::VertexArray line(sf::PrimitiveType::Lines, 2);
+		line[0].position = { aStart.x, aStart.y };
+		line[0].color = GetSFMLColor(aColor);
+
+		line[1].position = { aEnd.x, aEnd.y };
+		line[1].color = GetSFMLColor(aColor);
+
+		GetActiveRenderTarget()->draw(line);
+	}
+
+	void Window::RenderRect(const Rectf& aRect, int aColor, float aRotationInRadians)
+	{
+		myRectShape->setOrigin({ aRect.myExtents.x * 0.5f, aRect.myExtents.y * 0.5f });
+		myRectShape->setPosition({ aRect.myCenterPos.x, aRect.myCenterPos.y });
+		myRectShape->setRotation(sf::radians(aRotationInRadians));
+		
+		sf::Vector2f oldSize = myRectShape->getSize();
+		if (oldSize.x != aRect.myExtents.x || oldSize.y != aRect.myExtents.y)
+		{
+			myRectShape->setSize({ aRect.myExtents.x, aRect.myExtents.y });
+		}
+
+		myRectShape->setFillColor(GetSFMLColor(aColor));
+		myRectShape->setTexture(nullptr);
+
+		GetActiveRenderTarget()->draw(*myRectShape);
+	}
+
+	void Window::RenderCircle(const Vector2f& aCenter, float aRadius, int aColor)
+	{
+		myCircleShape->setPosition({ aCenter.x - aRadius, aCenter.y - aRadius });
+
+		if (myCircleShape->getRadius() != aRadius)
+			myCircleShape->setRadius(aRadius);
+
+		myCircleShape->setFillColor(GetSFMLColor(aColor));
+		GetActiveRenderTarget()->draw(*myCircleShape);
 	}
 
 	void Window::SaveAppLayoutConfig()

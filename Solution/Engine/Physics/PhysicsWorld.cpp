@@ -157,10 +157,10 @@ namespace Slush
 						myManifolds.Add(tempManifold);
 
 						if (A->ReportsCollisionsWith(B))
-							myContacts.Add({ A, B });
+							myContacts.Add({ A, B, tempManifold.myContacts[0] });
 
 						if (B->ReportsCollisionsWith(A))
-							myContacts.Add({ B, A });
+							myContacts.Add({ B, A, tempManifold.myContacts[0] });
 					}
 				}
 			}

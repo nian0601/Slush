@@ -92,6 +92,7 @@ namespace Slush
 	{
 		PhysicsObject* myFirst = nullptr;
 		PhysicsObject* mySecond = nullptr;
+		Vector2f myContactPosition;
 	};
 
 	struct MaxDistanceConstraint

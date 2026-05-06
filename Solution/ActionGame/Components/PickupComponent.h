@@ -25,7 +25,7 @@ public:
 public:
 	PickupComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
-	void OnCollision(Entity& aOtherEntity) override;
+	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition) override;
 
 private:
 	const Data& myData;

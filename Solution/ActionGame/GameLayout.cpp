@@ -136,7 +136,7 @@ void GameLayout::UpdatePhysics()
 			continue;
 		}
 
-		physA->myEntity.OnCollision(physB->myEntity);
+		physA->myEntity.OnCollision(physB->myEntity, contact.myContactPosition);
 	}
 }
 

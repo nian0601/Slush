@@ -59,10 +59,10 @@ void Entity::Render()
 		component->Render();
 }
 
-void Entity::OnCollision(Entity& aOtherEntity)
+void Entity::OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition)
 {
 	for (Component* component : myPackedComponents)
-		component->OnCollision(aOtherEntity);
+		component->OnCollision(aOtherEntity, aContactPosition);
 }
 
 void Entity::OnDeath()

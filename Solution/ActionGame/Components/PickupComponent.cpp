@@ -25,7 +25,7 @@ PickupComponent::PickupComponent(Entity& anEntity, const EntityPrefab& anEntityP
 {
 }
 
-void PickupComponent::OnCollision(Entity& aOtherEntity)
+void PickupComponent::OnCollision(Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
 {
 	if (aOtherEntity.myType == EntityType::PLAYER)
 	{

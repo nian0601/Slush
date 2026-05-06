@@ -51,7 +51,7 @@ public:
 	void Update();
 	void Render();
 
-	void OnCollision(Entity& aOtherEntity);
+	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition);
 	void OnDeath();
 
 	bool IsPlayerOwned() const { return myType == PLAYER || myType == PLAYER_PROJECTILE; }

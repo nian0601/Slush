@@ -11,13 +11,14 @@ public:
 		void OnBuildUI() override;
 
 		int myDamage = 10;
+		FW_String myImpactPrefab;
 	};
 public:
 	COMPONENT_HELPER("Damage Dealer", "damagedealer");
 
 	DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
 
-	void OnCollision(Entity& aOtherEntity) override;
+	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition) override;
 
 	void SetDamage(int aDamage) { myDamage = aDamage; }
 

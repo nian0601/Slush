@@ -21,7 +21,7 @@ public:
 	virtual void Update() {};
 	virtual void Render() {};
 
-	virtual void OnCollision(Entity& aOtherEntity) { aOtherEntity; };
+	virtual void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition) { aOtherEntity; aContactPosition; };
 	virtual void OnDeath() {};
 
 	Entity& myEntity;

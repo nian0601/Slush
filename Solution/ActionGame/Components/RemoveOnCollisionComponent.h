@@ -9,5 +9,5 @@ public:
 
 	using Component::Component;
 
-	void OnCollision(Entity& aOtherEntity) override;
+	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition) override;
 };

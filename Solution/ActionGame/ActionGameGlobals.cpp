@@ -26,6 +26,8 @@ void ActionGameGlobals::DebugSettings::OnParse(Slush::AssetParser::Handle aHandl
 	aHandle.ParseBoolField("PauseEnemySpawning", myPauseEnemySpawning);
 	aHandle.ParseBoolField("SkipStartScreen", mySkipStartScreen);
 	aHandle.ParseBoolField("UseNewUI", myUseNewUI);
+	aHandle.ParseBoolField("ShowPhysicsObjects", myShowPhysicsObjects);
+	aHandle.ParseBoolField("ShowPhysicsContacts", myShowPhysicsContacts);
 }
 
 
@@ -35,6 +37,8 @@ void ActionGameGlobals::DebugSettingsDockable::OnBuildUI()
 	ImGui::Checkbox("Pause Enemy Spawning", &settings.myPauseEnemySpawning);
 	ImGui::Checkbox("Skip Start Screen", &settings.mySkipStartScreen);
 	ImGui::Checkbox("New UI", &settings.myUseNewUI);
+	ImGui::Checkbox("Physics Objects", &settings.myShowPhysicsObjects);
+	ImGui::Checkbox("Physics Contacts", &settings.myShowPhysicsContacts);
 }
 
 

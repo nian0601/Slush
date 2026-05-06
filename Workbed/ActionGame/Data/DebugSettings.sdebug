@@ -3,4 +3,6 @@ DebugSettings
 	PauseEnemySpawning 0 
 	SkipStartScreen 0 
 	UseNewUI 0 
+	ShowPhysicsObjects 0 
+	ShowPhysicsContacts 1 
 } 

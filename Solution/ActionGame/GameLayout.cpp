@@ -104,6 +104,12 @@ void GameLayout::Render()
 
 	myEntityManager->Render();
 
+	if (ActionGameGlobals::GetInstance().myDebugSettings.myShowPhysicsObjects)
+		myPhysicsWorld->RenderAllObjects();
+
+	if (ActionGameGlobals::GetInstance().myDebugSettings.myShowPhysicsContacts)
+		myPhysicsWorld->RenderContacts();
+
 	switch (myGameState)
 	{
 	case START_SCREEN:

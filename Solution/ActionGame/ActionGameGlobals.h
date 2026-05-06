@@ -28,6 +28,8 @@ public:
 		bool myPauseEnemySpawning = false;
 		bool mySkipStartScreen = false;
 		bool myUseNewUI = false;
+		bool myShowPhysicsObjects = false;
+		bool myShowPhysicsContacts = false;
 
 	private:
 		void OnParse(Slush::AssetParser::Handle aHandle);

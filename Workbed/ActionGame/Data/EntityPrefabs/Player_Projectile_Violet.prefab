@@ -21,19 +21,9 @@ Entity Prefab
 		} 
 		animation 
 		{ 
+			islooping 1 
+			removeentityafteranimation 1 
 			spritesheettexture Small_Fireball_Violet_Sheet 
-			outlinetrack 
-			{ 
-			} 
-			scaletrack 
-			{ 
-			} 
-			postiontrack 
-			{ 
-			} 
-			colortrack 
-			{ 
-			} 
 			spritesheettrack 
 			{ 
 				clip 
@@ -222,6 +212,7 @@ Entity Prefab
 	damagedealer 
 	{ 
 		damage 10 
+		prefab Small_Explosion_Violet 
 	} 
 	timedremoval 
 	{ 

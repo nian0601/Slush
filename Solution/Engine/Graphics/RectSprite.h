@@ -10,6 +10,7 @@ namespace Slush
 		enum class Origin
 		{
 			CENTER,
+			BOTTOM_CENTER,
 			TOP_LEFT,
 		};
 

@@ -36,20 +36,22 @@ namespace Slush
 
 		if (myOrigin == Origin::CENTER)
 			myShape->setOrigin({ mySize.x * 0.5f, mySize.y * 0.5f });
-		else
+		else if (myOrigin == Origin::BOTTOM_CENTER)
+			myShape->setOrigin({ mySize.x * 0.5f, mySize.y });
+		else if (myOrigin == Origin::TOP_LEFT)
 			myShape->setOrigin({ 0.f, 0.f });
+		else
+			FW_ASSERT_ALWAYS;
 	}
 
 	void RectSprite::SetWidth(float aWidth)
 	{
-		mySize.x = aWidth;
-		static_cast<sf::RectangleShape*>(myShape)->setSize({ mySize.x, mySize.y });
+		SetSize(aWidth, mySize.y);
 	}
 
 	void RectSprite::SetHeight(float aHeight)
 	{
-		mySize.y = aHeight;
-		static_cast<sf::RectangleShape*>(myShape)->setSize({ mySize.x, mySize.y });
+		SetSize(mySize.x, aHeight);
 	}
 
 }

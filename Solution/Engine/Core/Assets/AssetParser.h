@@ -41,6 +41,13 @@ namespace Slush
 			void ParseVec2iField(const char* aFieldName, Vector2i& aValue);
 			void ParseVec2fField(const char* aFieldName, Vector2f& aValue);
 
+
+			// ParseOptional will READ the Field if it exists, and WRITE the Field based on 'aWriteConditon'
+			void ParseOptionalIntField(const char* aFieldName, int& aValue, bool aWriteCondition);
+			void ParseOptionalFloatField(const char* aFieldName, float& aValue, bool aWriteCondition);
+			void ParseOptionalBoolField(const char* aFieldName, bool& aValue, bool aWriteCondition);
+			void ParseOptionalStringField(const char* aFieldName, FW_String& aValue, bool aWriteCondition);
+
 		private:
 			bool ValidateField(const char* aFieldName);
 

@@ -1,0 +1,11 @@
+WeaponData 
+{ 
+	basecooldown 0.500 
+	basedamage 10 
+	projectileData 
+	{ 
+		type 2 
+		baseprojectilespeed 750.000 
+		projectilePrefab proj_player_fireball 
+	} 
+} 

@@ -1,0 +1,185 @@
+Entity Prefab 
+{ 
+	entitytype 
+	{ 
+		type 3 
+	} 
+	sprite 
+	{ 
+		color -1 
+		size 
+		{ 
+			width 16.000 
+			height 16.000 
+		} 
+		floatColor 
+		{ 
+			r 1.000 
+			g 1.000 
+			b 1.000 
+			a 1.000 
+		} 
+		animation 
+		{ 
+			islooping 1 
+			removeentityafteranimation 1 
+			spritesheettexture Small_Shuriken_Gray 
+			spritesheettrack 
+			{ 
+				clip 
+				{ 
+					starttime 0.000 
+					endtime 0.033 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 0 
+						y 0 
+						width 16 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.033 
+					endtime 0.067 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 16 
+						y 0 
+						width 16 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.067 
+					endtime 0.100 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 32 
+						y 0 
+						width 16 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.100 
+					endtime 0.133 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 48 
+						y 0 
+						width 16 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.133 
+					endtime 0.167 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 64 
+						y 0 
+						width 16 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.167 
+					endtime 0.200 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 80 
+						y 0 
+						width 16 
+						height 16 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.200 
+					endtime 0.233 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 96 
+						y 0 
+						width 16 
+						height 16 
+					} 
+				} 
+			} 
+		} 
+	} 
+	animation 
+	{ 
+	} 
+	physics 
+	{ 
+		isStatic 0 
+		isSensor 0 
+		matchSprite 0 
+		radius 8.000 
+		size 
+		{ 
+			width 0.000 
+			height 0.000 
+		} 
+	} 
+	removeoncollision 
+	{ 
+	} 
+	damagedealer 
+	{ 
+		damage 10 
+		prefab Small_Explosion_Violet 
+	} 
+	timedremoval 
+	{ 
+		duration 4.000 
+	} 
+} 

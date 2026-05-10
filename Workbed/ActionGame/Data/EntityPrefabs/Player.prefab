@@ -6,7 +6,6 @@ Entity Prefab
 	} 
 	sprite 
 	{ 
-		radius 20.000 
 		color -1 
 		textureID Hero_01 
 		size 
@@ -58,22 +57,7 @@ Entity Prefab
 	} 
 	weaponcomponent 
 	{ 
-		Weapon 
-		{ 
-			type 0 
-			basecooldown 0.500 
-			baseprojectilespeed 1500.000 
-			basedamage 10 
-			projectilePrefab Player_Projectile_Red 
-		} 
-		Weapon 
-		{ 
-			type 1 
-			basecooldown 0.500 
-			baseprojectilespeed 750.000 
-			basedamage 10 
-			projectilePrefab Player_Projectile_Violet 
-		} 
+		weapondata wpn_shuriken 
 	} 
 	experience 
 	{ 

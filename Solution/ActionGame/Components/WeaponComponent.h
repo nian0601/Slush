@@ -6,22 +6,51 @@
 #include <FW_String.h>
 #include <FW_GrowingArray.h>
 
+#include "Core\Assets\DataAsset.h"
+
+class WeaponData : public Slush::DataAsset
+{
+public:
+	DEFINE_ASSET("WeaponData", "weapondata", "data/weapondata");
+	using Slush::DataAsset::DataAsset;
+
+	void OnParse(Slush::AssetParser::Handle aRootHandle);
+	void BuildUI();
+
+	int myBaseDamage = 10;
+	float myBaseCooldown = 0.5f;
+
+	struct ProjectileData
+	{
+		enum Type
+		{
+			W_None,
+			W_LineShooter,
+			W_SpreadShooter,
+		};
+
+		Type myType = W_None;
+		float myBaseProjectileSpeed = 750.f;
+		FW_String myProjectilePrefab;
+	};
+	ProjectileData myProjectileData;
+};
+
 class StatsComponent;
 class Weapon
 {
 public:
-	Weapon(Entity& anEntity);
+	Weapon(Entity& anEntity, const WeaponData& aWeaponData);
 
 	void Update();
 
-	Slush::Timer myActivationCooldown;
-
 protected:
 	virtual void OnActivate() = 0;
-	virtual float GetBaseCooldown() const = 0;
 	virtual float GetAdditionalCooldownReduction(StatsComponent* /*aStatsComponent*/) const { return 1.f; }
 
 	Entity& myEntity;
+	Slush::Timer myActivationCooldown;
+	const WeaponData* myWeaponData;
 };
 
 class ProjectileShooter : public Weapon
@@ -30,25 +59,6 @@ public:
 	using Weapon::Weapon;
 
 	void ShootProjectile(const Vector2f& aDirection);
-	float GetBaseCooldown() const override { return myData.myBaseCooldown; }
-
-	// TODO: This should probably be in the base Weapon, lets figure it out when
-	// I add some non-projectileshooting weapons (orbiting weapons for example)
-	struct Data
-	{
-		enum Type
-		{
-			W_LineShooter,
-			W_SpreadShooter,
-		};
-
-		Type myType;
-		float myBaseCooldown = 0.5f;
-		float myBaseProjectileSpeed = 750.f;
-		int myBaseDamage = 10;
-		FW_String myProjectilePrefab;
-	};
-	Data myData;
 };
 
 class LineShooter : public ProjectileShooter
@@ -57,7 +67,6 @@ public:
 	using ProjectileShooter::ProjectileShooter;
 
 	void OnActivate() override;
-	float GetAdditionalCooldownReduction(StatsComponent* aStatsComponent) const override;
 };
 
 class SpreadShooter : public ProjectileShooter
@@ -77,7 +86,7 @@ public:
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
-		FW_GrowingArray<ProjectileShooter::Data> myProjectileShooterDatas;
+		FW_String myWeaponDataAsset;
 	};
 
 public:

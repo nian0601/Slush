@@ -148,6 +148,50 @@ namespace Slush
 		fieldHandle.ParseFloatField("y", aValue.y);
 	}
 
+	void AssetParser::Handle::ParseOptionalIntField(const char* aFieldName, int& aValue, bool aWriteCondition)
+	{
+		if (!ValidateField(aFieldName))
+			return;
+
+		if (myIsReading && HasField(aFieldName))
+			GetIntField(aFieldName, aValue);
+		else if (!myIsReading && aWriteCondition)
+			WriteIntField(aFieldName, aValue);
+	}
+
+	void AssetParser::Handle::ParseOptionalFloatField(const char* aFieldName, float& aValue, bool aWriteCondition)
+	{
+		if (!ValidateField(aFieldName))
+			return;
+
+		if (myIsReading && HasField(aFieldName))
+			GetFloatField(aFieldName, aValue);
+		else if (!myIsReading && aWriteCondition)
+			WriteFloatField(aFieldName, aValue);
+	}
+
+	void AssetParser::Handle::ParseOptionalBoolField(const char* aFieldName, bool& aValue, bool aWriteCondition)
+	{
+		if (!ValidateField(aFieldName))
+			return;
+
+		if (myIsReading && HasField(aFieldName))
+			GetBoolField(aFieldName, aValue);
+		else if (!myIsReading && aWriteCondition)
+			WriteBoolField(aFieldName, aValue);
+	}
+
+	void AssetParser::Handle::ParseOptionalStringField(const char* aFieldName, FW_String& aValue, bool aWriteCondition)
+	{
+		if (!ValidateField(aFieldName))
+			return;
+
+		if (myIsReading && HasField(aFieldName))
+			GetStringField(myElement->GetField(aFieldName), aValue);
+		else if (!myIsReading && aWriteCondition)
+			WriteStringField(myElement->AddField(aFieldName), aValue);
+	}
+
 	bool AssetParser::Handle::ValidateField(const char* aFieldName)
 	{
 		if (IsValid())

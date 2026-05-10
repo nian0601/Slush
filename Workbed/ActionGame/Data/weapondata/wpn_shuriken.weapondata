@@ -1,0 +1,11 @@
+WeaponData 
+{ 
+	basecooldown 0.100 
+	basedamage 5 
+	projectileData 
+	{ 
+		type 1 
+		baseprojectilespeed 900.000 
+		projectilePrefab proj_player_shuriken 
+	} 
+} 

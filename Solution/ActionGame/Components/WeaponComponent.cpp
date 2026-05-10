@@ -14,8 +14,69 @@
 #include <Graphics\Texture.h>
 #include "ActionGameGlobals.h"
 
-Weapon::Weapon(Entity& anEntity)
+
+void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
+{
+	aRootHandle.ParseFloatField("basecooldown", myBaseCooldown);
+	aRootHandle.ParseIntField("basedamage", myBaseDamage);
+
+	Slush::AssetParser::Handle projectileHandle = aRootHandle.ParseChildElement("projectileData");
+	int typeAsInt = myProjectileData.myType;
+	projectileHandle.ParseIntField("type", typeAsInt);
+	myProjectileData.myType = WeaponData::ProjectileData::Type(typeAsInt);
+	projectileHandle.ParseOptionalFloatField("baseprojectilespeed", myProjectileData.myBaseProjectileSpeed, myProjectileData.myType != WeaponData::ProjectileData::W_None);
+	projectileHandle.ParseOptionalStringField("projectilePrefab", myProjectileData.myProjectilePrefab, myProjectileData.myType != WeaponData::ProjectileData::W_None);
+}
+
+void WeaponData::BuildUI()
+{
+	if (ImGui::CollapsingHeader("Base Data", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		ImGui::SetNextItemWidth(150.f);
+		ImGui::InputFloat("Base Cooldown", &myBaseCooldown, 0.05f, 0.1f, "%.2f");
+
+		ImGui::SetNextItemWidth(150.f);
+		ImGui::InputInt("Base Damage", &myBaseDamage);
+	}
+
+	if (ImGui::CollapsingHeader("Projectile Data"))
+	{
+		ImGui::SetNextItemWidth(150.f);
+		const char* projectileTypes[] = { "None", "Line Shooter", "Spread Shooter" };
+		if (ImGui::BeginCombo("Projectile Type", projectileTypes[myProjectileData.myType]))
+		{
+			for (int i = 0; i < IM_ARRAYSIZE(projectileTypes); ++i)
+			{
+				if (ImGui::Selectable(projectileTypes[i]))
+					myProjectileData.myType = static_cast<WeaponData::ProjectileData::Type>(i);
+			}
+
+			ImGui::EndCombo();
+		}
+
+		if (myProjectileData.myType != WeaponData::ProjectileData::Type::W_None)
+		{
+			ImGui::SetNextItemWidth(150.f);
+			ImGui::InputFloat("Base Projectile Speed", &myProjectileData.myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
+
+			ImGui::SetNextItemWidth(150.f);
+			ImGui::InputText("ProjectilePrefab", &myProjectileData.myProjectilePrefab);
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+					myProjectileData.myProjectilePrefab = asset->GetAssetName();
+
+				ImGui::EndDragDropTarget();
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+Weapon::Weapon(Entity& anEntity, const WeaponData& aWeaponData)
 	: myEntity(anEntity)
+	, myWeaponData(&aWeaponData)
 {
 }
 
@@ -23,11 +84,10 @@ void Weapon::Update()
 {
 	if (!myActivationCooldown.IsStarted() || myActivationCooldown.HasExpired())
 	{
-		float cooldown = GetBaseCooldown();
+		float cooldown = myWeaponData->myBaseCooldown;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 		{
 			cooldown /= stats->GetCooldownReduction();
-			cooldown /= GetAdditionalCooldownReduction(stats);
 		}
 
 		myActivationCooldown.Start(cooldown);
@@ -40,12 +100,12 @@ void Weapon::Update()
 
 void ProjectileShooter::ShootProjectile(const Vector2f& aDirection)
 {
-	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myData.myProjectilePrefab.GetBuffer());
-	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myData.myBaseProjectileSpeed;
+	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myWeaponData->myProjectileData.myProjectilePrefab.GetBuffer());
+	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myWeaponData->myProjectileData.myBaseProjectileSpeed;
 	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
-		int damage = myData.myBaseDamage;
+		int damage = myWeaponData->myBaseDamage;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 			damage = static_cast<int>(damage * stats->GetDamageModifier());
 
@@ -73,11 +133,6 @@ void LineShooter::OnActivate()
 
 	Vector2f direction = GetNormalized(target.Get()->myPosition - myEntity.myPosition);
 	ShootProjectile(direction);
-}
-
-float LineShooter::GetAdditionalCooldownReduction(StatsComponent* aStatsComponent) const
-{
-	return static_cast<float>(aStatsComponent->GetAdditionalProjectiles());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -115,74 +170,18 @@ void SpreadShooter::OnActivate()
 
 void WeaponComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	if (aComponentHandle.IsReading())
-		myProjectileShooterDatas.Reserve(aComponentHandle.GetNumChildElements());
-	
-	for (int i = 0; i < myProjectileShooterDatas.Count(); ++i)
-	{
-		ProjectileShooter::Data& projShooterData = myProjectileShooterDatas[i];
-		
-		Slush::AssetParser::Handle weaponHandle;
-		if (aComponentHandle.IsReading())
-			weaponHandle = aComponentHandle.GetChildElementAtIndex(i);
-		else
-			weaponHandle = aComponentHandle.ParseChildElement("Weapon");
-
-		int typeAsInt = projShooterData.myType;
-		weaponHandle.ParseIntField("type", typeAsInt);
-		projShooterData.myType = ProjectileShooter::Data::Type(typeAsInt);
-
-		weaponHandle.ParseFloatField("basecooldown", projShooterData.myBaseCooldown);
-		weaponHandle.ParseFloatField("baseprojectilespeed", projShooterData.myBaseProjectileSpeed);
-		weaponHandle.ParseIntField("basedamage", projShooterData.myBaseDamage);
-		weaponHandle.ParseStringField("projectilePrefab", projShooterData.myProjectilePrefab);
-	}
+	aComponentHandle.ParseStringField("weapondata", myWeaponDataAsset);
 }
 
 void WeaponComponent::Data::OnBuildUI()
 {
-	for (ProjectileShooter::Data& projShooterData : myProjectileShooterDatas)
+	ImGui::InputText("WeaponData", &myWeaponDataAsset);
+	if (ImGui::BeginDragDropTarget())
 	{
-		const char* shooterType = projShooterData.myType == ProjectileShooter::Data::W_LineShooter ? "LineShooter" : "SpreadShooter";
-		if (ImGui::CollapsingHeader(shooterType))
-		{
-			ImGui::SetNextItemWidth(150.f);
-			ImGui::InputFloat("Base Cooldown", &projShooterData.myBaseCooldown, 0.05f, 0.1f, "%.2f");
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<WeaponData>()))
+			myWeaponDataAsset = asset->GetAssetName();
 
-			ImGui::SetNextItemWidth(150.f);
-			ImGui::InputFloat("Base Projectile Speed", &projShooterData.myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
-
-			ImGui::SetNextItemWidth(150.f);
-			ImGui::InputInt("Base Damage", &projShooterData.myBaseDamage);
-
-			ImGui::InputText("ProjectilePrefab", &projShooterData.myProjectilePrefab);
-			if (ImGui::BeginDragDropTarget())
-			{
-				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
-					projShooterData.myProjectilePrefab = asset->GetAssetName();
-
-				ImGui::EndDragDropTarget();
-			}
-		}
-	}
-
-	if (ImGui::Button("Add Weapon"))
-		ImGui::OpenPopup("add_weapon_popup");
-
-	if (ImGui::BeginPopup("add_weapon_popup"))
-	{
-		const char* weaponTypes[] = { "Line Shooter", "Spread Shooter" };
-		for (int i = 0; i < IM_ARRAYSIZE(weaponTypes); ++i)
-		{
-			if (ImGui::Selectable(weaponTypes[i]))
-			{
-				ProjectileShooter::Data& data = myProjectileShooterDatas.Add();
-				data.myType = static_cast<ProjectileShooter::Data::Type>(i);
-				ImGui::CloseCurrentPopup();
-			}
-		}
-
-		ImGui::EndPopup();
+		ImGui::EndDragDropTarget();
 	}
 }
 
@@ -190,20 +189,16 @@ void WeaponComponent::Data::OnBuildUI()
 WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	const Data& weaponData = anEntityPrefab.GetWeaponData();
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	WeaponData* data = assets.GetAsset<WeaponData>(anEntityPrefab.GetWeaponData().myWeaponDataAsset.GetBuffer());
 
-	for (const ProjectileShooter::Data& projShooterData : weaponData.myProjectileShooterDatas)
+	ProjectileShooter* shooter = nullptr;
+	switch (data->myProjectileData.myType)
 	{
-		ProjectileShooter* shooter = nullptr;
-		switch (projShooterData.myType)
-		{
-		case ProjectileShooter::Data::W_LineShooter: shooter = new LineShooter(anEntity); break;
-		case ProjectileShooter::Data::W_SpreadShooter: shooter = new SpreadShooter(anEntity); break;
-		}
-
-		shooter->myData = projShooterData;
-		myProjectileShooters.Add(shooter);
+	case WeaponData::ProjectileData::W_LineShooter: shooter = new LineShooter(anEntity, *data); break;
+	case WeaponData::ProjectileData::W_SpreadShooter: shooter = new SpreadShooter(anEntity, *data); break;
 	}
+	myProjectileShooters.Add(shooter);
 }
 
 WeaponComponent::~WeaponComponent()

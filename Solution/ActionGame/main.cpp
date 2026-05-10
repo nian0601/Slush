@@ -21,6 +21,7 @@
 #include "CharacterAnimationSet.h"
 #include "EntityEditorLayout.h"
 #include "GameLayout.h"
+#include "Components/WeaponComponent.h"
 
 class App : public Slush::IApp
 {
@@ -36,6 +37,7 @@ public:
 		assets.RegisterAssetType<Slush::Animation>();
 		assets.RegisterAssetType<CharacterAnimationSet>();
 		assets.RegisterAssetType<EntityPrefab>();
+		assets.RegisterAssetType<WeaponData>();
 		assets.LoadAllAssets();
 
 		myFont.Load("Data/NotoSans.ttf");

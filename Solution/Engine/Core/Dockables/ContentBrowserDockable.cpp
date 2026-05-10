@@ -22,10 +22,10 @@ namespace Slush
 		const FW_GrowingArray<IAssetStorage*>& storages = assetRegistry.GetAllAssetStorages();
 		FW_ASSERT(myAssetFilters.Count() == storages.Count(), "New AssetType was registered after opening ContentBrowser, we dont handle that yet");
 
-		for (int i = 0; i < storages.Count(); ++i)
+		if (ImGui::CollapsingHeader("Filters"))
 		{
-			ImGui::SameLine();
-			ImGui::Checkbox(storages[i]->GetAssetTypeName(), &myAssetFilters[i]);
+			for (int i = 0; i < storages.Count(); ++i)
+				ImGui::Checkbox(storages[i]->GetAssetTypeName(), &myAssetFilters[i]);
 		}
 
 		ImGui::Separator();

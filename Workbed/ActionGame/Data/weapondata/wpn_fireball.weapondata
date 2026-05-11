@@ -1,11 +1,12 @@
 WeaponData 
 { 
-	basecooldown 0.500 
+	basecooldown 0.950 
 	basedamage 10 
 	projectileData 
 	{ 
-		type 2 
+		enable 1 
 		baseprojectilespeed 750.000 
+		baseprojectilcount 3 
 		projectilePrefab proj_player_fireball 
 	} 
 } 

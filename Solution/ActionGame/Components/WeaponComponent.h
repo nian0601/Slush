@@ -22,21 +22,14 @@ public:
 
 	struct ProjectileData
 	{
-		enum Type
-		{
-			W_None,
-			W_LineShooter,
-			W_SpreadShooter,
-		};
-
-		Type myType = W_None;
+		bool myEnable = false;
 		float myBaseProjectileSpeed = 750.f;
+		int myBaseProjectileCount = 1;
 		FW_String myProjectilePrefab;
 	};
 	ProjectileData myProjectileData;
 };
 
-class StatsComponent;
 class Weapon
 {
 public:
@@ -45,36 +38,12 @@ public:
 	void Update();
 
 protected:
-	virtual void OnActivate() = 0;
-	virtual float GetAdditionalCooldownReduction(StatsComponent* /*aStatsComponent*/) const { return 1.f; }
+	void RunProjectileLogic();
+	void ShootProjectile(const Vector2f& aDirection);
 
 	Entity& myEntity;
 	Slush::Timer myActivationCooldown;
 	const WeaponData* myWeaponData;
-};
-
-class ProjectileShooter : public Weapon
-{
-public:
-	using Weapon::Weapon;
-
-	void ShootProjectile(const Vector2f& aDirection);
-};
-
-class LineShooter : public ProjectileShooter
-{
-public:
-	using ProjectileShooter::ProjectileShooter;
-
-	void OnActivate() override;
-};
-
-class SpreadShooter : public ProjectileShooter
-{
-public:
-	using ProjectileShooter::ProjectileShooter;
-
-	void OnActivate() override;
 };
 
 
@@ -98,5 +67,5 @@ public:
 	void Update() override;
 
 private:
-	FW_GrowingArray<ProjectileShooter*> myProjectileShooters;
+	FW_GrowingArray<Weapon*> myProjectileShooters;
 };

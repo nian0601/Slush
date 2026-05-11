@@ -9,8 +9,8 @@ Entity Prefab
 		color -1 
 		size 
 		{ 
-			width 0.000 
-			height 0.000 
+			width 36.000 
+			height 16.000 
 		} 
 		floatColor 
 		{ 

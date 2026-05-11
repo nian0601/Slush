@@ -4,8 +4,9 @@ WeaponData
 	basedamage 5 
 	projectileData 
 	{ 
-		type 1 
+		enable 1 
 		baseprojectilespeed 900.000 
+		baseprojectilcount 1 
 		projectilePrefab proj_player_shuriken 
 	} 
 } 

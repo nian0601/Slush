@@ -10,8 +10,8 @@ void StatsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 	aComponentHandle.ParseIntField("maxdamageupgrades", myMaxDamageUpgrades);
 	aComponentHandle.ParseFloatField("damageperupgrade", myDamagePerUpgrade);
 
-	aComponentHandle.ParseIntField("maxadditionalprojectileupgrades", myMaxAdditionalProjectileUpgrades);
-	aComponentHandle.ParseFloatField("additionalprojectilesperupgrade", myAdditionalProjectilesPerUpgrade);
+	aComponentHandle.ParseOptionalIntField("maxexperienceupgrades", myMaxExperienceUpgrades, true);
+	aComponentHandle.ParseOptionalFloatField("experiencegainperupgrade", myAdditionalExperiencePerUpgrade, true);
 }
 
 void StatsComponent::Data::OnBuildUI()
@@ -29,10 +29,10 @@ void StatsComponent::Data::OnBuildUI()
 	ImGui::InputFloat("Damage Per Upgrade", &myDamagePerUpgrade, 0.05f, 1.f, "%.2f");
 
 	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputInt("Max Additional Projectiles Upgrades", &myMaxAdditionalProjectileUpgrades);
+	ImGui::InputInt("Max Experience Upgrades", &myMaxExperienceUpgrades);
 
 	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputFloat("Additional Projectiles Per Upgrade", &myAdditionalProjectilesPerUpgrade, 1.f, 1.f, "%.0f");
+	ImGui::InputFloat("Experience Gain Per Upgrade", &myAdditionalExperiencePerUpgrade, 0.5f, 1.f, "%.2f");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -53,9 +53,9 @@ void StatsComponent::AddDamageUpgrade()
 	myDamageModifier.Upgrade(myEntityPrefab.GetStatsData().myDamagePerUpgrade);
 }
 
-void StatsComponent::AddAdditionalProjectilesUpgrade()
+void StatsComponent::AddExperienceUpgrade()
 {
-	myAdditionalProjectilesModifier.Upgrade(myEntityPrefab.GetStatsData().myAdditionalProjectilesPerUpgrade);
+	myExperienceModifier.Upgrade(myEntityPrefab.GetStatsData().myAdditionalExperiencePerUpgrade	);
 }
 
 bool StatsComponent::CanUpgradeCooldownReduction() const
@@ -68,7 +68,7 @@ bool StatsComponent::CanUpgradeDamage() const
 	return myDamageModifier.myNumberOfUpgrades < myEntityPrefab.GetStatsData().myMaxDamageUpgrades;
 }
 
-bool StatsComponent::CanUpgradeAdditionalProjectiles() const
+bool StatsComponent::CanUpgradeExperience() const
 {
-	return myAdditionalProjectilesModifier.myNumberOfUpgrades < myEntityPrefab.GetStatsData().myMaxAdditionalProjectileUpgrades;
+	return myExperienceModifier.myNumberOfUpgrades < myEntityPrefab.GetStatsData().myMaxExperienceUpgrades;
 }

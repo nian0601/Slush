@@ -153,16 +153,16 @@ void SpreadShooter::OnActivate()
 	Vector2f direction = GetNormalized(target.Get()->myPosition - myEntity.myPosition);
 	ShootProjectile(direction);
 
-	if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
-	{
-		int additionalProj = stats->GetAdditionalProjectiles();
-		for (int i = 0; i < additionalProj; ++i)
-		{
-			float spread = 0.1f * i;
-			ShootProjectile(Rotate(direction, FW_PI * spread));
-			ShootProjectile(Rotate(direction, -FW_PI * spread));
-		}
-	}
+	//if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
+	//{
+	//	int additionalProj = stats->GetAdditionalProjectiles();
+	//	for (int i = 0; i < additionalProj; ++i)
+	//	{
+	//		float spread = 0.1f * i;
+	//		ShootProjectile(Rotate(direction, FW_PI * spread));
+	//		ShootProjectile(Rotate(direction, -FW_PI * spread));
+	//	}
+	//}
 	
 }
 

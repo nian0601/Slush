@@ -128,7 +128,7 @@ void Level::HandleLevlingUp()
 
 	if (StatsComponent* stats = player->GetComponent<StatsComponent>())
 	{
-		if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage() && !stats->CanUpgradeAdditionalProjectiles())
+		if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage() && !stats->CanUpgradeExperience())
 		{
 			expComp->LevelUp();
 			myIsLevelingUp = false;
@@ -179,13 +179,13 @@ void Level::HandleLevlingUp()
 					uiBuilder.CloseElement();
 				}
 
-				if (stats->CanUpgradeAdditionalProjectiles())
+				if (stats->CanUpgradeExperience())
 				{
-					uiBuilder.OpenElement("Projectile", myUIButtonStyle);
+					uiBuilder.OpenElement("Experience", myUIButtonStyle);
 					uiBuilder.GetStyle().SetColor(0xFF33FF33);
 
 					uiBuilder.OpenElement();
-					uiBuilder.SetText("Projectile", myFont, 25);
+					uiBuilder.SetText("Experience", myFont, 25);
 					uiBuilder.GetStyle().SetColor(0xFF000000);
 					uiBuilder.CloseElement();
 
@@ -209,9 +209,9 @@ void Level::HandleLevlingUp()
 				expComp->LevelUp();
 				myIsLevelingUp = false;
 			}
-			if (stats->CanUpgradeAdditionalProjectiles() && uiBuilder.WasClicked("Projectile"))
+			if (stats->CanUpgradeExperience() && uiBuilder.WasClicked("Experience"))
 			{
-				stats->AddAdditionalProjectilesUpgrade();
+				stats->AddExperienceUpgrade();
 				expComp->LevelUp();
 				myIsLevelingUp = false;
 			}

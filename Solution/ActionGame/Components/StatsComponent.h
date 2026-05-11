@@ -16,8 +16,8 @@ public:
 		int myMaxDamageUpgrades = 10;
 		float myDamagePerUpgrade = 1.f;
 
-		int myMaxAdditionalProjectileUpgrades = 3;
-		float myAdditionalProjectilesPerUpgrade = 1.f;
+		int myMaxExperienceUpgrades = 10;
+		float myAdditionalExperiencePerUpgrade = 0.1f;
 	};
 
 public:
@@ -27,15 +27,15 @@ public:
 
 	void AddCooldownReductionUpgrade();
 	void AddDamageUpgrade();
-	void AddAdditionalProjectilesUpgrade();
+	void AddExperienceUpgrade();
 
 	bool CanUpgradeCooldownReduction() const;
 	bool CanUpgradeDamage() const;
-	bool CanUpgradeAdditionalProjectiles() const;
+	bool CanUpgradeExperience() const;
 
 	float GetCooldownReduction() const { return myCooldownReduction.myStatModifierValue; }
 	float GetDamageModifier() const { return myDamageModifier.myStatModifierValue; }
-	int GetAdditionalProjectiles() const { return static_cast<int>(myAdditionalProjectilesModifier.myStatModifierValue); }
+	float GetExperienceModfier() const { return myExperienceModifier.myStatModifierValue; }
 
 private:
 	struct Stat
@@ -48,5 +48,5 @@ private:
 
 	Stat myCooldownReduction;
 	Stat myDamageModifier;
-	Stat myAdditionalProjectilesModifier;
+	Stat myExperienceModifier;
 };

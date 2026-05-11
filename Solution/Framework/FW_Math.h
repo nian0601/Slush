@@ -135,6 +135,21 @@ inline T FW_Max(const T& aFirst, const T& aSecond)
 	return aFirst > aSecond ? aFirst : aSecond;
 }
 
+inline int FW_Floor(float aValue)
+{
+	return static_cast<int>(aValue);
+}
+
+inline int FW_Ceil(float aValue)
+{
+	return static_cast<int>(aValue + 1.f);
+}
+
+inline int FW_Round(float aValue)
+{
+	return static_cast<int>(aValue + 0.5f);
+}
+
 inline float FW_Lerp(float aStart, float aEnd, float aAlpha)
 {
 	return (aStart + (aEnd - aStart) * aAlpha);

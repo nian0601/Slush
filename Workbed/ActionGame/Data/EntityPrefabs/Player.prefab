@@ -68,8 +68,8 @@ Entity Prefab
 		cooldownperupgrade 0.200 
 		maxdamageupgrades 10 
 		damageperupgrade 1.000 
-		maxadditionalprojectileupgrades 3 
-		additionalprojectilesperupgrade 1.000 
+		maxexperienceupgrades 10 
+		experiencegainperupgrade 0.100 
 	} 
 	healthbar 
 	{ 

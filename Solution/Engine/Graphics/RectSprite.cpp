@@ -40,6 +40,8 @@ namespace Slush
 			myShape->setOrigin({ mySize.x * 0.5f, mySize.y });
 		else if (myOrigin == Origin::TOP_LEFT)
 			myShape->setOrigin({ 0.f, 0.f });
+		else if (myOrigin == Origin::LEFT)
+			myShape->setOrigin({ 0.f, mySize.y * 0.5f });
 		else
 			FW_ASSERT_ALWAYS;
 	}

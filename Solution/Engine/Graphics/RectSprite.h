@@ -12,6 +12,7 @@ namespace Slush
 			CENTER,
 			BOTTOM_CENTER,
 			TOP_LEFT,
+			LEFT,
 		};
 
 		RectSprite();

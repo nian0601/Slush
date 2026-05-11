@@ -3,6 +3,7 @@
 #include "ExperienceComponent.h"
 
 #include <Graphics/RectSprite.h>
+#include "StatsComponent.h"
 
 ExperienceComponent::ExperienceComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
@@ -12,8 +13,10 @@ ExperienceComponent::ExperienceComponent(Entity& anEntity, const EntityPrefab& a
 
 	myBackground->SetSize(myTotalWidth, myTotalHeight);
 	myBackground->SetFillColor(0xFF222222);
+	myBackground->SetOrigin(Slush::RectSprite::Origin::LEFT);
 	myForeground->SetSize(myTotalWidth - myPadding * 2.f, myTotalHeight - myPadding * 2.f);
 	myForeground->SetFillColor(0xFFAAAAFF);
+	myForeground->SetOrigin(Slush::RectSprite::Origin::LEFT);
 
 	RecalculateBarSize();
 }
@@ -26,14 +29,21 @@ ExperienceComponent::~ExperienceComponent()
 
 void ExperienceComponent::Render()
 {
-	Vector2f position = { 960.f, 1000.f };
+	float xPos = 1920.f;
+	xPos -= myTotalWidth;
+	xPos /= 2.f;
+	Vector2f position = { xPos, 1000.f };
 	myBackground->Render(position.x, position.y);
 	myForeground->Render(position.x, position.y);
 }
 
 void ExperienceComponent::AddExperience(int aAmount)
 {
-	myCurrentExperience += aAmount;
+	float modifier = 1.f;
+	if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
+		modifier += stats->GetExperienceModfier();
+
+	myCurrentExperience += FW_Round(aAmount * modifier);
 	RecalculateBarSize();
 }
 

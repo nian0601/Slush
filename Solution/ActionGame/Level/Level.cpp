@@ -14,6 +14,8 @@
 #include <Graphics\RectSprite.h>
 #include <Graphics\Text.h>
 #include "LevelData.h"
+#include "Components/WeaponComponent.h"
+#include "Core/Assets/AssetStorage.h"
 
 Level::Level()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
@@ -61,6 +63,7 @@ void Level::Update()
 		return;
 
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
+	WeaponComponent* weaponComp = player->GetComponent<WeaponComponent>();
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	const Slush::Input& input = engine.GetInput();
@@ -69,15 +72,16 @@ void Level::Update()
 		expComp->AddExperience(1);
 	}
 
-	myIsLevelingUp = expComp->NeedsLevelUp();
-	if (myIsLevelingUp)
-	{
+	const bool levelingUp = expComp->NeedsLevelUp();
+	const bool upgradingWeapon = weaponComp->HasPendingUpgrade();
+	myIsShowingUI = levelingUp || upgradingWeapon;
+
+	if (levelingUp)
 		HandleLevlingUp();
-	}
+	else if (upgradingWeapon)
+		HandleUpgradingWeapon();
 	else
-	{
 		HandleEnemyWaves();
-	}
 }
 
 void Level::RenderGame()
@@ -131,7 +135,7 @@ void Level::HandleLevlingUp()
 		if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage() && !stats->CanUpgradeExperience())
 		{
 			expComp->LevelUp();
-			myIsLevelingUp = false;
+			myIsShowingUI = false;
 			SLUSH_WARNING("No more available upgrades, auto-leveling");
 		}
 		else
@@ -201,19 +205,19 @@ void Level::HandleLevlingUp()
 			{
 				stats->AddCooldownReductionUpgrade();
 				expComp->LevelUp();
-				myIsLevelingUp = false;
+				myIsShowingUI = false;
 			}
 			if (stats->CanUpgradeDamage() && uiBuilder.WasClicked("Damage"))
 			{
 				stats->AddDamageUpgrade();
 				expComp->LevelUp();
-				myIsLevelingUp = false;
+				myIsShowingUI = false;
 			}
 			if (stats->CanUpgradeExperience() && uiBuilder.WasClicked("Experience"))
 			{
 				stats->AddExperienceUpgrade();
 				expComp->LevelUp();
-				myIsLevelingUp = false;
+				myIsShowingUI = false;
 			}
 		}
 	}
@@ -221,7 +225,81 @@ void Level::HandleLevlingUp()
 	{
 		SLUSH_ERROR("Player doesnt have a StatsComponent, not able to pick upgrade when Leveling");
 		expComp->LevelUp();
-		myIsLevelingUp = false;
+		myIsShowingUI = false;
+	}
+}
+
+void Level::HandleUpgradingWeapon()
+{
+	Entity* player = myPlayerHandle.Get();
+	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
+	const FW_GrowingArray<Weapon*>& activeWeapons = weaponComponent->GetWeapons();
+
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	const FW_GrowingArray<Slush::Asset*>& allWeapons = assets.GetAllAssets<WeaponData>();
+
+	if (activeWeapons.Count() == allWeapons.Count())
+	{
+		weaponComponent->FinishUpgrade();
+		return;
+	}
+
+	Slush::DynamicUIBuilder uiBuilder;
+	uiBuilder.Start();
+
+	{
+		uiBuilder.OpenElement("Title", myUIBackgroundStyle);
+		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
+
+		uiBuilder.OpenElement("title");
+		uiBuilder.SetText("Weapon Upgrade!", myFont, 32);
+		uiBuilder.CloseElement();
+
+		uiBuilder.CloseElement(); // Title
+	}
+
+	uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
+
+	FW_GrowingArray<const WeaponData*> potentialWeapons;
+	for (const Slush::Asset* asset : allWeapons)
+	{
+		const WeaponData* potentialWeapon = static_cast<const WeaponData*>(asset);
+		bool hasWeapon = false;
+		for (Weapon* ownedWeapon : activeWeapons)
+		{
+			if (&ownedWeapon->GetWeaponData() == potentialWeapon)
+			{
+				hasWeapon = true;
+				break;
+			}
+		}
+
+		if (hasWeapon)
+			continue;
+
+		potentialWeapons.Add(potentialWeapon);
+
+		uiBuilder.OpenElement(potentialWeapon->GetAssetName().GetBuffer(), myUIButtonStyle);
+		uiBuilder.GetStyle().SetColor(0xFFFF3333);
+
+		uiBuilder.OpenElement();
+		uiBuilder.SetText(potentialWeapon->GetAssetName().GetBuffer(), myFont, 25);
+		uiBuilder.GetStyle().SetColor(0xFF000000);
+		uiBuilder.CloseElement();
+
+		uiBuilder.CloseElement();
+	}
+
+	uiBuilder.CloseElement(); // ButtonBackground
+	uiBuilder.Finish(myUIRenderCommands);
+
+	for (const WeaponData* potentialWeapon : potentialWeapons)
+	{
+		if (uiBuilder.WasClicked(potentialWeapon->GetAssetName().GetBuffer()))
+		{
+			weaponComponent->UpgradeWeapon(*potentialWeapon);
+			weaponComponent->FinishUpgrade();
+		}
 	}
 }
 

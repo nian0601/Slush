@@ -37,13 +37,15 @@ public:
 
 	void Update();
 
+	const WeaponData& GetWeaponData() const { return myWeaponData; }
+
 protected:
 	void RunProjectileLogic();
 	void ShootProjectile(const Vector2f& aDirection);
 
 	Entity& myEntity;
 	Slush::Timer myActivationCooldown;
-	const WeaponData* myWeaponData;
+	const WeaponData& myWeaponData;
 };
 
 
@@ -65,7 +67,14 @@ public:
 	~WeaponComponent();
 
 	void Update() override;
+	void AddPendingUpgrade() { myHasPendingUpgrade = true; }
+	bool HasPendingUpgrade() const { return myHasPendingUpgrade; }
+	void FinishUpgrade() { myHasPendingUpgrade = false; }
+	void UpgradeWeapon(const WeaponData& someData);
+
+	const FW_GrowingArray<Weapon*>& GetWeapons() { return myWeapons; }
 
 private:
-	FW_GrowingArray<Weapon*> myProjectileShooters;
+	FW_GrowingArray<Weapon*> myWeapons;
+	bool myHasPendingUpgrade = false;
 };

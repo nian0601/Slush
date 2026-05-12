@@ -72,7 +72,7 @@ void WeaponData::BuildUI()
 
 Weapon::Weapon(Entity& anEntity, const WeaponData& aWeaponData)
 	: myEntity(anEntity)
-	, myWeaponData(&aWeaponData)
+	, myWeaponData(aWeaponData)
 {
 }
 
@@ -80,7 +80,7 @@ void Weapon::Update()
 {
 	if (!myActivationCooldown.IsStarted() || myActivationCooldown.HasExpired())
 	{
-		float cooldown = myWeaponData->myBaseCooldown;
+		float cooldown = myWeaponData.myBaseCooldown;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 		{
 			cooldown /= stats->GetCooldownReduction();
@@ -88,7 +88,7 @@ void Weapon::Update()
 
 		myActivationCooldown.Start(cooldown);
 
-		if (myWeaponData->myProjectileData.myEnable)
+		if (myWeaponData.myProjectileData.myEnable)
 			RunProjectileLogic();
 	}
 }
@@ -106,7 +106,7 @@ void Weapon::RunProjectileLogic()
 	if (!target.IsValid())
 		return;
 
-	const WeaponData::ProjectileData& projectileData = myWeaponData->myProjectileData;
+	const WeaponData::ProjectileData& projectileData = myWeaponData.myProjectileData;
 
 	const bool oddNumProjectiles = (projectileData.myBaseProjectileCount % 2) == 1;
 	int projectilesToSpawn = projectileData.myBaseProjectileCount;
@@ -129,12 +129,12 @@ void Weapon::RunProjectileLogic()
 
 void Weapon::ShootProjectile(const Vector2f& aDirection)
 {
-	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myWeaponData->myProjectileData.myProjectilePrefab.GetBuffer());
-	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myWeaponData->myProjectileData.myBaseProjectileSpeed;
+	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myWeaponData.myProjectileData.myProjectilePrefab.GetBuffer());
+	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myWeaponData.myProjectileData.myBaseProjectileSpeed;
 	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
-		int damage = myWeaponData->myBaseDamage;
+		int damage = myWeaponData.myBaseDamage;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 			damage = static_cast<int>(damage * stats->GetDamageModifier());
 
@@ -171,16 +171,21 @@ WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityP
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	WeaponData* data = assets.GetAsset<WeaponData>(anEntityPrefab.GetWeaponData().myWeaponDataAsset.GetBuffer());
 
-	myProjectileShooters.Add(new Weapon(myEntity, *data));
+	myWeapons.Add(new Weapon(myEntity, *data));
 }
 
 WeaponComponent::~WeaponComponent()
 {
-	myProjectileShooters.DeleteAll();
+	myWeapons.DeleteAll();
 }
 
 void WeaponComponent::Update()
 {
-	for (Weapon* projShooter : myProjectileShooters)
-		projShooter->Update();
+	for (Weapon* weapon : myWeapons)
+		weapon->Update();
+}
+
+void WeaponComponent::UpgradeWeapon(const WeaponData& someData)
+{
+	myWeapons.Add(new Weapon(myEntity, someData));
 }

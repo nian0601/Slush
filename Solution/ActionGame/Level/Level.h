@@ -28,10 +28,11 @@ public:
 	void RenderUI();
 
 	bool IsPlayerDead() const;
-	bool IsLevelingUp() const { return myIsLevelingUp; }
+	bool IsShowingUI() const { return myIsShowingUI; }
 
 private:
 	void HandleLevlingUp();
+	void HandleUpgradingWeapon();
 	void HandleEnemyWaves();
 
 	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);	
@@ -40,7 +41,7 @@ private:
 	EnemyWaveData* myEnemyWaveData = nullptr;
 	EntityManager& myEntityManager;
 	EntityHandle myPlayerHandle;
-	bool myIsLevelingUp = false;
+	bool myIsShowingUI = false;
 
 	Tilemap* myTilemap;
 

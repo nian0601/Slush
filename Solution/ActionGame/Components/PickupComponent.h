@@ -13,6 +13,7 @@ public:
 		{
 			EXPERIENCE,
 			HEALTH,
+			WEAPON_UPGRADE,
 		};
 
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;

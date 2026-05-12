@@ -6,7 +6,6 @@ Entity Prefab
 	} 
 	sprite 
 	{ 
-		radius 20.000 
 		color -1 
 		textureID Enemy_002_B 
 		size 
@@ -62,13 +61,14 @@ Entity Prefab
 	damagedealer 
 	{ 
 		damage 10 
+		prefab  
 	} 
 	drops 
 	{ 
 		drop 
 		{ 
 			weight 100 
-			prefab Pickup_Exp_Big 
+			prefab Pickup_Weapon 
 		} 
 	} 
 	characteranimation 

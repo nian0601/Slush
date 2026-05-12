@@ -74,7 +74,7 @@ void GameLayout::Update()
 {
 	bool pauseEntityUpdate = false;
 	if (myLevel)
-		pauseEntityUpdate = myLevel->IsLevelingUp();
+		pauseEntityUpdate = myLevel->IsShowingUI();
 
 	UpdateGameState();
 

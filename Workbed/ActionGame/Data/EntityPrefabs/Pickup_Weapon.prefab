@@ -22,16 +22,16 @@ Entity Prefab
 		} 
 		textureRect 
 		{ 
-			x 768 
-			y 720 
+			x 48 
+			y 0 
 			width 48 
 			height 48 
 		} 
 	} 
 	physics 
 	{ 
-		isStatic 1 
-		isSensor 1 
+		isStatic 0 
+		isSensor 0 
 		matchSprite 0 
 		radius 18.000 
 		size 
@@ -42,7 +42,7 @@ Entity Prefab
 	} 
 	pickup 
 	{ 
-		type 0 
+		type 2 
 		value 1 
 	} 
 } 

@@ -3,6 +3,7 @@
 #include "PickupComponent.h"
 #include "ExperienceComponent.h"
 #include <EntitySystem\EntityPrefab.h>
+#include "WeaponComponent.h"
 
 void PickupComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -12,7 +13,7 @@ void PickupComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 
 void PickupComponent::Data::OnBuildUI()
 {
-	const char* pickupTypes[] = { "Experience", "Health"};
+	const char* pickupTypes[] = { "Experience", "Health", "Weapon Upgrade"};
 	ImGui::Combo("Type", &myType, pickupTypes, IM_ARRAYSIZE(pickupTypes));
 	ImGui::InputInt("Value", &myValue);
 }
@@ -40,6 +41,11 @@ void PickupComponent::OnCollision(Entity& aOtherEntity, const Vector2f& /*aConta
 		{
 			if (HealthComponent* health = aOtherEntity.GetComponent<HealthComponent>())
 				health->RestoreHealth(myData.myValue);
+		}
+		else if (myData.myType == Data::PickupType::WEAPON_UPGRADE)
+		{
+			if (WeaponComponent* weapon = aOtherEntity.GetComponent<WeaponComponent>())
+				weapon->AddPendingUpgrade();
 		}
 		else
 		{

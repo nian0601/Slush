@@ -3,8 +3,8 @@ LevelData
 	playerEntityPrefab Player 
 	playerStartPosition 
 	{ 
-		x 500.000 
-		y 350.000 
+		x 920.000 
+		y 500.000 
 	} 
 	enemyWaves 
 	{ 

@@ -69,6 +69,9 @@ namespace Slush
 			CENTER
 		};
 
+		UIElementStyle() { Reset(); }
+		void Reset();
+
 		void SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
 		void SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
 		void SetLayoutDirection(UIElementStyle::LayoutDirection aDirection);
@@ -79,19 +82,19 @@ namespace Slush
 
 		void EnableButtonInteraction(int aHoverColor);
 
-		SizingMode myXSizing = FIT;
-		SizingMode myYSizing = FIT;
-		LayoutDirection myLayoutDirection = LEFT_TO_RIGHT;
-		Alignment myAlignment = TOP_LEFT;
+		SizingMode myXSizing;
+		SizingMode myYSizing;
+		LayoutDirection myLayoutDirection;
+		Alignment myAlignment;
 
-		Vector2i myMinSize = { 0, 0 };
-		Vector2i myMaxSize = { INT_MAX, INT_MAX };
-		Vector2i myPadding = { 0, 0 };
-		int myChildGap = 0;
-		int myColor = -1;
+		Vector2i myMinSize;
+		Vector2i myMaxSize;
+		Vector2i myPadding;
+		int myChildGap;
+		int myColor;
 
-		int myInteractionFlags = NONE;
-		int myHoverColor = -1;
+		int myInteractionFlags;
+		int myHoverColor;
 	};
 
 	class DynamicUIBuilder
@@ -129,24 +132,24 @@ namespace Slush
 	private:
 		struct Element
 		{
-			~Element()
-			{
-				myChildren.DeleteAll();
-			}
+			Element();
+			~Element();
+
+			void Reset();
 
 			FW_String myIdentifier;
 
 			UIElementStyle myStyle;
 
-			Vector2i myPosition = { 0, 0 };
-			Vector2i mySize = { 0, 0 };
-			Vector2i myContentSize = { 0, 0 };
-			int myColor = -1;
+			Vector2i myPosition;
+			Vector2i mySize;
+			Vector2i myContentSize;
+			int myColor;
 			FW_String myText;
-			int myTextSize = 15;
-			bool myWasMouseReleased = false; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames
+			int myTextSize;
+			bool myWasMouseReleased; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames
 
-			Element* myParent = nullptr;
+			Element* myParent;
 			FW_GrowingArray<Element*> myChildren;
 		};
 

@@ -109,6 +109,23 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
+	void UIElementStyle::Reset()
+	{
+		myXSizing = FIT;
+		myYSizing = FIT;
+		myLayoutDirection = LEFT_TO_RIGHT;
+		myAlignment = TOP_LEFT;
+
+		myMinSize = { 0, 0 };
+		myMaxSize = { INT_MAX, INT_MAX };
+		myPadding = { 0, 0 };
+		myChildGap = 0;
+		myColor = -1;
+
+		myInteractionFlags = NONE;
+		myHoverColor = -1;
+	}
+
 	void UIElementStyle::SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
 	{
 		myXSizing = aSizingMode;
@@ -168,6 +185,11 @@ namespace Slush
 		//Vector2f windowSize = window.GetGameViewRect().myExtents;
 		Vector2f windowSize = { 1920.f, 1080.f };
 
+		myCurrentElement = nullptr;
+		myInteractiveElements.Clear();
+		myRoot.Reset();
+
+		myRoot.myStyle.Reset();
 		myRoot.mySize = { (int)windowSize.x, (int)windowSize.y };
 		myRoot.myStyle.myMinSize = { (int)windowSize.x, (int)windowSize.y };
 		myRoot.myStyle.myMaxSize = { (int)windowSize.x, (int)windowSize.y };
@@ -518,4 +540,29 @@ namespace Slush
 		for (Element* child : anElement.myChildren)
 			GenerateRenderCommands(*child, outRenderCommands);
 	}
+
+	DynamicUIBuilder::Element::Element()
+	{
+		Reset();
+	}
+
+	DynamicUIBuilder::Element::~Element()
+	{
+		myChildren.DeleteAll();
+	}
+
+	void DynamicUIBuilder::Element::Reset()
+	{
+		myPosition = { 0, 0 };
+		mySize = { 0, 0 };
+		myContentSize = { 0, 0 };
+		myColor = -1;
+		myText = "";
+		myTextSize = 15;
+		myWasMouseReleased = false;
+
+		myParent = nullptr;
+		myChildren.DeleteAll();
+	}
+
 }

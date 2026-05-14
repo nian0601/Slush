@@ -44,10 +44,10 @@ public:
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		//window.SetAppLayout("Game");
-		//myAppLayout = new GameLayout();
-		window.SetAppLayout("Entity");
-		myAppLayout = new EntityEditorLayout();
+		window.SetAppLayout("Game");
+		myAppLayout = new GameLayout();
+		//window.SetAppLayout("Entity");
+		//myAppLayout = new EntityEditorLayout();
 	}
 
 	void Shutdown() override

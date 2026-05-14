@@ -6,6 +6,7 @@
 #include <Core\Assets\AssetStorage.h>
 #include <Graphics\RectSprite.h>
 #include <Graphics\Texture.h>
+#include "EntitySystem\EntityManager.h"
 
 Tilemap::Tilemap()
 {
@@ -63,6 +64,32 @@ Tilemap::Tilemap()
 
 Tilemap::~Tilemap()
 {
+}
+
+void Tilemap::CreateWallEntities(EntityManager& aEntityManager)
+{
+	Layer& wallLayer = myLayers.GetLast();
+
+	for (int y = 0; y < wallLayer.myYCount; ++y)
+	{
+		for (int x = 0; x < wallLayer.myXCount; ++x)
+		{
+			int tileIndex = wallLayer.GetTileIndex(x, y);
+			int subType = wallLayer.myVisualTiles[tileIndex];
+			if (subType == 0)
+				continue;
+
+			float offset = 0.5f;
+			if (myDisableSubTypes)
+				offset = -0.5f;
+
+			Vector2f pos;
+			pos.x = x * wallLayer.myTileSize + wallLayer.myTileSize * offset;
+			pos.y = y * wallLayer.myTileSize + wallLayer.myTileSize * offset;
+
+			aEntityManager.CreateEntity(pos, "Wall");
+		}
+	}
 }
 
 void Tilemap::Render()

@@ -122,6 +122,7 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 	{
 		myObject = new Slush::PhysicsObject(shape);
 		myObject->SetPosition(myEntity.myPosition);
+		myObject->SetInertia(0.f);
 		myObject->myUserData.Set<PhysicsComponent* const>(this);
 		myObject->myCollisionMask = GetCollisionFlag(aEntity.myType);
 		myObject->myCollidesWithMask = GetCollidesWithFlag(aEntity.myType);

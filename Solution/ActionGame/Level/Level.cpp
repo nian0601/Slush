@@ -88,6 +88,8 @@ void Level::Restart()
 
 	Entity* player = myEntityManager.CreateEntity(myLevelData->myPlayerStartPosition, myLevelData->myPlayerEntityPrefab);
 	myPlayerHandle = player->myHandle;
+
+	myTilemap->CreateWallEntities(myEntityManager);
 }
 
 void Level::RenderGame()

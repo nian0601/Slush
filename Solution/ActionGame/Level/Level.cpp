@@ -23,12 +23,7 @@ Level::Level()
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	myLevelData = assets.GetAsset<LevelData>("testLevel");
-	myEnemyWaveData = &myLevelData->myEnemyWaves[0];
-	myWaveTimer.Start(3.f);
-
-	Entity* player = myEntityManager.CreateEntity(myLevelData->myPlayerStartPosition, myLevelData->myPlayerEntityPrefab);
-	myPlayerHandle = player->myHandle;
-
+	
 	myTilemap = new Tilemap();
 
 	myUISprite = new Slush::RectSprite();
@@ -82,6 +77,17 @@ void Level::Update()
 		HandleUpgradingWeapon();
 	else
 		HandleEnemyWaves();
+}
+
+void Level::Restart()
+{
+	myEntityManager.DeleteAllEntities();
+
+	myEnemyWaveData = &myLevelData->myEnemyWaves[0];
+	myWaveTimer.Start(3.f);
+
+	Entity* player = myEntityManager.CreateEntity(myLevelData->myPlayerStartPosition, myLevelData->myPlayerEntityPrefab);
+	myPlayerHandle = player->myHandle;
 }
 
 void Level::RenderGame()

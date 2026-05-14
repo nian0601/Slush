@@ -23,6 +23,7 @@ public:
 	~Level();
 
 	void Update();
+	void Restart();
 
 	void RenderGame();
 	void RenderUI();

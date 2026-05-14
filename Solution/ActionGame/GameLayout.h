@@ -1,15 +1,18 @@
 #pragma once
 
 #include "AppLayout.h"
+#include "UI\UIManager.h"
 
 class EntityManager;
 class Level;
 
 namespace Slush
 {
+	class Font;
+	class RectSprite;
+	class Text;
+
 	class PhysicsWorld;
-	class UIButton;
-	class UIManager;
 }
 
 class GameLayout : public AppLayout
@@ -25,6 +28,11 @@ private:
 	void UpdatePhysics();
 	void UpdateGameState();
 
+	void UpdateStartScreen();
+	void UpdatePlaying();
+	void UpdateGameOver();
+
+
 	enum GameState
 	{
 		START_SCREEN,
@@ -39,9 +47,10 @@ private:
 	Level* myLevel = nullptr;
 	GameState myGameState = START_SCREEN;
 
-	Slush::UIButton* myStartGameButton = nullptr;
-	Slush::UIManager* myStartGameUIManager = nullptr;
-
-	Slush::UIButton* myRestartGameButton = nullptr;
-	Slush::UIManager* myRestartGameUIManager = nullptr;
+	Slush::UIElementStyle myUIBackgroundStyle;
+	Slush::UIElementStyle myUIButtonStyle;
+	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
+	Slush::RectSprite* myUISprite;
+	Slush::Text* myText;
+	Slush::Font& myFont;
 };

@@ -79,6 +79,8 @@ namespace Slush
 		void SetPadding(int x, int y);
 		void SetChildGap(int aGap);
 		void SetColor(int aColor);
+		void SetOutlineColor(int aColor);
+		void SetOutlineThickness(float aThickness);
 
 		void EnableButtonInteraction(int aHoverColor);
 
@@ -92,6 +94,8 @@ namespace Slush
 		Vector2i myPadding;
 		int myChildGap;
 		int myColor;
+		int myOutlineColor;
+		float myOutlineThickness;
 
 		int myInteractionFlags;
 		int myHoverColor;
@@ -105,6 +109,8 @@ namespace Slush
 			Vector2f myPosition;
 			Vector2f mySize;
 			int myColor;
+			int myOutlineColor;
+			float myOutlineThickness;
 			FW_String myText;
 			int myTextSize = 15;
 		};

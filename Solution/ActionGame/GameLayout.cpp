@@ -43,6 +43,7 @@ GameLayout::GameLayout()
 	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
 	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
 	myUIButtonStyle.SetColor(0xFFAAFFAF);
+	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 
 	myUISprite = new Slush::RectSprite();
@@ -109,6 +110,8 @@ void GameLayout::Render()
 			myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
 			myUISprite->SetSize(command.mySize.x, command.mySize.y);
 			myUISprite->SetFillColor(command.myColor);
+			myUISprite->SetOutlineColor(command.myOutlineColor);
+			myUISprite->SetOutlineThickness(command.myOutlineThickness);
 			myUISprite->Render();
 		}
 		else

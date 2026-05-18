@@ -32,6 +32,8 @@ Level::Level()
 	myUIBackgroundStyle.SetPadding(16, 16);
 	myUIBackgroundStyle.SetChildGap(16);
 	myUIBackgroundStyle.SetColor(0xAA121212);
+	myUIBackgroundStyle.SetOutlineColor(0xFF000000);
+	myUIBackgroundStyle.SetOutlineThickness(-1.f);
 	myUIBackgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
 	myUIBackgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
 
@@ -39,6 +41,8 @@ Level::Level()
 	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
 	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
 	myUIButtonStyle.SetColor(0xFFAAFFAF);
+	myUIButtonStyle.SetOutlineColor(0xFF000000);
+	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 }
 
@@ -107,6 +111,8 @@ void Level::RenderUI()
 			myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
 			myUISprite->SetSize(command.mySize.x, command.mySize.y);
 			myUISprite->SetFillColor(command.myColor);
+			myUISprite->SetOutlineColor(command.myOutlineColor);
+			myUISprite->SetOutlineThickness(command.myOutlineThickness);
 			myUISprite->Render();
 		}
 		else
@@ -158,6 +164,15 @@ void Level::HandleLevlingUp()
 				uiBuilder.OpenElement("title");
 				uiBuilder.SetText("Leveled Up!", myFont, 32);
 				uiBuilder.CloseElement();
+
+				uiBuilder.CloseElement(); // Title
+			}
+
+			{
+				uiBuilder.OpenElement("Spacing");
+				uiBuilder.GetStyle().SetColor(0x00000000);
+				uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
+				uiBuilder.GetStyle().SetYSizing(Slush::UIElementStyle::FIXED, 50);
 
 				uiBuilder.CloseElement(); // Title
 			}

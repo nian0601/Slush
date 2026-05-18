@@ -121,6 +121,8 @@ namespace Slush
 		myPadding = { 0, 0 };
 		myChildGap = 0;
 		myColor = -1;
+		myOutlineColor = -1;
+		myOutlineThickness = 0.f;
 
 		myInteractionFlags = NONE;
 		myHoverColor = -1;
@@ -169,6 +171,16 @@ namespace Slush
 	void UIElementStyle::SetColor(int aColor)
 	{
 		myColor = aColor;
+	}
+
+	void UIElementStyle::SetOutlineColor(int aColor)
+	{
+		myOutlineColor = aColor;
+	}
+
+	void UIElementStyle::SetOutlineThickness(float aThickness)
+	{
+		myOutlineThickness = aThickness;
 	}
 
 	void UIElementStyle::EnableButtonInteraction(int aHoverColor)
@@ -534,6 +546,8 @@ namespace Slush
 		command.mySize.x = static_cast<float>(anElement.mySize.x);
 		command.mySize.y = static_cast<float>(anElement.mySize.y);
 		command.myColor = anElement.myStyle.myColor;
+		command.myOutlineColor = anElement.myStyle.myOutlineColor;
+		command.myOutlineThickness = anElement.myStyle.myOutlineThickness;
 		command.myText = anElement.myText;
 		command.myTextSize = anElement.myTextSize;
 

@@ -155,6 +155,11 @@ void Level::HandleLevlingUp()
 		else
 		{
 			Slush::DynamicUIBuilder uiBuilder;
+
+			uiBuilder.Start();
+			uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
+			uiBuilder.Finish(myUIRenderCommands);
+
 			uiBuilder.Start();
 
 			uiBuilder.TextHeader("Leveled Up!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
@@ -224,6 +229,8 @@ void Level::HandleUpgradingWeapon()
 	uiBuilder.Start();
 
 	uiBuilder.TextHeader("Weapon Upgrade!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
+
+	uiBuilder.VerticalSpacing(20);
 
 	uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
 

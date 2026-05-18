@@ -120,12 +120,12 @@ namespace Slush
 		myMaxSize = { INT_MAX, INT_MAX };
 		myPadding = { 0, 0 };
 		myChildGap = 0;
-		myColor = -1;
-		myOutlineColor = -1;
+		myColor = 0;
+		myOutlineColor = 0;
 		myOutlineThickness = 0.f;
 
 		myInteractionFlags = NONE;
-		myHoverColor = -1;
+		myHoverColor = 0;
 	}
 
 	void UIElementStyle::SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
@@ -324,6 +324,75 @@ namespace Slush
 		Vector2f textSize = tempText.CalculateBounds(someText);
 		myCurrentElement->myStyle.SetXSizing(UIElementStyle::FIXED, static_cast<int>(textSize.x));
 		myCurrentElement->myStyle.SetYSizing(UIElementStyle::FIXED, static_cast<int>(textSize.y));
+	}
+
+	void DynamicUIBuilder::Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor)
+	{
+		OpenElement(someText, aStyle);
+		GetStyle().SetColor(aColor);
+
+		OpenElement();
+		SetText(someText, aFont, aTextSize);
+		GetStyle().SetColor(aTextColor);
+		CloseElement();
+
+		CloseElement();
+	}
+
+	void DynamicUIBuilder::HorizontalSpacing(int aSize)
+	{
+		OpenElement();
+
+		Slush::UIElementStyle& style = GetStyle();
+		style.SetColor(0x00000000);
+		style.SetXSizing(Slush::UIElementStyle::FIXED, aSize);
+		style.SetYSizing(Slush::UIElementStyle::GROW);
+
+		CloseElement();
+	}
+
+	void DynamicUIBuilder::VerticalSpacing(int aSize)
+	{
+		OpenElement();
+
+		Slush::UIElementStyle& style = GetStyle();
+		style.SetColor(0x00000000);
+		style.SetXSizing(Slush::UIElementStyle::GROW);
+		style.SetYSizing(Slush::UIElementStyle::FIXED, aSize);
+
+		CloseElement();
+	}
+
+	void DynamicUIBuilder::ScreenFade(int aColor)
+	{
+		OpenElement();
+		Slush::UIElementStyle& style = GetStyle();
+		style.SetColor(aColor);
+		style.SetXSizing(Slush::UIElementStyle::GROW);
+		style.SetYSizing(Slush::UIElementStyle::GROW);
+
+		CloseElement();
+	}
+
+	void DynamicUIBuilder::Text(const char* someText, Font& aFont, int aTextSize)
+	{
+		OpenElement();
+		SetText(someText, aFont, aTextSize);
+		GetStyle().SetColor(0xFFFFFFFF);
+		CloseElement();
+	}
+
+	void DynamicUIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor)
+	{
+		OpenElement(aStyle);
+		GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
+
+		OpenElement();
+		SetText(someText, aFont, aTextSize);
+		GetStyle().SetColor(aTextColor);
+		CloseElement();
+
+		CloseElement();
 	}
 
 	bool DynamicUIBuilder::WasClicked(const char* aIdentifier) const

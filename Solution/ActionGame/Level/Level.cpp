@@ -157,69 +157,22 @@ void Level::HandleLevlingUp()
 			Slush::DynamicUIBuilder uiBuilder;
 			uiBuilder.Start();
 
-			{
-				uiBuilder.OpenElement("Title", myUIBackgroundStyle);
-				uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
+			uiBuilder.TextHeader("Leveled Up!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
 
-				uiBuilder.OpenElement("title");
-				uiBuilder.SetText("Leveled Up!", myFont, 32);
-				uiBuilder.CloseElement();
+			uiBuilder.VerticalSpacing(50);
 
-				uiBuilder.CloseElement(); // Title
-			}
+			uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
 
-			{
-				uiBuilder.OpenElement("Spacing");
-				uiBuilder.GetStyle().SetColor(0x00000000);
-				uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-				uiBuilder.GetStyle().SetYSizing(Slush::UIElementStyle::FIXED, 50);
+			if (stats->CanUpgradeCooldownReduction())
+				uiBuilder.Button("Cooldown", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
 
-				uiBuilder.CloseElement(); // Title
-			}
+			if (stats->CanUpgradeDamage())
+				uiBuilder.Button("Damage", myFont, 25, myUIButtonStyle, 0xFFFFFF33, 0xFF000000);
 
-			{
-				uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
+			if (stats->CanUpgradeExperience())
+				uiBuilder.Button("Experience", myFont, 25, myUIButtonStyle, 0xFF33FF33, 0xFF000000);
 
-				if (stats->CanUpgradeCooldownReduction())
-				{
-					uiBuilder.OpenElement("Cooldown", myUIButtonStyle);
-					uiBuilder.GetStyle().SetColor(0xFFFF3333);
-
-					uiBuilder.OpenElement();
-					uiBuilder.SetText("Cooldown", myFont, 25);
-					uiBuilder.GetStyle().SetColor(0xFF000000);
-					uiBuilder.CloseElement();
-
-					uiBuilder.CloseElement();
-				}
-
-				if (stats->CanUpgradeDamage())
-				{
-					uiBuilder.OpenElement("Damage", myUIButtonStyle);
-					uiBuilder.GetStyle().SetColor(0xFFFFFF33);
-
-					uiBuilder.OpenElement();
-					uiBuilder.SetText("Damage", myFont, 25);
-					uiBuilder.GetStyle().SetColor(0xFF000000);
-					uiBuilder.CloseElement();
-
-					uiBuilder.CloseElement();
-				}
-
-				if (stats->CanUpgradeExperience())
-				{
-					uiBuilder.OpenElement("Experience", myUIButtonStyle);
-					uiBuilder.GetStyle().SetColor(0xFF33FF33);
-
-					uiBuilder.OpenElement();
-					uiBuilder.SetText("Experience", myFont, 25);
-					uiBuilder.GetStyle().SetColor(0xFF000000);
-					uiBuilder.CloseElement();
-
-					uiBuilder.CloseElement();
-				}
-				uiBuilder.CloseElement(); // ButtonBackground
-			}
+			uiBuilder.CloseElement(); // ButtonBackground
 
 			uiBuilder.Finish(myUIRenderCommands);
 
@@ -270,16 +223,7 @@ void Level::HandleUpgradingWeapon()
 	Slush::DynamicUIBuilder uiBuilder;
 	uiBuilder.Start();
 
-	{
-		uiBuilder.OpenElement("Title", myUIBackgroundStyle);
-		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-
-		uiBuilder.OpenElement("title");
-		uiBuilder.SetText("Weapon Upgrade!", myFont, 32);
-		uiBuilder.CloseElement();
-
-		uiBuilder.CloseElement(); // Title
-	}
+	uiBuilder.TextHeader("Weapon Upgrade!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
 
 	uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
 
@@ -302,15 +246,7 @@ void Level::HandleUpgradingWeapon()
 
 		potentialWeapons.Add(potentialWeapon);
 
-		uiBuilder.OpenElement(potentialWeapon->GetAssetName().GetBuffer(), myUIButtonStyle);
-		uiBuilder.GetStyle().SetColor(0xFFFF3333);
-
-		uiBuilder.OpenElement();
-		uiBuilder.SetText(potentialWeapon->GetAssetName().GetBuffer(), myFont, 25);
-		uiBuilder.GetStyle().SetColor(0xFF000000);
-		uiBuilder.CloseElement();
-
-		uiBuilder.CloseElement();
+		uiBuilder.Button(potentialWeapon->GetAssetName().GetBuffer(), myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
 	}
 
 	uiBuilder.CloseElement(); // ButtonBackground

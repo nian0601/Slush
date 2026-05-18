@@ -181,47 +181,25 @@ void GameLayout::UpdateStartScreen()
 
 	Slush::DynamicUIBuilder uiBuilder;
 	uiBuilder.Start();
-	{
-		uiBuilder.OpenElement("Title", myUIBackgroundStyle);
-		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-		uiBuilder.GetStyle().SetYSizing(Slush::UIElementStyle::GROW);
-	
-		uiBuilder.CloseElement(); // Title
-	}
+	uiBuilder.ScreenFade(0xAA121212);
 	uiBuilder.Finish(myUIRenderCommands);
 
 	uiBuilder.Start();
 	{
 		uiBuilder.OpenElement();
-		uiBuilder.GetStyle().SetChildGap(40);
 		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-		uiBuilder.GetStyle().SetColor(0x00000000);
 
-		uiBuilder.OpenElement("title");
-		uiBuilder.GetStyle().SetAlingment(Slush::UIElementStyle::CENTER);
-		uiBuilder.SetText("Action Game!", myFont, 50);
-		uiBuilder.CloseElement();
-
-		uiBuilder.OpenElement("StartGame", myUIButtonStyle);
-		uiBuilder.GetStyle().SetColor(0xFFFF3333);
-
-		uiBuilder.OpenElement();
-		uiBuilder.SetText("Start Game", myFont, 25);
-		uiBuilder.GetStyle().SetColor(0xFF000000);
-		uiBuilder.CloseElement();
-
-		uiBuilder.CloseElement();
+		uiBuilder.Text("Action Game!", myFont, 50);
+		uiBuilder.VerticalSpacing(60);
+		uiBuilder.Button("Start Game", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
 
 		uiBuilder.CloseElement();
 	}
 
 	uiBuilder.Finish(myUIRenderCommands);
 	
-
-	if (uiBuilder.WasClicked("StartGame"))
-	{
+	if (uiBuilder.WasClicked("Start Game"))
 		myGameState = LOADING_LEVEL;
-	}
 }
 
 void GameLayout::UpdatePlaying()
@@ -251,45 +229,23 @@ void GameLayout::UpdateGameOver()
 {
 	Slush::DynamicUIBuilder uiBuilder;
 	uiBuilder.Start();
-	{
-		uiBuilder.OpenElement("Title", myUIBackgroundStyle);
-		uiBuilder.GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-		uiBuilder.GetStyle().SetYSizing(Slush::UIElementStyle::GROW);
-
-		uiBuilder.CloseElement(); // Title
-	}
+	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
 	uiBuilder.Finish(myUIRenderCommands);
 
 	uiBuilder.Start();
 	{
 		uiBuilder.OpenElement();
-		uiBuilder.GetStyle().SetChildGap(40);
 		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-		uiBuilder.GetStyle().SetColor(0x00000000);
 
-		uiBuilder.OpenElement("title");
-		uiBuilder.GetStyle().SetAlingment(Slush::UIElementStyle::CENTER);
-		uiBuilder.SetText("Game Over!", myFont, 50);
-		uiBuilder.CloseElement();
-
-		uiBuilder.OpenElement("RestartGame", myUIButtonStyle);
-		uiBuilder.GetStyle().SetColor(0xFFFF3333);
-
-		uiBuilder.OpenElement();
-		uiBuilder.SetText("Try Again?", myFont, 25);
-		uiBuilder.GetStyle().SetColor(0xFF000000);
-		uiBuilder.CloseElement();
-
-		uiBuilder.CloseElement();
+		uiBuilder.Text("Game Over!", myFont, 50);
+		uiBuilder.VerticalSpacing(60);
+		uiBuilder.Button("Try Again?", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
 
 		uiBuilder.CloseElement();
 	}
 
 	uiBuilder.Finish(myUIRenderCommands);
 
-
-	if (uiBuilder.WasClicked("RestartGame"))
-	{
+	if (uiBuilder.WasClicked("Try Again?"))
 		myGameState = LOADING_LEVEL;
-	}
 }

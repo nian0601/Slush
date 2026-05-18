@@ -127,11 +127,12 @@ namespace Slush
 		void SetStyle(const UIElementStyle& aStyle);
 		UIElementStyle& GetStyle();
 
-		// Unsure about this interface, but text-rendering in general just doesnt feel great at the moment..
-		// Need to ensure that the same font is used here and when rendering.
-		// But dont really want to put a whole Font-object in the Element or RenderCommmands..
-		// Or do I? Its not *that* bad to just copy around a pointer?
-		void SetText(const char* someText, Font& aFont, int aTextSize = 15);
+		void Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor);
+		void HorizontalSpacing(int aSize);
+		void VerticalSpacing(int aSize);
+		void ScreenFade(int aColor);
+		void Text(const char* someText, Font& aFont, int aTextSize);
+		void TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor);
 
 		bool WasClicked(const char* aIdentifier) const;
 
@@ -162,6 +163,12 @@ namespace Slush
 		Element myRoot;
 		Element* myCurrentElement = nullptr;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;
+
+		// Unsure about this interface, but text-rendering in general just doesnt feel great at the moment..
+		// Need to ensure that the same font is used here and when rendering.
+		// But dont really want to put a whole Font-object in the Element or RenderCommmands..
+		// Or do I? Its not *that* bad to just copy around a pointer?
+		void SetText(const char* someText, Font& aFont, int aTextSize = 15);
 
 		void CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis);
 		void CalculatePositions(Element& anElement);

@@ -72,17 +72,17 @@ namespace Slush
 		UIElementStyle() { Reset(); }
 		void Reset();
 
-		void SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
-		void SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
-		void SetLayoutDirection(UIElementStyle::LayoutDirection aDirection);
-		void SetAlingment(UIElementStyle::Alignment anAlignment);
-		void SetPadding(int x, int y);
-		void SetChildGap(int aGap);
-		void SetColor(int aColor);
-		void SetOutlineColor(int aColor);
-		void SetOutlineThickness(float aThickness);
+		UIElementStyle& SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
+		UIElementStyle& SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize = 0);
+		UIElementStyle& SetLayoutDirection(UIElementStyle::LayoutDirection aDirection);
+		UIElementStyle& SetAlingment(UIElementStyle::Alignment anAlignment);
+		UIElementStyle& SetPadding(int x, int y);
+		UIElementStyle& SetChildGap(int aGap);
+		UIElementStyle& SetColor(int aColor);
+		UIElementStyle& SetOutlineColor(int aColor);
+		UIElementStyle& SetOutlineThickness(float aThickness);
 
-		void EnableButtonInteraction(int aHoverColor);
+		UIElementStyle& EnableButtonInteraction(int aHoverColor);
 
 		SizingMode myXSizing;
 		SizingMode myYSizing;
@@ -116,11 +116,13 @@ namespace Slush
 		};
 
 		void Start();
+		void Finish();
 		void Finish(FW_GrowingArray<RenderCommand>& outRenderCommands);
+		void GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands);
 
-		void OpenElement(const char* aIdentifier = nullptr);
-		void OpenElement(const UIElementStyle& aStyle);
-		void OpenElement(const char* aIdentifier, const UIElementStyle& aStyle);
+		UIElementStyle& OpenElement(const char* aIdentifier = nullptr);
+		UIElementStyle& OpenElement(const UIElementStyle& aStyle);
+		UIElementStyle& OpenElement(const char* aIdentifier, const UIElementStyle& aStyle);
 
 		void CloseElement();
 
@@ -128,11 +130,13 @@ namespace Slush
 		UIElementStyle& GetStyle();
 
 		void Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor);
+		void Button(const char* someText, Font& aFont, int aTextSize, int aWidth, int aHeight, int aColor, int aTextColor);
 		void HorizontalSpacing(int aSize);
 		void VerticalSpacing(int aSize);
 		void ScreenFade(int aColor);
-		void Text(const char* someText, Font& aFont, int aTextSize);
+		void Text(const char* someText, Font& aFont, int aTextSize, int aTextColor = 0xFFFFFFFF);
 		void TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor);
+		void TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor);
 
 		bool WasClicked(const char* aIdentifier) const;
 

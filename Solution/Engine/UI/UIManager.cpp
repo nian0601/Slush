@@ -128,7 +128,7 @@ namespace Slush
 		myHoverColor = 0;
 	}
 
-	void UIElementStyle::SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
+	UIElementStyle& UIElementStyle::SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
 	{
 		myXSizing = aSizingMode;
 		if (aSizingMode == UIElementStyle::FIXED)
@@ -136,9 +136,11 @@ namespace Slush
 			myMinSize.x = aSize;
 			myMaxSize.x = aSize;
 		}
+
+		return *this;
 	}
 
-	void UIElementStyle::SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
+	UIElementStyle& UIElementStyle::SetYSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
 	{
 		myYSizing = aSizingMode;
 		if (aSizingMode == UIElementStyle::FIXED)
@@ -146,47 +148,57 @@ namespace Slush
 			myMinSize.y = aSize;
 			myMaxSize.y = aSize;
 		}
+
+		return *this;
 	}
 
-	void UIElementStyle::SetLayoutDirection(UIElementStyle::LayoutDirection aDirection)
+	UIElementStyle& UIElementStyle::SetLayoutDirection(UIElementStyle::LayoutDirection aDirection)
 	{
 		myLayoutDirection = aDirection;
+		return *this;
 	}
 
-	void UIElementStyle::SetAlingment(UIElementStyle::Alignment anAlignment)
+	UIElementStyle& UIElementStyle::SetAlingment(UIElementStyle::Alignment anAlignment)
 	{
 		myAlignment = anAlignment;
+		return *this;
 	}
 
-	void UIElementStyle::SetPadding(int x, int y)
+	UIElementStyle& UIElementStyle::SetPadding(int x, int y)
 	{
 		myPadding = { x, y };
+		return *this;
 	}
 
-	void UIElementStyle::SetChildGap(int aGap)
+	UIElementStyle& UIElementStyle::SetChildGap(int aGap)
 	{
 		myChildGap = aGap;
+		return *this;
 	}
 
-	void UIElementStyle::SetColor(int aColor)
+	UIElementStyle& UIElementStyle::SetColor(int aColor)
 	{
 		myColor = aColor;
+		return *this;
 	}
 
-	void UIElementStyle::SetOutlineColor(int aColor)
+	UIElementStyle& UIElementStyle::SetOutlineColor(int aColor)
 	{
 		myOutlineColor = aColor;
+		return *this;
 	}
 
-	void UIElementStyle::SetOutlineThickness(float aThickness)
+	UIElementStyle& UIElementStyle::SetOutlineThickness(float aThickness)
 	{
 		myOutlineThickness = aThickness;
+		return *this;
 	}
 
-	void UIElementStyle::EnableButtonInteraction(int aHoverColor)
+	UIElementStyle& UIElementStyle::EnableButtonInteraction(int aHoverColor)
 	{
 		myInteractionFlags = UIElementStyle::BUTTON;
 		myHoverColor = aHoverColor;
+		return *this;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -213,7 +225,7 @@ namespace Slush
 		myRoot.myStyle.myLayoutDirection = UIElementStyle::TOP_TO_BOTTOM;
 	}
 
-	void DynamicUIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
+	void DynamicUIBuilder::Finish()
 	{
 		FW_ASSERT(myCurrentElement == &myRoot, "Not all Elements are closed!");
 
@@ -225,12 +237,21 @@ namespace Slush
 		// Handle input
 		for (Element* child : myRoot.myChildren)
 			HandleInput(*child);
+	}
 
+	void DynamicUIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
+	{
+		Finish();
+		GenerateRenderCommands(outRenderCommands);
+	}
+
+	void DynamicUIBuilder::GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands)
+	{
 		for (Element* child : myRoot.myChildren)
 			GenerateRenderCommands(*child, outRenderCommands);
 	}
 
-	void DynamicUIBuilder::OpenElement(const char* aIdentifier /*= nullptr*/)
+	UIElementStyle& DynamicUIBuilder::OpenElement(const char* aIdentifier /*= nullptr*/)
 	{
 		Element* newElement = new Element();
 		if (aIdentifier)
@@ -248,18 +269,21 @@ namespace Slush
 		}
 
 		myCurrentElement = newElement;
+		return myCurrentElement->myStyle;
 	}
 
-	void DynamicUIBuilder::OpenElement(const UIElementStyle& aStyle)
+	UIElementStyle& DynamicUIBuilder::OpenElement(const UIElementStyle& aStyle)
 	{
 		OpenElement();
 		myCurrentElement->myStyle = aStyle;
+		return myCurrentElement->myStyle;
 	}
 
-	void DynamicUIBuilder::OpenElement(const char* aIdentifier, const UIElementStyle& aStyle)
+	UIElementStyle& DynamicUIBuilder::OpenElement(const char* aIdentifier, const UIElementStyle& aStyle)
 	{
 		OpenElement(aIdentifier);
 		myCurrentElement->myStyle = aStyle;
+		return myCurrentElement->myStyle;
 	}
 
 	void DynamicUIBuilder::CloseElement()
@@ -339,6 +363,26 @@ namespace Slush
 		CloseElement();
 	}
 
+	void DynamicUIBuilder::Button(const char* someText, Font& aFont, int aTextSize, int aWidth, int aHeight, int aColor, int aTextColor)
+	{
+		OpenElement(someText);
+		UIElementStyle& style = GetStyle();
+		style.SetXSizing(Slush::UIElementStyle::FIXED, aWidth);
+		style.SetYSizing(Slush::UIElementStyle::FIXED, aHeight);
+		style.SetAlingment(Slush::UIElementStyle::CENTER);
+		style.SetColor(aColor);
+		style.SetOutlineColor(0xFF000000);
+		style.SetOutlineThickness(-1.f);
+		style.EnableButtonInteraction(0xFFDDDDDD);
+
+		OpenElement();
+		SetText(someText, aFont, aTextSize);
+		GetStyle().SetColor(aTextColor);
+		CloseElement();
+
+		CloseElement();
+	}
+
 	void DynamicUIBuilder::HorizontalSpacing(int aSize)
 	{
 		OpenElement();
@@ -374,11 +418,11 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::Text(const char* someText, Font& aFont, int aTextSize)
+	void DynamicUIBuilder::Text(const char* someText, Font& aFont, int aTextSize, int aTextColor /*= 0xFFFFFFFF*/)
 	{
-		OpenElement();
+		OpenElement().SetAlingment(Slush::UIElementStyle::CENTER);
 		SetText(someText, aFont, aTextSize);
-		GetStyle().SetColor(0xFFFFFFFF);
+		GetStyle().SetColor(aTextColor);
 		CloseElement();
 	}
 
@@ -386,6 +430,27 @@ namespace Slush
 	{
 		OpenElement(aStyle);
 		GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
+
+		OpenElement();
+		SetText(someText, aFont, aTextSize);
+		GetStyle().SetColor(aTextColor);
+		CloseElement();
+
+		CloseElement();
+	}
+
+	void DynamicUIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor)
+	{
+		OpenElement();
+
+		UIElementStyle& style = GetStyle();
+		style.SetPadding(16, 16);
+		style.SetChildGap(16);
+		style.SetColor(aBackgroundColor);
+		style.SetOutlineColor(0xFF000000);
+		style.SetOutlineThickness(-1.f);
+		style.SetXSizing(Slush::UIElementStyle::GROW);
+		style.SetAlingment(Slush::UIElementStyle::CENTER);
 
 		OpenElement();
 		SetText(someText, aFont, aTextSize);

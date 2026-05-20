@@ -8,6 +8,11 @@
 
 #include "Core\Assets\DataAsset.h"
 
+namespace Slush
+{
+	class DynamicUIBuilder;
+}
+
 class WeaponData : public Slush::DataAsset
 {
 public:
@@ -36,8 +41,10 @@ public:
 	Weapon(Entity& anEntity, const WeaponData& aWeaponData);
 
 	void Update();
+	void Upgrade() { ++myLevel; }
 
 	const WeaponData& GetWeaponData() const { return myWeaponData; }
+	int GetLevel() const { return myLevel; }
 
 protected:
 	void RunProjectileLogic();
@@ -45,6 +52,7 @@ protected:
 
 	Entity& myEntity;
 	Slush::Timer myActivationCooldown;
+	int myLevel = 0;
 	const WeaponData& myWeaponData;
 };
 
@@ -67,14 +75,20 @@ public:
 	~WeaponComponent();
 
 	void Update() override;
-	void AddPendingUpgrade() { myHasPendingUpgrade = true; }
+	void AddPendingUpgrade();
 	bool HasPendingUpgrade() const { return myHasPendingUpgrade; }
 	void FinishUpgrade() { myHasPendingUpgrade = false; }
 	void UpgradeWeapon(const WeaponData& someData);
 
 	const FW_GrowingArray<Weapon*>& GetWeapons() { return myWeapons; }
 
+	void HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder);
+
 private:
+	Weapon* GetWeapon(const WeaponData* aWeaponData);
+
 	FW_GrowingArray<Weapon*> myWeapons;
+	FW_GrowingArray<const WeaponData*> myAvailableNewWeapons;
+	FW_GrowingArray<const WeaponData*> myUpgradeSelection;
 	bool myHasPendingUpgrade = false;
 };

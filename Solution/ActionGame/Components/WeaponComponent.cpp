@@ -16,6 +16,7 @@
 #include <Graphics\Texture.h>
 
 #include <Physics\PhysicsWorld.h>
+#include "UI/UIManager.h"
 
 
 void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
@@ -169,9 +170,19 @@ WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityP
 	: Component(anEntity, anEntityPrefab)
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-	WeaponData* data = assets.GetAsset<WeaponData>(anEntityPrefab.GetWeaponData().myWeaponDataAsset.GetBuffer());
+	WeaponData* startingWeapon = assets.GetAsset<WeaponData>(anEntityPrefab.GetWeaponData().myWeaponDataAsset.GetBuffer());
 
-	myWeapons.Add(new Weapon(myEntity, *data));
+	myWeapons.Add(new Weapon(myEntity, *startingWeapon));
+
+	const FW_GrowingArray<Slush::Asset*>& allWeapons = assets.GetAllAssets<WeaponData>();
+	for (const Slush::Asset* asset : allWeapons)
+	{
+		const WeaponData* weapon = static_cast<const WeaponData*>(asset);
+		if (weapon == startingWeapon)
+			continue;
+
+		myAvailableNewWeapons.Add(weapon);
+	}
 }
 
 WeaponComponent::~WeaponComponent()
@@ -185,7 +196,118 @@ void WeaponComponent::Update()
 		weapon->Update();
 }
 
+void WeaponComponent::AddPendingUpgrade()
+{
+	myHasPendingUpgrade = true;
+
+	myUpgradeSelection.RemoveAll();
+
+	const FW_GrowingArray<Weapon*>& activeWeapons = GetWeapons();
+	int guaranteedUpgrade = FW_RandInt(0, activeWeapons.Count()-1);
+	myUpgradeSelection.Add(&activeWeapons[guaranteedUpgrade]->GetWeaponData());
+
+	for (int i = 0; i < activeWeapons.Count(); ++i)
+	{
+		if (i == guaranteedUpgrade)
+			continue;
+
+		float chance = FW_RandFloat();
+		if (chance > 0.5f)
+			myUpgradeSelection.Add(&activeWeapons[i]->GetWeaponData());
+	}
+
+	for (const Slush::Asset* asset : myAvailableNewWeapons)
+	{
+		float chance = FW_RandFloat();
+		if (chance > 0.5f)
+			myUpgradeSelection.Add(static_cast<const WeaponData*>(asset));
+	}
+}
+
 void WeaponComponent::UpgradeWeapon(const WeaponData& someData)
 {
-	myWeapons.Add(new Weapon(myEntity, someData));
+	if (Weapon* weapon = GetWeapon(&someData))
+		weapon->Upgrade();
+	else
+		myWeapons.Add(new Weapon(myEntity, someData));
+}
+
+void WeaponComponent::HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder)
+{
+	if (myUpgradeSelection.IsEmpty())
+	{
+		FinishUpgrade();
+		return;
+	}
+
+	aUIBuilder.Start();
+
+	aUIBuilder.TextHeader(
+		"Weapon Upgrade!", 
+		ActionGameGlobals::GetInstance().GetFont(), 
+		32, 
+		0xAA121212, 
+		0xFFFFFFFF);
+
+	aUIBuilder.VerticalSpacing(20);
+
+	aUIBuilder.OpenElement()
+		.SetPadding(16, 16)
+		.SetChildGap(16)
+		.SetColor(0xAA121212)
+		.SetAlingment(Slush::UIElementStyle::CENTER);
+
+	for (const WeaponData* potentialUpgrade : myUpgradeSelection)
+	{
+		Weapon* weapon = GetWeapon(potentialUpgrade);
+
+		Slush::UIElementStyle& style = aUIBuilder.OpenElement(potentialUpgrade->GetAssetName().GetBuffer());
+		style.SetXSizing(Slush::UIElementStyle::FIXED, 250);
+		style.SetYSizing(Slush::UIElementStyle::FIXED, 75);
+		style.SetAlingment(Slush::UIElementStyle::CENTER);
+		style.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
+		style.SetChildGap(8);
+
+		if (weapon)
+			style.SetColor(0xFF33FF33);
+		else
+			style.SetColor(0xFFFF3333);
+
+		style.SetOutlineColor(0xFF000000);
+		style.SetOutlineThickness(-1.f);
+		style.EnableButtonInteraction(0xFFDDDDDD);
+
+		aUIBuilder.Text(potentialUpgrade->GetAssetName().GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFF000000);
+
+		if (Weapon* weapon = GetWeapon(potentialUpgrade))
+			aUIBuilder.Text("Upgrade", ActionGameGlobals::GetInstance().GetFont(), 20, 0xFF000000);
+		else
+			aUIBuilder.Text("NEW", ActionGameGlobals::GetInstance().GetFont(), 20, 0xFF000000);
+
+		aUIBuilder.CloseElement();
+	}
+
+	aUIBuilder.CloseElement(); 
+	aUIBuilder.Finish();
+
+
+	for (const WeaponData* potentialWeapon : myUpgradeSelection)
+	{
+		if (aUIBuilder.WasClicked(potentialWeapon->GetAssetName().GetBuffer()))
+		{
+			UpgradeWeapon(*potentialWeapon);
+			FinishUpgrade();
+		}
+	}
+}
+
+Weapon* WeaponComponent::GetWeapon(const WeaponData* aWeaponData)
+{
+	for (Weapon* weapon : myWeapons)
+	{
+		if (&weapon->GetWeaponData() == aWeaponData)
+			return weapon;
+	}
+
+	return nullptr;
 }

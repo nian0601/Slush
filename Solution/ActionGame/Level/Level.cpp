@@ -70,6 +70,10 @@ void Level::Update()
 	{
 		expComp->AddExperience(1);
 	}
+	else if (input.WasKeyReleased(Slush::Input::Q))
+	{
+		weaponComp->AddPendingUpgrade();
+	}
 
 	const bool levelingUp = expComp->NeedsLevelUp();
 	const bool upgradingWeapon = weaponComp->HasPendingUpgrade();
@@ -214,59 +218,9 @@ void Level::HandleUpgradingWeapon()
 {
 	Entity* player = myPlayerHandle.Get();
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
-	const FW_GrowingArray<Weapon*>& activeWeapons = weaponComponent->GetWeapons();
-
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-	const FW_GrowingArray<Slush::Asset*>& allWeapons = assets.GetAllAssets<WeaponData>();
-
-	if (activeWeapons.Count() == allWeapons.Count())
-	{
-		weaponComponent->FinishUpgrade();
-		return;
-	}
-
 	Slush::DynamicUIBuilder uiBuilder;
-	uiBuilder.Start();
-
-	uiBuilder.TextHeader("Weapon Upgrade!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
-
-	uiBuilder.VerticalSpacing(20);
-
-	uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
-
-	FW_GrowingArray<const WeaponData*> potentialWeapons;
-	for (const Slush::Asset* asset : allWeapons)
-	{
-		const WeaponData* potentialWeapon = static_cast<const WeaponData*>(asset);
-		bool hasWeapon = false;
-		for (Weapon* ownedWeapon : activeWeapons)
-		{
-			if (&ownedWeapon->GetWeaponData() == potentialWeapon)
-			{
-				hasWeapon = true;
-				break;
-			}
-		}
-
-		if (hasWeapon)
-			continue;
-
-		potentialWeapons.Add(potentialWeapon);
-
-		uiBuilder.Button(potentialWeapon->GetAssetName().GetBuffer(), myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
-	}
-
-	uiBuilder.CloseElement(); // ButtonBackground
-	uiBuilder.Finish(myUIRenderCommands);
-
-	for (const WeaponData* potentialWeapon : potentialWeapons)
-	{
-		if (uiBuilder.WasClicked(potentialWeapon->GetAssetName().GetBuffer()))
-		{
-			weaponComponent->UpgradeWeapon(*potentialWeapon);
-			weaponComponent->FinishUpgrade();
-		}
-	}
+	weaponComponent->HandleUpgrading(uiBuilder);
+	uiBuilder.GenerateRenderCommands(myUIRenderCommands);
 }
 
 void Level::HandleEnemyWaves()

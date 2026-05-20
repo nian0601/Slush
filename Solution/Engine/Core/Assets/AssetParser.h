@@ -23,6 +23,8 @@ namespace Slush
 			bool IsReading() const { return myIsReading; }
 			bool IsWriting() const { return !myIsReading; }
 
+			const FW_String& GetName() const;
+
 			int GetNumChildElements();
 			Handle GetChildElementAtIndex(int aIndex);
 

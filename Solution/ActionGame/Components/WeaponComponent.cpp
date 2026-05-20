@@ -18,8 +18,7 @@
 #include <Physics\PhysicsWorld.h>
 #include "UI/UIManager.h"
 
-
-void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
+void WeaponData::RankData::OnParse(Slush::AssetParser::Handle aRootHandle)
 {
 	aRootHandle.ParseFloatField("basecooldown", myBaseCooldown);
 	aRootHandle.ParseIntField("basedamage", myBaseDamage);
@@ -31,42 +30,107 @@ void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
 	projectileHandle.ParseOptionalStringField("projectilePrefab", myProjectileData.myProjectilePrefab, myProjectileData.myEnable);
 }
 
-void WeaponData::BuildUI()
+WeaponData::WeaponData(const char* aName, unsigned int aAssetID)
+	: Slush::DataAsset(aName, aAssetID)
 {
-	if (ImGui::CollapsingHeader("Base Data", ImGuiTreeNodeFlags_DefaultOpen))
+	myRanks.Add();
+}
+
+void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
+{
+	int numRanks = myRanks.Count();
+	if (aRootHandle.IsReading())
 	{
-		ImGui::SetNextItemWidth(150.f);
-		ImGui::InputFloat("Base Cooldown", &myBaseCooldown, 0.05f, 0.1f, "%.2f");
+		numRanks = aRootHandle.GetNumChildElements();
 
-		ImGui::SetNextItemWidth(150.f);
-		ImGui::InputInt("Base Damage", &myBaseDamage);
-	}
-
-	if (ImGui::CollapsingHeader("Projectile Data"))
-	{
-		ImGui::SetNextItemWidth(150.f);
-		ImGui::Checkbox("Enable", &myProjectileData.myEnable);
-
-		if (myProjectileData.myEnable)
+		Slush::AssetParser::Handle firstChild = aRootHandle.GetChildElementAtIndex(0);
+		if (firstChild.IsValid() && firstChild.GetName() != "rankdata")
 		{
-			ImGui::SetNextItemWidth(150.f);
-			ImGui::InputFloat("Base Projectile Speed", &myProjectileData.myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
-
-			ImGui::SetNextItemWidth(150.f);
-			ImGui::InputInt("Base Projectile Count", &myProjectileData.myBaseProjectileCount);
-			myProjectileData.myBaseProjectileCount = FW_Clamp(myProjectileData.myBaseProjectileCount, 1, 20),
-
-			ImGui::SetNextItemWidth(150.f);
-			ImGui::InputText("ProjectilePrefab", &myProjectileData.myProjectilePrefab);
-			if (ImGui::BeginDragDropTarget())
-			{
-				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
-					myProjectileData.myProjectilePrefab = asset->GetAssetName();
-
-				ImGui::EndDragDropTarget();
-			}
+			myRanks[0].OnParse(aRootHandle);
+			return;
 		}
 	}
+
+	myRanks.Reserve(numRanks);
+	for (int i = 0; i < numRanks; ++i)
+	{
+		Slush::AssetParser::Handle rankHandle;
+		if (aRootHandle.IsReading())
+			rankHandle = aRootHandle.GetChildElementAtIndex(i);
+		else
+			rankHandle = aRootHandle.ParseChildElement("rankdata");
+
+		myRanks[i].OnParse(rankHandle);
+	}
+}
+
+void WeaponData::BuildUI()
+{
+	for (int i = 0; i < myRanks.Count(); ++i)
+	{
+		FW_String rankHeader = "Rank ";
+		rankHeader += i;
+
+		ImGui::PushID(i);
+
+		bool keepRank = true;
+		if (ImGui::CollapsingHeader(rankHeader.GetBuffer(), i == 0 ? nullptr : &keepRank))
+		{
+			ImGui::Indent();
+			RankData& rankData = myRanks[i];
+			if (ImGui::CollapsingHeader("Base Data", ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				ImGui::Indent();
+				ImGui::SetNextItemWidth(150.f);
+				ImGui::InputFloat("Base Cooldown", &rankData.myBaseCooldown, 0.05f, 0.1f, "%.2f");
+
+				ImGui::SetNextItemWidth(150.f);
+				ImGui::InputInt("Base Damage", &rankData.myBaseDamage);
+				ImGui::Unindent();
+			}
+
+			if (ImGui::CollapsingHeader("Projectile Data"))
+			{
+				ImGui::Indent();
+				ImGui::SetNextItemWidth(150.f);
+				ImGui::Checkbox("Enable", &rankData.myProjectileData.myEnable);
+
+				if (rankData.myProjectileData.myEnable)
+				{
+					ImGui::SetNextItemWidth(150.f);
+					ImGui::InputFloat("Base Projectile Speed", &rankData.myProjectileData.myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
+
+					ImGui::SetNextItemWidth(150.f);
+					ImGui::InputInt("Base Projectile Count", &rankData.myProjectileData.myBaseProjectileCount);
+					rankData.myProjectileData.myBaseProjectileCount = FW_Clamp(rankData.myProjectileData.myBaseProjectileCount, 1, 20);
+
+					ImGui::SetNextItemWidth(150.f);
+					ImGui::InputText("ProjectilePrefab", &rankData.myProjectileData.myProjectilePrefab);
+					if (ImGui::BeginDragDropTarget())
+					{
+						if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+							rankData.myProjectileData.myProjectilePrefab = asset->GetAssetName();
+
+						ImGui::EndDragDropTarget();
+					}
+				}
+				ImGui::Unindent();
+			}
+
+			ImGui::Unindent();
+		}
+
+		if (!keepRank)
+		{
+			myRanks.RemoveNonCyclicAtIndex(i);
+			--i;
+		}
+
+		ImGui::PopID();
+	}
+
+	if (ImGui::Button("Add Rank"))
+		myRanks.Add(myRanks.GetLast());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -75,13 +139,14 @@ Weapon::Weapon(Entity& anEntity, const WeaponData& aWeaponData)
 	: myEntity(anEntity)
 	, myWeaponData(aWeaponData)
 {
+	myRankData = &myWeaponData.myRanks[0];
 }
 
 void Weapon::Update()
 {
 	if (!myActivationCooldown.IsStarted() || myActivationCooldown.HasExpired())
 	{
-		float cooldown = myWeaponData.myBaseCooldown;
+		float cooldown = myRankData->myBaseCooldown;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 		{
 			cooldown /= stats->GetCooldownReduction();
@@ -89,9 +154,22 @@ void Weapon::Update()
 
 		myActivationCooldown.Start(cooldown);
 
-		if (myWeaponData.myProjectileData.myEnable)
+		if (myRankData->myProjectileData.myEnable)
 			RunProjectileLogic();
 	}
+}
+
+void Weapon::Upgrade()
+{
+	++myRank;
+	myRank = FW_Clamp(myRank, 0, myWeaponData.myRanks.Count() - 1);
+
+	myRankData = &myWeaponData.myRanks[myRank];
+}
+
+bool Weapon::CanBeUpgraded() const
+{
+	return myRank + 1 < myWeaponData.myRanks.Count();
 }
 
 void Weapon::RunProjectileLogic()
@@ -107,7 +185,7 @@ void Weapon::RunProjectileLogic()
 	if (!target.IsValid())
 		return;
 
-	const WeaponData::ProjectileData& projectileData = myWeaponData.myProjectileData;
+	const WeaponData::RankData::ProjectileData& projectileData = myRankData->myProjectileData;
 
 	const bool oddNumProjectiles = (projectileData.myBaseProjectileCount % 2) == 1;
 	int projectilesToSpawn = projectileData.myBaseProjectileCount;
@@ -130,12 +208,12 @@ void Weapon::RunProjectileLogic()
 
 void Weapon::ShootProjectile(const Vector2f& aDirection)
 {
-	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myWeaponData.myProjectileData.myProjectilePrefab.GetBuffer());
-	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myWeaponData.myProjectileData.myBaseProjectileSpeed;
+	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myRankData->myProjectileData.myProjectilePrefab.GetBuffer());
+	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
 	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
-		int damage = myWeaponData.myBaseDamage;
+		int damage = myRankData->myBaseDamage;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 			damage = static_cast<int>(damage * stats->GetDamageModifier());
 
@@ -203,12 +281,9 @@ void WeaponComponent::AddPendingUpgrade()
 	myUpgradeSelection.RemoveAll();
 
 	const FW_GrowingArray<Weapon*>& activeWeapons = GetWeapons();
-	int guaranteedUpgrade = FW_RandInt(0, activeWeapons.Count()-1);
-	myUpgradeSelection.Add(&activeWeapons[guaranteedUpgrade]->GetWeaponData());
-
 	for (int i = 0; i < activeWeapons.Count(); ++i)
 	{
-		if (i == guaranteedUpgrade)
+		if (!activeWeapons[i]->CanBeUpgraded())
 			continue;
 
 		float chance = FW_RandFloat();
@@ -229,7 +304,10 @@ void WeaponComponent::UpgradeWeapon(const WeaponData& someData)
 	if (Weapon* weapon = GetWeapon(&someData))
 		weapon->Upgrade();
 	else
+	{
 		myWeapons.Add(new Weapon(myEntity, someData));
+		myAvailableNewWeapons.RemoveCyclic(&someData);
+	}
 }
 
 void WeaponComponent::HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder)

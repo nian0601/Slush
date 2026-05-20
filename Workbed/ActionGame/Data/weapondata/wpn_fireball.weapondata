@@ -1,12 +1,27 @@
 WeaponData 
 { 
-	basecooldown 0.950 
-	basedamage 10 
-	projectileData 
+	rankdata 
 	{ 
-		enable 1 
-		baseprojectilespeed 750.000 
-		baseprojectilcount 3 
-		projectilePrefab proj_player_fireball 
+		basecooldown 0.950 
+		basedamage 10 
+		projectileData 
+		{ 
+			enable 1 
+			baseprojectilespeed 750.000 
+			baseprojectilcount 3 
+			projectilePrefab proj_player_fireball 
+		} 
+	} 
+	rankdata 
+	{ 
+		basecooldown 0.950 
+		basedamage 10 
+		projectileData 
+		{ 
+			enable 1 
+			baseprojectilespeed 750.000 
+			baseprojectilcount 5 
+			projectilePrefab proj_player_fireball 
+		} 
 	} 
 } 

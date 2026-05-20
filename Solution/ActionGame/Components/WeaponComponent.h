@@ -17,22 +17,28 @@ class WeaponData : public Slush::DataAsset
 {
 public:
 	DEFINE_ASSET("WeaponData", "weapondata", "data/weapondata");
-	using Slush::DataAsset::DataAsset;
+	WeaponData(const char* aName, unsigned int aAssetID);
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle);
 	void BuildUI();
 
-	int myBaseDamage = 10;
-	float myBaseCooldown = 0.5f;
-
-	struct ProjectileData
+	struct RankData
 	{
-		bool myEnable = false;
-		float myBaseProjectileSpeed = 750.f;
-		int myBaseProjectileCount = 1;
-		FW_String myProjectilePrefab;
+		void OnParse(Slush::AssetParser::Handle aRootHandle);
+
+		int myBaseDamage = 10;
+		float myBaseCooldown = 0.5f;
+
+		struct ProjectileData
+		{
+			bool myEnable = false;
+			float myBaseProjectileSpeed = 750.f;
+			int myBaseProjectileCount = 1;
+			FW_String myProjectilePrefab;
+		};
+		ProjectileData myProjectileData;
 	};
-	ProjectileData myProjectileData;
+	FW_GrowingArray<RankData> myRanks;
 };
 
 class Weapon
@@ -41,10 +47,10 @@ public:
 	Weapon(Entity& anEntity, const WeaponData& aWeaponData);
 
 	void Update();
-	void Upgrade() { ++myLevel; }
+	void Upgrade();
+	bool CanBeUpgraded() const;
 
 	const WeaponData& GetWeaponData() const { return myWeaponData; }
-	int GetLevel() const { return myLevel; }
 
 protected:
 	void RunProjectileLogic();
@@ -52,8 +58,9 @@ protected:
 
 	Entity& myEntity;
 	Slush::Timer myActivationCooldown;
-	int myLevel = 0;
+	int myRank = 0;
 	const WeaponData& myWeaponData;
+	const WeaponData::RankData* myRankData;
 };
 
 

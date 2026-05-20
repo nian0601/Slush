@@ -12,6 +12,11 @@ namespace Slush
 		myIsReading = aIsReading;
 	}
 
+	const FW_String& AssetParser::Handle::GetName() const
+	{
+		return myElement->myElementName;
+	}
+
 	int AssetParser::Handle::GetNumChildElements()
 	{
 		FW_ASSERT(myIsReading, "GetNumChildElements is only valid while reading files");

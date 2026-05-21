@@ -49,6 +49,8 @@ public:
 	inline void RemoveNonCyclicAtIndex(int aItemNumber);
 	inline void RemoveLast();
 
+	bool Contains(const ObjectType& aObject) const;
+
 	inline int Find(const ObjectType& aObject) const;
 
 	template<typename T>
@@ -354,6 +356,12 @@ inline void FW_GrowingArray<ObjectType>::RemoveLast()
 #endif
 
 	--myCurrentSize;
+}
+
+template<typename ObjectType>
+inline bool FW_GrowingArray<ObjectType>::Contains(const ObjectType& aObject) const
+{
+	return Find(aObject) != FoundNone;
 }
 
 template<typename ObjectType>

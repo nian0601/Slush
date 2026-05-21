@@ -46,6 +46,11 @@ void DamageDealerComponent::OnCollision(Entity& aOtherEntity, const Vector2f& aC
 	if (!otherHealth)
 		return;
 
+	if (myDamagedEntities.Contains(aOtherEntity.myHandle))
+		return;
+
+	myDamagedEntities.Add(aOtherEntity.myHandle);
+
 	if (myEntity.IsPlayerOwned() && aOtherEntity.IsNPCOwned())
 		otherHealth->DealDamage(myDamage);
 	else if (myEntity.IsNPCOwned() && aOtherEntity.IsPlayerOwned())

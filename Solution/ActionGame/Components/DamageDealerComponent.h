@@ -24,4 +24,5 @@ public:
 
 private:
 	int myDamage;
+	FW_GrowingArray<EntityHandle> myDamagedEntities;
 };

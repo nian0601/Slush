@@ -33,6 +33,7 @@ enum EntityType
 	PLAYER_PROJECTILE,
 	NPC_PROJECTILE,
 	PICKUP,
+	ENTITYTYPE_COUNT,
 };
 
 namespace Slush

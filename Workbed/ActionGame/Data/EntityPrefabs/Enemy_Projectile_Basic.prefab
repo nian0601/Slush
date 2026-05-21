@@ -21,19 +21,9 @@ Entity Prefab
 		} 
 		animation 
 		{ 
+			islooping 1 
+			removeentityafteranimation 1 
 			spritesheettexture Small_Fireball_Blue_Sheet 
-			outlinetrack 
-			{ 
-			} 
-			scaletrack 
-			{ 
-			} 
-			postiontrack 
-			{ 
-			} 
-			colortrack 
-			{ 
-			} 
 			spritesheettrack 
 			{ 
 				clip 
@@ -207,7 +197,7 @@ Entity Prefab
 	physics 
 	{ 
 		isStatic 0 
-		isSensor 0 
+		isSensor 1 
 		matchSprite 0 
 		radius 8.000 
 		size 
@@ -218,10 +208,17 @@ Entity Prefab
 	} 
 	removeoncollision 
 	{ 
+		environment 1 
+		player 1 
+		npc 1 
+		playerprojectile 0 
+		npcprojectile 0 
+		pickup 0 
 	} 
 	damagedealer 
 	{ 
 		damage 10 
+		prefab  
 	} 
 	timedremoval 
 	{ 

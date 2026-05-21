@@ -57,7 +57,7 @@ Entity Prefab
 	} 
 	weaponcomponent 
 	{ 
-		weapondata wpn_shuriken 
+		weapondata wpn_fireball 
 	} 
 	experience 
 	{ 

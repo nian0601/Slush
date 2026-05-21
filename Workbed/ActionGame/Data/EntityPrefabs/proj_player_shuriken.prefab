@@ -172,6 +172,12 @@ Entity Prefab
 	} 
 	removeoncollision 
 	{ 
+		environment 1 
+		player 0 
+		npc 1 
+		playerprojectile 0 
+		npcprojectile 0 
+		pickup 0 
 	} 
 	damagedealer 
 	{ 

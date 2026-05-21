@@ -37,7 +37,7 @@ void EntityManager::RegisterComponents()
 	registry.RegisterComponent<PlayerControllerComponent>();
 	registry.RegisterComponent<NPCControllerComponent, NPCControllerComponent::Data>();
 	registry.RegisterComponent<PhysicsComponent, PhysicsComponent::Data>();
-	registry.RegisterComponent<RemoveOnCollisionComponent>();
+	registry.RegisterComponent<RemoveOnCollisionComponent, RemoveOnCollisionComponent::Data>();
 	registry.RegisterComponent<TargetingComponent, TargetingComponent::Data>();
 	registry.RegisterComponent<WeaponComponent, WeaponComponent::Data>();
 	registry.RegisterComponent<ExperienceComponent>();

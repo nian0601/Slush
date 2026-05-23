@@ -27,4 +27,10 @@ namespace Slush
 		sf::Texture* mySFMLTexture = nullptr;
 		Vector2i mySize;
 	};
+
+	struct TextureDragPayload
+	{
+		Texture* myTexture;
+		Recti myTextureRect;
+	};
 }

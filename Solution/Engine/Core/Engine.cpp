@@ -109,6 +109,8 @@ namespace Slush
 			if (myInput->WasKeyPressed(Slush::Input::ESC))
 				myWindow->Close();
 
+			myWindow->RenderFade();
+
 			myWindow->Present();
 		}
 

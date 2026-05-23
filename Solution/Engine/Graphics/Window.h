@@ -5,7 +5,7 @@ namespace sf
 	class RenderWindow;
 	class RenderTexture;
 	class RenderTarget;
-
+	class Texture;
 	class CircleShape;
 	class RectangleShape;
 }
@@ -21,6 +21,8 @@ namespace Slush
 
 		bool PumpEvents();
 		void RenderOffscreenBufferToImGUI();
+		void StartFade(float aDuration);
+		void RenderFade();
 
 		void Present();
 
@@ -70,6 +72,16 @@ namespace Slush
 
 		sf::RenderTarget* myActiveRenderTarget = nullptr;
 		sf::RenderTexture* myOffscreenBuffer = nullptr;
+
+		struct FadeData
+		{
+			sf::Texture* myFadeTexture = nullptr;
+			bool myIsFading = false;
+			float myRemainingTime = 0.f;
+			float myTotalTime = 0.f;
+		};
+		FadeData myFadeData;
+
 		sf::CircleShape* myCircleShape = nullptr;
 		sf::RectangleShape* myRectShape = nullptr;
 	};

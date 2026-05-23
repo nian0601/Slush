@@ -16,6 +16,7 @@
 #include "imgui/imgui-SFML.h"
 #include <FW_FileSystem.h>
 #include <SFML/Graphics/VertexArray.hpp>
+#include "SFMLHelpers.h"
 
 namespace Slush
 {
@@ -41,6 +42,11 @@ namespace Slush
 		myCircleShape = new sf::CircleShape();
 		myRectShape = new sf::RectangleShape();
 
+		//myFadeData.myFadeTexture = new sf::Texture({ 1920, 1080 });
+		myFadeData.myFadeTexture = new sf::Texture();
+		bool resizeSuccess = myFadeData.myFadeTexture->resize({ 1920, 1080 });
+		FW_ASSERT(resizeSuccess);
+
 		myActiveRenderTarget = myRenderWindow;
 
 		ImGui::SFML::Init(*myRenderWindow, false);
@@ -65,6 +71,7 @@ namespace Slush
 
 		FW_SAFE_DELETE(myOffscreenBuffer);
 		FW_SAFE_DELETE(myRenderWindow);
+		FW_SAFE_DELETE(myFadeData.myFadeTexture);
 		FW_SAFE_DELETE(myCircleShape);
 		FW_SAFE_DELETE(myRectShape);
 		myDockables.DeleteAll();
@@ -74,25 +81,6 @@ namespace Slush
 	{
 		if (!myShouldBeOpen)
 			return false;
-
-		//sf::Event event;
-		//while (myRenderWindow->pollEvent(event))
-		//{
-		//	ImGui::SFML::ProcessEvent(*myRenderWindow, event);
-		//
-		//	if (event.type == sf::Event::Closed)
-		//	{
-		//		return false;
-		//	}
-		//	else if (event.type == sf::Event::Resized)
-		//	{
-		//		SetRectSize(myWindowRect, { static_cast<float>(event.size.width), static_cast<float>(event.size.height) });
-		//		//myGameViewRect = MakeRectFromTopLeft<float>({ 0.f, 0.f }, GetSizeThatRespectsAspectRatio(aWidth, aHeight));
-		//		//myRenderWindow->setSize({ event.size.width, event.size.height });
-		//		sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
-		//		myRenderWindow->setView(sf::View(visibleArea));
-		//	}
-		//}
 
 		while (const std::optional event = myRenderWindow->pollEvent())
 		{
@@ -115,6 +103,13 @@ namespace Slush
 		if (myShowEditorUI)
 			ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());
 
+		if (myFadeData.myIsFading)
+		{
+			myFadeData.myRemainingTime -= Time::GetDelta();
+			if (myFadeData.myRemainingTime <= 0.f)
+				myFadeData.myIsFading = false;
+		}
+
 		return true;
 	}
 
@@ -133,6 +128,28 @@ namespace Slush
 
 		ImTextureID textureID = myOffscreenBuffer->getTexture().getNativeHandle();
 		ImGui::Image(textureID, { myGameViewRect.myExtents.x, myGameViewRect.myExtents.y }, { 0, 1 }, { 1, 0 });
+	}
+
+	void Window::StartFade(float aDuration)
+	{
+		myFadeData.myIsFading = true;
+		myFadeData.myRemainingTime = aDuration;
+		myFadeData.myTotalTime = aDuration;
+	}
+
+	void Window::RenderFade()
+	{
+		if (myFadeData.myIsFading)
+		{
+			float alpha = FW_Max(0.f, myFadeData.myRemainingTime / myFadeData.myTotalTime);
+			sf::RectangleShape rect;
+			rect.setTexture(myFadeData.myFadeTexture);
+			rect.setSize({ 1920.f, 1080.f });
+			rect.setFillColor(SFMLHelpers::GetColor(FW_Float_To_ARGB(alpha, 1.f, 1.f, 1.f)));
+			myOffscreenBuffer->draw(rect);
+		}
+
+		myOffscreenBuffer->display();
 	}
 
 	void Window::Present()
@@ -185,6 +202,9 @@ namespace Slush
 			myRenderWindow->draw(rect);
 		}
 
+		if (!myFadeData.myIsFading)
+			myFadeData.myFadeTexture->update(myOffscreenBuffer->getTexture());
+
 		myRenderWindow->display();
 		myRenderWindow->clear();
 	}
@@ -197,7 +217,7 @@ namespace Slush
 
 	void Window::EndOffscreenBuffer()
 	{
-		myOffscreenBuffer->display();
+		//myOffscreenBuffer->display();
 		myActiveRenderTarget = myRenderWindow;
 	}
 

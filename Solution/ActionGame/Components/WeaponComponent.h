@@ -11,6 +11,7 @@
 namespace Slush
 {
 	class DynamicUIBuilder;
+	class Texture;
 }
 
 class WeaponData : public Slush::DataAsset
@@ -38,6 +39,11 @@ public:
 		};
 		ProjectileData myProjectileData;
 	};
+
+	FW_String myName;
+	FW_String myIconTextureID;
+	Recti myIconTextureRect;
+
 	FW_GrowingArray<RankData> myRanks;
 };
 
@@ -51,6 +57,7 @@ public:
 	bool CanBeUpgraded() const;
 
 	const WeaponData& GetWeaponData() const { return myWeaponData; }
+	int GetRank() const { return myRank; }
 
 protected:
 	void RunProjectileLogic();

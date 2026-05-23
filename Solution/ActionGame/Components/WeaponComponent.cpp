@@ -38,25 +38,30 @@ WeaponData::WeaponData(const char* aName, unsigned int aAssetID)
 
 void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
 {
+	aRootHandle.ParseStringField("name", myName);
+	aRootHandle.ParseStringField("icon", myIconTextureID);
+	Slush::AssetParser::Handle textureRectHandle = aRootHandle.ParseChildElement("iconTextureRect");
+	if (textureRectHandle.IsValid())
+	{
+		textureRectHandle.ParseIntField("x", myIconTextureRect.myTopLeft.x);
+		textureRectHandle.ParseIntField("y", myIconTextureRect.myTopLeft.y);
+		textureRectHandle.ParseIntField("width", myIconTextureRect.myExtents.x);
+		textureRectHandle.ParseIntField("height", myIconTextureRect.myExtents.y);
+		
+		if (aRootHandle.IsReading())
+			myIconTextureRect = MakeRectFromTopLeft(myIconTextureRect.myTopLeft, myIconTextureRect.myExtents);
+	}
+
 	int numRanks = myRanks.Count();
 	if (aRootHandle.IsReading())
-	{
-		numRanks = aRootHandle.GetNumChildElements();
-
-		Slush::AssetParser::Handle firstChild = aRootHandle.GetChildElementAtIndex(0);
-		if (firstChild.IsValid() && firstChild.GetName() != "rankdata")
-		{
-			myRanks[0].OnParse(aRootHandle);
-			return;
-		}
-	}
+		numRanks = aRootHandle.GetNumChildElements() - 1;
 
 	myRanks.Reserve(numRanks);
 	for (int i = 0; i < numRanks; ++i)
 	{
 		Slush::AssetParser::Handle rankHandle;
 		if (aRootHandle.IsReading())
-			rankHandle = aRootHandle.GetChildElementAtIndex(i);
+			rankHandle = aRootHandle.GetChildElementAtIndex(i+1);
 		else
 			rankHandle = aRootHandle.ParseChildElement("rankdata");
 
@@ -66,6 +71,45 @@ void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
 
 void WeaponData::BuildUI()
 {
+	ImGui::InputText("Name", &myName);
+
+	if (myIconTextureID.Empty())
+	{
+		ImGui::BeginDisabled(true);
+		ImGui::Button("Icon", { 64, 64 });
+		ImGui::EndDisabled();
+	}
+	else
+	{
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(myIconTextureID.GetBuffer()))
+		{
+			sf::FloatRect texRect;
+			texRect.position.x = static_cast<float>(myIconTextureRect.myTopLeft.x);
+			texRect.position.y = static_cast<float>(myIconTextureRect.myTopLeft.y);
+			texRect.size.x = static_cast<float>(myIconTextureRect.myExtents.x);
+			texRect.size.y = static_cast<float>(myIconTextureRect.myExtents.y);
+
+			sf::Vector2f size;
+			size.x = static_cast<float>(FW_Max(myIconTextureRect.myExtents.x, 48));
+			size.y = static_cast<float>(FW_Max(myIconTextureRect.myExtents.y, 48));
+
+			ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
+		}
+	}
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* imguiPayload = ImGui::AcceptDragDropPayload("TextureDragPayload"))
+		{
+			Slush::TextureDragPayload* payload = static_cast<Slush::TextureDragPayload*>(imguiPayload->Data);
+			myIconTextureID = payload->myTexture->GetAssetName();
+			myIconTextureRect = payload->myTextureRect;
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+
 	for (int i = 0; i < myRanks.Count(); ++i)
 	{
 		FW_String rankHeader = "Rank ";
@@ -335,32 +379,33 @@ void WeaponComponent::HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder)
 		.SetColor(0xAA121212)
 		.SetAlingment(Slush::UIElementStyle::CENTER);
 
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	for (const WeaponData* potentialUpgrade : myUpgradeSelection)
 	{
 		Weapon* weapon = GetWeapon(potentialUpgrade);
 
 		Slush::UIElementStyle& style = aUIBuilder.OpenElement(potentialUpgrade->GetAssetName().GetBuffer());
-		style.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-		style.SetYSizing(Slush::UIElementStyle::FIXED, 75);
 		style.SetAlingment(Slush::UIElementStyle::CENTER);
 		style.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
 		style.SetChildGap(8);
+		style.SetPadding(16, 16);
 
-		if (weapon)
-			style.SetColor(0xFF33FF33);
-		else
-			style.SetColor(0xFFFF3333);
-
+		style.SetColor(0xFF333333);
 		style.SetOutlineColor(0xFF000000);
 		style.SetOutlineThickness(-1.f);
-		style.EnableButtonInteraction(0xFFDDDDDD);
+		style.EnableButtonInteraction(0xFF888888);
 
-		aUIBuilder.Text(potentialUpgrade->GetAssetName().GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFF000000);
+		if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(potentialUpgrade->myIconTextureID))
+			aUIBuilder.Image(iconTexture, { 45, 45 }, potentialUpgrade->myIconTextureRect);
 
-		if (Weapon* weapon = GetWeapon(potentialUpgrade))
-			aUIBuilder.Text("Upgrade", ActionGameGlobals::GetInstance().GetFont(), 20, 0xFF000000);
-		else
-			aUIBuilder.Text("NEW", ActionGameGlobals::GetInstance().GetFont(), 20, 0xFF000000);
+		FW_String text = potentialUpgrade->myName;
+		if (weapon)
+		{
+			text += " ";
+			text += weapon->GetRank()+1;
+		}
+
+		aUIBuilder.Text(text.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
 
 		aUIBuilder.CloseElement();
 	}

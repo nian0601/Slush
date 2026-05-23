@@ -1,5 +1,14 @@
 WeaponData 
 { 
+	name Fireball 
+	icon Small_Fireball_Blue 
+	iconTextureRect 
+	{ 
+		x 0 
+		y 0 
+		width 36 
+		height 16 
+	} 
 	rankdata 
 	{ 
 		basecooldown 0.950 

@@ -3,6 +3,7 @@
 #include "GameOverState.h"
 #include "ActionGameGlobals.h"
 #include "Level\Level.h"
+#include "Graphics\Window.h"
 
 GameOverState::GameOverState(Level& aLevel)
 	: myLevel(aLevel)
@@ -21,6 +22,9 @@ GameOverState::GameOverState(Level& aLevel)
 	myUIButtonStyle.SetColor(0xFFAAFFAF);
 	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
+
+	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+	window.StartFade(0.15f);
 }
 
 GameState::GameStateResult GameOverState::Update()

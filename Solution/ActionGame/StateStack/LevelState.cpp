@@ -8,6 +8,7 @@
 #include "EntitySystem\EntityManager.h"
 #include "Level\Level.h"
 #include "StateStack.h"
+#include "Graphics\Window.h"
 
 LevelState::LevelState()
 {
@@ -20,6 +21,9 @@ LevelState::LevelState()
 
 	myLevel = new Level();
 	myLevel->Restart();
+
+	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+	window.StartFade(0.15f);
 }
 
 LevelState::~LevelState()
@@ -28,6 +32,12 @@ LevelState::~LevelState()
 
 	ActionGameGlobals::GetInstance().SetPhysicsWorld(nullptr);
 	ActionGameGlobals::GetInstance().SetEntityManager(nullptr);
+}
+
+void LevelState::ResumeState()
+{
+	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+	window.StartFade(0.15f);
 }
 
 GameState::GameStateResult LevelState::Update()

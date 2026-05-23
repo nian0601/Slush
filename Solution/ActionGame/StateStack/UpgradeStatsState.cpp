@@ -5,6 +5,7 @@
 #include "ActionGameGlobals.h"
 #include "Components\ExperienceComponent.h"
 #include "EntitySystem\Entity.h"
+#include "Graphics\Window.h"
 
 UpgradeStatsState::UpgradeStatsState(EntityHandle aPlayerHandle)
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
@@ -24,6 +25,9 @@ UpgradeStatsState::UpgradeStatsState(EntityHandle aPlayerHandle)
 	myUIButtonStyle.SetColor(0xFFAAFFAF);
 	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
+
+	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+	window.StartFade(0.15f);
 }
 
 GameState::GameStateResult UpgradeStatsState::Update()

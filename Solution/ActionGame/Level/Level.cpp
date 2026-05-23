@@ -20,6 +20,7 @@
 #include "StateStack/UpgradeWeaponState.h"
 
 #include "Tilemap.h"
+#include "Graphics/Window.h"
 
 Level::Level()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())

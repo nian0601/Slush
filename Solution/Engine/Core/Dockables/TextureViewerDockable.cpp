@@ -50,8 +50,11 @@ namespace Slush
 					if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
 						ImGui::Text("Dragging TextureRect");
 
-					Recti texRect = MakeRectFromTopLeft(texCoord, myTexCoordHelperSpriteSize);
-					ImGui::SetDragDropPayload("TextureRect", &texRect, sizeof(Recti), ImGuiCond_Once);
+					TextureDragPayload payload;
+					payload.myTexture = texture;
+					payload.myTextureRect = MakeRectFromTopLeft(texCoord, myTexCoordHelperSpriteSize);
+					ImGui::SetDragDropPayload("TextureDragPayload", &payload, sizeof(TextureDragPayload), ImGuiCond_Once);
+
 					ImGui::EndDragDropSource();
 				}
 

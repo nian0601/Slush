@@ -117,12 +117,14 @@ void SpriteComponent::Data::OnBuildUI()
 			if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::Texture>()))
 				myTextureID = asset->GetAssetName();
 
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("TextureRect"))
+			if (const ImGuiPayload* imguiPayload = ImGui::AcceptDragDropPayload("TextureDragPayload"))
 			{
-				Recti texRect = *static_cast<Recti*>(payload->Data);
-				myTextureRectPos = texRect.myTopLeft;
-				myTextureRectSize = texRect.myExtents;
+				Slush::TextureDragPayload* payload = static_cast<Slush::TextureDragPayload*>(imguiPayload->Data);
+				myTextureRectPos = payload->myTextureRect.myTopLeft;
+				myTextureRectSize = payload->myTextureRect.myExtents;
+				myTextureID = payload->myTexture->GetAssetName();
 			}
+
 			ImGui::EndDragDropTarget();
 		}
 

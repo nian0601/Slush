@@ -1,20 +1,11 @@
 #pragma once
 
-
-#include <UI\UIManager.h>
-
 class EntityManager;
 class Tilemap;
 class LevelData;
+class StateStack;
 
 struct EnemyWaveData;
-
-namespace Slush
-{
-	class Font;
-	class RectSprite;
-	class Text;
-}
 
 class Level
 {
@@ -22,18 +13,14 @@ public:
 	Level();
 	~Level();
 
-	void Update();
+	void Update(StateStack& aStateStack);
 	void Restart();
 
 	void RenderGame();
-	void RenderUI();
 
 	bool IsPlayerDead() const;
-	bool IsShowingUI() const { return myIsShowingUI; }
 
 private:
-	void HandleLevlingUp();
-	void HandleUpgradingWeapon();
 	void HandleEnemyWaves();
 
 	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);	
@@ -42,7 +29,6 @@ private:
 	EnemyWaveData* myEnemyWaveData = nullptr;
 	EntityManager& myEntityManager;
 	EntityHandle myPlayerHandle;
-	bool myIsShowingUI = false;
 
 	Tilemap* myTilemap;
 
@@ -50,10 +36,4 @@ private:
 	int myWaveCounter = 0;
 	float myPlayerClearanceRadius = 350.f;
 	float myEnemyClearanceRadius = 100.f;
-
-	Slush::UIElementStyle myUIBackgroundStyle;
-	Slush::UIElementStyle myUIButtonStyle;
-	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
-	Slush::DynamicUIRenderer myUIRenderer;
-	Slush::Font& myFont;
 };

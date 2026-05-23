@@ -91,6 +91,8 @@
     <ClCompile Include="StateStack\MainMenuState.cpp" />
     <ClCompile Include="StateStack\LevelState.cpp" />
     <ClCompile Include="StateStack\GameOverState.cpp" />
+    <ClCompile Include="StateStack\UpgradeWeaponState.cpp" />
+    <ClCompile Include="StateStack\UpgradeStatsState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -191,6 +193,8 @@
     <ClInclude Include="StateStack\MainMenuState.h" />
     <ClInclude Include="StateStack\LevelState.h" />
     <ClInclude Include="StateStack\GameOverState.h" />
+    <ClInclude Include="StateStack\UpgradeWeaponState.h" />
+    <ClInclude Include="StateStack\UpgradeStatsState.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

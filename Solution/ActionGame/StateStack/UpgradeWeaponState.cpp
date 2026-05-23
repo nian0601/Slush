@@ -1,14 +1,16 @@
 #include "stdafx.h"
 
-#include "GameOverState.h"
+#include "UpgradeWeaponState.h"
+#include "Components\WeaponComponent.h"
+#include "EntitySystem\Entity.h"
 #include "ActionGameGlobals.h"
-#include "Level\Level.h"
 
-GameOverState::GameOverState(Level& aLevel)
-	: myLevel(aLevel)
-	, myFont(ActionGameGlobals::GetInstance().GetFont())
+UpgradeWeaponState::UpgradeWeaponState(EntityHandle aPlayerHandle)
+	: myFont(ActionGameGlobals::GetInstance().GetFont())
 	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
+	myPlayerHandle = aPlayerHandle;
+
 	myUIBackgroundStyle.SetPadding(16, 16);
 	myUIBackgroundStyle.SetChildGap(16);
 	myUIBackgroundStyle.SetColor(0xAA121212);
@@ -23,38 +25,28 @@ GameOverState::GameOverState(Level& aLevel)
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 }
 
-GameState::GameStateResult GameOverState::Update()
+GameState::GameStateResult UpgradeWeaponState::Update()
 {
+	Entity* player = myPlayerHandle.Get();
+	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
 	Slush::DynamicUIBuilder uiBuilder;
+
 	uiBuilder.Start();
 	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
 	uiBuilder.Finish(myUIRenderCommands);
 
-	uiBuilder.Start();
-	{
-		uiBuilder.OpenElement();
-		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
+	weaponComponent->HandleUpgrading(uiBuilder);
+	uiBuilder.GenerateRenderCommands(myUIRenderCommands);
 
-		uiBuilder.Text("Game Over!", myFont, 50);
-		uiBuilder.VerticalSpacing(60);
-		uiBuilder.Button("Try Again?", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
+	if (weaponComponent->HasPendingUpgrade())
+		return GameState::KEEP;
 
-		uiBuilder.CloseElement();
-	}
-
-	uiBuilder.Finish(myUIRenderCommands);
-
-	if (uiBuilder.WasClicked("Try Again?"))
-	{
-		myLevel.Restart();
-		return GameState::POP_SUBSTATE;
-	}
-
-	return GameState::KEEP;
+	return GameState::POP_SUBSTATE;
 }
 
-void GameOverState::Render()
+void UpgradeWeaponState::Render()
 {
 	myUIRenderer.Render(myUIRenderCommands);
 	myUIRenderCommands.RemoveAll();
 }
+

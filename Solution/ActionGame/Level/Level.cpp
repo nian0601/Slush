@@ -1,47 +1,33 @@
 #include "stdafx.h"
 
-#include "EntitySystem/EntityManager.h"
-#include "Level.h"
 #include "ActionGameGlobals.h"
 
 #include "Components/ExperienceComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/StatsComponent.h"
-
-#include <Core\Input.h>
-#include <UI\UIManager.h>
-#include "Tilemap.h"
-#include <Graphics\RectSprite.h>
-#include <Graphics\Text.h>
-#include "LevelData.h"
 #include "Components/WeaponComponent.h"
+
 #include "Core/Assets/AssetStorage.h"
+#include "Core/Input.h"
+
+#include "EntitySystem/EntityManager.h"
+
+#include "Level.h"
+#include "LevelData.h"
+
+#include "StateStack/StateStack.h"
+#include "StateStack/UpgradeStatsState.h"
+#include "StateStack/UpgradeWeaponState.h"
+
+#include "Tilemap.h"
 
 Level::Level()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
-	, myFont(ActionGameGlobals::GetInstance().GetFont())
-	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	myLevelData = assets.GetAsset<LevelData>("testLevel");
 	
 	myTilemap = new Tilemap();
-
-	myUIBackgroundStyle.SetPadding(16, 16);
-	myUIBackgroundStyle.SetChildGap(16);
-	myUIBackgroundStyle.SetColor(0xAA121212);
-	myUIBackgroundStyle.SetOutlineColor(0xFF000000);
-	myUIBackgroundStyle.SetOutlineThickness(-1.f);
-	myUIBackgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
-	myUIBackgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-
-	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
-	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetColor(0xFFAAFFAF);
-	myUIButtonStyle.SetOutlineColor(0xFF000000);
-	myUIButtonStyle.SetOutlineThickness(-1.f);
-	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 }
 
 Level::~Level()
@@ -50,7 +36,7 @@ Level::~Level()
 	myEntityManager.DeleteAllEntities();
 }
 
-void Level::Update()
+void Level::Update(StateStack& aStateStack)
 {
 	Entity* player = myPlayerHandle.Get();
 	if (!player)
@@ -70,14 +56,10 @@ void Level::Update()
 		weaponComp->AddPendingUpgrade();
 	}
 
-	const bool levelingUp = expComp->NeedsLevelUp();
-	const bool upgradingWeapon = weaponComp->HasPendingUpgrade();
-	myIsShowingUI = levelingUp || upgradingWeapon;
-
-	if (levelingUp)
-		HandleLevlingUp();
-	else if (upgradingWeapon)
-		HandleUpgradingWeapon();
+	if (expComp->NeedsLevelUp())
+		aStateStack.PushSubState(new UpgradeStatsState(myPlayerHandle));
+	else if (weaponComp->HasPendingUpgrade())
+		aStateStack.PushSubState(new UpgradeWeaponState(myPlayerHandle));
 	else
 		HandleEnemyWaves();
 }
@@ -100,12 +82,6 @@ void Level::RenderGame()
 	myTilemap->Render();
 }
 
-void Level::RenderUI()
-{
-	myUIRenderer.Render(myUIRenderCommands);
-	myUIRenderCommands.RemoveAll();
-}
-
 bool Level::IsPlayerDead() const
 {
 	Entity* player = myPlayerHandle.Get();
@@ -116,86 +92,6 @@ bool Level::IsPlayerDead() const
 		return health->IsDead();
 
 	return true;
-}
-
-void Level::HandleLevlingUp()
-{
-	Entity* player = myPlayerHandle.Get();
-	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
-
-	if (StatsComponent* stats = player->GetComponent<StatsComponent>())
-	{
-		if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage() && !stats->CanUpgradeExperience())
-		{
-			expComp->LevelUp();
-			myIsShowingUI = false;
-			SLUSH_WARNING("No more available upgrades, auto-leveling");
-		}
-		else
-		{
-			Slush::DynamicUIBuilder uiBuilder;
-
-			uiBuilder.Start();
-			uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
-			uiBuilder.Finish(myUIRenderCommands);
-
-			uiBuilder.Start();
-
-			uiBuilder.TextHeader("Leveled Up!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
-
-			uiBuilder.VerticalSpacing(50);
-
-			uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
-
-			if (stats->CanUpgradeCooldownReduction())
-				uiBuilder.Button("Cooldown", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
-
-			if (stats->CanUpgradeDamage())
-				uiBuilder.Button("Damage", myFont, 25, myUIButtonStyle, 0xFFFFFF33, 0xFF000000);
-
-			if (stats->CanUpgradeExperience())
-				uiBuilder.Button("Experience", myFont, 25, myUIButtonStyle, 0xFF33FF33, 0xFF000000);
-
-			uiBuilder.CloseElement(); // ButtonBackground
-
-			uiBuilder.Finish(myUIRenderCommands);
-
-
-			if (stats->CanUpgradeCooldownReduction() && uiBuilder.WasClicked("Cooldown"))
-			{
-				stats->AddCooldownReductionUpgrade();
-				expComp->LevelUp();
-				myIsShowingUI = false;
-			}
-			if (stats->CanUpgradeDamage() && uiBuilder.WasClicked("Damage"))
-			{
-				stats->AddDamageUpgrade();
-				expComp->LevelUp();
-				myIsShowingUI = false;
-			}
-			if (stats->CanUpgradeExperience() && uiBuilder.WasClicked("Experience"))
-			{
-				stats->AddExperienceUpgrade();
-				expComp->LevelUp();
-				myIsShowingUI = false;
-			}
-		}
-	}
-	else
-	{
-		SLUSH_ERROR("Player doesnt have a StatsComponent, not able to pick upgrade when Leveling");
-		expComp->LevelUp();
-		myIsShowingUI = false;
-	}
-}
-
-void Level::HandleUpgradingWeapon()
-{
-	Entity* player = myPlayerHandle.Get();
-	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
-	Slush::DynamicUIBuilder uiBuilder;
-	weaponComponent->HandleUpgrading(uiBuilder);
-	uiBuilder.GenerateRenderCommands(myUIRenderCommands);
 }
 
 void Level::HandleEnemyWaves()

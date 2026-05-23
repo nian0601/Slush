@@ -2,24 +2,24 @@
 
 #include "GameState.h"
 #include "UI\UIManager.h"
+#include "EntitySystem\EntityHandle.h"
 
 namespace Slush
 {
 	class Font;
 }
 
-class Level;
-class GameOverState : public GameState
+class UpgradeWeaponState : public GameState
 {
 public:
-	GameOverState(Level& aLevel);
+	UpgradeWeaponState(EntityHandle aPlayerHandle);
 
 	GameStateResult Update() override;
 	void Render() override;
 	bool AllowPassThroughRender() override { return true; };
 
 private:
-	Level& myLevel;
+	EntityHandle myPlayerHandle;
 
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;

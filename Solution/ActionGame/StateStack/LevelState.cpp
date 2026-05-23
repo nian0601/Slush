@@ -30,25 +30,16 @@ LevelState::~LevelState()
 	ActionGameGlobals::GetInstance().SetEntityManager(nullptr);
 }
 
-void LevelState::ResumeState()
-{
-	myLevel->Restart();
-}
-
 GameState::GameStateResult LevelState::Update()
 {
-	bool pauseEntityUpdate = myLevel->IsShowingUI(); // Push SubStates instead
-	if (!pauseEntityUpdate)
-	{
-		myEntityManager->PrePhysicsUpdate();
-		myPhysicsWorld->TickLimited(Slush::Time::GetDelta());
-		UpdateCollisions();
-		myEntityManager->Update();
-	}
+	myEntityManager->PrePhysicsUpdate();
+	myPhysicsWorld->TickLimited(Slush::Time::GetDelta());
+	UpdateCollisions();
+	myEntityManager->Update();
 
-	myLevel->Update();
+	myLevel->Update(*myStateStack);
 	if (myLevel->IsPlayerDead())
-		myStateStack->PushSubState(new GameOverState());
+		myStateStack->PushSubState(new GameOverState(*myLevel));
 
 	myEntityManager->EndFrame();
 	return GameState::KEEP;
@@ -64,8 +55,6 @@ void LevelState::Render()
 	
 	if (ActionGameGlobals::GetInstance().myDebugSettings.myShowPhysicsContacts)
 		myPhysicsWorld->RenderContacts();
-	
-	myLevel->RenderUI();
 }
 
 void LevelState::UpdateCollisions()

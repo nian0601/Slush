@@ -14,8 +14,6 @@ public:
 	LevelState();
 	~LevelState();
 
-	void ResumeState() override;
-
 	GameStateResult Update() override;
 	void Render() override;
 

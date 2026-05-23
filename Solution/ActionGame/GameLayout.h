@@ -5,6 +5,7 @@
 
 class EntityManager;
 class Level;
+class StateStack;
 
 namespace Slush
 {
@@ -24,31 +25,7 @@ public:
 	void Render() override;
 
 private:
-	void UpdatePhysics();
-	void UpdateGameState();
-
-	void UpdateStartScreen();
-	void UpdatePlaying();
 	void UpdateGameOver();
 
-
-	enum GameState
-	{
-		START_SCREEN,
-		LOADING_LEVEL,
-		PLAYING,
-		GAME_OVER,
-	};
-
-	EntityManager* myEntityManager = nullptr;
-	Slush::PhysicsWorld* myPhysicsWorld = nullptr;
-
-	Level* myLevel = nullptr;
-	GameState myGameState = START_SCREEN;
-
-	Slush::UIElementStyle myUIBackgroundStyle;
-	Slush::UIElementStyle myUIButtonStyle;
-	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
-	Slush::DynamicUIRenderer myUIRenderer;
-	Slush::Font& myFont;
+	StateStack* myStateStack = nullptr;
 };

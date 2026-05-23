@@ -155,6 +155,8 @@
     <ClCompile Include="GameLayout.cpp" />
     <ClCompile Include="Components\HealthBarComponent.cpp" />
     <ClCompile Include="Components\HealthComponent.cpp" />
+    <ClCompile Include="StateStack\GameOverState.cpp" />
+    <ClCompile Include="StateStack\GameState.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="main.cpp" />
@@ -166,6 +168,9 @@
     <ClCompile Include="Components\RemoveOnCollisionComponent.cpp" />
     <ClCompile Include="Components\SpriteComponent.cpp" />
     <ClCompile Include="Components\StatsComponent.cpp" />
+    <ClCompile Include="StateStack\LevelState.cpp" />
+    <ClCompile Include="StateStack\MainMenuState.cpp" />
+    <ClCompile Include="StateStack\StateStack.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -196,6 +201,8 @@
     <ClInclude Include="GameLayout.h" />
     <ClInclude Include="Components\HealthBarComponent.h" />
     <ClInclude Include="Components\HealthComponent.h" />
+    <ClInclude Include="StateStack\GameOverState.h" />
+    <ClInclude Include="StateStack\GameState.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Components\NPCControllerComponent.h" />
     <ClInclude Include="Level\LevelData.h" />
@@ -206,6 +213,9 @@
     <ClInclude Include="Components\RemoveOnCollisionComponent.h" />
     <ClInclude Include="Components\SpriteComponent.h" />
     <ClInclude Include="Components\StatsComponent.h" />
+    <ClInclude Include="StateStack\LevelState.h" />
+    <ClInclude Include="StateStack\MainMenuState.h" />
+    <ClInclude Include="StateStack\StateStack.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Components\TargetingComponent.h" />
     <ClInclude Include="Level\Tilemap.h" />

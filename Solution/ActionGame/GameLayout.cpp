@@ -1,51 +1,20 @@
 #include "stdafx.h"
 
-#include <Graphics\Window.h>
-#include <Physics\PhysicsWorld.h>
-#include <UI\UIButton.h>
-#include <UI\UIManager.h>
-
+#include "Graphics\Window.h"
 #include "Core/Dockables/GameViewDockable.h"
 #include "Core/Dockables/TextureViewerDockable.h"
 #include "Core/Dockables/LogDockable.h"
 #include "Core/Dockables/ContentBrowserDockable.h"
 
-#include "EntitySystem/EntityManager.h"
-
 #include "ActionGameGlobals.h"
-#include "Level/Level.h"
-#include "Level/LevelData.h"
 #include "GameLayout.h"
-#include <UI\UILayout.h>
-#include "Graphics\Text.h"
-#include "Graphics\RectSprite.h"
+#include "StateStack\StateStack.h"
+#include "StateStack\MainMenuState.h"
 
 GameLayout::GameLayout()
-	: myFont(ActionGameGlobals::GetInstance().GetFont())
-	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
-	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
-
-	myPhysicsWorld = new Slush::PhysicsWorld();
-	myEntityManager = new EntityManager();
-
-	ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
-	ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);
-
-	myLevel = new Level();
-
-	myUIBackgroundStyle.SetPadding(16, 16);
-	myUIBackgroundStyle.SetChildGap(16);
-	myUIBackgroundStyle.SetColor(0xAA121212);
-	myUIBackgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
-	myUIBackgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-
-	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
-	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetColor(0xFFAAFFAF);
-	myUIButtonStyle.SetOutlineThickness(-1.f);
-	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
+	myStateStack = new StateStack();
+	myStateStack->PushMainState(new MainMenuState());
 	
 	bool disableEditorStuff = false;
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -64,19 +33,13 @@ GameLayout::GameLayout()
 
 GameLayout::~GameLayout()
 {
-	FW_SAFE_DELETE(myLevel);
-	FW_SAFE_DELETE(myEntityManager);
-	FW_SAFE_DELETE(myPhysicsWorld);
-
-	ActionGameGlobals::GetInstance().SetEntityManager(nullptr);
-	ActionGameGlobals::GetInstance().SetPhysicsWorld(nullptr);
+	myStateStack->Clear();
+	FW_SAFE_DELETE(myStateStack);
 }
 
 void GameLayout::Update()
 {
-	UpdateGameState();
-
-	myEntityManager->EndFrame();
+	myStateStack->Update();
 }
 
 void GameLayout::Render()
@@ -84,144 +47,7 @@ void GameLayout::Render()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().StartOffscreenBuffer();
 
-	if (myLevel)
-		myLevel->RenderGame();
-
-	myEntityManager->Render();
-
-	if (ActionGameGlobals::GetInstance().myDebugSettings.myShowPhysicsObjects)
-		myPhysicsWorld->RenderAllObjects();
-
-	if (ActionGameGlobals::GetInstance().myDebugSettings.myShowPhysicsContacts)
-		myPhysicsWorld->RenderContacts();
-
-	if (myLevel)
-		myLevel->RenderUI();
-
-	myUIRenderer.Render(myUIRenderCommands);
-	myUIRenderCommands.RemoveAll();
+	myStateStack->Render();
 
 	engine.GetWindow().EndOffscreenBuffer();
-}
-
-void GameLayout::UpdatePhysics()
-{
-	const FW_GrowingArray<Slush::Contact>& contacts = myPhysicsWorld->GetContacts();
-	for (const Slush::Contact& contact : contacts)
-	{
-		if (!contact.myFirst || !contact.mySecond)
-			continue;
-
-		PhysicsComponent* physA = contact.myFirst->myUserData.Get<PhysicsComponent*>();
-		PhysicsComponent* physB = contact.mySecond->myUserData.Get<PhysicsComponent*>();
-		if (!physA || !physB)
-		{
-			SLUSH_WARNING("PhysContact with Entity without PhysicsComponent");
-			continue;
-		}
-
-		physA->myEntity.OnCollision(physB->myEntity, contact.myContactPosition);
-	}
-}
-
-void GameLayout::UpdateGameState()
-{
-	switch (myGameState)
-	{
-	case START_SCREEN:
-	{
-		UpdateStartScreen();
-		break;
-	}
-	case LOADING_LEVEL:
-		myLevel->Restart();
-		myGameState = PLAYING;
-		break;
-	case PLAYING:
-		UpdatePlaying();
-		break;
-	case GAME_OVER:
-	{
-		UpdateGameOver();
-		break;
-	}
-	default:
-		break;
-	}
-}
-
-void GameLayout::UpdateStartScreen()
-{
-	if (ActionGameGlobals::GetInstance().myDebugSettings.mySkipStartScreen)
-		myGameState = LOADING_LEVEL;
-
-	Slush::DynamicUIBuilder uiBuilder;
-	uiBuilder.Start();
-	uiBuilder.ScreenFade(0xAA121212);
-	uiBuilder.Finish(myUIRenderCommands);
-
-	uiBuilder.Start();
-	{
-		uiBuilder.OpenElement();
-		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-
-		uiBuilder.Text("Action Game!", myFont, 50);
-		uiBuilder.VerticalSpacing(60);
-		uiBuilder.Button("Start Game", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
-
-		uiBuilder.CloseElement();
-	}
-
-	uiBuilder.Finish(myUIRenderCommands);
-	
-	if (uiBuilder.WasClicked("Start Game"))
-		myGameState = LOADING_LEVEL;
-}
-
-void GameLayout::UpdatePlaying()
-{
-	bool pauseEntityUpdate = false;
-	if (myLevel)
-		pauseEntityUpdate = myLevel->IsShowingUI();
-
-	if (!pauseEntityUpdate)
-	{
-		myEntityManager->PrePhysicsUpdate();
-		myPhysicsWorld->TickLimited(Slush::Time::GetDelta());
-		UpdatePhysics();
-	}
-
-	if (myLevel)
-		myLevel->Update();
-
-	if (!pauseEntityUpdate)
-		myEntityManager->Update();
-
-	if (myLevel->IsPlayerDead())
-		myGameState = GAME_OVER;
-}
-
-void GameLayout::UpdateGameOver()
-{
-	Slush::DynamicUIBuilder uiBuilder;
-	uiBuilder.Start();
-	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
-	uiBuilder.Finish(myUIRenderCommands);
-
-	uiBuilder.Start();
-	{
-		uiBuilder.OpenElement();
-		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-
-		uiBuilder.Text("Game Over!", myFont, 50);
-		uiBuilder.VerticalSpacing(60);
-		uiBuilder.Button("Try Again?", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
-
-		uiBuilder.CloseElement();
-	}
-
-	uiBuilder.Finish(myUIRenderCommands);
-
-	if (uiBuilder.WasClicked("Try Again?"))
-		myGameState = LOADING_LEVEL;
 }

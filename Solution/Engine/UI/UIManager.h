@@ -10,6 +10,7 @@ namespace Slush
 	class UIWidget;
 	class Input;
 	class Font;
+	class Texture;
 
 	class UIManager
 	{
@@ -111,6 +112,8 @@ namespace Slush
 			int myColor;
 			int myOutlineColor;
 			float myOutlineThickness;
+			const Texture* myTexture = nullptr;
+			Recti myTextureRect;
 			FW_String myText;
 			int myTextSize = 15;
 		};
@@ -137,6 +140,7 @@ namespace Slush
 		void Text(const char* someText, Font& aFont, int aTextSize, int aTextColor = 0xFFFFFFFF);
 		void TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor);
 		void TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor);
+		void Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect);
 
 		bool WasClicked(const char* aIdentifier) const;
 
@@ -156,6 +160,8 @@ namespace Slush
 			Vector2i mySize;
 			Vector2i myContentSize;
 			int myColor;
+			const Texture* myTexture;
+			Recti myTextureRect;
 			FW_String myText;
 			int myTextSize;
 			bool myWasMouseReleased; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames

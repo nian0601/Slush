@@ -460,6 +460,23 @@ namespace Slush
 		CloseElement();
 	}
 
+	void DynamicUIBuilder::Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect)
+	{
+		OpenElement();
+
+		UIElementStyle& style = GetStyle();
+		style.SetAlingment(Slush::UIElementStyle::CENTER);
+		style.SetXSizing(UIElementStyle::FIXED, aSize.x);
+		style.SetYSizing(UIElementStyle::FIXED, aSize.y);
+		style.SetColor(0xFFFFFFFF);
+
+		FW_ASSERT(myCurrentElement != nullptr);
+		myCurrentElement->myTexture = aTexture;
+		myCurrentElement->myTextureRect = aTextureRect;
+
+		CloseElement();
+	}
+
 	bool DynamicUIBuilder::WasClicked(const char* aIdentifier) const
 	{
 		if (Element* const* element = myInteractiveElements.GetIfExists(aIdentifier))
@@ -680,6 +697,8 @@ namespace Slush
 		command.mySize.x = static_cast<float>(anElement.mySize.x);
 		command.mySize.y = static_cast<float>(anElement.mySize.y);
 		command.myColor = anElement.myStyle.myColor;
+		command.myTexture = anElement.myTexture;
+		command.myTextureRect = anElement.myTextureRect;
 		command.myOutlineColor = anElement.myStyle.myOutlineColor;
 		command.myOutlineThickness = anElement.myStyle.myOutlineThickness;
 		command.myText = anElement.myText;
@@ -705,6 +724,8 @@ namespace Slush
 		mySize = { 0, 0 };
 		myContentSize = { 0, 0 };
 		myColor = -1;
+		myTexture = nullptr;
+		myTextureRect = MakeRect(0, 0, 0, 0);
 		myText = "";
 		myTextSize = 15;
 		myWasMouseReleased = false;

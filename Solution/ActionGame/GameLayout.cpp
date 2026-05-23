@@ -106,6 +106,16 @@ void GameLayout::Render()
 	{
 		if (command.myText.Empty())
 		{
+			if (command.myTexture)
+			{
+				myUISprite->SetTexture(*command.myTexture);
+				myUISprite->SetTextureRect(command.myTextureRect);
+			}
+			else
+			{
+				myUISprite->ClearTexture();
+			}
+
 			myUISprite->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
 			myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
 			myUISprite->SetSize(command.mySize.x, command.mySize.y);

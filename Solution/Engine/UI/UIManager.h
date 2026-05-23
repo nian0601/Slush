@@ -185,4 +185,20 @@ namespace Slush
 		bool HandleInput(Element& anElement);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};
+
+	class RectSprite;
+	class Text;
+
+	class DynamicUIRenderer
+	{
+	public:
+		DynamicUIRenderer(Slush::Font& aFont);
+		~DynamicUIRenderer();
+
+		void Render(const FW_GrowingArray<DynamicUIBuilder::RenderCommand>& someRenderCommands);
+
+	private:
+		Slush::RectSprite* myUISprite;
+		Slush::Text* myText;
+	};
 }

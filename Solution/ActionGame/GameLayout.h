@@ -11,7 +11,6 @@ namespace Slush
 	class Font;
 	class RectSprite;
 	class Text;
-
 	class PhysicsWorld;
 }
 
@@ -50,7 +49,6 @@ private:
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
-	Slush::RectSprite* myUISprite;
-	Slush::Text* myText;
+	Slush::DynamicUIRenderer myUIRenderer;
 	Slush::Font& myFont;
 };

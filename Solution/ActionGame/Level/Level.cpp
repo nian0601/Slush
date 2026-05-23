@@ -20,14 +20,12 @@
 Level::Level()
 	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
 	, myFont(ActionGameGlobals::GetInstance().GetFont())
+	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	myLevelData = assets.GetAsset<LevelData>("testLevel");
 	
 	myTilemap = new Tilemap();
-
-	myUISprite = new Slush::RectSprite();
-	myText = new Slush::Text(myFont);
 
 	myUIBackgroundStyle.SetPadding(16, 16);
 	myUIBackgroundStyle.SetChildGap(16);
@@ -50,9 +48,6 @@ Level::~Level()
 {
 	FW_SAFE_DELETE(myTilemap);
 	myEntityManager.DeleteAllEntities();
-
-	FW_SAFE_DELETE(myUISprite);
-	FW_SAFE_DELETE(myText);
 }
 
 void Level::Update()
@@ -107,37 +102,7 @@ void Level::RenderGame()
 
 void Level::RenderUI()
 {
-	for (Slush::DynamicUIBuilder::RenderCommand& command : myUIRenderCommands)
-	{
-		if (command.myText.Empty())
-		{
-			if (command.myTexture)
-			{
-				myUISprite->SetTexture(*command.myTexture);
-				myUISprite->SetTextureRect(command.myTextureRect);
-			}
-			else
-			{
-				myUISprite->ClearTexture();
-			}
-
-			myUISprite->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
-			myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
-			myUISprite->SetSize(command.mySize.x, command.mySize.y);
-			myUISprite->SetFillColor(command.myColor);
-			myUISprite->SetOutlineColor(command.myOutlineColor);
-			myUISprite->SetOutlineThickness(command.myOutlineThickness);
-			myUISprite->Render();
-		}
-		else
-		{
-			myText->SetText(command.myText);
-			myText->SetCharacterSize(command.myTextSize);
-			myText->SetColor(command.myColor);
-			myText->SetPosition(command.myPosition.x, command.myPosition.y);
-			myText->Render();
-		}
-	}
+	myUIRenderer.Render(myUIRenderCommands);
 	myUIRenderCommands.RemoveAll();
 }
 

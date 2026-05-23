@@ -8,6 +8,7 @@
 #include <Graphics\Window.h>
 #include <Core\Input.h>
 #include "Graphics\Text.h"
+#include "Graphics\RectSprite.h"
 
 namespace Slush
 {
@@ -732,6 +733,56 @@ namespace Slush
 
 		myParent = nullptr;
 		myChildren.DeleteAll();
+	}
+
+	
+	//////////////////////////////////////////////////////////////////////////
+
+	DynamicUIRenderer::DynamicUIRenderer(Slush::Font& aFont)
+	{
+		myUISprite = new Slush::RectSprite();
+		myText = new Slush::Text(aFont);
+	}
+
+	DynamicUIRenderer::~DynamicUIRenderer()
+	{
+		FW_SAFE_DELETE(myText);
+		FW_SAFE_DELETE(myUISprite);
+	}
+
+	void DynamicUIRenderer::Render(const FW_GrowingArray<DynamicUIBuilder::RenderCommand>& someRenderCommands)
+	{
+		for (const DynamicUIBuilder::RenderCommand& command : someRenderCommands)
+		{
+			if (command.myText.Empty())
+			{
+				if (command.myTexture)
+				{
+					myUISprite->SetTexture(*command.myTexture);
+					myUISprite->SetTextureRect(command.myTextureRect);
+				}
+				else
+				{
+					myUISprite->ClearTexture();
+				}
+
+				myUISprite->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
+				myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
+				myUISprite->SetSize(command.mySize.x, command.mySize.y);
+				myUISprite->SetFillColor(command.myColor);
+				myUISprite->SetOutlineColor(command.myOutlineColor);
+				myUISprite->SetOutlineThickness(command.myOutlineThickness);
+				myUISprite->Render();
+			}
+			else
+			{
+				myText->SetText(command.myText);
+				myText->SetCharacterSize(command.myTextSize);
+				myText->SetColor(command.myColor);
+				myText->SetPosition(command.myPosition.x, command.myPosition.y);
+				myText->Render();
+			}
+		}
 	}
 
 }

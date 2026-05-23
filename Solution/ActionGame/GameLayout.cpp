@@ -22,6 +22,7 @@
 
 GameLayout::GameLayout()
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
+	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
 	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
 
@@ -45,11 +46,6 @@ GameLayout::GameLayout()
 	myUIButtonStyle.SetColor(0xFFAAFFAF);
 	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
-
-	myUISprite = new Slush::RectSprite();
-	myText = new Slush::Text(myFont);
-
-
 	
 	bool disableEditorStuff = false;
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -102,37 +98,7 @@ void GameLayout::Render()
 	if (myLevel)
 		myLevel->RenderUI();
 
-	for (Slush::DynamicUIBuilder::RenderCommand& command : myUIRenderCommands)
-	{
-		if (command.myText.Empty())
-		{
-			if (command.myTexture)
-			{
-				myUISprite->SetTexture(*command.myTexture);
-				myUISprite->SetTextureRect(command.myTextureRect);
-			}
-			else
-			{
-				myUISprite->ClearTexture();
-			}
-
-			myUISprite->SetOrigin(Slush::RectSprite::Origin::TOP_LEFT);
-			myUISprite->SetPosition(command.myPosition.x, command.myPosition.y);
-			myUISprite->SetSize(command.mySize.x, command.mySize.y);
-			myUISprite->SetFillColor(command.myColor);
-			myUISprite->SetOutlineColor(command.myOutlineColor);
-			myUISprite->SetOutlineThickness(command.myOutlineThickness);
-			myUISprite->Render();
-		}
-		else
-		{
-			myText->SetText(command.myText);
-			myText->SetCharacterSize(command.myTextSize);
-			myText->SetColor(command.myColor);
-			myText->SetPosition(command.myPosition.x, command.myPosition.y);
-			myText->Render();
-		}
-	}
+	myUIRenderer.Render(myUIRenderCommands);
 	myUIRenderCommands.RemoveAll();
 
 	engine.GetWindow().EndOffscreenBuffer();

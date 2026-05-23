@@ -189,9 +189,13 @@ namespace Slush
 		
 		template <typename AssetType>
 		AssetType* GetAsset(const char* aAssetName);
+		template <typename AssetType>
+		AssetType* GetAsset(const FW_String& aAssetName);
 
 		template <typename AssetType>
 		const AssetType* GetAsset(const char* aAssetName) const;
+		template <typename AssetType>
+		const AssetType* GetAsset(const FW_String& aAssetName) const;
 
 		template <typename AssetType>
 		const AssetType* GetAsset(int aAssetIndex) const;
@@ -235,11 +239,23 @@ namespace Slush
 	}
 
 	template <typename AssetType>
+	inline AssetType* AssetRegistry::GetAsset(const FW_String& aAssetName)
+	{
+		return GetAsset<AssetType>(aAssetName.GetBuffer());
+	}
+
+	template <typename AssetType>
 	inline const AssetType* AssetRegistry::GetAsset(const char* aAssetName) const
 	{
 		int assetID = GetAssetID<AssetType>();
 		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
 		return static_cast<const AssetType*>(myAssetStorages[assetID]->GetAsset(aAssetName));
+	}
+
+	template <typename AssetType>
+	inline const AssetType* AssetRegistry::GetAsset(const FW_String& aAssetName) const
+	{
+		return GetAsset<AssetType>(aAssetName.GetBuffer());
 	}
 
 	template <typename AssetType>

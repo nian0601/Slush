@@ -298,10 +298,10 @@ namespace Slush
 		if (aValue.Empty())
 			return;
 
-		//Field* field = myElement->AddField(aFieldName);
-		//field->myRawData += aValue;
-
-		aField->myRawData = aValue;
+		if (aValue.Empty())
+			aField->myRawData += "none";
+		else
+			aField->myRawData = aValue;
 	}
 
 	//////////////////////////////////////////////////////////////////////////

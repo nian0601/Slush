@@ -23,6 +23,12 @@ namespace Slush
 		FW_SAFE_DELETE(myShape);
 	}
 
+	void BaseSprite::ClearTexture()
+	{
+		myTexture = nullptr;
+		myShape->setTexture(nullptr);
+	}
+
 	void BaseSprite::SetTexture(const Texture& aTexture)
 	{
 		myTexture = &aTexture;
@@ -44,6 +50,11 @@ namespace Slush
 		}
 
 		myShape->setTextureRect(rect);
+	}
+
+	void BaseSprite::SetTextureRect(const Recti& aRect)
+	{
+		SetTextureRect(aRect.myTopLeft.x, aRect.myTopLeft.y, aRect.myExtents.x, aRect.myExtents.y);
 	}
 
 	void BaseSprite::SetFillColor(int argb)

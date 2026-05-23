@@ -13,8 +13,10 @@ namespace Slush
 	public:
 		virtual ~BaseSprite();
 
+		void ClearTexture();
 		void SetTexture(const Texture& aTexture);
 		void SetTextureRect(int x, int y, int aWidth, int aHeight);
+		void SetTextureRect(const Recti& aRect);
 		void SetPosition(float x, float y);
 		void SetRotation(float aRadians);
 		void SetScale(float aScale);

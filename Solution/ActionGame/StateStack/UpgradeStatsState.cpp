@@ -28,6 +28,31 @@ UpgradeStatsState::UpgradeStatsState(EntityHandle aPlayerHandle)
 
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 	window.StartFade(0.15f);
+
+	Entity* player = myPlayerHandle.Get();
+	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
+	StatsComponent* stats = player->GetComponent<StatsComponent>();
+
+	FW_GrowingArray<StatType> potentialUpgrades;
+	potentialUpgrades.Add(StatType::COOLDOWN);
+	potentialUpgrades.Add(StatType::DAMAGE);
+	potentialUpgrades.Add(StatType::EXPERIENCE_GAIN);
+	const char* statTypeNames[] = { "Cooldown", "Damage", "Experience" };
+	static_assert(IM_ARRAYSIZE(statTypeNames) == StatType::NUM_STATS);
+
+	while (!potentialUpgrades.IsEmpty() && myUpgradeOptions.Count() < 3)
+	{
+		int statIndex = FW_RandInt(0, potentialUpgrades.Count() - 1);
+		StatType statToUpgrade = potentialUpgrades[statIndex];
+
+		if (stats->CanUpgradeStat(statToUpgrade))
+		{
+			myUpgradeOptions.Add(statToUpgrade);
+			myUpgradeLabels.Add(statTypeNames[statToUpgrade]);
+		}
+
+		potentialUpgrades.RemoveCyclicAtIndex(statIndex);
+	}
 }
 
 GameState::GameStateResult UpgradeStatsState::Update()
@@ -35,75 +60,43 @@ GameState::GameStateResult UpgradeStatsState::Update()
 	Entity* player = myPlayerHandle.Get();
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
 
-	bool leveledUp = false;
-	if (StatsComponent* stats = player->GetComponent<StatsComponent>())
+	if (myUpgradeOptions.IsEmpty())
 	{
-		if (!stats->CanUpgradeCooldownReduction() && !stats->CanUpgradeDamage() && !stats->CanUpgradeExperience())
-		{
-			expComp->LevelUp();
-			leveledUp = true;
-			SLUSH_WARNING("No more available upgrades, auto-leveling");
-		}
-		else
-		{
-			Slush::DynamicUIBuilder uiBuilder;
-
-			uiBuilder.Start();
-			uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
-			uiBuilder.Finish(myUIRenderCommands);
-
-			uiBuilder.Start();
-
-			uiBuilder.TextHeader("Leveled Up!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
-
-			uiBuilder.VerticalSpacing(50);
-
-			uiBuilder.OpenElement("ButtonBackground", myUIBackgroundStyle);
-
-			if (stats->CanUpgradeCooldownReduction())
-				uiBuilder.Button("Cooldown", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
-
-			if (stats->CanUpgradeDamage())
-				uiBuilder.Button("Damage", myFont, 25, myUIButtonStyle, 0xFFFFFF33, 0xFF000000);
-
-			if (stats->CanUpgradeExperience())
-				uiBuilder.Button("Experience", myFont, 25, myUIButtonStyle, 0xFF33FF33, 0xFF000000);
-
-			uiBuilder.CloseElement(); // ButtonBackground
-
-			uiBuilder.Finish(myUIRenderCommands);
-
-
-			if (stats->CanUpgradeCooldownReduction() && uiBuilder.WasClicked("Cooldown"))
-			{
-				stats->AddCooldownReductionUpgrade();
-				expComp->LevelUp();
-				leveledUp = true;
-			}
-			if (stats->CanUpgradeDamage() && uiBuilder.WasClicked("Damage"))
-			{
-				stats->AddDamageUpgrade();
-				expComp->LevelUp();
-				leveledUp = true;
-			}
-			if (stats->CanUpgradeExperience() && uiBuilder.WasClicked("Experience"))
-			{
-				stats->AddExperienceUpgrade();
-				expComp->LevelUp();
-				leveledUp = true;
-			}
-		}
-	}
-	else
-	{
-		SLUSH_ERROR("Player doesnt have a StatsComponent, not able to pick upgrade when Leveling");
+		SLUSH_WARNING("No more available upgrades, auto-leveling");
 		expComp->LevelUp();
-		leveledUp = true;
-	}
-
-	if (leveledUp)
 		return GameState::POP_SUBSTATE;
+	}
+	
+	Slush::DynamicUIBuilder uiBuilder;
 
+	uiBuilder.Start();
+	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
+	uiBuilder.Finish(myUIRenderCommands);
+
+	uiBuilder.Start();
+
+	uiBuilder.TextHeader("Leveled Up!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
+
+	uiBuilder.VerticalSpacing(50);
+
+	uiBuilder.OpenElement(myUIBackgroundStyle);
+	for (int i = 0; i < myUpgradeOptions.Count(); ++i)
+		uiBuilder.Button(myUpgradeLabels[i].GetBuffer(), myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
+	uiBuilder.CloseElement();
+
+	uiBuilder.Finish(myUIRenderCommands);
+
+	for (int i = 0; i < myUpgradeOptions.Count(); ++i)
+	{
+		if (uiBuilder.WasClicked(myUpgradeLabels[i].GetBuffer()))
+		{
+			StatsComponent* stats = player->GetComponent<StatsComponent>();
+			stats->UpgradeStat(myUpgradeOptions[i]);
+			expComp->LevelUp();
+			return GameState::POP_SUBSTATE;
+		}
+	}
+	
 	return GameState::KEEP;
 }
 

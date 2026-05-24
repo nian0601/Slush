@@ -193,7 +193,7 @@ void Weapon::Update()
 		float cooldown = myRankData->myBaseCooldown;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
 		{
-			cooldown /= stats->GetCooldownReduction();
+			cooldown /= stats->GetStatValue(StatType::COOLDOWN);
 		}
 
 		myActivationCooldown.Start(cooldown);
@@ -259,7 +259,7 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 	{
 		int damage = myRankData->myBaseDamage;
 		if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
-			damage = static_cast<int>(damage * stats->GetDamageModifier());
+			damage = static_cast<int>(damage * stats->GetStatValue(StatType::DAMAGE));
 
 		projDamage->SetDamage(damage);
 	}

@@ -41,7 +41,7 @@ void ExperienceComponent::AddExperience(int aAmount)
 {
 	float modifier = 1.f;
 	if (StatsComponent* stats = myEntity.GetComponent<StatsComponent>())
-		modifier += stats->GetExperienceModfier();
+		modifier += stats->GetStatValue(StatType::EXPERIENCE_GAIN);
 
 	myCurrentExperience += FW_Round(aAmount * modifier);
 	RecalculateBarSize();

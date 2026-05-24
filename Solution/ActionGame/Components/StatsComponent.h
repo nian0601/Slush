@@ -2,6 +2,37 @@
 
 #include "Component.h"
 
+#include "Core\Assets\DataAsset.h"
+
+enum StatType
+{
+	COOLDOWN,
+	DAMAGE,
+	EXPERIENCE_GAIN,
+	NUM_STATS,
+};
+
+class StatsUpgradeData : public Slush::DataAsset
+{
+public:
+	struct StatData
+	{
+		int myMaxUpgrades = 10;
+		float myIncreasePerUpgrade = 1.f;
+		FW_String myIconTextureID;
+		Recti myIconTextureRect;
+	};
+
+public:
+	DEFINE_ASSET("StatsUpgradeData", "statsdata", "data/statsdata");
+	using Slush::DataAsset::DataAsset;
+
+	void OnParse(Slush::AssetParser::Handle aRootHandle);
+	void BuildUI();
+
+	FW_StaticArray<StatData, StatType::NUM_STATS> myStatDatas;
+};
+
 class StatsComponent : public Component
 {
 public:
@@ -9,15 +40,6 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
-
-		int myMaxCooldownUpgrades = 5;
-		float myCooldownPerUpgrade = 0.2f;
-
-		int myMaxDamageUpgrades = 10;
-		float myDamagePerUpgrade = 1.f;
-
-		int myMaxExperienceUpgrades = 10;
-		float myAdditionalExperiencePerUpgrade = 0.1f;
 	};
 
 public:
@@ -25,20 +47,21 @@ public:
 
 	using Component::Component;
 
-	void AddCooldownReductionUpgrade();
-	void AddDamageUpgrade();
-	void AddExperienceUpgrade();
+	void OnEnterWorld();
 
-	bool CanUpgradeCooldownReduction() const;
-	bool CanUpgradeDamage() const;
-	bool CanUpgradeExperience() const;
+	
+	float GetCooldownReduction() const;
+	float GetDamageModifier() const;
+	float GetExperienceModfier() const;
 
-	float GetCooldownReduction() const { return myCooldownReduction.myStatModifierValue; }
-	float GetDamageModifier() const { return myDamageModifier.myStatModifierValue; }
-	float GetExperienceModfier() const { return myExperienceModifier.myStatModifierValue; }
+
+	bool CanUpgradeAnyStat() const;
+	void UpgradeStat(StatType aStat);
+	bool CanUpgradeStat(StatType aStat) const;
+	float GetStatValue(StatType aStat) const;
 
 private:
-	struct Stat
+	struct RuntimeStat
 	{
 		void Upgrade(float aValue);
 
@@ -46,7 +69,6 @@ private:
 		int myNumberOfUpgrades = 0;
 	};
 
-	Stat myCooldownReduction;
-	Stat myDamageModifier;
-	Stat myExperienceModifier;
+	const StatsUpgradeData* myUpgradeData;
+	FW_StaticArray<RuntimeStat, StatType::NUM_STATS> myRuntimeStats;
 };

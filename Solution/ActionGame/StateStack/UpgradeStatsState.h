@@ -20,6 +20,8 @@ public:
 
 private:
 	EntityHandle myPlayerHandle;
+	FW_GrowingArray<StatType> myUpgradeOptions;
+	FW_GrowingArray<FW_String> myUpgradeLabels;
 
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;

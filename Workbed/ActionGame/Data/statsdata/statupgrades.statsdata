@@ -1,0 +1,42 @@
+StatsUpgradeData 
+{ 
+	cooldown 
+	{ 
+		maxupgrades 10 
+		increaseperupgrade 0.200 
+		icon RA_Item_Icons01_2 
+		iconTextureRect 
+		{ 
+			x 1488 
+			y 528 
+			width 48 
+			height 48 
+		} 
+	} 
+	damage 
+	{ 
+		maxupgrades 10 
+		increaseperupgrade 2.500 
+		icon RA_Item_Icons01_2 
+		iconTextureRect 
+		{ 
+			x 432 
+			y 720 
+			width 48 
+			height 48 
+		} 
+	} 
+	experiencegain 
+	{ 
+		maxupgrades 10 
+		increaseperupgrade 0.500 
+		icon RA_Item_Icons01_2 
+		iconTextureRect 
+		{ 
+			x 1104 
+			y 720 
+			width 48 
+			height 48 
+		} 
+	} 
+} 

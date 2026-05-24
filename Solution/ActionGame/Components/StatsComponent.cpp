@@ -1,74 +1,155 @@
 #include "stdafx.h"
 
 #include "StatsComponent.h"
+#include "Graphics\Texture.h"
+#include "Core\Assets\AssetStorage.h"
 
-void StatsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void StatsUpgradeData::OnParse(Slush::AssetParser::Handle aRootHandle)
 {
-	aComponentHandle.ParseIntField("maxcooldownupgrades", myMaxCooldownUpgrades);
-	aComponentHandle.ParseFloatField("cooldownperupgrade", myCooldownPerUpgrade);
+	const char* statTypeNames[] = { "cooldown", "damage", "experiencegain"};
+	static_assert(IM_ARRAYSIZE(statTypeNames) == StatType::NUM_STATS);
 
-	aComponentHandle.ParseIntField("maxdamageupgrades", myMaxDamageUpgrades);
-	aComponentHandle.ParseFloatField("damageperupgrade", myDamagePerUpgrade);
+	for (int i = 0; i < IM_ARRAYSIZE(statTypeNames); ++i)
+	{
+		Slush::AssetParser::Handle statHandle = aRootHandle.ParseChildElement(statTypeNames[i]);
 
-	aComponentHandle.ParseOptionalIntField("maxexperienceupgrades", myMaxExperienceUpgrades, true);
-	aComponentHandle.ParseOptionalFloatField("experiencegainperupgrade", myAdditionalExperiencePerUpgrade, true);
+		StatData& statData = myStatDatas[i];
+		statHandle.ParseIntField("maxupgrades", statData.myMaxUpgrades);
+		statHandle.ParseFloatField("increaseperupgrade", statData.myIncreasePerUpgrade);
+		statHandle.ParseStringField("icon", statData.myIconTextureID);
+		Slush::AssetParser::Handle textureRectHandle = statHandle.ParseChildElement("iconTextureRect");
+		if (textureRectHandle.IsValid())
+		{
+			textureRectHandle.ParseIntField("x", statData.myIconTextureRect.myTopLeft.x);
+			textureRectHandle.ParseIntField("y", statData.myIconTextureRect.myTopLeft.y);
+			textureRectHandle.ParseIntField("width", statData.myIconTextureRect.myExtents.x);
+			textureRectHandle.ParseIntField("height", statData.myIconTextureRect.myExtents.y);
+
+			if (aRootHandle.IsReading())
+				statData.myIconTextureRect = MakeRectFromTopLeft(statData.myIconTextureRect.myTopLeft, statData.myIconTextureRect.myExtents);
+		}
+	}
 }
 
-void StatsComponent::Data::OnBuildUI()
+void StatsUpgradeData::BuildUI()
 {
-	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputInt("Max Cooldown Upgrades", &myMaxCooldownUpgrades);
+	const char* statTypeNames[] = { "Cooldown", "Damage", "Experience Gain" };
+	static_assert(IM_ARRAYSIZE(statTypeNames) == StatType::NUM_STATS);
 
-	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputFloat("Cooldown Per Upgrade", &myCooldownPerUpgrade, 0.05f, 1.f, "%.2f");
+	for (int i = 0; i < IM_ARRAYSIZE(statTypeNames); ++i)
+	{
+		ImGui::PushID(i);
 
-	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputInt("Max Damage Upgrades", &myMaxDamageUpgrades);
+		if (ImGui::CollapsingHeader(statTypeNames[i]))
+		{
+			ImGui::Indent();
 
-	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputFloat("Damage Per Upgrade", &myDamagePerUpgrade, 0.05f, 1.f, "%.2f");
+			StatData& statData = myStatDatas[i];
 
-	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputInt("Max Experience Upgrades", &myMaxExperienceUpgrades);
+			if (statData.myIconTextureID.Empty())
+			{
+				ImGui::BeginDisabled(true);
+				ImGui::Button("Icon", { 64, 64 });
+				ImGui::EndDisabled();
+			}
+			else
+			{
+				Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+				if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(statData.myIconTextureID))
+				{
+					sf::FloatRect texRect;
+					texRect.position.x = static_cast<float>(statData.myIconTextureRect.myTopLeft.x);
+					texRect.position.y = static_cast<float>(statData.myIconTextureRect.myTopLeft.y);
+					texRect.size.x = static_cast<float>(statData.myIconTextureRect.myExtents.x);
+					texRect.size.y = static_cast<float>(statData.myIconTextureRect.myExtents.y);
 
-	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputFloat("Experience Gain Per Upgrade", &myAdditionalExperiencePerUpgrade, 0.5f, 1.f, "%.2f");
+					sf::Vector2f size;
+					size.x = static_cast<float>(FW_Max(statData.myIconTextureRect.myExtents.x, 48));
+					size.y = static_cast<float>(FW_Max(statData.myIconTextureRect.myExtents.y, 48));
+
+					ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
+				}
+			}
+
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* imguiPayload = ImGui::AcceptDragDropPayload("TextureDragPayload"))
+				{
+					Slush::TextureDragPayload* payload = static_cast<Slush::TextureDragPayload*>(imguiPayload->Data);
+					statData.myIconTextureID = payload->myTexture->GetAssetName();
+					statData.myIconTextureRect = payload->myTextureRect;
+				}
+
+				ImGui::EndDragDropTarget();
+			}
+
+			ImGui::SetNextItemWidth(100.f);
+			ImGui::InputInt("Max Upgrades", &statData.myMaxUpgrades);
+
+			ImGui::SetNextItemWidth(100.f);
+			ImGui::InputFloat("Increase Per Upgrade", &statData.myIncreasePerUpgrade, 0.05f, 1.f, "%.2f");
+
+			ImGui::Unindent();
+		}
+
+		ImGui::PopID();
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-void StatsComponent::Stat::Upgrade(float aValue)
+void StatsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+{
+	aComponentHandle;
+}
+
+void StatsComponent::Data::OnBuildUI()
+{
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+void StatsComponent::RuntimeStat::Upgrade(float aValue)
 {
 	myStatModifierValue += aValue;
 	++myNumberOfUpgrades;
 }
 
-void StatsComponent::AddCooldownReductionUpgrade()
+void StatsComponent::OnEnterWorld()
 {
-	myCooldownReduction.Upgrade(myEntityPrefab.GetStatsData().myCooldownPerUpgrade);
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	myUpgradeData = assets.GetAsset<StatsUpgradeData>("statupgrades");
 }
 
-void StatsComponent::AddDamageUpgrade()
+bool StatsComponent::CanUpgradeAnyStat() const
 {
-	myDamageModifier.Upgrade(myEntityPrefab.GetStatsData().myDamagePerUpgrade);
+	for (int i = 0; i < StatType::NUM_STATS; ++i)
+	{
+		if (CanUpgradeStat(StatType(i)))
+			return true;
+	}
+
+	return false;
 }
 
-void StatsComponent::AddExperienceUpgrade()
+void StatsComponent::UpgradeStat(StatType aStat)
 {
-	myExperienceModifier.Upgrade(myEntityPrefab.GetStatsData().myAdditionalExperiencePerUpgrade	);
+	RuntimeStat& runtime = myRuntimeStats[aStat];
+	const StatsUpgradeData::StatData& upgradeData = myUpgradeData->myStatDatas[aStat];
+
+	runtime.Upgrade(upgradeData.myIncreasePerUpgrade);
 }
 
-bool StatsComponent::CanUpgradeCooldownReduction() const
+bool StatsComponent::CanUpgradeStat(StatType aStat) const
 {
-	return myCooldownReduction.myNumberOfUpgrades < myEntityPrefab.GetStatsData().myMaxCooldownUpgrades;
+	const RuntimeStat& runtime = myRuntimeStats[aStat];
+	const StatsUpgradeData::StatData& upgradeData = myUpgradeData->myStatDatas[aStat];
+
+	return runtime.myNumberOfUpgrades < upgradeData.myMaxUpgrades;
 }
 
-bool StatsComponent::CanUpgradeDamage() const
+float StatsComponent::GetStatValue(StatType aStat) const
 {
-	return myDamageModifier.myNumberOfUpgrades < myEntityPrefab.GetStatsData().myMaxDamageUpgrades;
-}
-
-bool StatsComponent::CanUpgradeExperience() const
-{
-	return myExperienceModifier.myNumberOfUpgrades < myEntityPrefab.GetStatsData().myMaxExperienceUpgrades;
+	const RuntimeStat& runtime = myRuntimeStats[aStat];
+	return runtime.myStatModifierValue;
 }

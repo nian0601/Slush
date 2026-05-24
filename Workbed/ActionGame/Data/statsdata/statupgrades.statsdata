@@ -7,8 +7,8 @@ StatsUpgradeData
 		icon RA_Item_Icons01_2 
 		iconTextureRect 
 		{ 
-			x 1488 
-			y 528 
+			x 1440 
+			y 480 
 			width 48 
 			height 48 
 		} 
@@ -16,7 +16,7 @@ StatsUpgradeData
 	damage 
 	{ 
 		maxupgrades 10 
-		increaseperupgrade 2.500 
+		increaseperupgrade 0.300 
 		icon RA_Item_Icons01_2 
 		iconTextureRect 
 		{ 

@@ -50,15 +50,12 @@ public:
 	void OnEnterWorld();
 
 	
-	float GetCooldownReduction() const;
-	float GetDamageModifier() const;
-	float GetExperienceModfier() const;
-
-
 	bool CanUpgradeAnyStat() const;
 	void UpgradeStat(StatType aStat);
 	bool CanUpgradeStat(StatType aStat) const;
 	float GetStatValue(StatType aStat) const;
+
+	const StatsUpgradeData* GetUpgradeData() const { return myUpgradeData; }
 
 private:
 	struct RuntimeStat

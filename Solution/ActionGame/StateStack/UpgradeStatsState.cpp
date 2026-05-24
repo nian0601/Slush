@@ -67,6 +67,11 @@ GameState::GameStateResult UpgradeStatsState::Update()
 		return GameState::POP_SUBSTATE;
 	}
 	
+	StatsComponent* stats = player->GetComponent<StatsComponent>();
+
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	const StatsUpgradeData* upgradeData = stats->GetUpgradeData();
+
 	Slush::DynamicUIBuilder uiBuilder;
 
 	uiBuilder.Start();
@@ -81,7 +86,31 @@ GameState::GameStateResult UpgradeStatsState::Update()
 
 	uiBuilder.OpenElement(myUIBackgroundStyle);
 	for (int i = 0; i < myUpgradeOptions.Count(); ++i)
-		uiBuilder.Button(myUpgradeLabels[i].GetBuffer(), myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
+	{
+		Slush::UIElementStyle& style = uiBuilder.OpenElement(myUpgradeLabels[i].GetBuffer());
+		style.SetAlingment(Slush::UIElementStyle::CENTER);
+		style.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
+		style.SetChildGap(8);
+		style.SetPadding(16, 16);
+
+		style.SetColor(0xFF333333);
+		style.SetOutlineColor(0xFF000000);
+		style.SetOutlineThickness(-1.f);
+		style.EnableButtonInteraction(0xFF888888);
+
+		const StatsUpgradeData::StatData& statdata = upgradeData->myStatDatas[myUpgradeOptions[i]];
+		if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(statdata.myIconTextureID))
+			uiBuilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
+
+		uiBuilder.Text(myUpgradeLabels[i].GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
+		FW_String upgradeValue;
+		upgradeValue += "+";
+		upgradeValue += static_cast<int>(statdata.myIncreasePerUpgrade * 100);
+		upgradeValue += "%";
+		uiBuilder.Text(upgradeValue.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 18, 0xFF44FF44);
+
+		uiBuilder.CloseElement();
+	}
 	uiBuilder.CloseElement();
 
 	uiBuilder.Finish(myUIRenderCommands);
@@ -90,7 +119,7 @@ GameState::GameStateResult UpgradeStatsState::Update()
 	{
 		if (uiBuilder.WasClicked(myUpgradeLabels[i].GetBuffer()))
 		{
-			StatsComponent* stats = player->GetComponent<StatsComponent>();
+			
 			stats->UpgradeStat(myUpgradeOptions[i]);
 			expComp->LevelUp();
 			return GameState::POP_SUBSTATE;

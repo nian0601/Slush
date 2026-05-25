@@ -54,6 +54,7 @@ public:
 	void UpgradeStat(StatType aStat);
 	bool CanUpgradeStat(StatType aStat) const;
 	float GetStatValue(StatType aStat) const;
+	int GetStatRank(StatType aStat) const;
 
 	const StatsUpgradeData* GetUpgradeData() const { return myUpgradeData; }
 

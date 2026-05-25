@@ -170,6 +170,7 @@
     <ClCompile Include="Components\StatsComponent.cpp" />
     <ClCompile Include="StateStack\LevelState.cpp" />
     <ClCompile Include="StateStack\MainMenuState.cpp" />
+    <ClCompile Include="StateStack\PauseState.cpp" />
     <ClCompile Include="StateStack\StateStack.cpp" />
     <ClCompile Include="StateStack\UpgradeStatsState.cpp" />
     <ClCompile Include="StateStack\UpgradeWeaponState.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="Components\StatsComponent.h" />
     <ClInclude Include="StateStack\LevelState.h" />
     <ClInclude Include="StateStack\MainMenuState.h" />
+    <ClInclude Include="StateStack\PauseState.h" />
     <ClInclude Include="StateStack\StateStack.h" />
     <ClInclude Include="StateStack\UpgradeStatsState.h" />
     <ClInclude Include="StateStack\UpgradeWeaponState.h" />

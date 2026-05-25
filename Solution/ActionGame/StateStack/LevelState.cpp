@@ -9,6 +9,8 @@
 #include "Level\Level.h"
 #include "StateStack.h"
 #include "Graphics\Window.h"
+#include "PauseState.h"
+#include "Core\Input.h"
 
 LevelState::LevelState()
 {
@@ -50,6 +52,13 @@ GameState::GameStateResult LevelState::Update()
 	myLevel->Update(*myStateStack);
 	if (myLevel->IsPlayerDead())
 		myStateStack->PushSubState(new GameOverState(*myLevel));
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	const Slush::Input& input = engine.GetInput();
+	if (input.WasKeyReleased(Slush::Input::ESC))
+	{
+		myStateStack->PushSubState(new PauseState(myLevel->GetPlayer()));
+	}
 
 	myEntityManager->EndFrame();
 	return GameState::KEEP;

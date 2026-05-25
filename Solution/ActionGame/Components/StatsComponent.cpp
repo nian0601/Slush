@@ -153,3 +153,9 @@ float StatsComponent::GetStatValue(StatType aStat) const
 	const RuntimeStat& runtime = myRuntimeStats[aStat];
 	return runtime.myStatModifierValue;
 }
+
+int StatsComponent::GetStatRank(StatType aStat) const
+{
+	const RuntimeStat& runtime = myRuntimeStats[aStat];
+	return runtime.myNumberOfUpgrades;
+}

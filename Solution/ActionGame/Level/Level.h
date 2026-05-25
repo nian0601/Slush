@@ -19,6 +19,7 @@ public:
 	void RenderGame();
 
 	bool IsPlayerDead() const;
+	EntityHandle GetPlayer() const { return myPlayerHandle; }
 
 private:
 	void HandleEnemyWaves();

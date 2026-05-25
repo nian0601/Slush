@@ -5,6 +5,7 @@
 #include "LevelState.h"
 #include "Level\Tilemap.h"
 #include "StateStack.h"
+#include "Graphics\Window.h"
 
 MainMenuState::MainMenuState()
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
@@ -52,6 +53,8 @@ GameState::GameStateResult MainMenuState::Update()
 		uiBuilder.Text("Action Game!", myFont, 50);
 		uiBuilder.VerticalSpacing(60);
 		uiBuilder.Button("Start Game", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
+		uiBuilder.VerticalSpacing(20);
+		uiBuilder.Button("Quit", myFont, 25, myUIButtonStyle, 0xFFAAAAAA, 0xFF000000);
 
 		uiBuilder.CloseElement();
 	}
@@ -59,7 +62,14 @@ GameState::GameStateResult MainMenuState::Update()
 	uiBuilder.Finish(myUIRenderCommands);
 
 	if (uiBuilder.WasClicked("Start Game"))
+	{
 		myStateStack->PushMainState(new LevelState());
+	}
+	else if (uiBuilder.WasClicked("Quit"))
+	{
+		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+		window.Close();
+	}
 
 	return GameState::KEEP;
 }

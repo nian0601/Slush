@@ -106,9 +106,6 @@ namespace Slush
 			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
 				myWindow->ToggleEditorUI();
 
-			if (myInput->WasKeyPressed(Slush::Input::ESC))
-				myWindow->Close();
-
 			myWindow->RenderFade();
 
 			myWindow->Present();

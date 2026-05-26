@@ -384,10 +384,21 @@ namespace Slush
 				field->myRawData = words[1];
 				myFields.Add(field);
 			}
-			// Anything else is invalid formatting
+			// Anything else *USED TO BE* invalid formatting.
+			// Attempting to instead merge all words except first one into 'myRawData'
+			// That should let me store text with spaces, but also could do oneline vector-representations
 			else
 			{
-				SLUSH_ERROR("AssetParser: Malformed Element, found '%i' words on one line but only 1 or 2 is expected, in %s", words.Count(), aFileParser.GetFilePath().GetBuffer());
+				//SLUSH_ERROR("AssetParser: Malformed Element, found '%i' words on one line but only 1 or 2 is expected, in %s", words.Count(), aFileParser.GetFilePath().GetBuffer());
+				Field* field = new Field();
+				field->myFieldName = words[0];
+				field->myRawData = words[1];
+				for (int i = 2; i < words.Count(); ++i)
+				{
+					field->myRawData += " ";
+					field->myRawData += words[i];
+				}
+				myFields.Add(field);
 			}
 		}
 

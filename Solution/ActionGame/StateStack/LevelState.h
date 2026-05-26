@@ -7,11 +7,12 @@ namespace Slush
 	class PhysicsWorld;
 }
 
+class CharacterInfo;
 class Level;
 class LevelState : public GameState
 {
 public:
-	LevelState();
+	LevelState(const CharacterInfo& aCharacterInfo);
 	~LevelState();
 
 	void ResumeState() override;

@@ -12,7 +12,7 @@
 #include "PauseState.h"
 #include "Core\Input.h"
 
-LevelState::LevelState()
+LevelState::LevelState(const CharacterInfo& aCharacterInfo)
 {
 	myPhysicsWorld = new Slush::PhysicsWorld();
 	myEntityManager = new EntityManager();
@@ -21,7 +21,7 @@ LevelState::LevelState()
 	ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
 	ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);
 
-	myLevel = new Level();
+	myLevel = new Level(aCharacterInfo);
 	myLevel->Restart();
 
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();

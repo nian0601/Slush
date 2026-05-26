@@ -140,6 +140,7 @@
   <ItemGroup>
     <ClCompile Include="ActionGameGlobals.cpp" />
     <ClCompile Include="CharacterAnimationSet.cpp" />
+    <ClCompile Include="CharacterInfo.cpp" />
     <ClCompile Include="Components\AnimationComponent.cpp" />
     <ClCompile Include="Components\CharacterAnimationComponent.cpp" />
     <ClCompile Include="Components\Component.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="GameLayout.cpp" />
     <ClCompile Include="Components\HealthBarComponent.cpp" />
     <ClCompile Include="Components\HealthComponent.cpp" />
+    <ClCompile Include="StateStack\CharacterSelectionState.cpp" />
     <ClCompile Include="StateStack\GameOverState.cpp" />
     <ClCompile Include="StateStack\GameState.cpp" />
     <ClCompile Include="Level\Level.cpp" />
@@ -186,6 +188,7 @@
   <ItemGroup>
     <ClInclude Include="ActionGameGlobals.h" />
     <ClInclude Include="CharacterAnimationSet.h" />
+    <ClInclude Include="CharacterInfo.h" />
     <ClInclude Include="Components\AnimationComponent.h" />
     <ClInclude Include="AppLayout.h" />
     <ClInclude Include="Components\CharacterAnimationComponent.h" />
@@ -204,6 +207,7 @@
     <ClInclude Include="GameLayout.h" />
     <ClInclude Include="Components\HealthBarComponent.h" />
     <ClInclude Include="Components\HealthComponent.h" />
+    <ClInclude Include="StateStack\CharacterSelectionState.h" />
     <ClInclude Include="StateStack\GameOverState.h" />
     <ClInclude Include="StateStack\GameState.h" />
     <ClInclude Include="Level\Level.h" />

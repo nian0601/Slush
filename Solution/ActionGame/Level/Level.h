@@ -1,5 +1,6 @@
 #pragma once
 
+class CharacterInfo;
 class EntityManager;
 class Tilemap;
 class LevelData;
@@ -10,7 +11,7 @@ struct EnemyWaveData;
 class Level
 {
 public:
-	Level();
+	Level(const CharacterInfo& aCharacterInfo);
 	~Level();
 
 	void Update(StateStack& aStateStack);
@@ -26,6 +27,7 @@ private:
 
 	bool IsTooClose(const Vector2f& aPosition, const Vector2f& aTestPosition, float aTestClearance);	
 
+	const CharacterInfo& myPlayerCharacterInfo;
 	LevelData* myLevelData = nullptr;
 	EnemyWaveData* myEnemyWaveData = nullptr;
 	EntityManager& myEntityManager;

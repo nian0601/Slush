@@ -6,6 +6,7 @@
 #include "Level\Tilemap.h"
 #include "StateStack.h"
 #include "Graphics\Window.h"
+#include "CharacterSelectionState.h"
 
 MainMenuState::MainMenuState()
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
@@ -36,7 +37,7 @@ GameState::GameStateResult MainMenuState::Update()
 {
 	if (ActionGameGlobals::GetInstance().myDebugSettings.mySkipStartScreen)
 	{
-		myStateStack->PushMainState(new LevelState());
+		myStateStack->PushMainState(new CharacterSelectionState());
 		return GameState::KEEP;
 	}
 
@@ -63,7 +64,7 @@ GameState::GameStateResult MainMenuState::Update()
 
 	if (uiBuilder.WasClicked("Start Game"))
 	{
-		myStateStack->PushMainState(new LevelState());
+		myStateStack->PushMainState(new CharacterSelectionState());
 	}
 	else if (uiBuilder.WasClicked("Quit"))
 	{

@@ -23,6 +23,7 @@
 #include "GameLayout.h"
 #include "Components/WeaponComponent.h"
 #include "Components/StatsComponent.h"
+#include "CharacterInfo.h"
 
 class App : public Slush::IApp
 {
@@ -37,6 +38,7 @@ public:
 		assets.RegisterAssetType<LevelData>();
 		assets.RegisterAssetType<Slush::Animation>();
 		assets.RegisterAssetType<CharacterAnimationSet>();
+		assets.RegisterAssetType<CharacterInfo>();
 		assets.RegisterAssetType<EntityPrefab>();
 		assets.RegisterAssetType<WeaponData>();
 		assets.RegisterAssetType<StatsUpgradeData>();

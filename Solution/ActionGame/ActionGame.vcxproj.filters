@@ -94,6 +94,8 @@
     <ClCompile Include="StateStack\UpgradeWeaponState.cpp" />
     <ClCompile Include="StateStack\UpgradeStatsState.cpp" />
     <ClCompile Include="StateStack\PauseState.cpp" />
+    <ClCompile Include="CharacterInfo.cpp" />
+    <ClCompile Include="StateStack\CharacterSelectionState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -197,6 +199,8 @@
     <ClInclude Include="StateStack\UpgradeWeaponState.h" />
     <ClInclude Include="StateStack\UpgradeStatsState.h" />
     <ClInclude Include="StateStack\PauseState.h" />
+    <ClInclude Include="CharacterInfo.h" />
+    <ClInclude Include="StateStack\CharacterSelectionState.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Entities">

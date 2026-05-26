@@ -22,8 +22,9 @@
 #include "Tilemap.h"
 #include "Graphics/Window.h"
 
-Level::Level()
-	: myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
+Level::Level(const CharacterInfo& aCharacterInfo)
+	: myPlayerCharacterInfo(aCharacterInfo)
+	, myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	myLevelData = assets.GetAsset<LevelData>("testLevel");

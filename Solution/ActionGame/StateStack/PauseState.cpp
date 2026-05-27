@@ -7,10 +7,13 @@
 #include "Components\StatsComponent.h"
 #include "Core\Assets\AssetStorage.h"
 #include "Components\WeaponComponent.h"
+#include "CharacterInfo.h"
+#include "Core\Input.h"
 
-PauseState::PauseState(EntityHandle aPlayerHandle)
+PauseState::PauseState(EntityHandle aPlayerHandle, const CharacterInfo& aCharacterInfo)
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
 	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
+	, myCharacterInfo(aCharacterInfo)
 {
 	myPlayerHandle = aPlayerHandle;
 
@@ -50,7 +53,11 @@ GameState::GameStateResult PauseState::Update()
 
 	uiBuilder.OpenElement().SetLayoutDirection(Slush::UIElementStyle::LEFT_TO_RIGHT).SetAlingment(Slush::UIElementStyle::CENTER);
 	BuildStatsDisplay(uiBuilder);
-	uiBuilder.HorizontalSpacing(200);
+
+	uiBuilder.HorizontalSpacing(50);
+	BuildCharacterDisplay(uiBuilder);
+	uiBuilder.HorizontalSpacing(50);
+
 	BuildWeaponsDisplay(uiBuilder);
 	uiBuilder.CloseElement();
 
@@ -71,6 +78,13 @@ GameState::GameStateResult PauseState::Update()
 	{
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.Close();
+	}
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	const Slush::Input& input = engine.GetInput();
+	if (input.WasKeyReleased(Slush::Input::ESC))
+	{
+		return GameState::POP_SUBSTATE;
 	}
 
 	return GameState::KEEP;
@@ -156,6 +170,30 @@ void PauseState::BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 		aUIBUilder.CloseElement();
 	}
 	aUIBUilder.CloseElement();
+}
+
+void PauseState::BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBuilder)
+{
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	const FW_GrowingArray<Slush::Asset*>& charAssets = assets.GetAllAssets<CharacterInfo>();
+
+	aUIBuilder.OpenElement().SetAlingment(Slush::UIElementStyle::CENTER);
+	
+	Slush::UIElementStyle& style = aUIBuilder.OpenElement(myCharacterInfo.myName.GetBuffer());
+	style.SetAlingment(Slush::UIElementStyle::CENTER);
+	style.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
+	style.SetChildGap(8);
+	style.SetPadding(16, 16);
+	style.SetColor(0x00333333);
+	style.SetOutlineColor(0x00000000);
+
+	if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(myCharacterInfo.myPortaitTextureID))
+		aUIBuilder.Image(iconTexture, myCharacterInfo.myPortaitTextureRect.myExtents, myCharacterInfo.myPortaitTextureRect);
+
+	aUIBuilder.Text(myCharacterInfo.myName.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
+
+	aUIBuilder.CloseElement();
+	aUIBuilder.CloseElement();
 }
 
 void PauseState::BuildNavigationButtons(Slush::DynamicUIBuilder& aUIBUilder)

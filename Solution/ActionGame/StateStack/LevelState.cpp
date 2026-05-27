@@ -13,6 +13,7 @@
 #include "Core\Input.h"
 
 LevelState::LevelState(const CharacterInfo& aCharacterInfo)
+	: myCharacterInfo(aCharacterInfo)
 {
 	myPhysicsWorld = new Slush::PhysicsWorld();
 	myEntityManager = new EntityManager();
@@ -57,7 +58,7 @@ GameState::GameStateResult LevelState::Update()
 	const Slush::Input& input = engine.GetInput();
 	if (input.WasKeyReleased(Slush::Input::ESC))
 	{
-		myStateStack->PushSubState(new PauseState(myLevel->GetPlayer()));
+		myStateStack->PushSubState(new PauseState(myLevel->GetPlayer(), myCharacterInfo));
 	}
 
 	myEntityManager->EndFrame();

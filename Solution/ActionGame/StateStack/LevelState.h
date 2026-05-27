@@ -27,4 +27,5 @@ private:
 	Slush::PhysicsWorld* myPhysicsWorld = nullptr;
 
 	Level* myLevel = nullptr;
+	const CharacterInfo& myCharacterInfo;
 };

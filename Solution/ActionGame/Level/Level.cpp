@@ -27,7 +27,7 @@ Level::Level(const CharacterInfo& aCharacterInfo)
 	, myEntityManager(ActionGameGlobals::GetInstance().GetEntityManager())
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-	myLevelData = assets.GetAsset<LevelData>("testLevel");
+	myLevelData = assets.GetAsset<LevelData>("level_main");
 	
 	myTilemap = new Tilemap();
 }

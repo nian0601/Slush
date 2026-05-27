@@ -34,7 +34,7 @@ void ExperienceComponent::Render()
 	xPos /= 2.f;
 	Vector2f position = { xPos, 1000.f };
 	myBackground->Render(position.x, position.y);
-	myForeground->Render(position.x, position.y);
+	myForeground->Render(position.x + myPadding, position.y);
 }
 
 void ExperienceComponent::AddExperience(int aAmount)

@@ -13,8 +13,10 @@ HealthBarComponent::HealthBarComponent(Entity& anEntity, const EntityPrefab& anE
 
 	myBackground->SetSize(myTotalWidth, myTotalHeight);
 	myBackground->SetFillColor(0xFF222222);
+	myBackground->SetOrigin(Slush::RectSprite::Origin::LEFT);
 	myForeground->SetSize(myTotalWidth - myPadding * 2.f, myTotalHeight - myPadding * 2.f);
 	myForeground->SetFillColor(0xFF00FF00);
+	myForeground->SetOrigin(Slush::RectSprite::Origin::LEFT);
 }
 
 HealthBarComponent::~HealthBarComponent()
@@ -26,10 +28,11 @@ HealthBarComponent::~HealthBarComponent()
 void HealthBarComponent::Render()
 {
 	Vector2f centeredPosition = myEntity.myPosition;
+	centeredPosition.x -= myTotalWidth / 2;
 	centeredPosition.y -= 40.f;
 
 	myBackground->Render(centeredPosition.x, centeredPosition.y);
-	myForeground->Render(centeredPosition.x, centeredPosition.y);
+	myForeground->Render(centeredPosition.x + myPadding, centeredPosition.y);
 }
 
 void HealthBarComponent::OnDamageTaken(const EntityDamageTakenEvent& anEvent)

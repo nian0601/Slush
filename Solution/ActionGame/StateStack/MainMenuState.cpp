@@ -22,10 +22,16 @@ MainMenuState::MainMenuState()
 
 	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
 	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
+
 	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetColor(0xFFAAFFAF);
+	myUIButtonStyle.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
+	myUIButtonStyle.SetChildGap(8);
+	myUIButtonStyle.SetPadding(16, 16);
+
+	myUIButtonStyle.SetColor(0xFF333333);
+	myUIButtonStyle.SetOutlineColor(0xFF000000);
 	myUIButtonStyle.SetOutlineThickness(-1.f);
-	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
+	myUIButtonStyle.EnableButtonInteraction(0xFF888888);
 }
 
 MainMenuState::~MainMenuState()
@@ -53,9 +59,9 @@ GameState::GameStateResult MainMenuState::Update()
 
 		uiBuilder.Text("Action Game!", myFont, 50);
 		uiBuilder.VerticalSpacing(60);
-		uiBuilder.Button("Start Game", myFont, 25, myUIButtonStyle, 0xFFFF3333, 0xFF000000);
+		uiBuilder.Button("Start Game", myFont, 25, myUIButtonStyle, 0xFF333333, 0xFFFFFFFF);
 		uiBuilder.VerticalSpacing(20);
-		uiBuilder.Button("Quit", myFont, 25, myUIButtonStyle, 0xFFAAAAAA, 0xFF000000);
+		uiBuilder.Button("Quit", myFont, 25, myUIButtonStyle, 0xFF333333, 0xFFFFFFFF);
 
 		uiBuilder.CloseElement();
 	}

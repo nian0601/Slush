@@ -1,6 +1,6 @@
 LevelData 
 { 
-	playerEntityPrefab Player 
+	playerEntityPrefab Player_Wizardman 
 	playerStartPosition 
 	{ 
 		x 920.000 

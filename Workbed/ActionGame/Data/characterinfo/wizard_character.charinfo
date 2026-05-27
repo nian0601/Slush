@@ -1,7 +1,7 @@
 CharacterInfo 
 { 
 	charactername Wizard Man 
-	characterentityprefab Player 
+	characterentityprefab Player_Wizardman
 	portrait Hero_01 
 	portraitTextureRect 
 	{ 

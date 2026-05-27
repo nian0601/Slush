@@ -1,7 +1,7 @@
 WeaponData 
 { 
 	name Fireball 
-	icon Small_Fireball_Blue 
+	icon Small_Fireball_Blue_Sheet 
 	iconTextureRect 
 	{ 
 		x 0 

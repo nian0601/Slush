@@ -23,7 +23,7 @@ Entity Prefab
 		{ 
 			islooping 1 
 			removeentityafteranimation 1 
-			spritesheettexture Small_Fireball_Blue_Sheet 
+			spritesheettexture Small_Fireball_Violet_Sheet 
 			spritesheettrack 
 			{ 
 				clip 
@@ -218,7 +218,7 @@ Entity Prefab
 	damagedealer 
 	{ 
 		damage 10 
-		prefab Small_Explosion_Red 
+		prefab Small_Explosion_Violet 
 	} 
 	timedremoval 
 	{ 

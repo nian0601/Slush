@@ -91,6 +91,8 @@ public:
 	void Update() override;
 	void AddPendingUpgrade();
 	bool HasPendingUpgrade() const { return myHasPendingUpgrade; }
+
+	bool PrepareUpgrade();
 	void FinishUpgrade() { myHasPendingUpgrade = false; }
 	void UpgradeWeapon(const WeaponData& someData);
 

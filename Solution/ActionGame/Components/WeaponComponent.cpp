@@ -320,27 +320,40 @@ void WeaponComponent::Update()
 
 void WeaponComponent::AddPendingUpgrade()
 {
-	myHasPendingUpgrade = true;
+	myHasPendingUpgrade = PrepareUpgrade();
+}
 
+bool WeaponComponent::PrepareUpgrade()
+{
 	myUpgradeSelection.RemoveAll();
 
 	const FW_GrowingArray<Weapon*>& activeWeapons = GetWeapons();
-	for (int i = 0; i < activeWeapons.Count(); ++i)
-	{
-		if (!activeWeapons[i]->CanBeUpgraded())
-			continue;
 
-		float chance = FW_RandFloat();
-		if (chance > 0.5f)
-			myUpgradeSelection.Add(&activeWeapons[i]->GetWeaponData());
-	}
-
-	for (const Slush::Asset* asset : myAvailableNewWeapons)
+	int maxIterations = 10;
+	int count = 0;
+	while (count < maxIterations && myUpgradeSelection.Count() < 3)
 	{
-		float chance = FW_RandFloat();
-		if (chance > 0.5f)
-			myUpgradeSelection.Add(static_cast<const WeaponData*>(asset));
+		++count;
+
+		for (int i = 0; i < activeWeapons.Count(); ++i)
+		{
+			if (!activeWeapons[i]->CanBeUpgraded())
+				continue;
+
+			float chance = FW_RandFloat();
+			if (chance > 0.5f && !myUpgradeSelection.Contains(&activeWeapons[i]->GetWeaponData()))
+				myUpgradeSelection.Add(&activeWeapons[i]->GetWeaponData());
+		}
+
+		for (const Slush::Asset* asset : myAvailableNewWeapons)
+		{
+			const WeaponData* wepData = static_cast<const WeaponData*>(asset);
+			float chance = FW_RandFloat();
+			if (chance > 0.5f && !myUpgradeSelection.Contains(wepData))
+				myUpgradeSelection.Add(wepData);
+		}
 	}
+	return !myUpgradeSelection.IsEmpty();
 }
 
 void WeaponComponent::UpgradeWeapon(const WeaponData& someData)

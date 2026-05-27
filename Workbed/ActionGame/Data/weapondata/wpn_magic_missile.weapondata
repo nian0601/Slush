@@ -1,0 +1,72 @@
+WeaponData 
+{ 
+	name Magic Missile 
+	icon large_magic_missile_green_sheet 
+	iconTextureRect 
+	{ 
+		x 336 
+		y 0 
+		width 48 
+		height 32 
+	} 
+	rankdata 
+	{ 
+		basecooldown 1.000 
+		basedamage 25 
+		projectileData 
+		{ 
+			enable 1 
+			baseprojectilespeed 750.000 
+			baseprojectilcount 1 
+			projectilePrefab proj_magic_missile 
+		} 
+	} 
+	rankdata 
+	{ 
+		basecooldown 0.850 
+		basedamage 25 
+		projectileData 
+		{ 
+			enable 1 
+			baseprojectilespeed 750.000 
+			baseprojectilcount 1 
+			projectilePrefab proj_magic_missile 
+		} 
+	} 
+	rankdata 
+	{ 
+		basecooldown 0.850 
+		basedamage 35 
+		projectileData 
+		{ 
+			enable 1 
+			baseprojectilespeed 750.000 
+			baseprojectilcount 1 
+			projectilePrefab proj_magic_missile 
+		} 
+	} 
+	rankdata 
+	{ 
+		basecooldown 0.750 
+		basedamage 35 
+		projectileData 
+		{ 
+			enable 1 
+			baseprojectilespeed 750.000 
+			baseprojectilcount 2 
+			projectilePrefab proj_magic_missile 
+		} 
+	} 
+	rankdata 
+	{ 
+		basecooldown 0.750 
+		basedamage 35 
+		projectileData 
+		{ 
+			enable 1 
+			baseprojectilespeed 750.000 
+			baseprojectilcount 3 
+			projectilePrefab proj_magic_missile 
+		} 
+	} 
+} 

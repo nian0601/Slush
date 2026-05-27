@@ -1,0 +1,13 @@
+CharacterInfo 
+{ 
+	charactername Bow Man 
+	characterentityprefab Player_bowman 
+	portrait Hero_04 
+	portraitTextureRect 
+	{ 
+		x 0 
+		y 0 
+		width 96 
+		height 96 
+	} 
+} 

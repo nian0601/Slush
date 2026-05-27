@@ -1,0 +1,83 @@
+Entity Prefab 
+{ 
+	entitytype 
+	{ 
+		type 2 
+	} 
+	sprite 
+	{ 
+		color -1 
+		textureID Enemy_001_C 
+		size 
+		{ 
+			width 96.000 
+			height 96.000 
+		} 
+		floatColor 
+		{ 
+			r 1.000 
+			g 1.000 
+			b 1.000 
+			a 1.000 
+		} 
+		textureRect 
+		{ 
+			x 0 
+			y 0 
+			width 96 
+			height 96 
+		} 
+	} 
+	animation 
+	{ 
+	} 
+	health 
+	{ 
+		maxhealth 70 
+		graceperiodduration 0.000 
+	} 
+	npccontroller 
+	{ 
+		movementspeed 200.000 
+		maxshootingdistance 800.000 
+		spawnanimation Spawn 
+	} 
+	physics 
+	{ 
+		isStatic 0 
+		isSensor 0 
+		matchSprite 0 
+		radius 10.000 
+		size 
+		{ 
+			width 40.000 
+			height 40.000 
+		} 
+	} 
+	targeting 
+	{ 
+		targettype 1 
+	} 
+	damagedealer 
+	{ 
+		damage 10 
+		prefab  
+	} 
+	drops 
+	{ 
+		drop 
+		{ 
+			weight 100 
+			prefab Pickup_Exp_Small 
+		} 
+		drop 
+		{ 
+			weight 9 
+			prefab Pickup_Health_Small 
+		} 
+	} 
+	characteranimation 
+	{ 
+		animationSetID melee_enemy_animation_c 
+	} 
+} 

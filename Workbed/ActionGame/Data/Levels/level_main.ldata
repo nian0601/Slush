@@ -16,6 +16,19 @@ LevelData
 			enemyPrefabs 
 			{ 
 				prefab Enemy_Melee 
+				prefab Enemy_Melee_D 
+			} 
+		} 
+		wave 
+		{ 
+			duration 5.000 
+			minEnemyCount 4 
+			maxEnemyCount 6 
+			enemyPrefabs 
+			{ 
+				prefab Enemy_Ranged 
+				prefab Enemy_Melee_C 
+				prefab Enemy_Melee 
 			} 
 		} 
 		wave 
@@ -27,19 +40,9 @@ LevelData
 			{ 
 				prefab Enemy_Ranged 
 				prefab Enemy_Melee 
-				prefab Enemy_Melee 
-			} 
-		} 
-		wave 
-		{ 
-			duration 5.000 
-			minEnemyCount 8 
-			maxEnemyCount 10 
-			enemyPrefabs 
-			{ 
 				prefab Enemy_Ranged 
-				prefab Enemy_Melee 
-				prefab Enemy_Ranged 
+				prefab Enemy_Melee_D 
+				prefab Enemy_Melee_C 
 			} 
 		} 
 		wave 

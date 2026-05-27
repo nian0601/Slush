@@ -1,0 +1,71 @@
+Entity Prefab 
+{ 
+	entitytype 
+	{ 
+		type 1 
+	} 
+	sprite 
+	{ 
+		color -1 
+		textureID Hero_04 
+		size 
+		{ 
+			width 96.000 
+			height 96.000 
+		} 
+		floatColor 
+		{ 
+			r 1.000 
+			g 1.000 
+			b 1.000 
+			a 1.000 
+		} 
+		textureRect 
+		{ 
+			x 0 
+			y 0 
+			width 96 
+			height 96 
+		} 
+	} 
+	animation 
+	{ 
+	} 
+	health 
+	{ 
+		maxhealth 40 
+		graceperiodduration 0.500 
+	} 
+	playercontroller 
+	{ 
+	} 
+	physics 
+	{ 
+		isStatic 0 
+		isSensor 0 
+		matchSprite 0 
+		radius 10.000 
+		size 
+		{ 
+			width 40.000 
+			height 40.000 
+		} 
+	} 
+	targeting 
+	{ 
+		targettype 2 
+	} 
+	weaponcomponent 
+	{ 
+		weapondata wpn_magic_missile 
+	} 
+	experience 
+	{ 
+	} 
+	stats 
+	{ 
+	} 
+	healthbar 
+	{ 
+	} 
+} 

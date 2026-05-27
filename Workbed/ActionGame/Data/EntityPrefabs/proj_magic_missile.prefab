@@ -1,0 +1,191 @@
+Entity Prefab 
+{ 
+	entitytype 
+	{ 
+		type 3 
+	} 
+	sprite 
+	{ 
+		color -1 
+		size 
+		{ 
+			width 36.000 
+			height 16.000 
+		} 
+		floatColor 
+		{ 
+			r 1.000 
+			g 1.000 
+			b 1.000 
+			a 1.000 
+		} 
+		animation 
+		{ 
+			islooping 1 
+			removeentityafteranimation 1 
+			spritesheettexture large_magic_missile_green_sheet 
+			spritesheettrack 
+			{ 
+				clip 
+				{ 
+					starttime 0.000 
+					endtime 0.067 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 0 
+						y 0 
+						width 48 
+						height 32 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.067 
+					endtime 0.133 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 48 
+						y 0 
+						width 48 
+						height 32 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.133 
+					endtime 0.200 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 96 
+						y 0 
+						width 48 
+						height 32 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.200 
+					endtime 0.267 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 144 
+						y 0 
+						width 48 
+						height 32 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.267 
+					endtime 0.333 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 192 
+						y 0 
+						width 48 
+						height 32 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.333 
+					endtime 0.400 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 240 
+						y 0 
+						width 48 
+						height 32 
+					} 
+				} 
+				clip 
+				{ 
+					starttime 0.400 
+					endtime 0.467 
+					interpolator 
+					{ 
+						startvalue 0.000 
+						endvalue 0.000 
+						type 0 
+					} 
+					frameRect 
+					{ 
+						x 288 
+						y 0 
+						width 48 
+						height 32 
+					} 
+				} 
+			} 
+		} 
+	} 
+	animation 
+	{ 
+	} 
+	physics 
+	{ 
+		isStatic 0 
+		isSensor 1 
+		matchSprite 0 
+		radius 8.000 
+		size 
+		{ 
+			width 0.000 
+			height 0.000 
+		} 
+	} 
+	removeoncollision 
+	{ 
+		environment 1 
+		player 0 
+		npc 0 
+		playerprojectile 0 
+		npcprojectile 0 
+		pickup 0 
+	} 
+	damagedealer 
+	{ 
+		damage 10 
+		prefab Small_Explosion_Violet 
+	} 
+	timedremoval 
+	{ 
+		duration 4.000 
+	} 
+} 

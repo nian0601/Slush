@@ -292,7 +292,7 @@ WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityP
 	: Component(anEntity, anEntityPrefab)
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-	WeaponData* startingWeapon = assets.GetAsset<WeaponData>(anEntityPrefab.GetWeaponData().myWeaponDataAsset.GetBuffer());
+	WeaponData* startingWeapon = assets.GetAsset<WeaponData>(anEntityPrefab.GetComponentData<WeaponComponent>().myWeaponDataAsset.GetBuffer());
 
 	myWeapons.Add(new Weapon(myEntity, *startingWeapon));
 

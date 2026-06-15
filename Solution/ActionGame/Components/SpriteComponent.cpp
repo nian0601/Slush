@@ -157,7 +157,7 @@ void SpriteComponent::Data::OnBuildUI()
 SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	const SpriteComponent::Data& spriteData = anEntityPrefab.GetSpriteData();
+	const SpriteComponent::Data& spriteData = anEntityPrefab.GetComponentData<SpriteComponent>();
 	if (spriteData.mySize.x <= 0.f)
 	{
 		SLUSH_ERROR("Trying to create SpriteComponent with 0 size");
@@ -239,10 +239,10 @@ void SpriteComponent::Update()
 	if (!myAnimationRuntime)
 	{
 		myAnimationRuntime = animComponent->PlayAnimation(*myAnimation);
-		myAnimationRuntime->myIsLooping = myEntityPrefab.GetSpriteData().myLoopAnimation;
+		myAnimationRuntime->myIsLooping = myEntityPrefab.GetComponentData<SpriteComponent>().myLoopAnimation;
 	}
 
-	if (!animComponent->IsAnimationPlaying(*myAnimation) && myEntityPrefab.GetSpriteData().myRemoveEntityAfterAnimation)
+	if (!animComponent->IsAnimationPlaying(*myAnimation) && myEntityPrefab.GetComponentData<SpriteComponent>().myRemoveEntityAfterAnimation)
 	{
 		myEntity.myIsMarkedForRemoval = true;
 	}

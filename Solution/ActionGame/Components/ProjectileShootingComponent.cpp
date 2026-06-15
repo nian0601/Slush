@@ -53,7 +53,7 @@ bool ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 
 	TriggerCooldown();
 
-	const Data& shootingData = myEntityPrefab.GetProjectileShootingData();
+	const ProjectileShootingComponent::Data& shootingData = myEntityPrefab.GetComponentData<ProjectileShootingComponent>();
 
 	Vector2f projPosition = myEntity.myPosition + aDirection * shootingData.myProjectileSpawnOffset;
 	Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, shootingData.myProjectileEntityPrefab.GetBuffer());
@@ -65,5 +65,5 @@ bool ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 
 void ProjectileShootingComponent::TriggerCooldown()
 {
-	myShootingReadyTimestamp = Slush::Time::GetCurrentExactTime() + Slush::Time::ConvertGameTimeToTimeUnit(myEntityPrefab.GetProjectileShootingData().myCooldown);
+	myShootingReadyTimestamp = Slush::Time::GetCurrentExactTime() + Slush::Time::ConvertGameTimeToTimeUnit(myEntityPrefab.GetComponentData<ProjectileShootingComponent>().myCooldown);
 }

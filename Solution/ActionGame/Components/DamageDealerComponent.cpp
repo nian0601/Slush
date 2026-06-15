@@ -33,7 +33,7 @@ void DamageDealerComponent::Data::OnBuildUI()
 DamageDealerComponent::DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
 	: Component(anEntity, anEntityPrefab)
 {
-	myDamage = myEntityPrefab.GetDamageDealerData().myDamage;
+	myDamage = myEntityPrefab.GetComponentData<DamageDealerComponent>().myDamage;
 }
 
 void DamageDealerComponent::OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition)
@@ -56,7 +56,7 @@ void DamageDealerComponent::OnCollision(Entity& aOtherEntity, const Vector2f& aC
 	else if (myEntity.IsNPCOwned() && aOtherEntity.IsPlayerOwned())
 		otherHealth->DealDamage(myDamage);
 
-	const Data& data = myEntityPrefab.GetDamageDealerData();
+	const Data& data = myEntityPrefab.GetComponentData<DamageDealerComponent>();
 	if (!data.myImpactPrefab.Empty())
 		ActionGameGlobals::GetInstance().GetEntityManager().CreateEntity(aContactPosition, data.myImpactPrefab.GetBuffer());
 }

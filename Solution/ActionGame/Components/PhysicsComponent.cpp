@@ -93,14 +93,14 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 	: Component(aEntity, anEntityPrefab)
 	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
 {
-	const Data& physData = anEntityPrefab.GetPhysicsData();
+	const Data& physData = anEntityPrefab.GetComponentData<PhysicsComponent>();
 
 	Slush::PhysicsShape* shape = nullptr;
 	if (physData.myMatchSprite)
 	{
 		if (anEntityPrefab.Has<SpriteComponent>())
 		{
-			const SpriteComponent::Data& spriteData = anEntityPrefab.GetSpriteData();
+			const SpriteComponent::Data& spriteData = anEntityPrefab.GetComponentData<SpriteComponent>();
 			if (spriteData.mySize.x > 0.f)
 				shape = new Slush::AABBShape(spriteData.mySize);
 		}

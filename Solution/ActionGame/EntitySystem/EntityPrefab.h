@@ -67,15 +67,6 @@ public:
 	template <typename ComponentType>
 	const ComponentType::Data& GetComponentData() const;
 
-	const SpriteComponent::Data& GetSpriteData() const;
-	const ProjectileShootingComponent::Data& GetProjectileShootingData() const;
-	const HealthComponent::Data& GetHealthData() const;
-	const PhysicsComponent::Data& GetPhysicsData() const;
-	const TargetingComponent::Data& GetTargetingData() const;
-	const WeaponComponent::Data& GetWeaponData() const;
-	const StatsComponent::Data& GetStatsData() const;
-	const DamageDealerComponent::Data& GetDamageDealerData() const;
-
 	FW_String myName;
 	int myEntityType;
 

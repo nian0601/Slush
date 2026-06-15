@@ -33,7 +33,7 @@ void TargetingComponent::Update()
 {
 	myTarget.Clear();
 
-	const Data& targetData = myEntityPrefab.GetTargetingData();
+	const Data& targetData = myEntityPrefab.GetComponentData<TargetingComponent>();
 
 	FW_GrowingArray<EntityHandle> targets;
 	myEntity.myEntityManager.FindEntitiesOfType(static_cast<EntityType>(targetData.myTargetType), targets);

@@ -5,6 +5,7 @@
 #include "Core/Engine.h"
 #include "Core/Time.h"
 #include "Core/Dockables/Dockable.h"
+#include "Core/Dockables/IAppLayout.h"
 
 
 #include <SFML/Graphics.hpp>
@@ -74,7 +75,6 @@ namespace Slush
 		FW_SAFE_DELETE(myFadeData.myFadeTexture);
 		FW_SAFE_DELETE(myCircleShape);
 		FW_SAFE_DELETE(myRectShape);
-		myDockables.DeleteAll();
 	}
 
 	bool Window::PumpEvents()
@@ -158,7 +158,9 @@ namespace Slush
 		{
 			if (ImGui::BeginMainMenuBar())
 			{
-				ImGui::Text("[ %s ]", myAppLayoutName);
+				if (myAppLayout)
+					ImGui::Text("[ %s ]", myAppLayout->GetName().GetBuffer());
+
 				if (ImGui::BeginMenu("Layouts"))
 				{
 					ImGui::Selectable("Game");
@@ -181,8 +183,8 @@ namespace Slush
 			if (myDisplayImGUIDemo)
 				ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
 
-			for (Dockable* dockable : myDockables)
-				dockable->Update();
+			if (myAppLayout)
+				myAppLayout->Update();
 
 			ImGui::SFML::Render(*myRenderWindow);
 		}
@@ -221,28 +223,27 @@ namespace Slush
 		myActiveRenderTarget = myRenderWindow;
 	}
 
-	void Window::AddDockable(Dockable* aDockable)
-	{
-		aDockable->myDockableID = myNextDockableID++;
-		myDockables.Add(aDockable);
-	}
-
-	void Window::DeleteAllDockables()
-	{
-		myDockables.DeleteAll();
-		myNextDockableID = 0;
-	}
-
-	void Window::SetAppLayout(const char* aName)
+	void Window::SetAppLayout(IAppLayout* aLayout)
 	{
 		SaveAppLayoutConfig();
 
-		myDockables.DeleteAll();
-		myNextDockableID = 0;
+		FW_SAFE_DELETE(myAppLayout);
 
-		myAppLayoutName = aName;
+		myAppLayout = aLayout;
 
 		LoadAppLayoutConfig();
+	}
+
+	void Window::UpdateAppLayout()
+	{
+		if (myAppLayout)
+			myAppLayout->Update();
+	}
+
+	void Window::RenderAppLayout()
+	{
+		if (myAppLayout)
+			myAppLayout->Render();
 	}
 
 	void Window::RenderLine(const Vector2i& aStart, const Vector2i& aEnd, int aColor)
@@ -300,9 +301,12 @@ namespace Slush
 
 	void Window::SaveAppLayoutConfig()
 	{
+		if (!myAppLayout)
+			return;
+
 		FW_String path;
 		FW_String settingName = "ImGUILayouts/";
-		settingName += myAppLayoutName;
+		settingName += myAppLayout->GetName();
 		settingName += ".ini";
 		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
 		ImGui::SaveIniSettingsToDisk(path.GetBuffer());
@@ -310,9 +314,12 @@ namespace Slush
 
 	void Window::LoadAppLayoutConfig()
 	{
+		if (!myAppLayout)
+			return;
+
 		FW_String path;
 		FW_String settingName = "ImGUILayouts/";
-		settingName += myAppLayoutName;
+		settingName += myAppLayout->GetName();
 		settingName += ".ini";
 		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
 		ImGui::LoadIniSettingsFromDisk(path.GetBuffer());

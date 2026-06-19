@@ -147,6 +147,7 @@
     <ClInclude Include="Core\Dockables\ContentBrowserDockable.h" />
     <ClInclude Include="Core\Dockables\Dockable.h" />
     <ClInclude Include="Core\Dockables\GameViewDockable.h" />
+    <ClInclude Include="Core\Dockables\IAppLayout.h" />
     <ClInclude Include="Core\Dockables\LogDockable.h" />
     <ClInclude Include="Core\Dockables\TextureViewerDockable.h" />
     <ClInclude Include="Core\Engine.h" />
@@ -193,6 +194,7 @@
     <ClCompile Include="Core\Dockables\ContentBrowserDockable.cpp" />
     <ClCompile Include="Core\Dockables\Dockable.cpp" />
     <ClCompile Include="Core\Dockables\GameViewDockable.cpp" />
+    <ClCompile Include="Core\Dockables\IAppLayout.cpp" />
     <ClCompile Include="Core\Dockables\LogDockable.cpp" />
     <ClCompile Include="Core\Dockables\TextureViewerDockable.cpp" />
     <ClCompile Include="Core\Engine.cpp" />

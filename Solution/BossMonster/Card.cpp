@@ -64,7 +64,7 @@ Card::~Card()
 	FW_SAFE_DELETE(myDescriptionText);
 }
 
-void Card::Load(const char* aFilePath, const Slush::AssetStorage<Slush::Texture>& someTextureStorage)
+void Card::Load(const char* aFilePath)
 {
 	FW_FileParser parser(aFilePath);
 
@@ -81,7 +81,7 @@ void Card::Load(const char* aFilePath, const Slush::AssetStorage<Slush::Texture>
 		}
 		else if (fieldName == "#texture")
 		{
-			const Slush::Asset* asset = someTextureStorage.GetAsset(line.GetBuffer());
+			const Slush::Asset* asset = Slush::AssetRegistry::GetInstance().GetAsset<Slush::Texture>(line.GetBuffer());
 			if(const Slush::Texture* texture = static_cast<const Slush::Texture*>(asset))
 				myImage->SetTexture(*texture);
 		}

@@ -45,7 +45,7 @@ public:
 	Card(const Slush::Font* aFont);
 	virtual ~Card();
 
-	void Load(const char* aFilePath, const Slush::AssetStorage<Slush::Texture>& someTextureStorage);
+	void Load(const char* aFilePath);
 
 	void Render();
 

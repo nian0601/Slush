@@ -48,15 +48,16 @@ public:
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.SetAppLayout("Game");
-		myAppLayout = new GameLayout();
+		window.SetAppLayout(new GameLayout());
+		//window.SetAppLayout("Game");
+		//myAppLayout = new GameLayout();
 		//window.SetAppLayout("Entity");
 		//myAppLayout = new EntityEditorLayout();
 	}
 
 	void Shutdown() override
 	{
-		FW_SAFE_DELETE(myAppLayout);
+		//FW_SAFE_DELETE(myAppLayout);
 
 		ActionGameGlobals::Destroy();
 	}
@@ -67,17 +68,23 @@ public:
 		const Slush::Input& input = engine.GetInput();
 		if (input.WasKeyReleased(Slush::Input::KeyCode::_1))
 		{
-			FW_SAFE_DELETE(myAppLayout);
+			//FW_SAFE_DELETE(myAppLayout);
+			//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+			//window.SetAppLayout("Game");
+			//myAppLayout = new GameLayout();
+
 			Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-			window.SetAppLayout("Game");
-			myAppLayout = new GameLayout();
+			window.SetAppLayout(new GameLayout());
 		}
 		else if (input.WasKeyReleased(Slush::Input::KeyCode::_2))
 		{
-			FW_SAFE_DELETE(myAppLayout);
+			//FW_SAFE_DELETE(myAppLayout);
+			//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+			//window.SetAppLayout("Entity");
+			//myAppLayout = new EntityEditorLayout();
+
 			Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-			window.SetAppLayout("Entity");
-			myAppLayout = new EntityEditorLayout();
+			window.SetAppLayout(new EntityEditorLayout());
 		}
 		else if (input.WasKeyReleased(Slush::Input::KeyCode::_3))
 		{
@@ -98,17 +105,17 @@ public:
 
 
 
-		myAppLayout->Update();
+		//myAppLayout->Update();
 	}
 
 	void Render() override
 	{
-		myAppLayout->Render();
+		//myAppLayout->Render();
 	}
 
 private:
 	Slush::Font myFont;
-	AppLayout* myAppLayout = nullptr;
+	//AppLayout* myAppLayout = nullptr;
 };
 
 #include <FW_UnitTestSuite.h>

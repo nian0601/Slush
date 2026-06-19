@@ -1,7 +1,7 @@
 #pragma once
 
-#include "AppLayout.h"
-#include "UI\UIManager.h"
+#include "Core/Dockables/IAppLayout.h"
+#include "UI/UIManager.h"
 
 class EntityManager;
 class Level;
@@ -15,14 +15,14 @@ namespace Slush
 	class PhysicsWorld;
 }
 
-class GameLayout : public AppLayout
+class GameLayout : public Slush::IAppLayout
 {
 public:
 	GameLayout();
 	~GameLayout();
 
-	void Update() override;
-	void Render() override;
+	void OnUpdate() override;
+	void OnRender() override;
 
 private:
 	void UpdateGameOver();

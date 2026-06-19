@@ -5,6 +5,7 @@ namespace Slush
 	class Dockable
 	{
 		friend class Window;
+		friend class IAppLayout;
 	public:
 		virtual ~Dockable() {}
 

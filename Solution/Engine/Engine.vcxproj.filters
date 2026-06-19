@@ -65,6 +65,7 @@
     <ClInclude Include="imgui\imgui_user.h" />
     <ClInclude Include="Graphics\Animation\AnimationTrack.h" />
     <ClInclude Include="Graphics\Animation\Interpolator.h" />
+    <ClInclude Include="Core\Dockables\IAppLayout.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -123,6 +124,7 @@
     <ClCompile Include="imgui\imgui_user.cpp" />
     <ClCompile Include="Graphics\Animation\AnimationTrack.cpp" />
     <ClCompile Include="Graphics\Animation\Interpolator.cpp" />
+    <ClCompile Include="Core\Dockables\IAppLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">

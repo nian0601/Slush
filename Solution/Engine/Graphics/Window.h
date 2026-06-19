@@ -12,6 +12,7 @@ namespace sf
 
 namespace Slush
 {
+	class IAppLayout;
 	class Dockable;
 	class Window
 	{
@@ -33,10 +34,10 @@ namespace Slush
 
 		void ToggleEditorUI() { myShowEditorUI = !myShowEditorUI; }
 
-		void AddDockable(Dockable* aDockable);
-		void DeleteAllDockables();
+		void SetAppLayout(IAppLayout* aLayout);
 
-		void SetAppLayout(const char* aName);
+		void UpdateAppLayout();
+		void RenderAppLayout();
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
 		sf::RenderTexture* GetOffscreenBuffer() const { return myOffscreenBuffer; }
@@ -65,10 +66,7 @@ namespace Slush
 		sf::RenderWindow* myRenderWindow = nullptr;
 		bool myShouldBeOpen = true;
 		bool myDisplayImGUIDemo = false;
-		const char* myAppLayoutName = "Default Layout";
-
-		FW_GrowingArray<Dockable*> myDockables;
-		int myNextDockableID = 0;
+		IAppLayout* myAppLayout = nullptr;
 
 		sf::RenderTarget* myActiveRenderTarget = nullptr;
 		sf::RenderTexture* myOffscreenBuffer = nullptr;

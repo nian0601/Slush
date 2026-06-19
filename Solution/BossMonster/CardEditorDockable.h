@@ -15,7 +15,7 @@ namespace Slush
 class CardEditorDockable : public Slush::Dockable
 {
 public:
-	CardEditorDockable(const Slush::AssetStorage<Slush::Texture>& someTextures);
+	CardEditorDockable();
 
 	const char* GetName() const override { return "Card Editor"; }
 
@@ -28,7 +28,6 @@ private:
 
 	FW_FileSystem::FileInfo myCardsDirectoryInfo;
 	FW_String myCardsFilePath;
-	const Slush::AssetStorage<Slush::Texture>& myCardTextures;
 
 	enum CardType
 	{

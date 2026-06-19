@@ -10,12 +10,11 @@
 #include <Core/Assets/AssetStorage.h>
 #include <Graphics/Texture.h>
 
-CardEditorDockable::CardEditorDockable(const Slush::AssetStorage<Slush::Texture>& someTextures)
+CardEditorDockable::CardEditorDockable()
 	: myFileName("")
 	, myTitle("")
 	, myDescription("")
 	, myTextureName("")
-	, myCardTextures(someTextures)
 {
 	myCardsFilePath = Slush::Engine::GetInstance().GetDataFolder();
 	myCardsFilePath += "Data/Cards";
@@ -70,7 +69,7 @@ void CardEditorDockable::OnBuildUI()
 			static ImGuiTextFilter textureFilter;
 			textureFilter.Draw("Search");
 
-			const FW_GrowingArray<Slush::Asset*> assets = myCardTextures.GetAllAssets();
+			const FW_GrowingArray<Slush::Asset*> assets = Slush::AssetRegistry::GetInstance().GetAllAssets<Slush::Texture>();
 			for (Slush::Asset* asset : assets)
 			{
 				Slush::Texture* texture = static_cast<Slush::Texture*>(asset);

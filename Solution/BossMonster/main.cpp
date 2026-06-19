@@ -19,9 +19,23 @@
 #include "BossCard.h"
 
 #include "CardEditorDockable.h"
+#include "Core/Dockables/IAppLayout.h"
 #include "Core/Dockables/GameViewDockable.h"
 #include "Core/Dockables/TextureViewerDockable.h"
 #include "Core/Dockables/LogDockable.h"
+
+class BossMonsterLayout : public Slush::IAppLayout
+{
+public:
+	BossMonsterLayout()
+		: Slush::IAppLayout("Default")
+	{
+		AddDockable(new CardEditorDockable());
+		AddDockable(new Slush::GameViewDockable());
+		AddDockable(new Slush::TextureViewerDockable());
+		AddDockable(new Slush::LogDockable());
+	}
+};
 
 class App : public Slush::IApp
 {
@@ -29,7 +43,6 @@ class App : public Slush::IApp
 public:
 	void Initialize() override
 	{
-		myTextures.LoadAllAssets();
 		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 		assets.RegisterAssetType<Slush::Texture>();
 		assets.LoadAllAssets();
@@ -37,22 +50,19 @@ public:
 		myFont.Load("Data/OpenSans-Regular.ttf");
 
 		myHeroCard = new HeroCard(&myFont);
-		myHeroCard->Load("Data/Cards/hero_cleric.hero", myTextures);
+		myHeroCard->Load("Data/Cards/hero_cleric.hero");
 		myHeroCard->SetPosition(200, 500);
 
 		myRoomCard = new RoomCard(&myFont);
-		myRoomCard->Load("Data/Cards/room_spawnpoint.room", myTextures);
+		myRoomCard->Load("Data/Cards/room_spawnpoint.room");
 		myRoomCard->SetPosition(600, 500);
 
 		myBossCard = new BossCard(&myFont);
-		myBossCard->Load("Data/Cards/boss_eclipse.boss", myTextures);
+		myBossCard->Load("Data/Cards/boss_eclipse.boss");
 		myBossCard->SetPosition(1000, 500);		
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.AddDockable(new CardEditorDockable(myTextures));
-		window.AddDockable(new Slush::GameViewDockable());
-		window.AddDockable(new Slush::TextureViewerDockable());
-		window.AddDockable(new Slush::LogDockable());
+		window.SetAppLayout(new BossMonsterLayout());
 	}
 
 	void Shutdown() override
@@ -84,7 +94,6 @@ private:
 	bool myRenderImGUI = true;
 
 	Slush::Font myFont;
-	Slush::AssetStorage<Slush::Texture> myTextures;
 
 	HeroCard* myHeroCard;
 	RoomCard* myRoomCard;

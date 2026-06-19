@@ -101,7 +101,9 @@ namespace Slush
 			}
 
 			anApp.Update();
+
 			anApp.Render();
+			myWindow->RenderAppLayout();
 
 			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
 				myWindow->ToggleEditorUI();

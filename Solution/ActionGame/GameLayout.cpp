@@ -12,6 +12,7 @@
 #include "StateStack\MainMenuState.h"
 
 GameLayout::GameLayout()
+	: Slush::IAppLayout("Game")
 {
 	myStateStack = new StateStack();
 	myStateStack->PushMainState(new MainMenuState());
@@ -25,9 +26,9 @@ GameLayout::GameLayout()
 	}
 	else
 	{
-		window.AddDockable(new Slush::GameViewDockable());
-		window.AddDockable(new Slush::LogDockable());
-		window.AddDockable(new ActionGameGlobals::DebugSettingsDockable());
+		AddDockable(new Slush::GameViewDockable());
+		AddDockable(new Slush::LogDockable());
+		AddDockable(new ActionGameGlobals::DebugSettingsDockable());
 	}
 }
 
@@ -37,12 +38,12 @@ GameLayout::~GameLayout()
 	FW_SAFE_DELETE(myStateStack);
 }
 
-void GameLayout::Update()
+void GameLayout::OnUpdate()
 {
 	myStateStack->Update();
 }
 
-void GameLayout::Render()
+void GameLayout::OnRender()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().StartOffscreenBuffer();

@@ -100,9 +100,6 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="ActionGameGlobals.h" />
-    <ClInclude Include="AppLayout.h">
-      <Filter>AppLayout</Filter>
-    </ClInclude>
     <ClInclude Include="GameLayout.h">
       <Filter>AppLayout</Filter>
     </ClInclude>

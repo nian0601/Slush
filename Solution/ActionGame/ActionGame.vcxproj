@@ -190,7 +190,6 @@
     <ClInclude Include="CharacterAnimationSet.h" />
     <ClInclude Include="CharacterInfo.h" />
     <ClInclude Include="Components\AnimationComponent.h" />
-    <ClInclude Include="AppLayout.h" />
     <ClInclude Include="Components\CharacterAnimationComponent.h" />
     <ClInclude Include="Components\Component.h" />
     <ClInclude Include="Components\DropComponent.h" />

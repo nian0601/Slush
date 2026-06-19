@@ -270,6 +270,21 @@ namespace Slush
 		GetActiveRenderTarget()->draw(line);
 	}
 
+	void Window::RenderTriangle(const Vector2f& aV1, const Vector2f& aV2, const Vector2f& aV3, int aColor /*= 0xFFFFFFFF*/)
+	{
+		sf::VertexArray triangle(sf::PrimitiveType::Triangles, 3);
+		triangle[0].position = { aV1.x, aV1.y };
+		triangle[0].color = GetSFMLColor(aColor);
+
+		triangle[1].position = { aV2.x, aV2.y };
+		triangle[1].color = GetSFMLColor(aColor);
+
+		triangle[2].position = { aV3.x, aV3.y };
+		triangle[2].color = GetSFMLColor(aColor);
+		
+		GetActiveRenderTarget()->draw(triangle);
+	}
+
 	void Window::RenderRect(const Rectf& aRect, int aColor, float aRotationInRadians)
 	{
 		myRectShape->setOrigin({ aRect.myExtents.x * 0.5f, aRect.myExtents.y * 0.5f });

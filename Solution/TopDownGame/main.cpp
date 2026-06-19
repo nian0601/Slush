@@ -2,93 +2,45 @@
 
 #include "Core/IApp.h"
 #include "Core/Engine.h"
+#include "Graphics/Window.h"
+#include "Core/Input.h"
 
-
+#include "Navmesh.h"
 
 class App : public Slush::IApp
 {
 public:
 	void Initialize() override
 	{
-		//EntityManager::RegisterComponents();
-		//
-		//Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-		//assets.RegisterAssetType<Slush::UILayout>();
-		//assets.RegisterAssetType<Slush::Texture>();
-		//assets.RegisterAssetType<LevelData>();
-		//assets.RegisterAssetType<Slush::Animation>();
-		//assets.RegisterAssetType<CharacterAnimationSet>();
-		//assets.RegisterAssetType<CharacterInfo>();
-		//assets.RegisterAssetType<EntityPrefab>();
-		//assets.RegisterAssetType<WeaponData>();
-		//assets.RegisterAssetType<StatsUpgradeData>();
-		//assets.LoadAllAssets();
-		//
-		//myFont.Load("Data/NotoSans.ttf");
-		//ActionGameGlobals::GetInstance().SetFont(myFont);
-		//
-		//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		//window.SetAppLayout("Game");
-		//myAppLayout = new GameLayout();
-		//window.SetAppLayout("Entity");
-		//myAppLayout = new EntityEditorLayout();
+		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+		window.ToggleEditorUI();
+		
 	}
 
 	void Shutdown() override
 	{
-		//FW_SAFE_DELETE(myAppLayout);
-
-		//ActionGameGlobals::Destroy();
 	}
 
 	void Update() override
 	{
-		//Slush::Engine& engine = Slush::Engine::GetInstance();
-		//const Slush::Input& input = engine.GetInput();
-		//if (input.WasKeyReleased(Slush::Input::KeyCode::_1))
-		//{
-		//	FW_SAFE_DELETE(myAppLayout);
-		//	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		//	window.SetAppLayout("Game");
-		//	myAppLayout = new GameLayout();
-		//}
-		//else if (input.WasKeyReleased(Slush::Input::KeyCode::_2))
-		//{
-		//	FW_SAFE_DELETE(myAppLayout);
-		//	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		//	window.SetAppLayout("Entity");
-		//	myAppLayout = new EntityEditorLayout();
-		//}
-		//else if (input.WasKeyReleased(Slush::Input::KeyCode::_3))
-		//{
-		//	SLUSH_INFO("SOME INFO");
-		//}
-		//else if (input.WasKeyReleased(Slush::Input::KeyCode::_4))
-		//{
-		//	SLUSH_DEBUG("SOME DEBUG");
-		//}
-		//else if (input.WasKeyReleased(Slush::Input::KeyCode::_5))
-		//{
-		//	SLUSH_WARNING("SOME WARNING");
-		//}
-		//else if (input.WasKeyReleased(Slush::Input::KeyCode::_6))
-		//{
-		//	SLUSH_ERROR("SOME ERROR");
-		//}
-		//
-		//
-		//
-		//myAppLayout->Update();
+		Slush::Engine& engine = Slush::Engine::GetInstance();
+
+		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
+			engine.GetWindow().Close();
 	}
 
 	void Render() override
 	{
-		//myAppLayout->Render();
+		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+		window.StartOffscreenBuffer();
+
+		myNavmesh.Render();
+
+		window.EndOffscreenBuffer();
 	}
 
 private:
-	//Slush::Font myFont;
-	//AppLayout* myAppLayout = nullptr;
+	Navmesh myNavmesh;
 };
 
 #include <FW_UnitTestSuite.h>

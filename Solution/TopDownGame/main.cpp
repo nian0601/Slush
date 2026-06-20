@@ -27,6 +27,8 @@ public:
 
 		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
 			engine.GetWindow().Close();
+
+		myNavmesh.Update();
 	}
 
 	void Render() override

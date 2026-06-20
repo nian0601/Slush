@@ -136,6 +136,7 @@
     <ClInclude Include="FW_Hashing.h" />
     <ClInclude Include="FW_Hashmap.h" />
     <ClInclude Include="FW_Includes.h" />
+    <ClInclude Include="FW_Intersection.h" />
     <ClInclude Include="FW_Logger.h" />
     <ClInclude Include="FW_Math.h" />
     <ClInclude Include="FW_Matrix22.h" />

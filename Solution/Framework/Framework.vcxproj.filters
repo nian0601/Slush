@@ -24,6 +24,7 @@
     <ClInclude Include="FW_Any.h" />
     <ClInclude Include="FW_TypeID.h" />
     <ClInclude Include="FW_StaticArray.h" />
+    <ClInclude Include="FW_Intersection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FW_FileParser.cpp" />

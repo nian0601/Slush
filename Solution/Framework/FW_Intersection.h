@@ -17,6 +17,12 @@ namespace FW_Intersection
 		return (b1 == b2) && (b1 == b3);
 	}
 
+	struct Ray
+	{
+		Vector2f myStart;
+		Vector2f myDirection;
+	};
+
 	struct LineSegment
 	{
 		Vector2f myStart;
@@ -32,6 +38,13 @@ namespace FW_Intersection
 			Normalize(myNormal);
 			myDist = Dot(aSegment.myStart, myNormal);
 		}
+		void FromRay(const Ray& aRay)
+		{
+			myNormal = Vector2f(-aRay.myDirection.y, aRay.myDirection.x);
+			Normalize(myNormal);
+			myDist = Dot(aRay.myStart, myNormal);
+		}
+
 		Vector2f myNormal;
 		float myDist;
 	};
@@ -111,6 +124,56 @@ namespace FW_Intersection
 		if (aIntersectionPoint)
 			*aIntersectionPoint = intersection;
 		
+		return true;
+	}
+
+	inline bool RayVsLineSegment(const Ray& aRay, const LineSegment& aLineSegment, Vector2f* aIntersectionPoint = nullptr)
+	{
+		if (Length2(aLineSegment.myEnd - aLineSegment.myStart) == 0.f)
+			return false;
+
+		Line line1;
+		line1.FromRay(aRay);
+		Line line2;
+		line2.FromSegment(aLineSegment);
+
+		float denomX = line1.myNormal.x * line2.myNormal.y - line2.myNormal.x * line1.myNormal.y;
+		float denomY = line1.myNormal.x * line2.myNormal.y - line2.myNormal.x * line1.myNormal.y;
+		if (denomX == 0 || denomY == 0)
+		{
+			//Lines are parallel, if dist are different then there is 0 overlap
+			if (line1.myDist != line2.myDist)
+				return false;
+
+			Vector2f dir1 = aRay.myDirection;
+			float length1 = FLT_MAX;
+			Normalize(dir1);
+
+			if (CheckOverlap(dir1, length1, aLineSegment.myEnd, aRay.myStart, aIntersectionPoint))
+				return true;
+			if (CheckOverlap(dir1, length1, aLineSegment.myStart, aRay.myStart, aIntersectionPoint))
+				return true;
+
+			return false;
+		}
+
+		float numX = line2.myNormal.y * line1.myDist - line1.myNormal.y * line2.myDist;
+		float numY = line1.myNormal.x * line2.myDist - line2.myNormal.x * line1.myDist;
+		const Vector2f intersection = { numX / denomX, numY / denomY };
+
+		Vector2f rayToIntersect = GetNormalized(intersection - aRay.myStart);
+		if (Dot(rayToIntersect, aRay.myDirection) < 0.f)
+			return false;
+
+		Vector2f dir2 = aLineSegment.myEnd - aLineSegment.myStart;
+		Vector2f dir2Intersect = intersection - aLineSegment.myStart;
+
+		if (Dot(dir2, dir2Intersect) < 0 || Length2(dir2Intersect) > Length2(dir2))
+			return false;
+
+		if (aIntersectionPoint)
+			*aIntersectionPoint = intersection;
+
 		return true;
 	}
 }

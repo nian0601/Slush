@@ -8,8 +8,7 @@
 Navmesh::Navmesh()
 {
 	Vector2f offset = { 20.f, 20. };
-	Vertex* topLeft = new Vertex();
-	topLeft->myPos = offset;
+	Vertex* topLeft = CreateVertex(offset);
 
 	Edge* outRight = nullptr;
 	FW_GrowingArray<Edge*> bottomEdges;
@@ -40,16 +39,12 @@ void Navmesh::Update()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 	{
-		myMouseAnchor = engine.GetInput().GetMousePositionf();
-		myHasAnchor = true;
+		myCutPositions.Add(engine.GetInput().GetMousePositionf());
 	}
 	else if (engine.GetInput().WasMouseReleased(Slush::Input::RIGHTMB))
 	{
-		if (myHasAnchor)
-		{
-			myHasAnchor = false;
-			Cut(myMouseAnchor, engine.GetInput().GetMousePositionf());
-		}
+		PerformCut();
+		myCutPositions.RemoveAll();
 	}
 
 	if (engine.GetInput().WasKeyReleased(Slush::Input::E))
@@ -65,14 +60,7 @@ void Navmesh::Render()
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 
 	const Vector2f& mousePos = engine.GetInput().GetMousePositionf();
-	FW_Intersection::LineSegment mouseSegment;
-	mouseSegment.myStart = myMouseAnchor;
-	mouseSegment.myEnd = mousePos;
-
-	FW_Intersection::Ray mouseRay;
-	mouseRay.myStart = myMouseAnchor;
-	mouseRay.myDirection = GetNormalized(mousePos - myMouseAnchor);
-
+	
 	int lineColor = 0xFF00FFFF;
 	int faceColor = 0xAA00AAFF;
 
@@ -82,49 +70,41 @@ void Navmesh::Render()
 	{
 		bool collision = false;
 		Vector2f intersection;
-		if (myHasAnchor)
+		if (!myCutPositions.IsEmpty())
 		{
 			FW_Intersection::LineSegment edge1{ triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos };
 			FW_Intersection::LineSegment edge2{ triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos };
 			FW_Intersection::LineSegment edge3{ triangle->myVertices[2]->myPos, triangle->myVertices[0]->myPos };
 
-#if 0
-			if (FW_Intersection::LineSegmentVsLineSegment(mouseSegment, edge1, &intersection))
+			for (int i = 0; i < myCutPositions.Count(); ++i)
 			{
-				intersections.Add(intersection);
-				collision = true;
-			}
+				FW_Intersection::LineSegment cutSegment;
+				cutSegment.myStart = myCutPositions[i];
+				
+				if (i == myCutPositions.Count() - 1)
+					cutSegment.myEnd = mousePos;
+				else
+					cutSegment.myEnd = myCutPositions[i+1];
 
-			if (FW_Intersection::LineSegmentVsLineSegment(mouseSegment, edge2, &intersection))
-			{
-				intersections.Add(intersection);
-				collision = true;
-			}
+				if (FW_Intersection::LineSegmentVsLineSegment(cutSegment, edge1, &intersection))
+				{
+					intersections.Add(intersection);
+					collision = true;
+				}
 
-			if (FW_Intersection::LineSegmentVsLineSegment(mouseSegment, edge3, &intersection))
-			{
-				intersections.Add(intersection);
-				collision = true;
-			}
-#else
-			if (FW_Intersection::RayVsLineSegment(mouseRay, edge1, &intersection))
-			{
-				intersections.Add(intersection);
-				collision = true;
-			}
+				if (FW_Intersection::LineSegmentVsLineSegment(cutSegment, edge2, &intersection))
+				{
+					intersections.Add(intersection);
+					collision = true;
+				}
 
-			if (FW_Intersection::RayVsLineSegment(mouseRay, edge2, &intersection))
-			{
-				intersections.Add(intersection);
-				collision = true;
+				if (FW_Intersection::LineSegmentVsLineSegment(cutSegment, edge3, &intersection))
+				{
+					intersections.Add(intersection);
+					collision = true;
+				}
 			}
-
-			if (FW_Intersection::RayVsLineSegment(mouseRay, edge3, &intersection))
-			{
-				intersections.Add(intersection);
-				collision = true;
-			}
-#endif
+			
 		}
 		else
 		{
@@ -150,8 +130,13 @@ void Navmesh::Render()
 	for (const Vector2f& intersect : intersections)
 		window.RenderCircle(intersect, 3.f, 0xFFFF0000);
 
-	if (myHasAnchor)
-		window.RenderLine(mouseSegment.myStart, mouseSegment.myEnd, 0xFF000000);
+	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
+	{
+		window.RenderLine(myCutPositions[i], myCutPositions[i+1], 0xFF000000);
+	}
+
+	if (!myCutPositions.IsEmpty())
+		window.RenderLine(myCutPositions.GetLast(), mousePos, 0xFF000000);
 }
 
 Navmesh::Vertex* Navmesh::GetVertex(int x, int y) const
@@ -195,11 +180,10 @@ void Navmesh::CreateQuad(Vertex*& aTopLeftVertex, Edge*& aLeftEdge, Edge*& aTopE
 	}
 	else if (!left)
 	{
-		bottomLeft = new Vertex();
-		bottomLeft->myPos = aTopLeftVertex->myPos;
-		bottomLeft->myPos.y += mySectorGridSize.y;
-		myVertices.Add(bottomLeft);
+		Vector2f vertPos = aTopLeftVertex->myPos;
+		vertPos.y += mySectorGridSize.y;
 
+		bottomLeft = CreateVertex(vertPos);
 		left = CreateEdge(aTopLeftVertex, bottomLeft);
 	}
 
@@ -212,19 +196,18 @@ void Navmesh::CreateQuad(Vertex*& aTopLeftVertex, Edge*& aLeftEdge, Edge*& aTopE
 	}
 	else if (!aTopEdge)
 	{
-		topRight = new Vertex();
-		topRight->myPos = aTopLeftVertex->myPos;
-		topRight->myPos.x += mySectorGridSize.x;
-		myVertices.Add(topRight);
+		Vector2f vertPos = aTopLeftVertex->myPos;
+		vertPos.x += mySectorGridSize.x;
 
+		topRight = CreateVertex(vertPos);
 		top = CreateEdge(aTopLeftVertex, topRight);
 	}
 
-	Vertex* bottomRight = new Vertex();
-	bottomRight->myPos = aTopLeftVertex->myPos;
-	bottomRight->myPos.x += mySectorGridSize.x;
-	bottomRight->myPos.y += mySectorGridSize.y;
-	myVertices.Add(bottomRight);
+	Vector2f vertPos = aTopLeftVertex->myPos;
+	vertPos.x += mySectorGridSize.x;
+	vertPos.y += mySectorGridSize.y;
+
+	Vertex* bottomRight = CreateVertex(vertPos);
 
 	Edge* right = CreateEdge(topRight, bottomRight);
 	Edge* bottom = CreateEdge(bottomLeft, bottomRight);
@@ -238,6 +221,22 @@ void Navmesh::CreateQuad(Vertex*& aTopLeftVertex, Edge*& aLeftEdge, Edge*& aTopE
 	aTopEdge = bottom;
 }
 
+Navmesh::Vertex* Navmesh::CreateVertex(const Vector2f aPosition)
+{
+	Vertex* vertex = new Vertex();
+	vertex->myPos = aPosition;
+	myVertices.Add(vertex);
+	return vertex;
+}
+
+void Navmesh::DeleteVertexIfNeeded(Vertex* aVertex)
+{
+	if (!aVertex->myEdges.IsEmpty())
+		return;
+
+	myVertices.DeleteCyclic(aVertex);
+}
+
 Navmesh::Edge* Navmesh::CreateEdge(Vertex* aV1, Vertex* aV2)
 {
 	Edge* edge = new Edge();
@@ -247,6 +246,20 @@ Navmesh::Edge* Navmesh::CreateEdge(Vertex* aV1, Vertex* aV2)
 	aV2->myEdges.Add(edge);
 	myEdges.Add(edge);
 	return edge;
+}
+
+void Navmesh::DeleteEdgeIfNeeded(Edge* aEdge)
+{
+	if (aEdge->myTriangles[0] != nullptr || aEdge->myTriangles[1] != nullptr)
+		return;
+
+	aEdge->myVertices[0]->myEdges.RemoveCyclic(aEdge);
+	aEdge->myVertices[1]->myEdges.RemoveCyclic(aEdge);
+
+	DeleteVertexIfNeeded(aEdge->myVertices[0]);
+	DeleteVertexIfNeeded(aEdge->myVertices[1]);
+
+	myEdges.DeleteCyclic(aEdge);
 }
 
 Navmesh::Triangle* Navmesh::CreateTriangle(Edge* aE1, Edge* aE2, Edge* aE3)
@@ -260,85 +273,142 @@ Navmesh::Triangle* Navmesh::CreateTriangle(Edge* aE1, Edge* aE2, Edge* aE3)
 	triangle->myVertices[1] = aE1->myVertices[1];
 	triangle->myVertices[2] = aE2->GetSharedVertex(aE3);
 
-	aE1->myTriangles.Add(triangle);
-	aE2->myTriangles.Add(triangle);
-	aE3->myTriangles.Add(triangle);
+	aE1->AddTriangle(triangle);
+	aE2->AddTriangle(triangle);
+	aE3->AddTriangle(triangle);
 	myTriangles.Add(triangle);
 	return triangle;
 }
 
+void Navmesh::DeleteTriangle(Triangle* aTriangle)
+{
+	aTriangle->myEdges[0]->RemoveTriangle(aTriangle);
+	DeleteEdgeIfNeeded(aTriangle->myEdges[0]);
+
+	aTriangle->myEdges[1]->RemoveTriangle(aTriangle);
+	DeleteEdgeIfNeeded(aTriangle->myEdges[1]);
+
+	aTriangle->myEdges[2]->RemoveTriangle(aTriangle);
+	DeleteEdgeIfNeeded(aTriangle->myEdges[2]);
+
+	myTriangles.DeleteCyclic(aTriangle);
+}
+
+void Navmesh::PerformCut()
+{
+	if (myCutPositions.Count() < 3)
+		return;
+
+	myCutPositions.Add(myCutPositions[0]);
+	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
+	{
+		Cut(myCutPositions[i], myCutPositions[i + 1]);
+	}
+
+	for (int i = 0; i < myTriangles.Count(); ++i)
+	{
+		if (IsInsideCutArea(myTriangles[i]))
+		{
+			DeleteTriangle(myTriangles[i]);
+			--i;
+		}
+	}
+}
+
 void Navmesh::Cut(const Vector2f& aV1, const Vector2f& aV2)
 {
-	Triangle* startTriangle = nullptr;
-	Triangle* endTriangle = nullptr;
+	// There is not guarantee that there will be a Vertex created exactly at aV1 and aV2, so the
+	// further away from an edge those postions are within a triangle, the less accurate the cut becomes
+	// in that triangle.
+	// Ideally a Vertex should always be created on those specific positions, but that also makes the
+	// cutting more complex.
 
-	for (Triangle* triangle : myTriangles)
+	FW_Intersection::LineSegment cuttingLine;
+	cuttingLine.myStart = aV1;
+	cuttingLine.myEnd = aV2;
+
+	FW_GrowingArray<CutEdge> cuttingEdges;
+	CollectCutEdges(cuttingLine, cuttingEdges);
+
+	FW_GrowingArray<Triangle*> oldTriangles;
+	for (CutEdge& cutEdge : cuttingEdges)
 	{
-		if (triangle->PointInside(aV1))
+		Vertex* cutVertex = CreateVertex(cutEdge.myCutPosition);
+
+		Edge* newEdge1 = CreateEdge(cutEdge.myEdge->myVertices[0], cutVertex);
+		Edge* newEdge2 = CreateEdge(cutVertex, cutEdge.myEdge->myVertices[1]);
+		CutTriangle(cutEdge.myEdge->myTriangles[0], cutEdge.myEdge, cutVertex, newEdge1, newEdge2);
+		CutTriangle(cutEdge.myEdge->myTriangles[1], cutEdge.myEdge, cutVertex, newEdge1, newEdge2);
+
+		oldTriangles.Add(cutEdge.myEdge->myTriangles[0]);
+		oldTriangles.Add(cutEdge.myEdge->myTriangles[1]);
+	}
+
+	for (Triangle* oldTriangle : oldTriangles)
+	{
+		if (oldTriangle)
+			DeleteTriangle(oldTriangle);
+	}
+}
+
+void Navmesh::CollectCutEdges(const FW_Intersection::LineSegment& aCuttingLine, FW_GrowingArray<CutEdge>& outCutEdges) const
+{
+	FW_Intersection::LineSegment edgeSegment;
+	Vector2f intersectionPoint;
+	for (Edge* edge : myEdges)
+	{
+		edgeSegment.myStart = edge->myVertices[0]->myPos;
+		edgeSegment.myEnd = edge->myVertices[1]->myPos;
+		if (FW_Intersection::LineSegmentVsLineSegment(aCuttingLine, edgeSegment, &intersectionPoint))
 		{
-			FW_ASSERT(startTriangle == nullptr);
-			startTriangle = triangle;
-			if (endTriangle)
-				break;
-		}
-		if (triangle->PointInside(aV2))
-		{
-			FW_ASSERT(endTriangle == nullptr);
-			endTriangle = triangle;
-			if (startTriangle)
-				break;
+			CutEdge& cutEdge = outCutEdges.Add();
+			cutEdge.myEdge = edge;
+			cutEdge.myCutPosition = intersectionPoint;
 		}
 	}
+}
 
-	if (startTriangle && startTriangle == endTriangle)
+void Navmesh::CutTriangle(Triangle* aTriangle, Edge* aCutEdge, Vertex* aCutVertex, Edge* aNewEdge1, Edge* aNewEdge2)
+{
+	if (!aTriangle)
+		return;
+
+	Vertex* oppositeVertex = aTriangle->GetOtherVertex(aCutEdge);
+
+	Edge* centerEdge = CreateEdge(aCutVertex, oppositeVertex);
+
+	Edge* oldEdge1 = aTriangle->GetOtherEdge(aCutEdge, aCutEdge->myVertices[0]);
+	oldEdge1->RemoveTriangle(aTriangle);
+	CreateTriangle(aNewEdge1, oldEdge1, centerEdge);
+
+	Edge* oldEdge2 = aTriangle->GetOtherEdge(aCutEdge, aCutEdge->myVertices[1]);
+	oldEdge2->RemoveTriangle(aTriangle);
+	CreateTriangle(centerEdge, oldEdge2, aNewEdge2);
+}
+
+bool Navmesh::IsInsideCutArea(Triangle* aTriangle)
+{
+	Vector2f center = aTriangle->GetCenterPosition();
+
+	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
 	{
-		SLUSH_INFO("Cut completely contained");
+		FW_Intersection::LineSegment cutSegment;
+		cutSegment.myStart = myCutPositions[i];
+		cutSegment.myEnd = myCutPositions[i + 1];
 
-		Vertex* v1 = new Vertex();
-		v1->myPos = aV1;
+		FW_Intersection::Line cutLine;
+		cutLine.FromSegment(cutSegment);
 
-		Vertex* v2 = new Vertex();
-		v2->myPos = aV2;
+		Vector2f cutCenter = (cutSegment.myStart + cutSegment.myEnd) / 2.f;
+		
+		Vector2f triangleToCutCenter = cutCenter - center;
+		Normalize(triangleToCutCenter);
 
-		Edge* cutEdge = CreateEdge(v1, v2);
-
-		FW_Intersection::Ray ray;
-		ray.myStart = aV1;
-		ray.myDirection = GetNormalized(aV1 - aV2);
-
-		Edge* intersectEdge1 = startTriangle->FindIntersectingEdge(ray);
-		Edge* newEdge1 = CreateEdge(intersectEdge1->myVertices[0], v1);
-		Edge* newEdge2 = CreateEdge(intersectEdge1->myVertices[1], v1);
-		CreateTriangle(intersectEdge1, newEdge1, newEdge2);
-
-
-		ray.myStart = aV2;
-		ray.myDirection = GetNormalized(aV2 - aV1);
-		Edge* intersectEdge2 = startTriangle->FindIntersectingEdge(ray);
-		Edge* newEdge3 = CreateEdge(intersectEdge2->myVertices[0], v2);
-		Edge* newEdge4 = CreateEdge(intersectEdge2->myVertices[1], v2);
-		CreateTriangle(intersectEdge2, newEdge3, newEdge4);
-
-		Vertex* sharedVertex = intersectEdge1->GetSharedVertex(intersectEdge2);
-		Edge* e1 = GetEdgeWithVertex(sharedVertex, newEdge1, newEdge2);
-		Edge* e2 = GetEdgeWithVertex(sharedVertex, newEdge3, newEdge4);
-		CreateTriangle(e1, e2, cutEdge);
-
-		Edge* opposite = startTriangle->GetEdgeWithoutVertex(sharedVertex);
-		Edge* newOpposite1 = GetEdgeWithoutVertex(sharedVertex, newEdge1, newEdge2);
-		Edge* newOpposite2 = GetEdgeWithoutVertex(sharedVertex, newEdge3, newEdge4);
-		Edge* extraOpposite = CreateEdge(v1, newOpposite1->GetOtherUniqueVertex(v1, opposite));
-
-		CreateTriangle(opposite, newOpposite1, extraOpposite);
-		CreateTriangle(cutEdge, newOpposite2, extraOpposite);
-
-		myTriangles.RemoveCyclic(startTriangle);
-		FW_SAFE_DELETE(startTriangle);
+		if (Dot(cutLine.myNormal, triangleToCutCenter) > 0.f)
+			return false;
 	}
-	else
-	{
-		SLUSH_INFO("Annoying cut");
-	}
+
+	return true;
 }
 
 Navmesh::Triangle::~Triangle()
@@ -371,22 +441,75 @@ Navmesh::Edge* Navmesh::Triangle::FindIntersectingEdge(const FW_Intersection::Ra
 
 Navmesh::Edge* Navmesh::Triangle::GetEdgeWithoutVertex(Vertex* aVertex) const
 {
-	if (myEdges[0]->myVertices[0] != aVertex && myEdges[0]->myVertices[1] != aVertex)
-		return myEdges[0];
+	for (int i = 0; i < 3; ++i)
+	{
+		Edge* edge = myEdges[i];
 
-	if (myEdges[1]->myVertices[0] != aVertex && myEdges[1]->myVertices[1] != aVertex)
-		return myEdges[1];
-
-	if (myEdges[2]->myVertices[0] != aVertex && myEdges[2]->myVertices[1] != aVertex)
-		return myEdges[2];
+		if (edge->myVertices[0] != aVertex && edge->myVertices[1] != aVertex)
+			return edge;
+	}
 
 	FW_ASSERT_ALWAYS("No edge without vertex");
 	return nullptr;
 }
 
-void Navmesh::Edge::RemoveTriangle(Triangle* aTriangle)
+Navmesh::Edge* Navmesh::Triangle::GetOtherEdge(Edge* aEdge, Vertex* aVertex) const
 {
-	myTriangles.RemoveCyclic(aTriangle);
+	for (int i = 0; i < 3; ++i)
+	{
+		Edge* otherEdge = myEdges[i];
+		if (otherEdge == aEdge)
+			continue;
+
+		if (otherEdge->myVertices[0] == aVertex || otherEdge->myVertices[1] == aVertex)
+			return otherEdge;
+	}
+
+	FW_ASSERT_ALWAYS("No other edge");
+	return nullptr;
+}
+
+Navmesh::Vertex* Navmesh::Triangle::GetOtherVertex(Edge* aEdge) const
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		Vertex* vert = myVertices[i];
+		if (vert != aEdge->myVertices[0] && vert != aEdge->myVertices[1])
+			return vert;
+	}
+
+	FW_ASSERT_ALWAYS("Couldnt find OtherVertex");
+	return nullptr;
+}
+
+Vector2f Navmesh::Triangle::GetCenterPosition() const
+{
+	Vector2f pos;
+	pos += myVertices[0]->myPos;
+	pos += myVertices[1]->myPos;
+	pos += myVertices[2]->myPos;
+	pos /= 3.f;
+	return pos;
+}
+
+void Navmesh::Edge::AddTriangle(Triangle* aTriangle)
+{
+	if (myTriangles[0] == nullptr)
+		myTriangles[0] = aTriangle;
+	else if (myTriangles[1] == nullptr)
+		myTriangles[1] = aTriangle;
+	else
+		FW_ASSERT_ALWAYS("Tried to add more than two triangles to an edge");
+}
+
+bool Navmesh::Edge::RemoveTriangle(Triangle* aTriangle)
+{
+	if (myTriangles[0] == aTriangle)
+		myTriangles[0] = nullptr;
+	else if (myTriangles[1] == aTriangle)
+		myTriangles[1] = nullptr;
+
+	return myTriangles[0] == nullptr && myTriangles[1] == nullptr;
 }
 
 Navmesh::Vertex* Navmesh::Edge::GetSharedVertex(Edge* aEdge) const

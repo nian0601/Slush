@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
+#include "EntitySystem/EntityType.h"
 
-class RemoveOnCollisionComponent : public Component
+class RemoveOnCollisionComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -15,7 +16,7 @@ public:
 public:
 	COMPONENT_HELPER("Remove On Collision", "removeoncollision");
 
-	using Component::Component;
+	using Slush::Component::Component;
 
-	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition) override;
+	void OnCollision(Slush::Entity& aOtherEntity, const Vector2f& aContactPosition) override;
 };

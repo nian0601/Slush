@@ -1,16 +1,15 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 #include <FW_Vector2.h>
 
 class CharacterAnimationSet;
-class EntityPrefab;
-class CharacterAnimationComponent : public Component
+class CharacterAnimationComponent : public Slush::Component
 {
 public:
 	COMPONENT_HELPER("Character Animation", "characteranimation");
 
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -19,7 +18,7 @@ public:
 	};
 
 public:
-	CharacterAnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	CharacterAnimationComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~CharacterAnimationComponent();
 
 	void PlayMovementAnimation();

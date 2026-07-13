@@ -6,7 +6,7 @@
 #include "ActionGameGlobals.h"
 #include "Graphics\Window.h"
 
-UpgradeWeaponState::UpgradeWeaponState(EntityHandle aPlayerHandle)
+UpgradeWeaponState::UpgradeWeaponState(Slush::EntityHandle aPlayerHandle)
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
 	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
@@ -31,7 +31,7 @@ UpgradeWeaponState::UpgradeWeaponState(EntityHandle aPlayerHandle)
 
 GameState::GameStateResult UpgradeWeaponState::Update()
 {
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
 
 	if (!weaponComponent->HasPendingUpgrade())

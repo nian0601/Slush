@@ -2,7 +2,9 @@
 
 #include "PickupComponent.h"
 #include "ExperienceComponent.h"
+#include "HealthComponent.h"
 #include <EntitySystem\EntityPrefab.h>
+#include <EntitySystem\EntityType.h>
 #include "WeaponComponent.h"
 
 void PickupComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
@@ -20,13 +22,13 @@ void PickupComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-PickupComponent::PickupComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+PickupComponent::PickupComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 	, myData(*static_cast<const PickupComponent::Data*>(anEntityPrefab.GetComponentBaseData<PickupComponent>()))
 {
 }
 
-void PickupComponent::OnCollision(Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
+void PickupComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
 {
 	if (aOtherEntity.myType == EntityType::PLAYER)
 	{

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
+#include <Core\Time.h>
 
-class EntityPrefab;
-
-class TimedRemovalComponent : public Component
+class TimedRemovalComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -18,7 +17,7 @@ public:
 public:
 	COMPONENT_HELPER("TimedRemoval", "timedremoval");
 
-	TimedRemovalComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	TimedRemovalComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 
 	void Update() override;
 

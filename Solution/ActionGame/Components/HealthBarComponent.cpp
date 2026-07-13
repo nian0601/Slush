@@ -5,8 +5,8 @@
 
 #include <Graphics/RectSprite.h>
 
-HealthBarComponent::HealthBarComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+HealthBarComponent::HealthBarComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 	myBackground = new Slush::RectSprite();
 	myForeground = new Slush::RectSprite();

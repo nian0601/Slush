@@ -1,16 +1,14 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
 #include <Core\Time.h>
 #include <FW_Vector2.h>
 
-class EntityPrefab;
-
-class ProjectileShootingComponent : public Component
+class ProjectileShootingComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -24,7 +22,7 @@ public:
 public:
 	COMPONENT_HELPER("Projectile Shooting", "projectileshooting");
 
-	ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	ProjectileShootingComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 
 	bool TryShoot(const Vector2f& aDirection);
 	void TriggerCooldown();

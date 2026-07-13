@@ -66,7 +66,7 @@ Tilemap::~Tilemap()
 {
 }
 
-void Tilemap::CreateWallEntities(EntityManager& aEntityManager)
+void Tilemap::CreateWallEntities(Slush::EntityManager& aEntityManager)
 {
 	Layer& wallLayer = myLayers.GetLast();
 

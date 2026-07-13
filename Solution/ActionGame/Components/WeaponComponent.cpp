@@ -152,7 +152,7 @@ void WeaponData::BuildUI()
 					ImGui::InputText("ProjectilePrefab", &rankData.myProjectileData.myProjectilePrefab);
 					if (ImGui::BeginDragDropTarget())
 					{
-						if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+						if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
 							rankData.myProjectileData.myProjectilePrefab = asset->GetAssetName();
 
 						ImGui::EndDragDropTarget();
@@ -179,7 +179,7 @@ void WeaponData::BuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-Weapon::Weapon(Entity& anEntity, const WeaponData& aWeaponData)
+Weapon::Weapon(Slush::Entity& anEntity, const WeaponData& aWeaponData)
 	: myEntity(anEntity)
 	, myWeaponData(aWeaponData)
 {
@@ -225,7 +225,7 @@ void Weapon::RunProjectileLogic()
 		return;
 	}
 
-	EntityHandle target = targeting->GetTarget();
+	Slush::EntityHandle target = targeting->GetTarget();
 	if (!target.IsValid())
 		return;
 
@@ -252,7 +252,7 @@ void Weapon::RunProjectileLogic()
 
 void Weapon::ShootProjectile(const Vector2f& aDirection)
 {
-	Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myRankData->myProjectileData.myProjectilePrefab.GetBuffer());
+	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myRankData->myProjectileData.myProjectilePrefab.GetBuffer());
 	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
 	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
@@ -288,8 +288,8 @@ void WeaponComponent::Data::OnBuildUI()
 }
 
 
-WeaponComponent::WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+WeaponComponent::WeaponComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	WeaponData* startingWeapon = assets.GetAsset<WeaponData>(anEntityPrefab.GetComponentData<WeaponComponent>().myWeaponDataAsset.GetBuffer());

@@ -14,8 +14,8 @@ void TimedRemovalComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-TimedRemovalComponent::TimedRemovalComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+TimedRemovalComponent::TimedRemovalComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 	const TimedRemovalComponent::Data* data = static_cast<const TimedRemovalComponent::Data*>(anEntityPrefab.GetComponentBaseData<TimedRemovalComponent>());
 	myTimer.Start(data->myDuration);

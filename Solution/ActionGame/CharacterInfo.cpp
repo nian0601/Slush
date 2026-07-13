@@ -66,7 +66,7 @@ void CharacterInfo::BuildUI()
 			myPortaitTextureRect = payload->myTextureRect;
 		}
 
-		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
 			myCharacterEntityPrefabID = asset->GetAssetName();
 
 		ImGui::EndDragDropTarget();

@@ -22,7 +22,7 @@ void DamageDealerComponent::Data::OnBuildUI()
 
 	if (ImGui::BeginDragDropTarget())
 	{
-		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
 			myImpactPrefab = asset->GetAssetName();
 
 		ImGui::EndDragDropTarget();
@@ -31,13 +31,13 @@ void DamageDealerComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-DamageDealerComponent::DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+DamageDealerComponent::DamageDealerComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 	myDamage = myEntityPrefab.GetComponentData<DamageDealerComponent>().myDamage;
 }
 
-void DamageDealerComponent::OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition)
+void DamageDealerComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& aContactPosition)
 {
 	EntityType otherType = static_cast<EntityType>(aOtherEntity.myType);
 	if (otherType == EntityType::ENVIRONMENT)

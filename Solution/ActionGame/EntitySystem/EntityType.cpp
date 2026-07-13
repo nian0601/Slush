@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "EntityType.h"
-#include "Entity.h"
+#include <EntitySystem/Entity.h>
 
 namespace
 {
@@ -9,12 +9,12 @@ namespace
 	static_assert(IM_ARRAYSIZE(ourEntityTypeNames) == EntityType::ENTITYTYPE_COUNT);
 }
 
-bool IsPlayerOwned(const Entity& anEntity)
+bool IsPlayerOwned(const Slush::Entity& anEntity)
 {
 	return anEntity.myType == PLAYER || anEntity.myType == PLAYER_PROJECTILE;
 }
 
-bool IsNPCOwned(const Entity& anEntity)
+bool IsNPCOwned(const Slush::Entity& anEntity)
 {
 	return anEntity.myType == NPC || anEntity.myType == NPC_PROJECTILE;
 }

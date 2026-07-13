@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
 namespace Slush
 {
@@ -10,12 +10,12 @@ namespace Slush
 	struct AnimationRuntime;
 }
 
-class SpriteComponent : public Component
+class SpriteComponent : public Slush::Component
 {
 public:
 	COMPONENT_HELPER("Sprite", "sprite");
 
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		Data();
 		~Data();
@@ -47,7 +47,7 @@ public:
 	};
 
 public:
-	SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	SpriteComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~SpriteComponent();
 
 	void MakeRect(float aWidth, float aHeight, int aColor);

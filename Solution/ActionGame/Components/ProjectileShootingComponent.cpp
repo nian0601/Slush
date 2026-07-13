@@ -32,7 +32,7 @@ void ProjectileShootingComponent::Data::OnBuildUI()
 
 	if (ImGui::BeginDragDropTarget())
 	{
-		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
 			myProjectileEntityPrefab = asset->GetAssetName();
 
 		ImGui::EndDragDropTarget();
@@ -41,8 +41,8 @@ void ProjectileShootingComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-ProjectileShootingComponent::ProjectileShootingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+ProjectileShootingComponent::ProjectileShootingComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 }
 
@@ -56,7 +56,7 @@ bool ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 	const ProjectileShootingComponent::Data& shootingData = myEntityPrefab.GetComponentData<ProjectileShootingComponent>();
 
 	Vector2f projPosition = myEntity.myPosition + aDirection * shootingData.myProjectileSpawnOffset;
-	Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, shootingData.myProjectileEntityPrefab.GetBuffer());
+	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, shootingData.myProjectileEntityPrefab.GetBuffer());
 	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
 	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 

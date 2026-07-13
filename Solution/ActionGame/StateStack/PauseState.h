@@ -13,7 +13,7 @@ class CharacterInfo;
 class PauseState : public GameState
 {
 public:
-	PauseState(EntityHandle aPlayerHandle, const CharacterInfo& aCharacterInfo);
+	PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& aCharacterInfo);
 
 	GameStateResult Update() override;
 	void Render() override;
@@ -25,7 +25,7 @@ private:
 	void BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBuilder);
 	void BuildNavigationButtons(Slush::DynamicUIBuilder& aUIBUilder);
 
-	EntityHandle myPlayerHandle;
+	Slush::EntityHandle myPlayerHandle;
 	const CharacterInfo& myCharacterInfo;
 
 	Slush::UIElementStyle myUIBackgroundStyle;

@@ -20,7 +20,7 @@ void RemoveOnCollisionComponent::Data::OnBuildUI()
 	}
 }
 
-void RemoveOnCollisionComponent::OnCollision(Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
+void RemoveOnCollisionComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
 {
 	const RemoveOnCollisionComponent::Data& data = myEntityPrefab.GetComponentData<RemoveOnCollisionComponent>();
 	if (!data.myCollisionFlags[aOtherEntity.myType])

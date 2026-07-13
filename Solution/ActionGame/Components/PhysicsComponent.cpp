@@ -2,6 +2,8 @@
 
 #include "PhysicsComponent.h"
 
+#include "EntitySystem/EntityType.h"
+#include "SpriteComponent.h"
 #include <Physics\PhysicsWorld.h>
 #include "ActionGameGlobals.h"
 
@@ -89,8 +91,8 @@ void PhysicsComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab)
-	: Component(aEntity, anEntityPrefab)
+PhysicsComponent::PhysicsComponent(Slush::Entity& aEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(aEntity, anEntityPrefab)
 	, myPhysicsWorld(ActionGameGlobals::GetInstance().GetPhysicsWorld())
 {
 	const Data& physData = anEntityPrefab.GetComponentData<PhysicsComponent>();

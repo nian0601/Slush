@@ -12,14 +12,14 @@ namespace Slush
 class UpgradeWeaponState : public GameState
 {
 public:
-	UpgradeWeaponState(EntityHandle aPlayerHandle);
+	UpgradeWeaponState(Slush::EntityHandle aPlayerHandle);
 
 	GameStateResult Update() override;
 	void Render() override;
 	bool AllowPassThroughRender() override { return true; };
 
 private:
-	EntityHandle myPlayerHandle;
+	Slush::EntityHandle myPlayerHandle;
 
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;

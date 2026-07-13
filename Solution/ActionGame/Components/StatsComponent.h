@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
 #include "Core\Assets\DataAsset.h"
 
@@ -33,10 +33,10 @@ public:
 	FW_StaticArray<StatData, StatType::NUM_STATS> myStatDatas;
 };
 
-class StatsComponent : public Component
+class StatsComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -45,7 +45,7 @@ public:
 public:
 	COMPONENT_HELPER("Stats", "stats");
 
-	using Component::Component;
+	using Slush::Component::Component;
 
 	void OnEnterWorld();
 

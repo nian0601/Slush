@@ -64,7 +64,7 @@ Slush::Font& ActionGameGlobals::GetFont()
 	return *myFont;
 }
 
-EntityManager& ActionGameGlobals::GetEntityManager()
+Slush::EntityManager& ActionGameGlobals::GetEntityManager()
 {
 	FW_ASSERT(myEntityManager != nullptr, "Need to set an EntityManager");
 	return *myEntityManager;

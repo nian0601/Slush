@@ -38,8 +38,8 @@ void NPCControllerComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-NPCControllerComponent::NPCControllerComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab)
-	: Component(aEntity, anEntityPrefab)
+NPCControllerComponent::NPCControllerComponent(Slush::Entity& aEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(aEntity, anEntityPrefab)
 	, myData(static_cast<const Data&>(*anEntityPrefab.GetComponentBaseData<NPCControllerComponent>()))
 {
 	if (!myData.mySpawnAnimationID.Empty())
@@ -75,7 +75,7 @@ void NPCControllerComponent::PrePhysicsUpdate()
 		return;
 	}
 
-	EntityHandle target = targeting->GetTarget();
+	Slush::EntityHandle target = targeting->GetTarget();
 	if (!target.IsValid())
 		return;
 

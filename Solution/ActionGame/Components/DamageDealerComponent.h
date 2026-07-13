@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
+#include "EntitySystem/EntityHandle.h"
 
-class DamageDealerComponent : public Component
+class DamageDealerComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -16,13 +17,13 @@ public:
 public:
 	COMPONENT_HELPER("Damage Dealer", "damagedealer");
 
-	DamageDealerComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	DamageDealerComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 
-	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition) override;
+	void OnCollision(Slush::Entity& aOtherEntity, const Vector2f& aContactPosition) override;
 
 	void SetDamage(int aDamage) { myDamage = aDamage; }
 
 private:
 	int myDamage;
-	FW_GrowingArray<EntityHandle> myDamagedEntities;
+	FW_GrowingArray<Slush::EntityHandle> myDamagedEntities;
 };

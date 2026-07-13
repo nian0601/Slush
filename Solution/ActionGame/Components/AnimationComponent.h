@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 #include <FW_Vector2.h>
 
 namespace Slush
@@ -11,13 +11,12 @@ namespace Slush
 	struct AnimationRuntime;
 }
 
-class EntityPrefab;
-class AnimationComponent : public Component
+class AnimationComponent : public Slush::Component
 {
 public:
 	COMPONENT_HELPER("Animation", "animation");
 
-	AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	AnimationComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~AnimationComponent();
 
 	void OnEnterWorld() override;

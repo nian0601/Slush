@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
-class PickupComponent : public Component
+class PickupComponent : public Slush::Component
 {
 public:
 	COMPONENT_HELPER("Pickup", "pickup");
 
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		enum PickupType
 		{
@@ -24,9 +24,9 @@ public:
 	};
 
 public:
-	PickupComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	PickupComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 
-	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition) override;
+	void OnCollision(Slush::Entity& aOtherEntity, const Vector2f& aContactPosition) override;
 
 private:
 	const Data& myData;

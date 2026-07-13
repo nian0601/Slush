@@ -10,9 +10,9 @@
 #include "Core/Assets/AssetParser.h"
 #include "Core/Dockables/Dockable.h"
 
-class EntityManager;
 namespace Slush
 {
+	class EntityManager;
 	class Font;
 	class PhysicsWorld;
 }
@@ -49,12 +49,12 @@ public:
 
 	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
 
-	void SetEntityManager(EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
+	void SetEntityManager(Slush::EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
 	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
 
 	Slush::Font& GetFont();
 
-	EntityManager& GetEntityManager();
+	Slush::EntityManager& GetEntityManager();
 	Slush::PhysicsWorld& GetPhysicsWorld();
 
 	DebugSettings myDebugSettings;
@@ -66,6 +66,6 @@ private:
 
 	Slush::Font* myFont = nullptr;
 
-	EntityManager* myEntityManager = nullptr;
+	Slush::EntityManager* myEntityManager = nullptr;
 	Slush::PhysicsWorld* myPhysicsWorld = nullptr;
 };

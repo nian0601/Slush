@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
-class DropComponent : public Component
+class DropComponent : public Slush::Component
 {
 public:
 	COMPONENT_HELPER("Drop", "drops");
 
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -21,7 +21,7 @@ public:
 	};
 
 public:
-	DropComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	DropComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 
 	void OnDeath() override;
 

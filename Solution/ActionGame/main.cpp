@@ -30,7 +30,7 @@ class App : public Slush::IApp
 public:
 	void Initialize() override
 	{
-		EntityManager::RegisterComponents();
+		Slush::EntityManager::RegisterComponents();
 
 		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 		assets.RegisterAssetType<Slush::UILayout>();
@@ -39,7 +39,7 @@ public:
 		assets.RegisterAssetType<Slush::Animation>();
 		assets.RegisterAssetType<CharacterAnimationSet>();
 		assets.RegisterAssetType<CharacterInfo>();
-		assets.RegisterAssetType<EntityPrefab>();
+		assets.RegisterAssetType<Slush::EntityPrefab>();
 		assets.RegisterAssetType<WeaponData>();
 		assets.RegisterAssetType<StatsUpgradeData>();
 		assets.LoadAllAssets();

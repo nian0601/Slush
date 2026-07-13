@@ -5,8 +5,8 @@
 #include <Graphics/RectSprite.h>
 #include "StatsComponent.h"
 
-ExperienceComponent::ExperienceComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+ExperienceComponent::ExperienceComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 	myBackground = new Slush::RectSprite();
 	myForeground = new Slush::RectSprite();

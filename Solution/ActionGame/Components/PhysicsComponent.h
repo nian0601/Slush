@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
 #include <FW_Vector2.h>
 
@@ -11,11 +11,10 @@ namespace Slush
 	struct PhysicsObject;
 }
 
-class EntityPrefab;
-class PhysicsComponent : public Component
+class PhysicsComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -30,7 +29,7 @@ public:
 public:
 	COMPONENT_HELPER("Physics", "physics");
 
-	PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab);
+	PhysicsComponent(Slush::Entity& aEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~PhysicsComponent();
 
 	void Update() override;

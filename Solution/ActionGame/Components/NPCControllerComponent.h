@@ -1,16 +1,16 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
 namespace Slush
 {
 	class Animation;
 }
 
-class NPCControllerComponent : public Component
+class NPCControllerComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -22,7 +22,7 @@ public:
 
 	COMPONENT_HELPER("NPC Controller", "npccontroller");
 
-	NPCControllerComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab);
+	NPCControllerComponent(Slush::Entity& aEntity, const Slush::EntityPrefab& anEntityPrefab);
 
 	void OnEnterWorld() override;
 	void PrePhysicsUpdate() override;

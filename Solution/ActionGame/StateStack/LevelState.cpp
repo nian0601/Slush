@@ -5,6 +5,7 @@
 #include "GameOverState.h"
 
 #include "Physics\PhysicsWorld.h"
+#include "Components\PhysicsComponent.h"
 #include "EntitySystem\EntityManager.h"
 #include "Level\Level.h"
 #include "StateStack.h"
@@ -16,7 +17,7 @@ LevelState::LevelState(const CharacterInfo& aCharacterInfo)
 	: myCharacterInfo(aCharacterInfo)
 {
 	myPhysicsWorld = new Slush::PhysicsWorld();
-	myEntityManager = new EntityManager();
+	myEntityManager = new Slush::EntityManager();
 
 	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
 	ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);

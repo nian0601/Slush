@@ -3,7 +3,6 @@
 #include "Core/Dockables/IAppLayout.h"
 #include "UI/UIManager.h"
 
-class EntityManager;
 class Level;
 class StateStack;
 

@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
+#include "EntitySystem/EntityComponentEvents.h"
 #include <Core\Time.h>
 
 namespace Slush
@@ -8,13 +9,12 @@ namespace Slush
 	class RectSprite;
 }
 
-class EntityPrefab;
-class HealthBarComponent : public Component
+class HealthBarComponent : public Slush::Component
 {
 public:
 	COMPONENT_HELPER("Health Bar", "healthbar");
 
-	HealthBarComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	HealthBarComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~HealthBarComponent();
 
 	void Render() override;

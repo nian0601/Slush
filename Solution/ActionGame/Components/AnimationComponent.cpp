@@ -14,8 +14,8 @@
 
 
 #define USE_ANIMATION_ASSETS 1
-AnimationComponent::AnimationComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+AnimationComponent::AnimationComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 #if USE_ANIMATION_ASSETS
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();

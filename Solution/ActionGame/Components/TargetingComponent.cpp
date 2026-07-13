@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "EntitySystem/EntityManager.h"
+#include "EntitySystem/EntityType.h"
 #include "PhysicsComponent.h"
 #include "TargetingComponent.h"
 
@@ -23,8 +24,8 @@ void TargetingComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-TargetingComponent::TargetingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+TargetingComponent::TargetingComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 }
 
@@ -34,8 +35,8 @@ void TargetingComponent::Update()
 
 	const Data& targetData = myEntityPrefab.GetComponentData<TargetingComponent>();
 
-	FW_GrowingArray<EntityHandle> targets;
-	myEntity.myEntityManager.FindEntitiesOfType(static_cast<EntityType>(targetData.myTargetType), targets);
+	FW_GrowingArray<Slush::EntityHandle> targets;
+	myEntity.myEntityManager.FindEntitiesOfType(targetData.myTargetType, targets);
 
 	if (targetData.myTargetType == EntityType::PLAYER)
 	{
@@ -46,7 +47,7 @@ void TargetingComponent::Update()
 	{
 		float bestDist = FLT_MAX;
 		const float maxDist = FW_Square(600.f);
-		for (const EntityHandle& handle : targets)
+		for (const Slush::EntityHandle& handle : targets)
 		{
 			if (handle.IsValid())
 			{

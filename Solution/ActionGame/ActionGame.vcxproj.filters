@@ -13,9 +13,6 @@
     <ClCompile Include="Components\AnimationComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Components\Component.cpp">
-      <Filter>Entities\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Components\DamageDealerComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
@@ -61,16 +58,7 @@
     <ClCompile Include="Components\WeaponComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
-    <ClCompile Include="EntitySystem\ComponentRegistry.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="EntitySystem\Entity.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="EntitySystem\EntityManager.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="EntitySystem\EntityPrefab.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="EntitySystem\EntityType.cpp">
@@ -110,9 +98,6 @@
       <Filter>AppLayout</Filter>
     </ClInclude>
     <ClInclude Include="Components\AnimationComponent.h">
-      <Filter>Entities\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Components\Component.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
     <ClInclude Include="Components\DamageDealerComponent.h">
@@ -160,22 +145,7 @@
     <ClInclude Include="Components\WeaponComponent.h">
       <Filter>Entities\Components</Filter>
     </ClInclude>
-    <ClInclude Include="EntitySystem\ComponentRegistry.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntitySystem\Entity.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="EntitySystem\EntityComponentEvents.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntitySystem\EntityHandle.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntitySystem\EntityManager.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntitySystem\EntityPrefab.h">
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="EntitySystem\EntityType.h">

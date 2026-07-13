@@ -4,6 +4,7 @@
 #include "HealthComponent.h"
 #include "HealthBarComponent.h"
 
+#include "EntitySystem/EntityComponentEvents.h"
 #include <Graphics/RectSprite.h>
 
 void HealthComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
@@ -20,8 +21,8 @@ void HealthComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-HealthComponent::HealthComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+HealthComponent::HealthComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 	const Data& healthData = anEntityPrefab.GetComponentData<HealthComponent>();
 

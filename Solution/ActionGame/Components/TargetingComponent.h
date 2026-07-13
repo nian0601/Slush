@@ -1,15 +1,13 @@
 #pragma once
 
-#include "Component.h"
-#include "EntityHandle.h"
-#include "Entity.h"
+#include "EntitySystem/Component.h"
+#include "EntitySystem/EntityHandle.h"
+#include "EntitySystem/Entity.h"
 
-class EntityPrefab;
-
-class TargetingComponent : public Component
+class TargetingComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -20,11 +18,11 @@ public:
 public:
 	COMPONENT_HELPER("Targeting", "targeting");
 
-	TargetingComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	TargetingComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 
 	void Update() override;
-	EntityHandle GetTarget() const { return myTarget; }
+	Slush::EntityHandle GetTarget() const { return myTarget; }
 
 private:
-	EntityHandle myTarget;
+	Slush::EntityHandle myTarget;
 };

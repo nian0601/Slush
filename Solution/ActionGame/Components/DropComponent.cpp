@@ -51,7 +51,7 @@ void DropComponent::Data::OnBuildUI()
 
 			if (ImGui::BeginDragDropTarget())
 			{
-				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
 					drop.myPrefabName = asset->GetAssetName();
 
 				ImGui::EndDragDropTarget();
@@ -67,8 +67,8 @@ void DropComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-DropComponent::DropComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+DropComponent::DropComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 	, myData(*static_cast<const DropComponent::Data*>(anEntityPrefab.GetComponentBaseData<DropComponent>()))
 {
 }
@@ -84,7 +84,7 @@ void DropComponent::OnDeath()
 	{
 		if (item.myWeight > pick)
 		{
-			EntityManager& entityManager = ActionGameGlobals::GetInstance().GetEntityManager();
+			Slush::EntityManager& entityManager = ActionGameGlobals::GetInstance().GetEntityManager();
 			entityManager.CreateEntity(myEntity.myPosition, item.myPrefabName);
 			return;
 		}

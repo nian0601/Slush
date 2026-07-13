@@ -4,6 +4,7 @@
 
 namespace Slush
 {
+	class EntityManager;
 	class PhysicsWorld;
 }
 
@@ -23,7 +24,7 @@ public:
 private:
 	void UpdateCollisions();
 
-	EntityManager* myEntityManager = nullptr;
+	Slush::EntityManager* myEntityManager = nullptr;
 	Slush::PhysicsWorld* myPhysicsWorld = nullptr;
 
 	Level* myLevel = nullptr;

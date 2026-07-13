@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
 #include <Core\Time.h>
 #include <FW_String.h>
@@ -50,7 +50,7 @@ public:
 class Weapon
 {
 public:
-	Weapon(Entity& anEntity, const WeaponData& aWeaponData);
+	Weapon(Slush::Entity& anEntity, const WeaponData& aWeaponData);
 
 	void Update();
 	void Upgrade();
@@ -63,7 +63,7 @@ protected:
 	void RunProjectileLogic();
 	void ShootProjectile(const Vector2f& aDirection);
 
-	Entity& myEntity;
+	Slush::Entity& myEntity;
 	Slush::Timer myActivationCooldown;
 	int myRank = 0;
 	const WeaponData& myWeaponData;
@@ -71,10 +71,10 @@ protected:
 };
 
 
-class WeaponComponent : public Component
+class WeaponComponent : public Slush::Component
 {
 public:
-	struct Data : public Component::BaseData
+	struct Data : public Slush::Component::BaseData
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
@@ -85,7 +85,7 @@ public:
 public:
 	COMPONENT_HELPER("Weapon", "weaponcomponent");
 
-	WeaponComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	WeaponComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~WeaponComponent();
 
 	void Update() override;

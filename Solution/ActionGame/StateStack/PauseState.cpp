@@ -10,7 +10,7 @@
 #include "CharacterInfo.h"
 #include "Core\Input.h"
 
-PauseState::PauseState(EntityHandle aPlayerHandle, const CharacterInfo& aCharacterInfo)
+PauseState::PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& aCharacterInfo)
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
 	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 	, myCharacterInfo(aCharacterInfo)
@@ -98,7 +98,7 @@ void PauseState::Render()
 
 void PauseState::BuildStatsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 {
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
 
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
@@ -137,7 +137,7 @@ void PauseState::BuildStatsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 
 void PauseState::BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 {
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
 	const FW_GrowingArray<Weapon*>& weapons = weaponComponent->GetWeapons();
 

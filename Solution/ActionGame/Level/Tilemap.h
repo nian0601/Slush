@@ -6,14 +6,18 @@ namespace Slush
 	class Texture;
 }
 
-class EntityManager;
+namespace Slush
+{
+	class EntityManager;
+}
+
 class Tilemap
 {
 public:
 	Tilemap();
 	~Tilemap();
 
-	void CreateWallEntities(EntityManager& aEntityManager);
+	void CreateWallEntities(Slush::EntityManager& aEntityManager);
 
 	void Render();
 

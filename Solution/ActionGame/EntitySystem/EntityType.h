@@ -1,6 +1,9 @@
 #pragma once
 
-class Entity;
+namespace Slush
+{
+	class Entity;
+}
 
 enum EntityType
 {
@@ -13,8 +16,8 @@ enum EntityType
 	ENTITYTYPE_COUNT,
 };
 
-bool IsPlayerOwned(const Entity& anEntity);
-bool IsNPCOwned(const Entity& anEntity);
+bool IsPlayerOwned(const Slush::Entity& anEntity);
+bool IsNPCOwned(const Slush::Entity& anEntity);
 
 const char* ToString(EntityType aType);
 const char* const* GetEntityTypeNames();

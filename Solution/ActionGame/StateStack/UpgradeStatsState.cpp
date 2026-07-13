@@ -4,10 +4,11 @@
 #include "Components\WeaponComponent.h"
 #include "ActionGameGlobals.h"
 #include "Components\ExperienceComponent.h"
+#include "Components\StatsComponent.h"
 #include "EntitySystem\Entity.h"
 #include "Graphics\Window.h"
 
-UpgradeStatsState::UpgradeStatsState(EntityHandle aPlayerHandle)
+UpgradeStatsState::UpgradeStatsState(Slush::EntityHandle aPlayerHandle)
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
 	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
@@ -29,7 +30,7 @@ UpgradeStatsState::UpgradeStatsState(EntityHandle aPlayerHandle)
 	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 	window.StartFade(0.15f);
 
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
 
@@ -57,7 +58,7 @@ UpgradeStatsState::UpgradeStatsState(EntityHandle aPlayerHandle)
 
 GameState::GameStateResult UpgradeStatsState::Update()
 {
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
 
 	if (myUpgradeOptions.IsEmpty())

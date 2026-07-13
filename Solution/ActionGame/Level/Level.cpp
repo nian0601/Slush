@@ -4,6 +4,7 @@
 
 #include "Components/ExperienceComponent.h"
 #include "Components/HealthComponent.h"
+#include "Components/ProjectileShootingComponent.h"
 #include "Components/StatsComponent.h"
 #include "Components/WeaponComponent.h"
 
@@ -40,7 +41,7 @@ Level::~Level()
 
 void Level::Update(StateStack& aStateStack)
 {
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 	if (!player)
 		return;
 
@@ -73,7 +74,7 @@ void Level::Restart()
 	myEnemyWaveData = &myLevelData->myEnemyWaves[0];
 	myWaveTimer.Start(3.f);
 
-	Entity* player = myEntityManager.CreateEntity(myLevelData->myPlayerStartPosition, myLevelData->myPlayerEntityPrefab);
+	Slush::Entity* player = myEntityManager.CreateEntity(myLevelData->myPlayerStartPosition, myLevelData->myPlayerEntityPrefab);
 	myPlayerHandle = player->myHandle;
 
 	myTilemap->CreateWallEntities(myEntityManager);
@@ -86,7 +87,7 @@ void Level::RenderGame()
 
 bool Level::IsPlayerDead() const
 {
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 	if (!player)
 		return true;
 
@@ -106,14 +107,14 @@ void Level::HandleEnemyWaves()
 
 	myWaveTimer.Start(myEnemyWaveData->myDuration);
 
-	Entity* player = myPlayerHandle.Get();
+	Slush::Entity* player = myPlayerHandle.Get();
 
 	const int iterationLimit = 100;
 	int iterations = 0;
 	Vector2f spawnArea = { 1920.f, 1080.f };
 	Vector2f spawnAreaMargin = { 75.f, 75.f };
 	const int numEnemies = FW_RandInt(myEnemyWaveData->myMinEnemyCount, myEnemyWaveData->myMaxEnemyCount);
-	FW_GrowingArray<Entity*> spawnedEnemies;
+	FW_GrowingArray<Slush::Entity*> spawnedEnemies;
 	while (spawnedEnemies.Count() < numEnemies && iterations <= iterationLimit)
 	{
 		++iterations;
@@ -127,7 +128,7 @@ void Level::HandleEnemyWaves()
 		if (IsTooClose(player->myPosition, position, myPlayerClearanceRadius))
 			continue;
 
-		for (Entity* enemy : spawnedEnemies)
+		for (Slush::Entity* enemy : spawnedEnemies)
 		{
 			if (IsTooClose(enemy->myPosition, position, myEnemyClearanceRadius))
 				continue;
@@ -135,7 +136,7 @@ void Level::HandleEnemyWaves()
 
 		int enemyPick = FW_RandInt(0, myEnemyWaveData->myEnemyPrefabs.Count() -1);
 
-		Entity* enemy = myEntityManager.CreateEntity(position, myEnemyWaveData->myEnemyPrefabs[enemyPick]);
+		Slush::Entity* enemy = myEntityManager.CreateEntity(position, myEnemyWaveData->myEnemyPrefabs[enemyPick]);
 		if (ProjectileShootingComponent* projShoot = enemy->GetComponent<ProjectileShootingComponent>())
 			projShoot->TriggerCooldown();
 

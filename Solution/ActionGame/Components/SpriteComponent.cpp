@@ -17,7 +17,7 @@
 #include "AnimationComponent.h"
 
 SpriteComponent::Data::Data()
-	: Component::BaseData()
+	: Slush::Component::BaseData()
 {
 	// TODO: Change Slush::Asset to have empty ctor?
 	// and instead have AssetStorage call functions for setting name and assetID?
@@ -154,8 +154,8 @@ void SpriteComponent::Data::OnBuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-SpriteComponent::SpriteComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab)
-	: Component(anEntity, anEntityPrefab)
+SpriteComponent::SpriteComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
+	: Slush::Component(anEntity, anEntityPrefab)
 {
 	const SpriteComponent::Data& spriteData = anEntityPrefab.GetComponentData<SpriteComponent>();
 	if (spriteData.mySize.x <= 0.f)

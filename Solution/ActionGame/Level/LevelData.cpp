@@ -26,7 +26,7 @@ void LevelData::BuildUI()
 
 	if (ImGui::BeginDragDropTarget())
 	{
-		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
 			myPlayerEntityPrefab = asset->GetAssetName();
 
 		ImGui::EndDragDropTarget();
@@ -62,7 +62,7 @@ void LevelData::BuildUI()
 						ImGui::InputText("", &waveData.myEnemyPrefabs[j]);
 						if (ImGui::BeginDragDropTarget())
 						{
-							if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<EntityPrefab>()))
+							if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
 								waveData.myEnemyPrefabs[j] = asset->GetAssetName();
 
 							ImGui::EndDragDropTarget();

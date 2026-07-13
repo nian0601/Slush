@@ -1,12 +1,19 @@
 #pragma once
 
+#include <EntitySystem/EntityHandle.h>
+#include <Core/Time.h>
+
 class CharacterInfo;
-class EntityManager;
 class Tilemap;
 class LevelData;
 class StateStack;
 
 struct EnemyWaveData;
+
+namespace Slush
+{
+	class EntityManager;
+}
 
 class Level
 {
@@ -20,7 +27,7 @@ public:
 	void RenderGame();
 
 	bool IsPlayerDead() const;
-	EntityHandle GetPlayer() const { return myPlayerHandle; }
+	Slush::EntityHandle GetPlayer() const { return myPlayerHandle; }
 
 private:
 	void HandleEnemyWaves();
@@ -30,8 +37,8 @@ private:
 	const CharacterInfo& myPlayerCharacterInfo;
 	LevelData* myLevelData = nullptr;
 	EnemyWaveData* myEnemyWaveData = nullptr;
-	EntityManager& myEntityManager;
-	EntityHandle myPlayerHandle;
+	Slush::EntityManager& myEntityManager;
+	Slush::EntityHandle myPlayerHandle;
 
 	Tilemap* myTilemap;
 

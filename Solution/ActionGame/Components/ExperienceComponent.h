@@ -1,19 +1,18 @@
 #pragma once
 
-#include "Component.h"
+#include "EntitySystem/Component.h"
 
 namespace Slush
 {
 	class RectSprite;
 }
 
-class EntityPrefab;
-class ExperienceComponent : public Component
+class ExperienceComponent : public Slush::Component
 {
 public:
 	COMPONENT_HELPER("Experience", "experience");
 
-	ExperienceComponent(Entity& anEntity, const EntityPrefab& anEntityPrefab);
+	ExperienceComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~ExperienceComponent();
 
 	void Render() override;

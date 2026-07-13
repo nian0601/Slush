@@ -3,6 +3,7 @@
 #include <FW_Vector2.h>
 
 #include "EntityHandle.h"
+#include "EntityType.h"
 #include "Components/Component.h"
 #include <FW_TypeID.h>
 #include "EntityPrefab.h"
@@ -24,17 +25,6 @@ class DamageDealerComponent;
 class HealthBarComponent;
 
 class EntityManager;
-
-enum EntityType
-{
-	ENVIRONMENT,
-	PLAYER,
-	NPC,
-	PLAYER_PROJECTILE,
-	NPC_PROJECTILE,
-	PICKUP,
-	ENTITYTYPE_COUNT,
-};
 
 namespace Slush
 {

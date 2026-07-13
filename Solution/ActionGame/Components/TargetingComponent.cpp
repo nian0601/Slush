@@ -17,8 +17,7 @@ void TargetingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHand
 void TargetingComponent::Data::OnBuildUI()
 {
 	int type = myTargetType;
-	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
-	ImGui::Combo("Target Type", &type, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
+	ImGui::Combo("Target Type", &type, GetEntityTypeNames(), EntityType::ENTITYTYPE_COUNT);
 	myTargetType = EntityType(type);
 }
 

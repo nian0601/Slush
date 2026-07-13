@@ -151,7 +151,7 @@
     <ClCompile Include="EntityEditorLayout.cpp" />
     <ClCompile Include="EntitySystem\EntityManager.cpp" />
     <ClCompile Include="EntitySystem\EntityPrefab.cpp" />
-    <ClCompile Include="EntitySystem\EntityTypeUtils.cpp" />
+    <ClCompile Include="EntitySystem\EntityType.cpp" />
     <ClCompile Include="AssetEditorDockable.cpp" />
     <ClCompile Include="Components\ExperienceComponent.cpp" />
     <ClCompile Include="GameLayout.cpp" />
@@ -202,7 +202,7 @@
     <ClInclude Include="EntitySystem\EntityHandle.h" />
     <ClInclude Include="EntitySystem\EntityManager.h" />
     <ClInclude Include="EntitySystem\EntityPrefab.h" />
-    <ClInclude Include="EntitySystem\EntityTypeUtils.h" />
+    <ClInclude Include="EntitySystem\EntityType.h" />
     <ClInclude Include="AssetEditorDockable.h" />
     <ClInclude Include="Components\ExperienceComponent.h" />
     <ClInclude Include="GameLayout.h" />

@@ -13,13 +13,10 @@ void RemoveOnCollisionComponent::Data::OnParse(Slush::AssetParser::Handle aCompo
 
 void RemoveOnCollisionComponent::Data::OnBuildUI()
 {
-	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
-	static_assert(IM_ARRAYSIZE(entityTypeNames) == EntityType::ENTITYTYPE_COUNT);
-
 	ImGui::Text("Remove when colliding with:");
-	for (int i = 0; i < IM_ARRAYSIZE(entityTypeNames); ++i)
+	for (int i = 0; i < EntityType::ENTITYTYPE_COUNT; ++i)
 	{
-		ImGui::Checkbox(entityTypeNames[i], &myCollisionFlags[i]);
+		ImGui::Checkbox(GetEntityTypeNames()[i], &myCollisionFlags[i]);
 	}
 }
 

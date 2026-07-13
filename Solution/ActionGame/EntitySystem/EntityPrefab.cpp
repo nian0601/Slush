@@ -77,9 +77,7 @@ void EntityPrefab::OnParse(Slush::AssetParser::Handle aRootHandle)
 
 void EntityPrefab::BuildUI()
 {
-	const char* entityTypeNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
-	static_assert(IM_ARRAYSIZE(entityTypeNames) == EntityType::ENTITYTYPE_COUNT);
-	ImGui::Combo("Entity Type", &myEntityType, entityTypeNames, IM_ARRAYSIZE(entityTypeNames));
+	ImGui::Combo("Entity Type", &myEntityType, GetEntityTypeNames(), EntityType::ENTITYTYPE_COUNT);
 
 	FW_GrowingArray<MissingComponent> missingComponents;
 	for (Component::BaseData* data : myComponentBaseDatas)

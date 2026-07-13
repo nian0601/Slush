@@ -5,7 +5,7 @@
 #include "HealthComponent.h"
 #include "ActionGameGlobals.h"
 #include "EntitySystem\EntityManager.h"
-#include "EntitySystem\EntityTypeUtils.h"
+#include "EntitySystem\EntityType.h"
 
 void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {

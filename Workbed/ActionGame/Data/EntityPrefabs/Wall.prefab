@@ -10,10 +10,20 @@ Entity Prefab
 		isSensor 0 
 		matchSprite 0 
 		radius 0.000 
-		size 
-		{ 
-			width 48.000 
-			height 48.000 
-		} 
-	} 
+		size
+		{
+			width 48.000
+			height 48.000
+		}
+		collisionflag 0
+		collideswith
+		{
+			environment 0
+			player 1
+			npc 1
+			playerprojectile 1
+			npcprojectile 1
+			pickup 0
+		}
+	}
 } 

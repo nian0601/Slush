@@ -205,6 +205,16 @@ Entity Prefab
 			width 0.000 
 			height 0.000 
 		} 
+		collisionflag 4 
+		collideswith 
+		{ 
+			environment 1 
+			player 1 
+			npc 0 
+			playerprojectile 0 
+			npcprojectile 0 
+			pickup 0 
+		} 
 	} 
 	removeoncollision 
 	{ 

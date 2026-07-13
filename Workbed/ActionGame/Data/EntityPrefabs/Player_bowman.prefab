@@ -50,6 +50,16 @@ Entity Prefab
 			width 40.000 
 			height 40.000 
 		} 
+		collisionflag 1 
+		collideswith 
+		{ 
+			environment 1 
+			player 0 
+			npc 1 
+			playerprojectile 0 
+			npcprojectile 1 
+			pickup 1 
+		} 
 	} 
 	targeting 
 	{ 

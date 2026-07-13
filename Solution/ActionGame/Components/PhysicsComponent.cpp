@@ -2,66 +2,16 @@
 
 #include "PhysicsComponent.h"
 
-#include "EntitySystem/EntityType.h"
 #include "SpriteComponent.h"
 #include <Physics\PhysicsWorld.h>
 #include "ActionGameGlobals.h"
 
 namespace
 {
-	enum CollisionFlags
-	{
-		COL_ENVIRONMENT = 1 << 1,
-		COL_PLAYER = 1 << 2,
-		COL_NPC = 1 << 3,
-		COL_PLAYER_PROJECTILE = 1 << 4,
-		COL_NPC_PROJECTILE = 1 << 5,
-		COL_PICKUP = 1 << 6
-	};
-
-	unsigned int GetCollisionFlag(EntityType anEntityType)
-	{
-		switch (anEntityType)
-		{
-		case EntityType::ENVIRONMENT:
-			return COL_ENVIRONMENT;
-		case EntityType::PLAYER:
-			return COL_PLAYER;
-		case EntityType::NPC:
-			return COL_NPC;
-		case EntityType::PLAYER_PROJECTILE:
-			return COL_PLAYER_PROJECTILE;
-		case EntityType::NPC_PROJECTILE:
-			return COL_NPC_PROJECTILE;
-		case EntityType::PICKUP:
-			return COL_PICKUP;
-		default:
-			FW_ASSERT_ALWAYS("Unhandled EntityType");
-			return 0;
-		}
-	}
-
-	unsigned int GetCollidesWithFlag(EntityType anEntityType)
-	{
-		switch (anEntityType)
-		{
-		case EntityType::ENVIRONMENT:
-			return COL_PLAYER | COL_NPC | COL_PLAYER_PROJECTILE | COL_NPC_PROJECTILE;
-		case EntityType::PLAYER:
-			return COL_ENVIRONMENT | COL_NPC | COL_NPC_PROJECTILE | COL_PICKUP;
-		case EntityType::NPC:
-			return COL_ENVIRONMENT | COL_PLAYER | COL_PLAYER_PROJECTILE;
-		case EntityType::PLAYER_PROJECTILE:
-			return COL_ENVIRONMENT | COL_NPC;
-		case EntityType::NPC_PROJECTILE:
-			return COL_ENVIRONMENT | COL_PLAYER;
-		case EntityType::PICKUP:
-			return COL_PLAYER;
-		default:
-			FW_ASSERT_ALWAYS("Unhandled EntityType");
-			return 0;
-		}
-	}
+	const char* ourCollisionFlagNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
+	const char* ourCollisionFlagSerializationNames[] = { "environment", "player", "npc", "playerprojectile", "npcprojectile", "pickup" };
+	static_assert(IM_ARRAYSIZE(ourCollisionFlagNames) == CollisionFlag::COLLISIONFLAG_COUNT);
+	static_assert(IM_ARRAYSIZE(ourCollisionFlagSerializationNames) == CollisionFlag::COLLISIONFLAG_COUNT);
 }
 
 void PhysicsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
@@ -77,6 +27,15 @@ void PhysicsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle
 		sizeHandle.ParseFloatField("width", mySize.x);
 		sizeHandle.ParseFloatField("height", mySize.y);
 	}
+
+	aComponentHandle.ParseIntField("collisionflag", myCollisionFlag);
+
+	Slush::AssetParser::Handle collidesWithHandle = aComponentHandle.ParseChildElement("collideswith");
+	if (collidesWithHandle.IsValid())
+	{
+		for (int i = 0; i < CollisionFlag::COLLISIONFLAG_COUNT; ++i)
+			collidesWithHandle.ParseBoolField(ourCollisionFlagSerializationNames[i], myCollidesWithFlags[i]);
+	}
 }
 
 void PhysicsComponent::Data::OnBuildUI()
@@ -87,6 +46,12 @@ void PhysicsComponent::Data::OnBuildUI()
 
 	ImGui::InputFloat("Radius", &myRadius, 1.f, 10.f, "%.2f");
 	ImGui::InputFloat2("Size", &mySize.x, "%.2f");
+
+	ImGui::Combo("Collision Flag", &myCollisionFlag, ourCollisionFlagNames, CollisionFlag::COLLISIONFLAG_COUNT);
+
+	ImGui::Text("Collides With:");
+	for (int i = 0; i < CollisionFlag::COLLISIONFLAG_COUNT; ++i)
+		ImGui::Checkbox(ourCollisionFlagNames[i], &myCollidesWithFlags[i]);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,8 +91,16 @@ PhysicsComponent::PhysicsComponent(Slush::Entity& aEntity, const Slush::EntityPr
 		myObject->SetPosition(myEntity.myPosition);
 		myObject->SetInertia(0.f);
 		myObject->myUserData.Set<PhysicsComponent* const>(this);
-		myObject->myCollisionMask = GetCollisionFlag(static_cast<EntityType>(aEntity.myType));
-		myObject->myCollidesWithMask = GetCollidesWithFlag(static_cast<EntityType>(aEntity.myType));
+
+		myObject->myCollisionMask = 1 << physData.myCollisionFlag;
+
+		unsigned int collidesWithMask = 0;
+		for (int i = 0; i < CollisionFlag::COLLISIONFLAG_COUNT; ++i)
+		{
+			if (physData.myCollidesWithFlags[i])
+				collidesWithMask |= 1 << i;
+		}
+		myObject->myCollidesWithMask = collidesWithMask;
 		myObject->myReportCollisionsWith = myObject->myCollidesWithMask;
 
 		myPhysicsWorld.AddObject(myObject);

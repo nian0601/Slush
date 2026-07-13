@@ -24,6 +24,8 @@ Use `Platform=x86` (not `x64`) — the vendored SFML libs in `SFML/lib/` are onl
 
 Adding new files through Visual Studio's Solution Explorer ("Add > New Item"/"Existing Item") automatically updates the relevant `.vcxproj`, so no extra step is needed for new files to show up in CLI builds.
 
+Always build via `Solution.sln`, not by pointing MSBuild at an individual `.vcxproj` — project-level `IncludePath`s rely on `$(SolutionDir)`, which isn't resolved correctly when a project is built standalone (e.g. `Engine.vcxproj` alone fails with `Cannot open include file: 'FW_Includes.h'`).
+
 ## Code style
 
 These conventions differ from typical C++ defaults — follow them in this codebase:
@@ -38,6 +40,10 @@ These conventions differ from typical C++ defaults — follow them in this codeb
 - `#pragma once` for header guards, never `#ifndef`
 - Framework code prefers custom containers (`FW_GrowingArray`, `FW_String`) over STL equivalents; `std::string`/STL do show up occasionally in Engine/game code
 - Assertions use the `FW_ASSERT` macro (`Solution/Framework/FW_Assert.h`), not `<cassert>`
+- Avoid bare global functions for utilities that need to be called from more than one `.cpp` — wrap them in a namespace instead (e.g. `CollisionUtils::GetNames()` in `PhysicsComponent.h`, not a free `GetCollisionFlagNames()`)
+- An enum/helper-functions pair that's conceptually owned by a single component (e.g. `CollisionFlag` living in `PhysicsComponent.h/.cpp`) should stay colocated with that component rather than being pulled into its own file. Reserve a dedicated file (like `EntityType.h/.cpp`) for types that are genuinely shared by many independent components with no single owner
+- Prefer exposing a getter on the owning `Component` (e.g. `PhysicsComponent::GetCollisionFlag()`) over having other components call `EntityPrefab::GetComponentData<T>()` themselves
+- `FW_StaticArray<Type, Size>`'s default constructor does **not** zero-initialize elements — if a `Data` struct has one and needs a known default (e.g. all-`false`), give `Data` an explicit constructor that calls `.Fill(...)`
 
 ## Testing
 
@@ -53,3 +59,5 @@ Note: commit messages mentioning "test" for the navmesh/intersection work (e.g. 
 ## Repo etiquette
 
 Solo project — commit directly to `main`, no branch/PR convention to follow.
+
+Claude should never run `git commit` without the user explicitly asking for it in that turn. Creating/editing/staging files does not need separate approval — only the commit itself does.

@@ -14,7 +14,15 @@ Slush is a personal, hand-rolled C++ game engine (namespace `Slush`) built on ve
 
 ## Build
 
-Windows-only. Open `Solution/Solution.sln` in Visual Studio and build/run from the IDE (Debug|x64 or Release|x64). There is no CLI/CMake build path — don't invent an `msbuild` or `cmake` command.
+Windows-only, no CMake. Use MSBuild directly (find its path via `vswhere` if not on PATH):
+
+```
+"C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" Solution\Solution.sln /p:Configuration=Debug /p:Platform=x86 /m
+```
+
+Use `Platform=x86` (not `x64`) — the vendored SFML libs in `SFML/lib/` are only built for x86, so `x64` configs don't fully build (see WIP state below). `x86` builds all three game executables cleanly.
+
+Adding new files through Visual Studio's Solution Explorer ("Add > New Item"/"Existing Item") automatically updates the relevant `.vcxproj`, so no extra step is needed for new files to show up in CLI builds.
 
 ## Code style
 
@@ -39,7 +47,8 @@ Note: commit messages mentioning "test" for the navmesh/intersection work (e.g. 
 
 ## Current WIP state
 
-Navmesh cutting (`Navmesh.cpp`) is under active development and known incomplete: cutting arbitrary convex shapes mostly works, but resulting vertices aren't guaranteed to land exactly at cut positions.
+- Navmesh cutting (`Navmesh.cpp`) is under active development and known incomplete: cutting arbitrary convex shapes mostly works, but resulting vertices aren't guaranteed to land exactly at cut positions.
+- The `x64` platform doesn't fully build: `Engine.vcxproj`'s x64 configs are missing PCH settings, the `SFML_STATIC` define, and library dependencies, and the vendored SFML libs (`SFML/lib/`) are x86-only. Use `Platform=x86` until x64 SFML libs are vendored and the vcxproj configs are ported over.
 
 ## Repo etiquette
 

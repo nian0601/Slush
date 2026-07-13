@@ -124,8 +124,8 @@ PhysicsComponent::PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntity
 		myObject->SetPosition(myEntity.myPosition);
 		myObject->SetInertia(0.f);
 		myObject->myUserData.Set<PhysicsComponent* const>(this);
-		myObject->myCollisionMask = GetCollisionFlag(aEntity.myType);
-		myObject->myCollidesWithMask = GetCollidesWithFlag(aEntity.myType);
+		myObject->myCollisionMask = GetCollisionFlag(static_cast<EntityType>(aEntity.myType));
+		myObject->myCollidesWithMask = GetCollidesWithFlag(static_cast<EntityType>(aEntity.myType));
 		myObject->myReportCollisionsWith = myObject->myCollidesWithMask;
 
 		myPhysicsWorld.AddObject(myObject);

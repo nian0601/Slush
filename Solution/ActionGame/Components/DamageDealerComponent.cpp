@@ -5,6 +5,7 @@
 #include "HealthComponent.h"
 #include "ActionGameGlobals.h"
 #include "EntitySystem\EntityManager.h"
+#include "EntitySystem\EntityTypeUtils.h"
 
 void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -38,7 +39,7 @@ DamageDealerComponent::DamageDealerComponent(Entity& anEntity, const EntityPrefa
 
 void DamageDealerComponent::OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition)
 {
-	EntityType otherType = aOtherEntity.myType;
+	EntityType otherType = static_cast<EntityType>(aOtherEntity.myType);
 	if (otherType == EntityType::ENVIRONMENT)
 		return;
 
@@ -51,9 +52,9 @@ void DamageDealerComponent::OnCollision(Entity& aOtherEntity, const Vector2f& aC
 
 	myDamagedEntities.Add(aOtherEntity.myHandle);
 
-	if (myEntity.IsPlayerOwned() && aOtherEntity.IsNPCOwned())
+	if (IsPlayerOwned(myEntity) && IsNPCOwned(aOtherEntity))
 		otherHealth->DealDamage(myDamage);
-	else if (myEntity.IsNPCOwned() && aOtherEntity.IsPlayerOwned())
+	else if (IsNPCOwned(myEntity) && IsPlayerOwned(aOtherEntity))
 		otherHealth->DealDamage(myDamage);
 
 	const Data& data = myEntityPrefab.GetComponentData<DamageDealerComponent>();

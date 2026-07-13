@@ -78,7 +78,7 @@ Entity* EntityManager::CreateEmptyEntity()
 Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab)
 {
 	Entity* entity = CreateEmptyEntity();
-	entity->myType = static_cast<EntityType>(aPrefab.myEntityType);
+	entity->myType = aPrefab.myEntityType;
 	entity->myPosition = aPosition;
 	entity->CreateComponents(aPrefab);
 

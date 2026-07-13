@@ -55,9 +55,6 @@ public:
 	void OnCollision(Entity& aOtherEntity, const Vector2f& aContactPosition);
 	void OnDeath();
 
-	bool IsPlayerOwned() const { return myType == PLAYER || myType == PLAYER_PROJECTILE; }
-	bool IsNPCOwned() const { return myType == NPC || myType == NPC_PROJECTILE; }
-
 	template <typename ComponentType>
 	ComponentType* GetComponent();
 
@@ -66,7 +63,7 @@ public:
 
 
 	Vector2f myPosition;
-	EntityType myType = ENVIRONMENT;
+	int myType = ENVIRONMENT;
 	bool myIsMarkedForRemoval = false;
 	EntityHandle myHandle;
 	EntityManager& myEntityManager;

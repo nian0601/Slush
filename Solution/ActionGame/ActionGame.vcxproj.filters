@@ -73,6 +73,9 @@
     <ClCompile Include="EntitySystem\EntityPrefab.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="EntitySystem\EntityTypeUtils.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Level</Filter>
     </ClCompile>
@@ -173,6 +176,9 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="EntitySystem\EntityPrefab.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="EntitySystem\EntityTypeUtils.h">
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="Level\Level.h">

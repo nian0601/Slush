@@ -3,9 +3,9 @@
 #include "DamageDealerComponent.h"
 
 #include "HealthComponent.h"
+#include "PhysicsComponent.h"
 #include "ActionGameGlobals.h"
 #include "EntitySystem\EntityManager.h"
-#include "EntitySystem\EntityType.h"
 
 void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -39,8 +39,12 @@ DamageDealerComponent::DamageDealerComponent(Slush::Entity& anEntity, const Slus
 
 void DamageDealerComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& aContactPosition)
 {
-	EntityType otherType = static_cast<EntityType>(aOtherEntity.myType);
-	if (otherType == EntityType::ENVIRONMENT)
+	PhysicsComponent* myPhysics = myEntity.GetComponent<PhysicsComponent>();
+	PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<PhysicsComponent>();
+	if (!myPhysics || !otherPhysics)
+		return;
+
+	if (otherPhysics->GetCollisionFlag() == CollisionUtils::COL_ENVIRONMENT)
 		return;
 
 	HealthComponent* otherHealth = aOtherEntity.GetComponent<HealthComponent>();
@@ -52,9 +56,15 @@ void DamageDealerComponent::OnCollision(Slush::Entity& aOtherEntity, const Vecto
 
 	myDamagedEntities.Add(aOtherEntity.myHandle);
 
-	if (IsPlayerOwned(myEntity) && IsNPCOwned(aOtherEntity))
-		otherHealth->DealDamage(myDamage);
-	else if (IsNPCOwned(myEntity) && IsPlayerOwned(aOtherEntity))
+	CollisionUtils::CollisionFlag myFlag = myPhysics->GetCollisionFlag();
+	CollisionUtils::CollisionFlag otherFlag = otherPhysics->GetCollisionFlag();
+
+	bool isPlayerSide = myFlag == CollisionUtils::COL_PLAYER || myFlag == CollisionUtils::COL_PLAYER_PROJECTILE;
+	bool isNPCSide = myFlag == CollisionUtils::COL_NPC || myFlag == CollisionUtils::COL_NPC_PROJECTILE;
+	bool otherIsPlayerSide = otherFlag == CollisionUtils::COL_PLAYER || otherFlag == CollisionUtils::COL_PLAYER_PROJECTILE;
+	bool otherIsNPCSide = otherFlag == CollisionUtils::COL_NPC || otherFlag == CollisionUtils::COL_NPC_PROJECTILE;
+
+	if ((isPlayerSide && otherIsNPCSide) || (isNPCSide && otherIsPlayerSide))
 		otherHealth->DealDamage(myDamage);
 
 	const Data& data = myEntityPrefab.GetComponentData<DamageDealerComponent>();

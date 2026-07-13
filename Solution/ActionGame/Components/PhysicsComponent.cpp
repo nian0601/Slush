@@ -144,7 +144,12 @@ PhysicsComponent::~PhysicsComponent()
 	FW_SAFE_DELETE(myObject);
 }
 
+CollisionUtils::CollisionFlag PhysicsComponent::GetCollisionFlag() const
+{
+	return static_cast<CollisionUtils::CollisionFlag>(myEntityPrefab.GetComponentData<PhysicsComponent>().myCollisionFlag);
+}
+
 void PhysicsComponent::Update()
-{	
+{
 	myEntity.myPosition = myObject->myPosition;
 }

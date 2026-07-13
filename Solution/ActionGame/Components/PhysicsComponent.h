@@ -57,6 +57,8 @@ public:
 
 	void Update() override;
 
+	CollisionUtils::CollisionFlag GetCollisionFlag() const;
+
 	Slush::PhysicsObject* myObject;
 
 private:

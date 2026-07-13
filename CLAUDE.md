@@ -28,7 +28,7 @@ Adding new files through Visual Studio's Solution Explorer ("Add > New Item"/"Ex
 
 These conventions differ from typical C++ defaults — follow them in this codebase:
 
-- Member variables: `my` + PascalCase (`myVertices`, `myHasAnchor`)
+- Member variables: `my` + PascalCase (`myVertices`, `myHasAnchor`). The `my` prefix is reserved for member variables only — local variables declared inside a function body must not use it.
 - Function parameters: `a`/`an` + PascalCase (`aVertex`, `anExpression`)
 - Types/functions/methods: PascalCase (`GetVertex`, `CreateEdge`)
 - Framework-library types are prefixed `FW_` (`FW_Vector2`, `FW_GrowingArray`, `FW_Intersection`) instead of being namespaced under a nested namespace — some are `namespace FW_Xxx { }` blocks, others are `FW_Xxx`-prefixed template classes

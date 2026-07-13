@@ -2,29 +2,39 @@
 
 #include "RemoveOnCollisionComponent.h"
 
+#include <Physics\PhysicsWorld.h>
+
 void RemoveOnCollisionComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	const char* entityTypeNames[] = { "environment", "player", "npc", "playerprojectile", "npcprojectile", "pickup" };
-	static_assert(IM_ARRAYSIZE(entityTypeNames) == EntityType::ENTITYTYPE_COUNT);
-
-	for (int i = 0; i < IM_ARRAYSIZE(entityTypeNames); ++i)
-		aComponentHandle.ParseBoolField(entityTypeNames[i], myCollisionFlags[i]);
+	const char* const* serializationNames = CollisionUtils::GetSerializationNames();
+	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
+		aComponentHandle.ParseBoolField(serializationNames[i], myCollisionFlags[i]);
 }
 
 void RemoveOnCollisionComponent::Data::OnBuildUI()
 {
 	ImGui::Text("Remove when colliding with:");
-	for (int i = 0; i < EntityType::ENTITYTYPE_COUNT; ++i)
+	const char* const* names = CollisionUtils::GetNames();
+	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
 	{
-		ImGui::Checkbox(GetEntityTypeNames()[i], &myCollisionFlags[i]);
+		ImGui::Checkbox(names[i], &myCollisionFlags[i]);
 	}
 }
 
 void RemoveOnCollisionComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
 {
-	const RemoveOnCollisionComponent::Data& data = myEntityPrefab.GetComponentData<RemoveOnCollisionComponent>();
-	if (!data.myCollisionFlags[aOtherEntity.myType])
+	PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<PhysicsComponent>();
+	if (!otherPhysics)
 		return;
 
-	myEntity.myIsMarkedForRemoval = true;
+	const RemoveOnCollisionComponent::Data& data = myEntityPrefab.GetComponentData<RemoveOnCollisionComponent>();
+
+	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
+	{
+		if (data.myCollisionFlags[i] && (otherPhysics->myObject->myCollisionMask & (1u << i)))
+		{
+			myEntity.myIsMarkedForRemoval = true;
+			return;
+		}
+	}
 }

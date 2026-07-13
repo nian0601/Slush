@@ -11,16 +11,23 @@ namespace Slush
 	struct PhysicsObject;
 }
 
-enum CollisionFlag
+namespace CollisionUtils
 {
-	COL_ENVIRONMENT,
-	COL_PLAYER,
-	COL_NPC,
-	COL_PLAYER_PROJECTILE,
-	COL_NPC_PROJECTILE,
-	COL_PICKUP,
-	COLLISIONFLAG_COUNT,
-};
+	enum CollisionFlag
+	{
+		COL_ENVIRONMENT,
+		COL_PLAYER,
+		COL_NPC,
+		COL_PLAYER_PROJECTILE,
+		COL_NPC_PROJECTILE,
+		COL_PICKUP,
+		COLLISIONFLAG_COUNT,
+	};
+
+	const char* ToString(CollisionFlag aFlag);
+	const char* const* GetNames();
+	const char* const* GetSerializationNames();
+}
 
 class PhysicsComponent : public Slush::Component
 {
@@ -38,8 +45,8 @@ public:
 		float myRadius = 10.f;
 		Vector2f mySize;
 
-		int myCollisionFlag = CollisionFlag::COL_ENVIRONMENT;
-		FW_StaticArray<bool, CollisionFlag::COLLISIONFLAG_COUNT> myCollidesWithFlags;
+		int myCollisionFlag = CollisionUtils::COL_ENVIRONMENT;
+		FW_StaticArray<bool, CollisionUtils::COLLISIONFLAG_COUNT> myCollidesWithFlags;
 	};
 
 public:

@@ -6,12 +6,31 @@
 #include <Physics\PhysicsWorld.h>
 #include "ActionGameGlobals.h"
 
-namespace
+namespace CollisionUtils
 {
-	const char* ourCollisionFlagNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
-	const char* ourCollisionFlagSerializationNames[] = { "environment", "player", "npc", "playerprojectile", "npcprojectile", "pickup" };
-	static_assert(IM_ARRAYSIZE(ourCollisionFlagNames) == CollisionFlag::COLLISIONFLAG_COUNT);
-	static_assert(IM_ARRAYSIZE(ourCollisionFlagSerializationNames) == CollisionFlag::COLLISIONFLAG_COUNT);
+	namespace
+	{
+		const char* ourNames[] = { "Environment", "Player", "NPC", "Player Projectile", "NPC Projectile", "Pickup" };
+		const char* ourSerializationNames[] = { "environment", "player", "npc", "playerprojectile", "npcprojectile", "pickup" };
+		static_assert(IM_ARRAYSIZE(ourNames) == COLLISIONFLAG_COUNT);
+		static_assert(IM_ARRAYSIZE(ourSerializationNames) == COLLISIONFLAG_COUNT);
+	}
+
+	const char* ToString(CollisionFlag aFlag)
+	{
+		FW_ASSERT(aFlag >= 0 && aFlag < COLLISIONFLAG_COUNT, "Invalid CollisionFlag");
+		return ourNames[aFlag];
+	}
+
+	const char* const* GetNames()
+	{
+		return ourNames;
+	}
+
+	const char* const* GetSerializationNames()
+	{
+		return ourSerializationNames;
+	}
 }
 
 void PhysicsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
@@ -33,8 +52,9 @@ void PhysicsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle
 	Slush::AssetParser::Handle collidesWithHandle = aComponentHandle.ParseChildElement("collideswith");
 	if (collidesWithHandle.IsValid())
 	{
-		for (int i = 0; i < CollisionFlag::COLLISIONFLAG_COUNT; ++i)
-			collidesWithHandle.ParseBoolField(ourCollisionFlagSerializationNames[i], myCollidesWithFlags[i]);
+		const char* const* serializationNames = CollisionUtils::GetSerializationNames();
+		for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
+			collidesWithHandle.ParseBoolField(serializationNames[i], myCollidesWithFlags[i]);
 	}
 }
 
@@ -47,11 +67,12 @@ void PhysicsComponent::Data::OnBuildUI()
 	ImGui::InputFloat("Radius", &myRadius, 1.f, 10.f, "%.2f");
 	ImGui::InputFloat2("Size", &mySize.x, "%.2f");
 
-	ImGui::Combo("Collision Flag", &myCollisionFlag, ourCollisionFlagNames, CollisionFlag::COLLISIONFLAG_COUNT);
+	const char* const* names = CollisionUtils::GetNames();
+	ImGui::Combo("Collision Flag", &myCollisionFlag, names, CollisionUtils::COLLISIONFLAG_COUNT);
 
 	ImGui::Text("Collides With:");
-	for (int i = 0; i < CollisionFlag::COLLISIONFLAG_COUNT; ++i)
-		ImGui::Checkbox(ourCollisionFlagNames[i], &myCollidesWithFlags[i]);
+	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
+		ImGui::Checkbox(names[i], &myCollidesWithFlags[i]);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -95,7 +116,7 @@ PhysicsComponent::PhysicsComponent(Slush::Entity& aEntity, const Slush::EntityPr
 		myObject->myCollisionMask = 1 << physData.myCollisionFlag;
 
 		unsigned int collidesWithMask = 0;
-		for (int i = 0; i < CollisionFlag::COLLISIONFLAG_COUNT; ++i)
+		for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
 		{
 			if (physData.myCollidesWithFlags[i])
 				collidesWithMask |= 1 << i;

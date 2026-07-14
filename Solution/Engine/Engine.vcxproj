@@ -70,13 +70,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)..\Workbed\</OutDir>
-    <IntDir>$(SolutionDir)..\Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(RepoRoot)Workbed\</OutDir>
+    <IntDir>$(RepoRoot)Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)\Framework;$(SolutionDir)..\SFML\include;$(SolutionDir)\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)..\Workbed\</OutDir>
-    <IntDir>$(SolutionDir)..\Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(RepoRoot)Workbed\</OutDir>
+    <IntDir>$(RepoRoot)Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)\Framework;$(SolutionDir)..\SFML\include;$(SolutionDir)\Engine;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

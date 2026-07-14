@@ -70,14 +70,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)..\Workbed\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)..\Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(RepoRoot)Workbed\$(ProjectName)\</OutDir>
+    <IntDir>$(RepoRoot)Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\ActionGame;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\SFML\libs;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)..\Workbed\$(ProjectName)\</OutDir>
-    <IntDir>$(SolutionDir)..\Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
+    <OutDir>$(RepoRoot)Workbed\$(ProjectName)\</OutDir>
+    <IntDir>$(RepoRoot)Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
     <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\ActionGame;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>

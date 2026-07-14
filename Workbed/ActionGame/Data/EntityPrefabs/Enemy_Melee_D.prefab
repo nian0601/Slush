@@ -67,7 +67,6 @@ Entity Prefab
 	damagedealer 
 	{ 
 		damage 10 
-		prefab  
 	} 
 	drops 
 	{ 

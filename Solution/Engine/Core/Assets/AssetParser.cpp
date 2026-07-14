@@ -253,15 +253,9 @@ namespace Slush
 
 	bool AssetParser::Handle::GetStringField(Field* aField, FW_String& aValue) const
 	{
-		//if (Field* field = myElement->GetField(aFieldName))
-		//{
-		//	aValue = field->myRawData;
-		//	return true;
-		//}
-
 		if (aField)
 		{
-			aValue = aField->myRawData;
+			aValue = (aField->myRawData == "none") ? "" : aField->myRawData;
 			return true;
 		}
 
@@ -295,11 +289,10 @@ namespace Slush
 
 	void AssetParser::Handle::WriteStringField(Field* aField, FW_String& aValue)
 	{
-		if (aValue.Empty())
-			return;
+		FW_ASSERT(aValue != "none", "Cant write the literal string 'none', its reserved as the empty-string sentinel");
 
 		if (aValue.Empty())
-			aField->myRawData += "none";
+			aField->myRawData = "none";
 		else
 			aField->myRawData = aValue;
 	}

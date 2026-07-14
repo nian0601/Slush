@@ -63,7 +63,7 @@ Entity Prefab
 	} 
 	targeting 
 	{ 
-		targettype 2 
+		targetflag 2 
 	} 
 	weaponcomponent 
 	{ 

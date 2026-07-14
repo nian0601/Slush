@@ -66,7 +66,7 @@ Entity Prefab
 	} 
 	targeting 
 	{ 
-		targettype 1 
+		targetflag 1 
 	} 
 	damagedealer 
 	{ 

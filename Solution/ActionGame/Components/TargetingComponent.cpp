@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "EntitySystem/EntityManager.h"
-#include "EntitySystem/EntityType.h"
 #include "PhysicsComponent.h"
 #include "TargetingComponent.h"
 
@@ -10,16 +9,12 @@
 
 void TargetingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
-	int targetTypeAsInt = myTargetType;
-	aComponentHandle.ParseIntField("targettype", targetTypeAsInt);
-	myTargetType = EntityType(targetTypeAsInt);
+	aComponentHandle.ParseIntField("targetflag", myTargetFlag);
 }
 
 void TargetingComponent::Data::OnBuildUI()
 {
-	int type = myTargetType;
-	ImGui::Combo("Target Type", &type, GetEntityTypeNames(), EntityType::ENTITYTYPE_COUNT);
-	myTargetType = EntityType(type);
+	ImGui::Combo("Target Flag", &myTargetFlag, CollisionUtils::GetNames(), CollisionUtils::COLLISIONFLAG_COUNT);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -35,10 +30,21 @@ void TargetingComponent::Update()
 
 	const Data& targetData = myEntityPrefab.GetComponentData<TargetingComponent>();
 
-	FW_GrowingArray<Slush::EntityHandle> targets;
-	myEntity.myEntityManager.FindEntitiesOfType(targetData.myTargetType, targets);
+	FW_GrowingArray<Slush::EntityHandle> allEntities;
+	myEntity.myEntityManager.GetAllEntities(allEntities);
 
-	if (targetData.myTargetType == EntityType::PLAYER)
+	FW_GrowingArray<Slush::EntityHandle> targets;
+	for (const Slush::EntityHandle& handle : allEntities)
+	{
+		if (!handle.IsValid())
+			continue;
+
+		PhysicsComponent* physics = handle.Get()->GetComponent<PhysicsComponent>();
+		if (physics && physics->GetCollisionFlag() == targetData.myTargetFlag)
+			targets.Add(handle);
+	}
+
+	if (targetData.myTargetFlag == CollisionUtils::COL_PLAYER)
 	{
 		if (!targets.IsEmpty())
 			myTarget = targets[0];
@@ -49,14 +55,11 @@ void TargetingComponent::Update()
 		const float maxDist = FW_Square(600.f);
 		for (const Slush::EntityHandle& handle : targets)
 		{
-			if (handle.IsValid())
+			const float dist = Length2(myEntity.myPosition - handle.Get()->myPosition);
+			if (dist < maxDist && dist < bestDist)
 			{
-				const float dist = Length2(myEntity.myPosition - handle.Get()->myPosition);
-				if (dist < maxDist && dist < bestDist)
-				{
-					myTarget = handle;
-					bestDist = dist;
-				}
+				myTarget = handle;
+				bestDist = dist;
 			}
 		}
 	}

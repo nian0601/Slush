@@ -24,7 +24,7 @@ namespace Slush
 
 		void DeleteAllEntities();
 
-		void FindEntitiesOfType(int aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const;
+		void GetAllEntities(FW_GrowingArray<EntityHandle>& outEntityHandles) const;
 
 		void PrePhysicsUpdate();
 

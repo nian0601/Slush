@@ -3,6 +3,7 @@
 #include "EntitySystem/Component.h"
 #include "EntitySystem/EntityHandle.h"
 #include "EntitySystem/Entity.h"
+#include "PhysicsComponent.h"
 
 class TargetingComponent : public Slush::Component
 {
@@ -12,7 +13,7 @@ public:
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
-		int myTargetType;
+		int myTargetFlag = CollisionUtils::COL_ENVIRONMENT;
 	};
 
 public:

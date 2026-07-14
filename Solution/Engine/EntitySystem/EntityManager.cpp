@@ -65,13 +65,10 @@ namespace Slush
 		myEntities.DeleteAll();
 	}
 
-	void EntityManager::FindEntitiesOfType(int aType, FW_GrowingArray<EntityHandle>& outEntityHandles) const
+	void EntityManager::GetAllEntities(FW_GrowingArray<EntityHandle>& outEntityHandles) const
 	{
 		for (Entity* entity : myEntities)
-		{
-			if (entity->myType == aType)
-				outEntityHandles.Add(entity->myHandle);
-		}
+			outEntityHandles.Add(entity->myHandle);
 	}
 
 	void EntityManager::PrePhysicsUpdate()

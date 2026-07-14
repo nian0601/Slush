@@ -34,7 +34,6 @@ namespace Slush
 
 
 		Vector2f myPosition;
-		int myType = 0;
 		bool myIsMarkedForRemoval = false;
 		EntityHandle myHandle;
 		EntityManager& myEntityManager;

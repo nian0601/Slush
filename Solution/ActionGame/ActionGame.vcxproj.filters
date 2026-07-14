@@ -61,9 +61,6 @@
     <ClCompile Include="EntitySystem\EntityManager.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="EntitySystem\EntityType.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Level</Filter>
     </ClCompile>
@@ -146,9 +143,6 @@
       <Filter>Entities\Components</Filter>
     </ClInclude>
     <ClInclude Include="EntitySystem\EntityComponentEvents.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="EntitySystem\EntityType.h">
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="Level\Level.h">

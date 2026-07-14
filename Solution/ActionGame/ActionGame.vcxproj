@@ -147,7 +147,6 @@
     <ClCompile Include="Components\DamageDealerComponent.cpp" />
     <ClCompile Include="EntityEditorLayout.cpp" />
     <ClCompile Include="EntitySystem\EntityManager.cpp" />
-    <ClCompile Include="EntitySystem\EntityType.cpp" />
     <ClCompile Include="AssetEditorDockable.cpp" />
     <ClCompile Include="Components\ExperienceComponent.cpp" />
     <ClCompile Include="GameLayout.cpp" />
@@ -192,7 +191,6 @@
     <ClInclude Include="Components\DamageDealerComponent.h" />
     <ClInclude Include="EntitySystem\EntityComponentEvents.h" />
     <ClInclude Include="EntityEditorLayout.h" />
-    <ClInclude Include="EntitySystem\EntityType.h" />
     <ClInclude Include="AssetEditorDockable.h" />
     <ClInclude Include="Components\ExperienceComponent.h" />
     <ClInclude Include="GameLayout.h" />

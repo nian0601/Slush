@@ -62,10 +62,6 @@ namespace Slush
 
 	void EntityPrefab::OnParse(AssetParser::Handle aRootHandle)
 	{
-		AssetParser::Handle entityTypeHandle = aRootHandle.ParseChildElement("entitytype");
-		if (entityTypeHandle.IsValid())
-			entityTypeHandle.ParseIntField("type", myEntityType);
-
 		for (Component::BaseData* data : myComponentBaseDatas)
 		{
 			if (data)
@@ -75,8 +71,6 @@ namespace Slush
 
 	void EntityPrefab::BuildUI()
 	{
-		ImGui::InputInt("Entity Type", &myEntityType);
-
 		FW_GrowingArray<MissingComponent> missingComponents;
 		for (Component::BaseData* data : myComponentBaseDatas)
 		{

@@ -35,7 +35,6 @@ namespace Slush
 	Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab)
 	{
 		Entity* entity = CreateEmptyEntity();
-		entity->myType = aPrefab.myEntityType;
 		entity->myPosition = aPosition;
 		entity->CreateComponents(aPrefab);
 

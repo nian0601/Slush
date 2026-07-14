@@ -59,7 +59,6 @@ namespace Slush
 		const ComponentType::Data& GetComponentData() const;
 
 		FW_String myName;
-		int myEntityType;
 
 		FW_StaticArray<Component::BaseData*, 32> myComponentBaseDatas;
 	};

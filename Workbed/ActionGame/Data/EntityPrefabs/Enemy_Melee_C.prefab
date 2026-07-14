@@ -1,9 +1,5 @@
 Entity Prefab 
 { 
-	entitytype 
-	{ 
-		type 2 
-	} 
 	sprite 
 	{ 
 		color -1 

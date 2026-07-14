@@ -1,9 +1,5 @@
 Entity Prefab 
 { 
-	entitytype 
-	{ 
-		type 2 
-	} 
 	sprite 
 	{ 
 		radius 20.000 

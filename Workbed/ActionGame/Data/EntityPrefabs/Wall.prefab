@@ -1,9 +1,5 @@
 Entity Prefab 
 { 
-	entitytype 
-	{ 
-		type 0 
-	} 
 	physics 
 	{ 
 		isStatic 1 

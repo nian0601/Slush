@@ -144,6 +144,8 @@
     <ClInclude Include="Core\Assets\AssetParser.h" />
     <ClInclude Include="Core\Assets\AssetStorage.h" />
     <ClInclude Include="Core\Assets\DataAsset.h" />
+    <ClInclude Include="Core\Dockables\AssetEditorDockable.h" />
+    <ClInclude Include="Core\Dockables\AssetEditorLayout.h" />
     <ClInclude Include="Core\Dockables\ContentBrowserDockable.h" />
     <ClInclude Include="Core\Dockables\Dockable.h" />
     <ClInclude Include="Core\Dockables\GameViewDockable.h" />
@@ -197,6 +199,8 @@
     <ClCompile Include="Core\Assets\AssetParser.cpp" />
     <ClCompile Include="Core\Assets\AssetStorage.cpp" />
     <ClCompile Include="Core\Assets\DataAsset.cpp" />
+    <ClCompile Include="Core\Dockables\AssetEditorDockable.cpp" />
+    <ClCompile Include="Core\Dockables\AssetEditorLayout.cpp" />
     <ClCompile Include="Core\Dockables\ContentBrowserDockable.cpp" />
     <ClCompile Include="Core\Dockables\Dockable.cpp" />
     <ClCompile Include="Core\Dockables\GameViewDockable.cpp" />

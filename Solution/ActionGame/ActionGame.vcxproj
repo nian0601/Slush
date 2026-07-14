@@ -145,9 +145,7 @@
     <ClCompile Include="Components\CharacterAnimationComponent.cpp" />
     <ClCompile Include="Components\DropComponent.cpp" />
     <ClCompile Include="Components\DamageDealerComponent.cpp" />
-    <ClCompile Include="EntityEditorLayout.cpp" />
     <ClCompile Include="EntitySystem\EntityManager.cpp" />
-    <ClCompile Include="AssetEditorDockable.cpp" />
     <ClCompile Include="Components\ExperienceComponent.cpp" />
     <ClCompile Include="GameLayout.cpp" />
     <ClCompile Include="Components\HealthBarComponent.cpp" />
@@ -190,8 +188,6 @@
     <ClInclude Include="Components\DropComponent.h" />
     <ClInclude Include="Components\DamageDealerComponent.h" />
     <ClInclude Include="EntitySystem\EntityComponentEvents.h" />
-    <ClInclude Include="EntityEditorLayout.h" />
-    <ClInclude Include="AssetEditorDockable.h" />
     <ClInclude Include="Components\ExperienceComponent.h" />
     <ClInclude Include="GameLayout.h" />
     <ClInclude Include="Components\HealthBarComponent.h" />

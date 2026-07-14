@@ -41,6 +41,8 @@
     <ClInclude Include="Graphics\Text.h" />
     <ClInclude Include="Graphics\SFMLHelpers.h" />
     <ClInclude Include="Core\Dockables\Dockable.h" />
+    <ClInclude Include="Core\Dockables\AssetEditorDockable.h" />
+    <ClInclude Include="Core\Dockables\AssetEditorLayout.h" />
     <ClInclude Include="Core\Dockables\GameViewDockable.h" />
     <ClInclude Include="Core\Dockables\TextureViewerDockable.h" />
     <ClInclude Include="Core\Dockables\LogDockable.h" />
@@ -107,6 +109,8 @@
     <ClCompile Include="Graphics\Text.cpp" />
     <ClCompile Include="Graphics\SFMLHelpers.cpp" />
     <ClCompile Include="Core\Dockables\Dockable.cpp" />
+    <ClCompile Include="Core\Dockables\AssetEditorDockable.cpp" />
+    <ClCompile Include="Core\Dockables\AssetEditorLayout.cpp" />
     <ClCompile Include="Core\Dockables\GameViewDockable.cpp" />
     <ClCompile Include="Core\Dockables\TextureViewerDockable.cpp" />
     <ClCompile Include="Core\Dockables\LogDockable.cpp" />

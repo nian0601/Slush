@@ -17,9 +17,8 @@
 #include "UI/UILayout.h"
 
 #include "ActionGameGlobals.h"
-#include "AssetEditorDockable.h"
 #include "CharacterAnimationSet.h"
-#include "EntityEditorLayout.h"
+#include "Core/Dockables/AssetEditorLayout.h"
 #include "GameLayout.h"
 #include "Components/WeaponComponent.h"
 #include "Components/StatsComponent.h"
@@ -84,7 +83,7 @@ public:
 			//myAppLayout = new EntityEditorLayout();
 
 			Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-			window.SetAppLayout(new EntityEditorLayout());
+			window.SetAppLayout(new Slush::AssetEditorLayout());
 		}
 		else if (input.WasKeyReleased(Slush::Input::KeyCode::_3))
 		{

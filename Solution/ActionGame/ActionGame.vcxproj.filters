@@ -7,9 +7,6 @@
     <ClCompile Include="GameLayout.cpp">
       <Filter>AppLayout</Filter>
     </ClCompile>
-    <ClCompile Include="EntityEditorLayout.cpp">
-      <Filter>AppLayout</Filter>
-    </ClCompile>
     <ClCompile Include="Components\AnimationComponent.cpp">
       <Filter>Entities\Components</Filter>
     </ClCompile>
@@ -69,9 +66,6 @@
     </ClCompile>
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="Components\DropComponent.cpp" />
-    <ClCompile Include="AssetEditorDockable.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="CharacterAnimationSet.cpp" />
     <ClCompile Include="Components\CharacterAnimationComponent.cpp" />
     <ClCompile Include="StateStack\StateStack.cpp" />
@@ -89,9 +83,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="ActionGameGlobals.h" />
     <ClInclude Include="GameLayout.h">
-      <Filter>AppLayout</Filter>
-    </ClInclude>
-    <ClInclude Include="EntityEditorLayout.h">
       <Filter>AppLayout</Filter>
     </ClInclude>
     <ClInclude Include="Components\AnimationComponent.h">
@@ -153,9 +144,6 @@
     </ClInclude>
     <ClInclude Include="Level\LevelData.h" />
     <ClInclude Include="Components\DropComponent.h" />
-    <ClInclude Include="AssetEditorDockable.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
     <ClInclude Include="CharacterAnimationSet.h" />
     <ClInclude Include="Components\CharacterAnimationComponent.h" />
     <ClInclude Include="StateStack\StateStack.h" />

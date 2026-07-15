@@ -51,6 +51,8 @@ There's no third-party test framework (no GoogleTest/Catch2). `Solution/Framewor
 
 Note: commit messages mentioning "test" for the navmesh/intersection work (e.g. testing `FW_Intersection` against navmesh triangles) refer to **interactive/visual runtime checks** in `Navmesh.cpp`'s `Render()`/`Update()` (drag the mouse, see highlighted triangles/intersection points) — not entries in `FW_UnitTestSuite`. Don't conflate the two when asked to "add a test."
 
+`DataAsset` types carry a version number (`DEFINE_ASSET`'s last argument) and auto-resave on `Load()` if the file's `version` field is behind (see `Solution/Engine/Core/Assets/DataAsset.cpp`). When a change triggers this kind of resave across `Workbed/` files, diff more than one resaved file in full — a resave normalizes the *entire* file to match current parsing code, so it can surface unrelated latent drift (stale unused fields, newly-required fields) that's easy to miss if you only check that the version number changed.
+
 ## Current WIP state
 
 - Navmesh cutting (`Navmesh.cpp`) is under active development and known incomplete: cutting arbitrary convex shapes mostly works, but resulting vertices aren't guaranteed to land exactly at cut positions.

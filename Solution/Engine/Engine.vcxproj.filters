@@ -74,6 +74,8 @@
     <ClInclude Include="EntitySystem\EntityHandle.h" />
     <ClInclude Include="EntitySystem\EntityManager.h" />
     <ClInclude Include="EntitySystem\EntityPrefab.h" />
+    <ClInclude Include="StateStack\IGameState.h" />
+    <ClInclude Include="StateStack\StateStack.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
@@ -126,6 +128,7 @@
     <ClCompile Include="EntitySystem\Entity.cpp" />
     <ClCompile Include="EntitySystem\EntityManager.cpp" />
     <ClCompile Include="EntitySystem\EntityPrefab.cpp" />
+    <ClCompile Include="StateStack\StateStack.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
     <ClCompile Include="UI\UILayout.cpp" />

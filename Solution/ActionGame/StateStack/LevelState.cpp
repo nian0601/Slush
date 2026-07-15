@@ -8,7 +8,7 @@
 #include "Components\PhysicsComponent.h"
 #include "EntitySystem\EntityManager.h"
 #include "Level\Level.h"
-#include "StateStack.h"
+#include "StateStack/StateStack.h"
 #include "Graphics\Window.h"
 #include "PauseState.h"
 #include "Core\Input.h"
@@ -44,7 +44,7 @@ void LevelState::ResumeState()
 	window.StartFade(0.15f);
 }
 
-GameState::GameStateResult LevelState::Update()
+Slush::IGameState::GameStateResult LevelState::Update()
 {
 	myEntityManager->PrePhysicsUpdate();
 	myPhysicsWorld->TickLimited(Slush::Time::GetDelta());
@@ -63,7 +63,7 @@ GameState::GameStateResult LevelState::Update()
 	}
 
 	myEntityManager->EndFrame();
-	return GameState::KEEP;
+	return Slush::IGameState::KEEP;
 }
 
 void LevelState::Render()

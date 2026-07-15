@@ -4,7 +4,6 @@
 #include "UI/UIManager.h"
 
 class Level;
-class StateStack;
 
 namespace Slush
 {
@@ -12,6 +11,7 @@ namespace Slush
 	class RectSprite;
 	class Text;
 	class PhysicsWorld;
+	class StateStack;
 }
 
 class GameLayout : public Slush::IAppLayout
@@ -26,5 +26,5 @@ public:
 private:
 	void UpdateGameOver();
 
-	StateStack* myStateStack = nullptr;
+	Slush::StateStack* myStateStack = nullptr;
 };

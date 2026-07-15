@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameState.h"
+#include "StateStack/IGameState.h"
 #include "UI\UIManager.h"
 
 namespace Slush
@@ -9,7 +9,7 @@ namespace Slush
 }
 
 class Level;
-class GameOverState : public GameState
+class GameOverState : public Slush::IGameState
 {
 public:
 	GameOverState(Level& aLevel);

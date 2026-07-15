@@ -68,8 +68,6 @@
     <ClCompile Include="Components\DropComponent.cpp" />
     <ClCompile Include="CharacterAnimationSet.cpp" />
     <ClCompile Include="Components\CharacterAnimationComponent.cpp" />
-    <ClCompile Include="StateStack\StateStack.cpp" />
-    <ClCompile Include="StateStack\GameState.cpp" />
     <ClCompile Include="StateStack\MainMenuState.cpp" />
     <ClCompile Include="StateStack\LevelState.cpp" />
     <ClCompile Include="StateStack\GameOverState.cpp" />
@@ -146,8 +144,6 @@
     <ClInclude Include="Components\DropComponent.h" />
     <ClInclude Include="CharacterAnimationSet.h" />
     <ClInclude Include="Components\CharacterAnimationComponent.h" />
-    <ClInclude Include="StateStack\StateStack.h" />
-    <ClInclude Include="StateStack\GameState.h" />
     <ClInclude Include="StateStack\MainMenuState.h" />
     <ClInclude Include="StateStack\LevelState.h" />
     <ClInclude Include="StateStack\GameOverState.h" />

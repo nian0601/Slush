@@ -4,7 +4,7 @@
 #include "MainMenuState.h"
 #include "LevelState.h"
 #include "Level\Tilemap.h"
-#include "StateStack.h"
+#include "StateStack/StateStack.h"
 #include "Graphics\Window.h"
 #include "CharacterSelectionState.h"
 
@@ -39,12 +39,12 @@ MainMenuState::~MainMenuState()
 	FW_SAFE_DELETE(myTilemap);
 }
 
-GameState::GameStateResult MainMenuState::Update()
+Slush::IGameState::GameStateResult MainMenuState::Update()
 {
 	if (ActionGameGlobals::GetInstance().myDebugSettings.mySkipStartScreen)
 	{
 		myStateStack->PushMainState(new CharacterSelectionState());
-		return GameState::KEEP;
+		return Slush::IGameState::KEEP;
 	}
 
 	Slush::DynamicUIBuilder uiBuilder;
@@ -78,7 +78,7 @@ GameState::GameStateResult MainMenuState::Update()
 		window.Close();
 	}
 
-	return GameState::KEEP;
+	return Slush::IGameState::KEEP;
 }
 
 void MainMenuState::Render()

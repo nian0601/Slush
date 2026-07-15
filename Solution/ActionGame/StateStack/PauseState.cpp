@@ -37,7 +37,7 @@ PauseState::PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& a
 	window.StartFade(0.15f);
 }
 
-GameState::GameStateResult PauseState::Update()
+Slush::IGameState::GameStateResult PauseState::Update()
 {
 	Slush::DynamicUIBuilder uiBuilder;
 
@@ -68,11 +68,11 @@ GameState::GameStateResult PauseState::Update()
 
 	if (uiBuilder.WasClicked("Resume"))
 	{
-		return GameState::POP_SUBSTATE;
+		return Slush::IGameState::POP_SUBSTATE;
 	}
 	else if (uiBuilder.WasClicked("Main Menu"))
 	{
-		return GameState::POP_MAINSTATE;
+		return Slush::IGameState::POP_MAINSTATE;
 	}
 	else if (uiBuilder.WasClicked("Quit"))
 	{
@@ -84,10 +84,10 @@ GameState::GameStateResult PauseState::Update()
 	const Slush::Input& input = engine.GetInput();
 	if (input.WasKeyReleased(Slush::Input::ESC))
 	{
-		return GameState::POP_SUBSTATE;
+		return Slush::IGameState::POP_SUBSTATE;
 	}
 
-	return GameState::KEEP;
+	return Slush::IGameState::KEEP;
 }
 
 void PauseState::Render()

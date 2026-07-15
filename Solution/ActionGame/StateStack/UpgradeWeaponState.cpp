@@ -29,13 +29,13 @@ UpgradeWeaponState::UpgradeWeaponState(Slush::EntityHandle aPlayerHandle)
 	window.StartFade(0.15f);
 }
 
-GameState::GameStateResult UpgradeWeaponState::Update()
+Slush::IGameState::GameStateResult UpgradeWeaponState::Update()
 {
 	Slush::Entity* player = myPlayerHandle.Get();
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
 
 	if (!weaponComponent->HasPendingUpgrade())
-		return GameState::POP_SUBSTATE;
+		return Slush::IGameState::POP_SUBSTATE;
 
 	Slush::DynamicUIBuilder uiBuilder;
 
@@ -46,7 +46,7 @@ GameState::GameStateResult UpgradeWeaponState::Update()
 	weaponComponent->HandleUpgrading(uiBuilder);
 	uiBuilder.GenerateRenderCommands(myUIRenderCommands);
 
-	return GameState::KEEP;
+	return Slush::IGameState::KEEP;
 }
 
 void UpgradeWeaponState::Render()

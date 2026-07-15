@@ -27,7 +27,7 @@ GameOverState::GameOverState(Level& aLevel)
 	window.StartFade(0.15f);
 }
 
-GameState::GameStateResult GameOverState::Update()
+Slush::IGameState::GameStateResult GameOverState::Update()
 {
 	Slush::DynamicUIBuilder uiBuilder;
 	uiBuilder.Start();
@@ -51,10 +51,10 @@ GameState::GameStateResult GameOverState::Update()
 	if (uiBuilder.WasClicked("Try Again?"))
 	{
 		myLevel.Restart();
-		return GameState::POP_SUBSTATE;
+		return Slush::IGameState::POP_SUBSTATE;
 	}
 
-	return GameState::KEEP;
+	return Slush::IGameState::KEEP;
 }
 
 void GameOverState::Render()

@@ -56,7 +56,7 @@ UpgradeStatsState::UpgradeStatsState(Slush::EntityHandle aPlayerHandle)
 	}
 }
 
-GameState::GameStateResult UpgradeStatsState::Update()
+Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 {
 	Slush::Entity* player = myPlayerHandle.Get();
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
@@ -65,9 +65,9 @@ GameState::GameStateResult UpgradeStatsState::Update()
 	{
 		SLUSH_WARNING("No more available upgrades, auto-leveling");
 		expComp->LevelUp();
-		return GameState::POP_SUBSTATE;
+		return Slush::IGameState::POP_SUBSTATE;
 	}
-	
+
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
 
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
@@ -123,11 +123,11 @@ GameState::GameStateResult UpgradeStatsState::Update()
 			
 			stats->UpgradeStat(myUpgradeOptions[i]);
 			expComp->LevelUp();
-			return GameState::POP_SUBSTATE;
+			return Slush::IGameState::POP_SUBSTATE;
 		}
 	}
-	
-	return GameState::KEEP;
+
+	return Slush::IGameState::KEEP;
 }
 
 void UpgradeStatsState::Render()

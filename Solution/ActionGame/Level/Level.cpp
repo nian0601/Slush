@@ -39,7 +39,7 @@ Level::~Level()
 	myEntityManager.DeleteAllEntities();
 }
 
-void Level::Update(StateStack& aStateStack)
+void Level::Update(Slush::StateStack& aStateStack)
 {
 	Slush::Entity* player = myPlayerHandle.Get();
 	if (!player)

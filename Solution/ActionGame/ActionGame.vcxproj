@@ -152,7 +152,6 @@
     <ClCompile Include="Components\HealthComponent.cpp" />
     <ClCompile Include="StateStack\CharacterSelectionState.cpp" />
     <ClCompile Include="StateStack\GameOverState.cpp" />
-    <ClCompile Include="StateStack\GameState.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="main.cpp" />
@@ -167,7 +166,6 @@
     <ClCompile Include="StateStack\LevelState.cpp" />
     <ClCompile Include="StateStack\MainMenuState.cpp" />
     <ClCompile Include="StateStack\PauseState.cpp" />
-    <ClCompile Include="StateStack\StateStack.cpp" />
     <ClCompile Include="StateStack\UpgradeStatsState.cpp" />
     <ClCompile Include="StateStack\UpgradeWeaponState.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -194,7 +192,6 @@
     <ClInclude Include="Components\HealthComponent.h" />
     <ClInclude Include="StateStack\CharacterSelectionState.h" />
     <ClInclude Include="StateStack\GameOverState.h" />
-    <ClInclude Include="StateStack\GameState.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Components\NPCControllerComponent.h" />
     <ClInclude Include="Level\LevelData.h" />
@@ -208,7 +205,6 @@
     <ClInclude Include="StateStack\LevelState.h" />
     <ClInclude Include="StateStack\MainMenuState.h" />
     <ClInclude Include="StateStack\PauseState.h" />
-    <ClInclude Include="StateStack\StateStack.h" />
     <ClInclude Include="StateStack\UpgradeStatsState.h" />
     <ClInclude Include="StateStack\UpgradeWeaponState.h" />
     <ClInclude Include="stdafx.h" />

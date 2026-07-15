@@ -6,7 +6,7 @@
 #include "Graphics\Window.h"
 #include "Core\Assets\AssetStorage.h"
 #include "LevelState.h"
-#include "StateStack.h"
+#include "StateStack/StateStack.h"
 #include "Level\Tilemap.h"
 
 CharacterSelectionState::CharacterSelectionState()
@@ -40,7 +40,7 @@ CharacterSelectionState::~CharacterSelectionState()
 	FW_SAFE_DELETE(myTilemap);
 }
 
-GameState::GameStateResult CharacterSelectionState::Update()
+Slush::IGameState::GameStateResult CharacterSelectionState::Update()
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& charAssets = assets.GetAllAssets<CharacterInfo>();
@@ -77,9 +77,9 @@ GameState::GameStateResult CharacterSelectionState::Update()
 	}
 
 	if (uiBuilder.WasClicked("Back"))
-		return GameState::POP_MAINSTATE;
+		return Slush::IGameState::POP_MAINSTATE;
 
-	return GameState::KEEP;
+	return Slush::IGameState::KEEP;
 }
 
 void CharacterSelectionState::Render()

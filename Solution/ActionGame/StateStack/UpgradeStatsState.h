@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameState.h"
+#include "StateStack/IGameState.h"
 #include "UI\UIManager.h"
 #include "EntitySystem\EntityHandle.h"
 #include "Components\StatsComponent.h"
@@ -10,7 +10,7 @@ namespace Slush
 	class Font;
 }
 
-class UpgradeStatsState : public GameState
+class UpgradeStatsState : public Slush::IGameState
 {
 public:
 	UpgradeStatsState(Slush::EntityHandle aPlayerHandle);

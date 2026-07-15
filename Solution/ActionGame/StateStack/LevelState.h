@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameState.h"
+#include "StateStack/IGameState.h"
 
 namespace Slush
 {
@@ -10,7 +10,7 @@ namespace Slush
 
 class CharacterInfo;
 class Level;
-class LevelState : public GameState
+class LevelState : public Slush::IGameState
 {
 public:
 	LevelState(const CharacterInfo& aCharacterInfo);

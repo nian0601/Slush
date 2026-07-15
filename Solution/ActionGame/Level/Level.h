@@ -6,13 +6,13 @@
 class CharacterInfo;
 class Tilemap;
 class LevelData;
-class StateStack;
 
 struct EnemyWaveData;
 
 namespace Slush
 {
 	class EntityManager;
+	class StateStack;
 }
 
 class Level
@@ -21,7 +21,7 @@ public:
 	Level(const CharacterInfo& aCharacterInfo);
 	~Level();
 
-	void Update(StateStack& aStateStack);
+	void Update(Slush::StateStack& aStateStack);
 	void Restart();
 
 	void RenderGame();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameState.h"
+#include "StateStack/IGameState.h"
 #include "UI\UIManager.h"
 #include "EntitySystem\EntityHandle.h"
 
@@ -10,7 +10,7 @@ namespace Slush
 }
 
 class CharacterInfo;
-class PauseState : public GameState
+class PauseState : public Slush::IGameState
 {
 public:
 	PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& aCharacterInfo);

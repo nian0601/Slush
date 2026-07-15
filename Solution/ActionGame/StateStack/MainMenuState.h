@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameState.h"
+#include "StateStack/IGameState.h"
 
 #include "UI\UIManager.h"
 
@@ -10,7 +10,7 @@ namespace Slush
 }
 
 class Tilemap;
-class MainMenuState : public GameState
+class MainMenuState : public Slush::IGameState
 {
 public:
 	MainMenuState();

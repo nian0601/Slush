@@ -14,7 +14,7 @@
 GameLayout::GameLayout()
 	: Slush::IAppLayout("Game")
 {
-	myStateStack = new StateStack();
+	myStateStack = new Slush::StateStack();
 	myStateStack->PushMainState(new MainMenuState());
 	
 	bool disableEditorStuff = false;

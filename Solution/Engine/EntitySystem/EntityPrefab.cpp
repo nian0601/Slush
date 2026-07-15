@@ -60,7 +60,7 @@ namespace Slush
 		myComponentBaseDatas.DeleteAll();
 	}
 
-	void EntityPrefab::OnParse(AssetParser::Handle aRootHandle)
+	void EntityPrefab::OnParse(AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 	{
 		for (Component::BaseData* data : myComponentBaseDatas)
 		{

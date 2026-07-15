@@ -1,8 +1,6 @@
 Animation 
 { 
-	outlinetrack 
-	{ 
-	} 
+	version 1 
 	scaletrack 
 	{ 
 		clip 
@@ -63,11 +61,5 @@ Animation
 				type 1 
 			} 
 		} 
-	} 
-	colortrack 
-	{ 
-	} 
-	spritesheettrack 
-	{ 
 	} 
 } 

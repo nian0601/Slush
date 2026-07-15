@@ -1,5 +1,6 @@
 Entity Prefab 
 { 
+	version 1 
 	sprite 
 	{ 
 		color -1 
@@ -30,12 +31,12 @@ Entity Prefab
 		isSensor 1 
 		matchSprite 0 
 		radius 18.000 
+		collisionflag 5 
 		size 
 		{ 
 			width 0.000 
 			height 0.000 
 		} 
-		collisionflag 5 
 		collideswith 
 		{ 
 			environment 0 

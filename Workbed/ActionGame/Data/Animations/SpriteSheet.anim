@@ -1,18 +1,7 @@
 Animation 
 { 
+	version 1 
 	spritesheettexture Hero_01 
-	outlinetrack 
-	{ 
-	} 
-	scaletrack 
-	{ 
-	} 
-	postiontrack 
-	{ 
-	} 
-	colortrack 
-	{ 
-	} 
 	spritesheettrack 
 	{ 
 		clip 

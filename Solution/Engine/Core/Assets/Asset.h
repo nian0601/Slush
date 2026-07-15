@@ -15,6 +15,7 @@ namespace Slush
 		virtual const char* GetTypeName() const = 0;
 		virtual const char* GetTypeExtention() const = 0;
 		virtual const char* GetTypeFolder() const = 0;
+		virtual unsigned int GetCurrentAssetVersion() const = 0;
 
 		const FW_String& GetAssetName() const { return myAssetName; }
 		const FW_String& GetFilePath() const { return myFilePath; }
@@ -28,13 +29,14 @@ namespace Slush
 		unsigned int myAssetTypeID = INT_MAX;
 	};
 
-#define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder)\
+#define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder, Version)\
 	static const char* GetAssetTypeName() { return AssetName; }\
 	static const char* GetAssetTypeExtention() { return AssetExtention; }\
 	static const char* GetAssetTypeFolder() { return AssetFolder; }\
 	const char* GetTypeName() const override { return GetAssetTypeName(); }\
 	const char* GetTypeExtention() const override { return GetAssetTypeExtention(); }\
 	const char* GetTypeFolder() const override { return GetAssetTypeFolder(); }\
+	unsigned int GetCurrentAssetVersion() const override { return Version; }\
 
 
 	template <typename AssetType>

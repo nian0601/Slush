@@ -14,6 +14,7 @@ namespace Slush
 		void Save() final;
 
 	protected:
-		virtual void OnParse(AssetParser::Handle /*aRootHandle*/) {};
+		virtual void OnParse(AssetParser::Handle /*aRootHandle*/, unsigned int /*aVersion*/) {};
+		virtual bool NeedsUpgrade(unsigned int aLoadedVersion) const { return aLoadedVersion < GetCurrentAssetVersion(); }
 	};
 }

@@ -7,10 +7,10 @@
 class CharacterInfo : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("CharacterInfo", "charinfo", "data/characterinfo");
+	DEFINE_ASSET("CharacterInfo", "charinfo", "data/characterinfo", 1);
 	using Slush::DataAsset::DataAsset;
 
-	void OnParse(Slush::AssetParser::Handle aRootHandle);
+	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 	void BuildUI();
 
 	FW_String myPortaitTextureID;

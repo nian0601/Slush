@@ -5,10 +5,10 @@ namespace Slush
 {
 	struct UILayout : public DataAsset
 	{
-		DEFINE_ASSET("UI Layout", "uilayout", "data/uilayouts");
+		DEFINE_ASSET("UI Layout", "uilayout", "data/uilayouts", 1);
 		using DataAsset::DataAsset;
 
-		void OnParse(AssetParser::Handle aRootHandle) override;
+		void OnParse(AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 
 		struct Button
 		{

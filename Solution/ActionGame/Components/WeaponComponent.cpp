@@ -36,7 +36,7 @@ WeaponData::WeaponData(const char* aName, unsigned int aAssetID)
 	myRanks.Add();
 }
 
-void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle)
+void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
 	aRootHandle.ParseStringField("name", myName);
 	aRootHandle.ParseStringField("icon", myIconTextureID);

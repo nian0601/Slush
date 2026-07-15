@@ -1,5 +1,6 @@
 WeaponData 
 { 
+	version 1 
 	name Shuriken 
 	icon Small_Shuriken_Gray 
 	iconTextureRect 

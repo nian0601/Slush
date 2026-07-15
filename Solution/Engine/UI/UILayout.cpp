@@ -4,7 +4,7 @@
 
 namespace Slush
 {
-	void UILayout::OnParse(AssetParser::Handle aRootHandle)
+	void UILayout::OnParse(AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 	{
 		Slush::AssetParser::Handle buttonsHandle = aRootHandle.ParseChildElement("buttons");
 		Slush::AssetParser::Handle rectsHandle = aRootHandle.ParseChildElement("rects");

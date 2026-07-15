@@ -4,7 +4,7 @@
 #include "Graphics\Texture.h"
 #include "Core\Assets\AssetStorage.h"
 
-void StatsUpgradeData::OnParse(Slush::AssetParser::Handle aRootHandle)
+void StatsUpgradeData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
 	const char* statTypeNames[] = { "cooldown", "damage", "experiencegain"};
 	static_assert(IM_ARRAYSIZE(statTypeNames) == StatType::NUM_STATS);

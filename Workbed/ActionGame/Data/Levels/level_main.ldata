@@ -1,5 +1,6 @@
 LevelData 
 { 
+	version 1 
 	playerEntityPrefab Player_Wizardman 
 	playerStartPosition 
 	{ 

@@ -27,19 +27,19 @@ CharacterAnimationSet::~CharacterAnimationSet()
 	FW_SAFE_DELETE(myWalk);
 }
 
-void CharacterAnimationSet::OnParse(Slush::AssetParser::Handle aRootHandle)
+void CharacterAnimationSet::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion)
 {
 	Slush::AssetParser::Handle walkAnimationHandle = aRootHandle.ParseChildElement("walkanimation");
 	if (walkAnimationHandle.IsValid())
-		myWalk->OnParse(walkAnimationHandle);
+		myWalk->OnParse(walkAnimationHandle, aVersion);
 
 	Slush::AssetParser::Handle attackAnimationHandle = aRootHandle.ParseChildElement("attackanimation");
 	if (attackAnimationHandle.IsValid())
-		myAttack->OnParse(attackAnimationHandle);
+		myAttack->OnParse(attackAnimationHandle, aVersion);
 
 	Slush::AssetParser::Handle deathAnimationHandle = aRootHandle.ParseChildElement("deathanimation");
 	if (deathAnimationHandle.IsValid())
-		myDeath->OnParse(deathAnimationHandle);
+		myDeath->OnParse(deathAnimationHandle, aVersion);
 }
 
 void CharacterAnimationSet::BuildUI()

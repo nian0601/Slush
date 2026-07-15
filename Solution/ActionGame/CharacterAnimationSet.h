@@ -12,11 +12,11 @@ namespace Slush
 class CharacterAnimationSet : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("CharacterAnimationSet", "charanimset", "data/characteranimationsets");
+	DEFINE_ASSET("CharacterAnimationSet", "charanimset", "data/characteranimationsets", 1);
 	CharacterAnimationSet(const char* aName, unsigned int aAssetID);
 	~CharacterAnimationSet();
 
-	void OnParse(Slush::AssetParser::Handle aRootHandle);
+	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 	void BuildUI();
 
 	Slush::Animation* myWalk;

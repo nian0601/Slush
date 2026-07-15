@@ -9,7 +9,7 @@ LevelData::LevelData(const char* aName, unsigned int aAssetID)
 {
 }
 
-void LevelData::OnParse(Slush::AssetParser::Handle aRootHandle)
+void LevelData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
 	if (aRootHandle.IsReading())
 		OnLoad(aRootHandle);

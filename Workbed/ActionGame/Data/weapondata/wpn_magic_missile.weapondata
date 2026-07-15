@@ -1,5 +1,6 @@
 WeaponData 
 { 
+	version 1 
 	name Magic Missile 
 	icon large_magic_missile_green_sheet 
 	iconTextureRect 

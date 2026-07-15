@@ -1,5 +1,6 @@
 CharacterInfo 
 { 
+	version 1 
 	charactername Bow Man 
 	characterentityprefab Player_bowman 
 	portrait Hero_04 

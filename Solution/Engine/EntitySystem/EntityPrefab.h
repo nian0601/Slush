@@ -37,12 +37,12 @@ namespace Slush
 		};
 
 	public:
-		DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs");
+		DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs", 1);
 
 		EntityPrefab(const char* aName, unsigned int aAssetID);
 		~EntityPrefab();
 
-		void OnParse(AssetParser::Handle aRootHandle) override;
+		void OnParse(AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 
 		void BuildUI() override;
 		void BuildMissingComponentsUI(const FW_GrowingArray<MissingComponent>& someMissingComponents);

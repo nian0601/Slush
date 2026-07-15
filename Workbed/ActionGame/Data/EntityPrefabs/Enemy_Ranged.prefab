@@ -1,8 +1,8 @@
 Entity Prefab 
 { 
+	version 1 
 	sprite 
 	{ 
-		radius 20.000 
 		color -1 
 		textureID Enemy_003_A 
 		size 
@@ -52,12 +52,12 @@ Entity Prefab
 		isSensor 0 
 		matchSprite 0 
 		radius 10.000 
+		collisionflag 2 
 		size 
 		{ 
 			width 40.000 
 			height 40.000 
 		} 
-		collisionflag 2 
 		collideswith 
 		{ 
 			environment 1 
@@ -75,6 +75,7 @@ Entity Prefab
 	damagedealer 
 	{ 
 		damage 10 
+		prefab none 
 	} 
 	drops 
 	{ 

@@ -1,5 +1,6 @@
 CharacterAnimationSet 
 { 
+	version 1 
 	walkanimation 
 	{ 
 		spritesheettexture Enemy_001_D 

@@ -18,10 +18,10 @@ namespace Slush
 class WeaponData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("WeaponData", "weapondata", "data/weapondata");
+	DEFINE_ASSET("WeaponData", "weapondata", "data/weapondata", 1);
 	WeaponData(const char* aName, unsigned int aAssetID);
 
-	void OnParse(Slush::AssetParser::Handle aRootHandle);
+	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 	void BuildUI();
 
 	struct RankData

@@ -13,11 +13,11 @@ struct EnemyWaveData
 class LevelData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("LevelData", "ldata", "data/levels/");
+	DEFINE_ASSET("LevelData", "ldata", "data/levels/", 1);
 
 	LevelData(const char* aName, unsigned int aAssetID);
 
-	void OnParse(Slush::AssetParser::Handle aRootHandle) override;
+	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 	void BuildUI() override;
 
 	Vector2f myPlayerStartPosition;

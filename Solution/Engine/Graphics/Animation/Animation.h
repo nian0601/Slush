@@ -14,11 +14,11 @@ namespace Slush
 	class Animation : public DataAsset
 	{
 	public:
-		DEFINE_ASSET("Animation", "anim", "data/animations");
+		DEFINE_ASSET("Animation", "anim", "data/animations", 1);
 		Animation(const char* aName, unsigned int aAssetID);
 		~Animation();
 
-		void OnParse(AssetParser::Handle aRootHandle);
+		void OnParse(AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 		void BuildUI();
 
 		void Update(AnimationRuntime& aRuntimeData) const;

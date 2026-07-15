@@ -25,7 +25,7 @@ namespace Slush
 		FW_SAFE_DELETE(myToolData.myRuntime);
 	}
 
-	void Animation::OnParse(AssetParser::Handle aRootHandle)
+	void Animation::OnParse(AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 	{
 		myOutlineTrack.OnParse("outlinetrack", aRootHandle);
 		myScaleTrack.OnParse("scaletrack", aRootHandle);

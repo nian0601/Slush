@@ -79,7 +79,7 @@ namespace Slush
 			AssetParser::Handle animationHandle = aComponentHandle.ParseChildElement("animation");
 			animationHandle.ParseBoolField("islooping", myLoopAnimation);
 			animationHandle.ParseBoolField("removeentityafteranimation", myRemoveEntityAfterAnimation);
-			myAnimation->OnParse(animationHandle);
+			myAnimation->OnParse(animationHandle, 0); // embedded inline, not a standalone loaded Animation asset, no version context of its own
 		}
 	}
 

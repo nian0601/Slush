@@ -11,7 +11,16 @@ namespace Slush
 		Slush::AssetParser parser;
 		Slush::AssetParser::Handle rootHandle = parser.Load(myFilePath.GetBuffer());
 
-		OnParse(rootHandle);
+		int loadedVersion = 0;
+		rootHandle.ParseOptionalIntField("version", loadedVersion, true);
+
+		OnParse(rootHandle, static_cast<unsigned int>(loadedVersion));
+
+		if (NeedsUpgrade(static_cast<unsigned int>(loadedVersion)))
+		{
+			SLUSH_WARNING("[Asset] '%s' (%s) is version %u, current is %u, resaving to upgrade", myAssetName.GetBuffer(), GetTypeName(), loadedVersion, GetCurrentAssetVersion());
+			Save();
+		}
 	}
 
 	void DataAsset::Save()
@@ -19,7 +28,10 @@ namespace Slush
 		Slush::AssetParser parser;
 		Slush::AssetParser::Handle rootHandle = parser.StartWriting(GetTypeName());
 
-		OnParse(rootHandle);
+		int versionToWrite = static_cast<int>(GetCurrentAssetVersion());
+		rootHandle.ParseOptionalIntField("version", versionToWrite, true);
+
+		OnParse(rootHandle, GetCurrentAssetVersion());
 
 		FW_String filepath = GetTypeFolder();
 		filepath += "/";

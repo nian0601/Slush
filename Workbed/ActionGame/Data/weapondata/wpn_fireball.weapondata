@@ -1,5 +1,6 @@
 WeaponData 
 { 
+	version 1 
 	name Fireball 
 	icon Small_Fireball_Blue_Sheet 
 	iconTextureRect 

@@ -1,20 +1,9 @@
 CharacterAnimationSet 
 { 
+	version 1 
 	walkanimation 
 	{ 
 		spritesheettexture Enemy_002_A 
-		outlinetrack 
-		{ 
-		} 
-		scaletrack 
-		{ 
-		} 
-		postiontrack 
-		{ 
-		} 
-		colortrack 
-		{ 
-		} 
 		spritesheettrack 
 		{ 
 			clip 
@@ -75,38 +64,8 @@ CharacterAnimationSet
 	} 
 	attackanimation 
 	{ 
-		outlinetrack 
-		{ 
-		} 
-		scaletrack 
-		{ 
-		} 
-		postiontrack 
-		{ 
-		} 
-		colortrack 
-		{ 
-		} 
-		spritesheettrack 
-		{ 
-		} 
 	} 
 	deathanimation 
 	{ 
-		outlinetrack 
-		{ 
-		} 
-		scaletrack 
-		{ 
-		} 
-		postiontrack 
-		{ 
-		} 
-		colortrack 
-		{ 
-		} 
-		spritesheettrack 
-		{ 
-		} 
 	} 
 } 

@@ -1,5 +1,6 @@
 Entity Prefab 
 { 
+	version 1 
 	sprite 
 	{ 
 		color -1 

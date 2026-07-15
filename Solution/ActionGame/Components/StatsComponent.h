@@ -24,10 +24,10 @@ public:
 	};
 
 public:
-	DEFINE_ASSET("StatsUpgradeData", "statsdata", "data/statsdata");
+	DEFINE_ASSET("StatsUpgradeData", "statsdata", "data/statsdata", 1);
 	using Slush::DataAsset::DataAsset;
 
-	void OnParse(Slush::AssetParser::Handle aRootHandle);
+	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 	void BuildUI();
 
 	FW_StaticArray<StatData, StatType::NUM_STATS> myStatDatas;

@@ -1,5 +1,6 @@
 StatsUpgradeData 
 { 
+	version 1 
 	cooldown 
 	{ 
 		maxupgrades 10 

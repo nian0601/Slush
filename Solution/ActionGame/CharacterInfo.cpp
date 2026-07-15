@@ -5,7 +5,7 @@
 #include "Graphics/Texture.h"
 #include "Core/Assets/AssetStorage.h"
 
-void CharacterInfo::OnParse(Slush::AssetParser::Handle aRootHandle)
+void CharacterInfo::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
 	aRootHandle.ParseStringField("charactername", myName);
 	aRootHandle.ParseStringField("characterentityprefab", myCharacterEntityPrefabID);

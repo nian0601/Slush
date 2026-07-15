@@ -34,8 +34,6 @@ class PhysicsComponent : public Slush::Component
 public:
 	struct Data : public Slush::Component::BaseData
 	{
-		Data() { myCollidesWithFlags.Fill(false); }
-
 		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
 		void OnBuildUI() override;
 
@@ -46,7 +44,7 @@ public:
 		Vector2f mySize;
 
 		int myCollisionFlag = CollisionUtils::COL_ENVIRONMENT;
-		FW_StaticArray<bool, CollisionUtils::COLLISIONFLAG_COUNT> myCollidesWithFlags;
+		unsigned int myCollidesWithMask = 0;
 	};
 
 public:

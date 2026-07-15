@@ -54,7 +54,15 @@ void PhysicsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle
 	{
 		const char* const* serializationNames = CollisionUtils::GetSerializationNames();
 		for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
-			collidesWithHandle.ParseBoolField(serializationNames[i], myCollidesWithFlags[i]);
+		{
+			bool flagSet = (myCollidesWithMask & (1u << i)) != 0;
+			collidesWithHandle.ParseBoolField(serializationNames[i], flagSet);
+
+			if (flagSet)
+				myCollidesWithMask |= 1u << i;
+			else
+				myCollidesWithMask &= ~(1u << i);
+		}
 	}
 }
 
@@ -72,7 +80,16 @@ void PhysicsComponent::Data::OnBuildUI()
 
 	ImGui::Text("Collides With:");
 	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
-		ImGui::Checkbox(names[i], &myCollidesWithFlags[i]);
+	{
+		bool flagSet = (myCollidesWithMask & (1u << i)) != 0;
+		if (ImGui::Checkbox(names[i], &flagSet))
+		{
+			if (flagSet)
+				myCollidesWithMask |= 1u << i;
+			else
+				myCollidesWithMask &= ~(1u << i);
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -114,14 +131,7 @@ PhysicsComponent::PhysicsComponent(Slush::Entity& aEntity, const Slush::EntityPr
 		myObject->myUserData.Set<PhysicsComponent* const>(this);
 
 		myObject->myCollisionMask = 1 << physData.myCollisionFlag;
-
-		unsigned int collidesWithMask = 0;
-		for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
-		{
-			if (physData.myCollidesWithFlags[i])
-				collidesWithMask |= 1 << i;
-		}
-		myObject->myCollidesWithMask = collidesWithMask;
+		myObject->myCollidesWithMask = physData.myCollidesWithMask;
 		myObject->myReportCollisionsWith = myObject->myCollidesWithMask;
 
 		myPhysicsWorld.AddObject(myObject);

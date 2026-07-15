@@ -12,55 +12,10 @@
 #include <ActionGameGlobals.h>
 #include <Core\Assets\AssetStorage.h>
 
-
-#define USE_ANIMATION_ASSETS 1
-AnimationComponent::AnimationComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
-	: Slush::Component(anEntity, anEntityPrefab)
-{
-#if USE_ANIMATION_ASSETS
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-	myDashAnimation = assets.GetAsset<Slush::Animation>("Dash");
-	myBlinkAnimation = assets.GetAsset<Slush::Animation>("Blink");
-	mySpritesheetAnimation = assets.GetAsset<Slush::Animation>("SpriteSheet");
-#else
-	myDashAnimation = new Slush::Animation("Dash", Slush::GetAssetID<Slush::Animation>());
-	myDashAnimation->myScaleTrack
-		.Linear(0.1f, 1.f, 0.2f)
-		.Wait(0.1f)
-		.Linear(0.1f, 0.2f, 1.f);
-	myDashAnimation->myPositionTrack
-		.Wait(0.1f)
-		.Linear(0.25f, 0.f, 1.f);
-	
-	myBlinkAnimation = new Slush::Animation("Blink", Slush::GetAssetID<Slush::Animation>());
-	myBlinkAnimation->myColorTrack
-		.Linear(0.1f, 0.f, 1.f)
-		.Linear(0.1f, 1.f, 0.f);
-	
-	mySpritesheetAnimation = new Slush::Animation("SpriteSheet", Slush::GetAssetID<Slush::Animation>());
-	for (int i = 0; i < 6; ++i)
-		mySpritesheetAnimation->mySpritesheetTrack.Frame({ i, 5 }, { 96, 96 }, 15.f);
-	
-	myDashAnimation->Save();
-	myBlinkAnimation->Save();
-	mySpritesheetAnimation->Save();
-#endif
-}
-
 AnimationComponent::~AnimationComponent()
 {
-#if !USE_ANIMATION_ASSETS
-	FW_SAFE_DELETE(myDashAnimation);
-	FW_SAFE_DELETE(myBlinkAnimation);
-	FW_SAFE_DELETE(mySpawnAnimation);
-	FW_SAFE_DELETE(mySpritesheetAnimation);
-#endif
 	for (int i = 0; i < myRunningAnimations.Count(); ++i)
 		FW_SAFE_DELETE(myRunningAnimations[i].myRuntime);
-}
-
-void AnimationComponent::OnEnterWorld()
-{
 }
 
 void AnimationComponent::Update()
@@ -98,22 +53,6 @@ void AnimationComponent::Update()
 			++i;
 		}
 	}
-}
-
-bool AnimationComponent::IsPlayingDash() const
-{
-	for (const RunningAnimation& anim : myRunningAnimations)
-	{
-		if (anim.myAnimation == myDashAnimation)
-			return true;
-	}
-
-	return false;
-}
-
-void AnimationComponent::PlaySpritesheetAnimation()
-{
-	PlayAnimation(*mySpritesheetAnimation);
 }
 
 Slush::AnimationRuntime* AnimationComponent::PlayAnimation(const Slush::Animation& anAnimation, bool aOverrideSpriteSheetAnimation /*= true*/)

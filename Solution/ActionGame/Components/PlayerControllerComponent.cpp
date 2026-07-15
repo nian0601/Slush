@@ -28,7 +28,7 @@ void PlayerControllerComponent::OnEnterWorld()
 void PlayerControllerComponent::PrePhysicsUpdate()
 {
 	AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>();
-	if (!anim || !anim->IsPlayingDash())
+	if (!anim || !anim->IsAnimationPlaying(*myDashAnimation))
 	{
 		myDirection = { 0.f, 0.f };
 

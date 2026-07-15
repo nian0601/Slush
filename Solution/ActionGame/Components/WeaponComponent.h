@@ -10,6 +10,7 @@
 
 namespace Slush
 {
+	class Animation;
 	class DynamicUIBuilder;
 	class Texture;
 }
@@ -68,6 +69,7 @@ protected:
 	int myRank = 0;
 	const WeaponData& myWeaponData;
 	const WeaponData::RankData* myRankData;
+	const Slush::Animation* mySpriteSheetAnimation = nullptr;
 };
 
 

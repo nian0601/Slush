@@ -184,6 +184,9 @@ Weapon::Weapon(Slush::Entity& anEntity, const WeaponData& aWeaponData)
 	, myWeaponData(aWeaponData)
 {
 	myRankData = &myWeaponData.myRanks[0];
+
+	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+	mySpriteSheetAnimation = assets.GetAsset<Slush::Animation>("SpriteSheet");
 }
 
 void Weapon::Update()
@@ -265,7 +268,7 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 	}
 
 	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
-		anim->PlaySpritesheetAnimation();
+		anim->PlayAnimation(*mySpriteSheetAnimation);
 }
 
 //////////////////////////////////////////////////////////////////////////

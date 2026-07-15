@@ -16,15 +16,10 @@ class AnimationComponent : public Slush::Component
 public:
 	COMPONENT_HELPER("Animation", "animation");
 
-	AnimationComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
+	using Slush::Component::Component;
 	~AnimationComponent();
 
-	void OnEnterWorld() override;
 	void Update() override;
-	bool IsPlayingDash() const;
-
-	void PlaySpritesheetAnimation();
-
 
 	Slush::AnimationRuntime* PlayAnimation(const Slush::Animation& anAnimation, bool aOverrideSpriteSheetAnimation = true);
 	bool IsAnimationPlaying(const Slush::Animation& anAnimation) const;
@@ -40,8 +35,4 @@ private:
 	void ApplyAnimation(Slush::AnimationRuntime& aRuntimeData);
 
 	void InitRuntime(RunningAnimation& aRunningAnimation) const;
-
-	Slush::Animation* myDashAnimation = nullptr;
-	Slush::Animation* myBlinkAnimation = nullptr;
-	Slush::Animation* mySpritesheetAnimation = nullptr;
 };

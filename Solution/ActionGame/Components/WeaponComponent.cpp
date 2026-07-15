@@ -2,15 +2,15 @@
 
 
 #include "ActionGameGlobals.h"
-#include "AnimationComponent.h"
 #include "DamageDealerComponent.h"
-#include "PhysicsComponent.h"
-#include "SpriteComponent.h"
 #include "StatsComponent.h"
 #include "TargetingComponent.h"
 #include "WeaponComponent.h"
 
 #include "EntitySystem/EntityManager.h"
+#include "EntitySystem/Components/AnimationComponent.h"
+#include "EntitySystem/Components/PhysicsComponent.h"
+#include "EntitySystem/Components/SpriteComponent.h"
 
 #include <Graphics\BaseSprite.h>
 #include <Graphics\Texture.h>
@@ -256,8 +256,8 @@ void Weapon::RunProjectileLogic()
 void Weapon::ShootProjectile(const Vector2f& aDirection)
 {
 	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myRankData->myProjectileData.myProjectilePrefab.GetBuffer());
-	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
-	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+	projectile->GetComponent<Slush::PhysicsComponent>()->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
+	projectile->GetComponent<Slush::SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
 		int damage = myRankData->myBaseDamage;
@@ -267,7 +267,7 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 		projDamage->SetDamage(damage);
 	}
 
-	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+	if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
 		anim->PlayAnimation(*mySpriteSheetAnimation);
 }
 

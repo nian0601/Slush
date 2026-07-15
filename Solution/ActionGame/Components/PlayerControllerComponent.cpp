@@ -1,10 +1,7 @@
 #include "stdafx.h"
 
-#include "AnimationComponent.h"
 #include "HealthComponent.h"
-#include "PhysicsComponent.h"
 #include "PlayerControllerComponent.h"
-#include "SpriteComponent.h"
 
 #include "Core\Engine.h"
 #include "Core\Input.h"
@@ -15,6 +12,9 @@
 #include "Graphics\Animation\AnimationRuntime.h"
 #include "ActionGameGlobals.h"
 #include "EntitySystem\EntityManager.h"
+#include "EntitySystem\Components\AnimationComponent.h"
+#include "EntitySystem\Components\PhysicsComponent.h"
+#include "EntitySystem\Components\SpriteComponent.h"
 
 
 void PlayerControllerComponent::OnEnterWorld()
@@ -27,7 +27,7 @@ void PlayerControllerComponent::OnEnterWorld()
 
 void PlayerControllerComponent::PrePhysicsUpdate()
 {
-	AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>();
+	Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>();
 	if (!anim || !anim->IsAnimationPlaying(*myDashAnimation))
 	{
 		myDirection = { 0.f, 0.f };
@@ -45,10 +45,10 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 
 		Normalize(myDirection);
 
-		if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
+		if (Slush::PhysicsComponent* phys = myEntity.GetComponent<Slush::PhysicsComponent>())
 			phys->myObject->myVelocity = myDirection * mySpeed;
 
-		if (SpriteComponent* sprite = myEntity.GetComponent<SpriteComponent>())
+		if (Slush::SpriteComponent* sprite = myEntity.GetComponent<Slush::SpriteComponent>())
 		{
 			if (myDirection.x > 0.f)
 				sprite->GetSprite().SetHorizontalFlip(false);

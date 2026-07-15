@@ -9,6 +9,8 @@
 
 namespace Slush
 {
+	class PhysicsWorld;
+
 	class EntityManager
 	{
 	public:
@@ -26,6 +28,9 @@ namespace Slush
 
 		void GetAllEntities(FW_GrowingArray<EntityHandle>& outEntityHandles) const;
 
+		void SetPhysicsWorld(PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
+		PhysicsWorld& GetPhysicsWorld() const;
+
 		void PrePhysicsUpdate();
 
 		void Update();
@@ -40,5 +45,7 @@ namespace Slush
 		FW_GrowingArray<Entity*> myEntities;
 
 		FW_GrowingArray<Entity*> myAddQueue;
+
+		PhysicsWorld* myPhysicsWorld = nullptr;
 	};
 }

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #include "EntitySystem/EntityManager.h"
-#include "PhysicsComponent.h"
+#include "EntitySystem/Components/PhysicsComponent.h"
+#include "EntitySystem/Components/SpriteComponent.h"
 #include "ProjectileShootingComponent.h"
-#include "SpriteComponent.h"
 #include "ActionGameGlobals.h"
 
 #include <Physics\PhysicsWorld.h>
@@ -57,8 +57,8 @@ bool ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 
 	Vector2f projPosition = myEntity.myPosition + aDirection * shootingData.myProjectileSpawnOffset;
 	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, shootingData.myProjectileEntityPrefab.GetBuffer());
-	projectile->GetComponent<PhysicsComponent>()->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
-	projectile->GetComponent<SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+	projectile->GetComponent<Slush::PhysicsComponent>()->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
+	projectile->GetComponent<Slush::SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 
 	return true;
 }

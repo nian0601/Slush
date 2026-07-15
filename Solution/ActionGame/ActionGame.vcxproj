@@ -141,8 +141,8 @@
     <ClCompile Include="ActionGameGlobals.cpp" />
     <ClCompile Include="CharacterAnimationSet.cpp" />
     <ClCompile Include="CharacterInfo.cpp" />
-    <ClCompile Include="Components\AnimationComponent.cpp" />
     <ClCompile Include="Components\CharacterAnimationComponent.cpp" />
+    <ClCompile Include="Components\CollisionFlag.cpp" />
     <ClCompile Include="Components\DropComponent.cpp" />
     <ClCompile Include="Components\DamageDealerComponent.cpp" />
     <ClCompile Include="EntitySystem\EntityManager.cpp" />
@@ -156,12 +156,10 @@
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Components\NPCControllerComponent.cpp" />
-    <ClCompile Include="Components\PhysicsComponent.cpp" />
     <ClCompile Include="Components\PickupComponent.cpp" />
     <ClCompile Include="Components\PlayerControllerComponent.cpp" />
     <ClCompile Include="Components\ProjectileShootingComponent.cpp" />
     <ClCompile Include="Components\RemoveOnCollisionComponent.cpp" />
-    <ClCompile Include="Components\SpriteComponent.cpp" />
     <ClCompile Include="Components\StatsComponent.cpp" />
     <ClCompile Include="StateStack\LevelState.cpp" />
     <ClCompile Include="StateStack\MainMenuState.cpp" />
@@ -181,8 +179,8 @@
     <ClInclude Include="ActionGameGlobals.h" />
     <ClInclude Include="CharacterAnimationSet.h" />
     <ClInclude Include="CharacterInfo.h" />
-    <ClInclude Include="Components\AnimationComponent.h" />
     <ClInclude Include="Components\CharacterAnimationComponent.h" />
+    <ClInclude Include="Components\CollisionFlag.h" />
     <ClInclude Include="Components\DropComponent.h" />
     <ClInclude Include="Components\DamageDealerComponent.h" />
     <ClInclude Include="EntitySystem\EntityComponentEvents.h" />
@@ -195,12 +193,10 @@
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Components\NPCControllerComponent.h" />
     <ClInclude Include="Level\LevelData.h" />
-    <ClInclude Include="Components\PhysicsComponent.h" />
     <ClInclude Include="Components\PickupComponent.h" />
     <ClInclude Include="Components\PlayerControllerComponent.h" />
     <ClInclude Include="Components\ProjectileShootingComponent.h" />
     <ClInclude Include="Components\RemoveOnCollisionComponent.h" />
-    <ClInclude Include="Components\SpriteComponent.h" />
     <ClInclude Include="Components\StatsComponent.h" />
     <ClInclude Include="StateStack\LevelState.h" />
     <ClInclude Include="StateStack\MainMenuState.h" />

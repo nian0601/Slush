@@ -14,7 +14,6 @@ namespace Slush
 {
 	class EntityManager;
 	class Font;
-	class PhysicsWorld;
 }
 
 class ActionGameGlobals
@@ -50,12 +49,10 @@ public:
 	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
 
 	void SetEntityManager(Slush::EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
-	void SetPhysicsWorld(Slush::PhysicsWorld* aPhysicsWorld) { myPhysicsWorld = aPhysicsWorld; }
 
 	Slush::Font& GetFont();
 
 	Slush::EntityManager& GetEntityManager();
-	Slush::PhysicsWorld& GetPhysicsWorld();
 
 	DebugSettings myDebugSettings;
 
@@ -67,5 +64,4 @@ private:
 	Slush::Font* myFont = nullptr;
 
 	Slush::EntityManager* myEntityManager = nullptr;
-	Slush::PhysicsWorld* myPhysicsWorld = nullptr;
 };

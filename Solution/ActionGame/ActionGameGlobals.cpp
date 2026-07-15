@@ -70,12 +70,6 @@ Slush::EntityManager& ActionGameGlobals::GetEntityManager()
 	return *myEntityManager;
 }
 
-Slush::PhysicsWorld& ActionGameGlobals::GetPhysicsWorld()
-{
-	FW_ASSERT(myPhysicsWorld != nullptr, "Need to set an PhysicsWorld");
-	return *myPhysicsWorld;
-}
-
 ActionGameGlobals::ActionGameGlobals()
 {
 	myDebugSettings.LoadFromDisk();
@@ -88,5 +82,4 @@ ActionGameGlobals::~ActionGameGlobals()
 	myFont = nullptr;
 
 	myEntityManager = nullptr;
-	myPhysicsWorld = nullptr;
 }

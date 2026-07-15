@@ -1,17 +1,17 @@
 #include "stdafx.h"
 
 #include "NPCControllerComponent.h"
-#include "PhysicsComponent.h"
 #include "ProjectileShootingComponent.h"
 #include "TargetingComponent.h"
 
 #include <Physics\PhysicsWorld.h>
-#include "AnimationComponent.h"
 #include "Core\Assets\AssetStorage.h"
 #include "Graphics\Animation\Animation.h"
 #include "CharacterAnimationComponent.h"
-#include "SpriteComponent.h"
 #include "Graphics\BaseSprite.h"
+#include "EntitySystem\Components\AnimationComponent.h"
+#include "EntitySystem\Components\PhysicsComponent.h"
+#include "EntitySystem\Components\SpriteComponent.h"
 
 void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
 {
@@ -53,7 +53,7 @@ void NPCControllerComponent::OnEnterWorld()
 {
 	myHasFinishedSpawning = true;
 
-	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+	if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
 	{
 		if (mySpawnAnimation)
 		{
@@ -83,7 +83,7 @@ void NPCControllerComponent::PrePhysicsUpdate()
 
 	Vector2f toTarget = target.Get()->myPosition - myEntity.myPosition;
 
-	if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
+	if (Slush::PhysicsComponent* phys = myEntity.GetComponent<Slush::PhysicsComponent>())
 	{
 		Vector2f direction = GetNormalized(toTarget);
 		phys->myObject->myVelocity = direction * myData.myMovementSpeed;
@@ -91,7 +91,7 @@ void NPCControllerComponent::PrePhysicsUpdate()
 		if (characterAnimation)
 			characterAnimation->PlayMovementAnimation();
 
-		if (SpriteComponent* sprite = myEntity.GetComponent<SpriteComponent>())
+		if (Slush::SpriteComponent* sprite = myEntity.GetComponent<Slush::SpriteComponent>())
 		{
 			if (direction.x > 0.f)
 				sprite->GetSprite().SetHorizontalFlip(false);
@@ -120,7 +120,7 @@ void NPCControllerComponent::Update()
 	if (myHasFinishedSpawning)
 		return;
 
-	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+	if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
 	{
 		if (mySpawnAnimation)
 			myHasFinishedSpawning = !anim->IsAnimationPlaying(*mySpawnAnimation);

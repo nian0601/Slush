@@ -1,12 +1,11 @@
 #include "stdafx.h"
 
-#include "AnimationComponent.h"
 #include "CharacterAnimationSet.h"
 #include "CharacterAnimationComponent.h"
-#include "PhysicsComponent.h"
-#include "SpriteComponent.h"
 
 #include <Physics\PhysicsWorld.h>
+
+#include "EntitySystem\Components\AnimationComponent.h"
 
 #include <Graphics\Animation\Animation.h>
 #include <Graphics\Animation\AnimationRuntime.h>
@@ -52,7 +51,7 @@ void CharacterAnimationComponent::PlayMovementAnimation()
 	if (!myAnimationSet->myWalk)
 		return;
 
-	AnimationComponent* animComponent = myEntity.GetComponent<AnimationComponent>();
+	Slush::AnimationComponent* animComponent = myEntity.GetComponent<Slush::AnimationComponent>();
 	if (animComponent->IsAnimationPlaying(*myAnimationSet->myWalk))
 		return;
 
@@ -64,6 +63,6 @@ void CharacterAnimationComponent::PlayMovementAnimation()
 
 void CharacterAnimationComponent::PlayAttackAnimation()
 {
-	AnimationComponent* animComponent = myEntity.GetComponent<AnimationComponent>();
+	Slush::AnimationComponent* animComponent = myEntity.GetComponent<Slush::AnimationComponent>();
 	animComponent->PlayAnimation(*myAnimationSet->myAttack);
 }

@@ -5,7 +5,7 @@
 #include "GameOverState.h"
 
 #include "Physics\PhysicsWorld.h"
-#include "Components\PhysicsComponent.h"
+#include "EntitySystem\Components\PhysicsComponent.h"
 #include "EntitySystem\EntityManager.h"
 #include "Level\Level.h"
 #include "StateStack/StateStack.h"
@@ -20,7 +20,7 @@ LevelState::LevelState(const CharacterInfo& aCharacterInfo)
 	myEntityManager = new Slush::EntityManager();
 
 	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
-	ActionGameGlobals::GetInstance().SetPhysicsWorld(myPhysicsWorld);
+	myEntityManager->SetPhysicsWorld(myPhysicsWorld);
 	ActionGameGlobals::GetInstance().SetEntityManager(myEntityManager);
 
 	myLevel = new Level(aCharacterInfo);
@@ -34,7 +34,6 @@ LevelState::~LevelState()
 {
 	FW_SAFE_DELETE(myLevel);
 
-	ActionGameGlobals::GetInstance().SetPhysicsWorld(nullptr);
 	ActionGameGlobals::GetInstance().SetEntityManager(nullptr);
 }
 
@@ -86,8 +85,8 @@ void LevelState::UpdateCollisions()
 		if (!contact.myFirst || !contact.mySecond)
 			continue;
 
-		PhysicsComponent* physA = contact.myFirst->myUserData.Get<PhysicsComponent*>();
-		PhysicsComponent* physB = contact.mySecond->myUserData.Get<PhysicsComponent*>();
+		Slush::PhysicsComponent* physA = contact.myFirst->myUserData.Get<Slush::PhysicsComponent*>();
+		Slush::PhysicsComponent* physB = contact.mySecond->myUserData.Get<Slush::PhysicsComponent*>();
 		if (!physA || !physB)
 		{
 			SLUSH_WARNING("PhysContact with Entity without PhysicsComponent");

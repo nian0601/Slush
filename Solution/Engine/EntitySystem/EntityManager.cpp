@@ -70,6 +70,12 @@ namespace Slush
 			outEntityHandles.Add(entity->myHandle);
 	}
 
+	PhysicsWorld& EntityManager::GetPhysicsWorld() const
+	{
+		FW_ASSERT(myPhysicsWorld != nullptr, "Need to set a PhysicsWorld");
+		return *myPhysicsWorld;
+	}
+
 	void EntityManager::PrePhysicsUpdate()
 	{
 		for (Entity* entity : myEntities)

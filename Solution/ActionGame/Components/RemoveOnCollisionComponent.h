@@ -1,7 +1,8 @@
 #pragma once
 
 #include "EntitySystem/Component.h"
-#include "PhysicsComponent.h"
+#include "EntitySystem/Components/PhysicsComponent.h"
+#include "CollisionFlag.h"
 
 class RemoveOnCollisionComponent : public Slush::Component
 {

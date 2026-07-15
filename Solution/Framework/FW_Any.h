@@ -6,7 +6,7 @@ public:
 	template <typename T>
 	void Set(T& someData)
 	{
-		FW_ASSERT(sizeof(T) < sizeof(char) * 24, "Object of size %i does not fit in FW_Any", sizeof(T));
+		static_assert(sizeof(T) < sizeof(char) * 24, "Object does not fit in FW_Any");
 		memcpy(myData, &someData, sizeof(someData));
 	}
 

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "EntitySystem/EntityManager.h"
-#include "PhysicsComponent.h"
 #include "TargetingComponent.h"
 
 #include <Physics\PhysicsWorld.h>
@@ -39,7 +38,7 @@ void TargetingComponent::Update()
 		if (!handle.IsValid())
 			continue;
 
-		PhysicsComponent* physics = handle.Get()->GetComponent<PhysicsComponent>();
+		Slush::PhysicsComponent* physics = handle.Get()->GetComponent<Slush::PhysicsComponent>();
 		if (physics && physics->GetCollisionFlag() == targetData.myTargetFlag)
 			targets.Add(handle);
 	}

@@ -3,7 +3,8 @@
 #include "DamageDealerComponent.h"
 
 #include "HealthComponent.h"
-#include "PhysicsComponent.h"
+#include "EntitySystem/Components/PhysicsComponent.h"
+#include "CollisionFlag.h"
 #include "ActionGameGlobals.h"
 #include "EntitySystem\EntityManager.h"
 
@@ -39,8 +40,8 @@ DamageDealerComponent::DamageDealerComponent(Slush::Entity& anEntity, const Slus
 
 void DamageDealerComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& aContactPosition)
 {
-	PhysicsComponent* myPhysics = myEntity.GetComponent<PhysicsComponent>();
-	PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<PhysicsComponent>();
+	Slush::PhysicsComponent* myPhysics = myEntity.GetComponent<Slush::PhysicsComponent>();
+	Slush::PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<Slush::PhysicsComponent>();
 	if (!myPhysics || !otherPhysics)
 		return;
 
@@ -56,8 +57,8 @@ void DamageDealerComponent::OnCollision(Slush::Entity& aOtherEntity, const Vecto
 
 	myDamagedEntities.Add(aOtherEntity.myHandle);
 
-	CollisionUtils::CollisionFlag myFlag = myPhysics->GetCollisionFlag();
-	CollisionUtils::CollisionFlag otherFlag = otherPhysics->GetCollisionFlag();
+	CollisionUtils::CollisionFlag myFlag = static_cast<CollisionUtils::CollisionFlag>(myPhysics->GetCollisionFlag());
+	CollisionUtils::CollisionFlag otherFlag = static_cast<CollisionUtils::CollisionFlag>(otherPhysics->GetCollisionFlag());
 
 	bool isPlayerSide = myFlag == CollisionUtils::COL_PLAYER || myFlag == CollisionUtils::COL_PLAYER_PROJECTILE;
 	bool isNPCSide = myFlag == CollisionUtils::COL_NPC || myFlag == CollisionUtils::COL_NPC_PROJECTILE;

@@ -23,7 +23,7 @@ void RemoveOnCollisionComponent::Data::OnBuildUI()
 
 void RemoveOnCollisionComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
 {
-	PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<PhysicsComponent>();
+	Slush::PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<Slush::PhysicsComponent>();
 	if (!otherPhysics)
 		return;
 

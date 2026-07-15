@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "AnimationComponent.h"
+#include "EntitySystem/Components/AnimationComponent.h"
 #include "HealthComponent.h"
 #include "HealthBarComponent.h"
 
@@ -67,7 +67,7 @@ void HealthComponent::DealDamage(int aDamageAmount)
 
 	damageTaken.myNewHealth = myCurrentHealth;
 
-	if (AnimationComponent* anim = myEntity.GetComponent<AnimationComponent>())
+	if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
 	{
 		Slush::AnimationRuntime* animData = anim->PlayAnimation(*myDamageAnimation);
 		animData->myEndColor = 0xFFFF0000;

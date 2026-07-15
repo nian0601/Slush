@@ -3,7 +3,8 @@
 #include "EntitySystem/Component.h"
 #include "EntitySystem/EntityHandle.h"
 #include "EntitySystem/Entity.h"
-#include "PhysicsComponent.h"
+#include "EntitySystem/Components/PhysicsComponent.h"
+#include "CollisionFlag.h"
 
 class TargetingComponent : public Slush::Component
 {

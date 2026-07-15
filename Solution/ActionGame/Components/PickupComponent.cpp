@@ -3,7 +3,8 @@
 #include "PickupComponent.h"
 #include "ExperienceComponent.h"
 #include "HealthComponent.h"
-#include "PhysicsComponent.h"
+#include "EntitySystem/Components/PhysicsComponent.h"
+#include "CollisionFlag.h"
 #include <EntitySystem\EntityPrefab.h>
 #include "WeaponComponent.h"
 
@@ -30,7 +31,7 @@ PickupComponent::PickupComponent(Slush::Entity& anEntity, const Slush::EntityPre
 
 void PickupComponent::OnCollision(Slush::Entity& aOtherEntity, const Vector2f& /*aContactPosition*/)
 {
-	PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<PhysicsComponent>();
+	Slush::PhysicsComponent* otherPhysics = aOtherEntity.GetComponent<Slush::PhysicsComponent>();
 	if (otherPhysics && otherPhysics->GetCollisionFlag() == CollisionUtils::COL_PLAYER)
 	{
 		myEntity.myIsMarkedForRemoval = true;

@@ -3,6 +3,7 @@ Entity Prefab
 	version 1 
 	sprite 
 	{ 
+		version 1 
 		color -1 
 		textureID Hero_01 
 		size 
@@ -27,17 +28,21 @@ Entity Prefab
 	} 
 	animation 
 	{ 
+		version 1 
 	} 
 	health 
 	{ 
+		version 1 
 		maxhealth 50 
 		graceperiodduration 0.500 
 	} 
 	playercontroller 
 	{ 
+		version 1 
 	} 
 	physics 
 	{ 
+		version 1 
 		isStatic 0 
 		isSensor 0 
 		matchSprite 0 
@@ -60,19 +65,24 @@ Entity Prefab
 	} 
 	targeting 
 	{ 
+		version 1 
 		targetflag 2 
 	} 
 	weaponcomponent 
 	{ 
+		version 1 
 		weapondata wpn_fireball 
 	} 
 	experience 
 	{ 
+		version 1 
 	} 
 	stats 
 	{ 
+		version 1 
 	} 
 	healthbar 
 	{ 
+		version 1 
 	} 
 } 

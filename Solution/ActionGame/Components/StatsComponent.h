@@ -38,12 +38,12 @@ class StatsComponent : public Slush::Component
 public:
 	struct Data : public Slush::Component::BaseData
 	{
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 	};
 
 public:
-	COMPONENT_HELPER("Stats", "stats");
+	COMPONENT_HELPER("Stats", "stats", 1);
 
 	using Slush::Component::Component;
 

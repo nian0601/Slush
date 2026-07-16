@@ -38,8 +38,9 @@ namespace Slush
 
 			virtual ~BaseData() {}
 
-			void Parse(AssetParser::Handle aRootHandle);
-			virtual void OnParse(AssetParser::Handle aComponentHandle) { aComponentHandle; }
+			// Returns true if the on-disk version was behind myCurrentComponentVersion (reading only; always false when writing).
+			bool Parse(AssetParser::Handle aRootHandle);
+			virtual void OnParse(AssetParser::Handle /*aComponentHandle*/, unsigned int /*aVersion*/) {}
 
 			void BuildUI();
 			virtual void OnBuildUI() {};
@@ -47,6 +48,7 @@ namespace Slush
 			bool myEnabled = false;
 			const char* myComponentDataName = nullptr; // Used for seriallization, should not have any spaces
 			const char* myComponentLabel = nullptr; // Used for UI-display, can be whatever
+			unsigned int myCurrentComponentVersion = 1; // Set by ComponentFactory::CreateComponentData() from COMPONENT_HELPER's Version arg
 		};
 	};
 
@@ -59,6 +61,7 @@ namespace Slush
 
 #define MAX_COMPONENTS 32
 
-#define COMPONENT_HELPER(Label, DataName) \
+#define COMPONENT_HELPER(Label, DataName, Version) \
 static const char* GetComponentLabel() { return Label; }; \
-static const char* GetComponentDataName() { return DataName; };
+static const char* GetComponentDataName() { return DataName; }; \
+static unsigned int GetCurrentComponentVersion() { return Version; };

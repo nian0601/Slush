@@ -5,7 +5,7 @@
 class PickupComponent : public Slush::Component
 {
 public:
-	COMPONENT_HELPER("Pickup", "pickup");
+	COMPONENT_HELPER("Pickup", "pickup", 1);
 
 	struct Data : public Slush::Component::BaseData
 	{
@@ -16,7 +16,7 @@ public:
 			WEAPON_UPGRADE,
 		};
 
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 
 		int myType = EXPERIENCE;

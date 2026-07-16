@@ -8,14 +8,14 @@ class DamageDealerComponent : public Slush::Component
 public:
 	struct Data : public Slush::Component::BaseData
 	{
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 
 		int myDamage = 10;
 		FW_String myImpactPrefab;
 	};
 public:
-	COMPONENT_HELPER("Damage Dealer", "damagedealer");
+	COMPONENT_HELPER("Damage Dealer", "damagedealer", 1);
 
 	DamageDealerComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 

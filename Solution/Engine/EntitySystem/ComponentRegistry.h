@@ -34,6 +34,7 @@ namespace Slush
 			Component::BaseData* data = new ComponentData();
 			data->myComponentLabel = ComponentType::GetComponentLabel();
 			data->myComponentDataName = ComponentType::GetComponentDataName();
+			data->myCurrentComponentVersion = ComponentType::GetCurrentComponentVersion();
 			return data;
 		}
 

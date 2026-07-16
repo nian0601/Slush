@@ -9,7 +9,7 @@
 #include <Physics\PhysicsWorld.h>
 #include <Graphics\BaseSprite.h>
 
-void ProjectileShootingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void ProjectileShootingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseFloatField("cooldown", myCooldown);
 	aComponentHandle.ParseFloatField("projectilespeed", myProjectileSpeed);

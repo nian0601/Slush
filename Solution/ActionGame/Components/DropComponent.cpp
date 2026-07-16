@@ -5,7 +5,7 @@
 #include <ActionGameGlobals.h>
 #include <EntitySystem\EntityManager.h>
 
-void DropComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void DropComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	if (aComponentHandle.IsReading())
 	{

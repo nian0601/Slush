@@ -13,7 +13,7 @@
 #include "EntitySystem\Components\PhysicsComponent.h"
 #include "EntitySystem\Components\SpriteComponent.h"
 
-void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseFloatField("movementspeed", myMovementSpeed);
 	aComponentHandle.ParseFloatField("maxshootingdistance", myMaxShootingDistance);

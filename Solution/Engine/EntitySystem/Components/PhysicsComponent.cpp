@@ -10,7 +10,7 @@
 
 namespace Slush
 {
-	void PhysicsComponent::Data::OnParse(AssetParser::Handle aComponentHandle)
+	void PhysicsComponent::Data::OnParse(AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 	{
 		aComponentHandle.ParseBoolField("isStatic", myStatic);
 		aComponentHandle.ParseBoolField("isSensor", mySensor);

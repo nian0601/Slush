@@ -32,7 +32,7 @@ namespace Slush
 		FW_SAFE_DELETE(myAnimation);
 	}
 
-	void SpriteComponent::Data::OnParse(AssetParser::Handle aComponentHandle)
+	void SpriteComponent::Data::OnParse(AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 	{
 		aComponentHandle.ParseIntField("color", myColor);
 

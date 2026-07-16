@@ -3,7 +3,7 @@
 
 namespace Slush
 {
-	void Component::BaseData::Parse(AssetParser::Handle aRootHandle)
+	bool Component::BaseData::Parse(AssetParser::Handle aRootHandle)
 	{
 		if (aRootHandle.IsReading())
 		{
@@ -11,7 +11,12 @@ namespace Slush
 			if (componentHandle.IsValid())
 			{
 				myEnabled = true;
-				OnParse(componentHandle);
+
+				int loadedVersion = 0;
+				componentHandle.ParseOptionalIntField("version", loadedVersion, true);
+
+				OnParse(componentHandle, static_cast<unsigned int>(loadedVersion));
+				return static_cast<unsigned int>(loadedVersion) < myCurrentComponentVersion;
 			}
 		}
 		else
@@ -20,9 +25,15 @@ namespace Slush
 			{
 				AssetParser::Handle componentHandle = aRootHandle.ParseChildElement(myComponentDataName);
 				if (componentHandle.IsValid())
-					OnParse(componentHandle);
+				{
+					int versionToWrite = static_cast<int>(myCurrentComponentVersion);
+					componentHandle.ParseOptionalIntField("version", versionToWrite, true);
+					OnParse(componentHandle, myCurrentComponentVersion);
+				}
 			}
 		}
+
+		return false;
 	}
 
 	void Component::BaseData::BuildUI()

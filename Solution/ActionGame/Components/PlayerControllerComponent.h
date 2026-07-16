@@ -12,7 +12,7 @@ namespace Slush
 class PlayerControllerComponent : public Slush::Component
 {
 public:
-	COMPONENT_HELPER("Player Controller", "playercontroller");
+	COMPONENT_HELPER("Player Controller", "playercontroller", 1);
 
 	using Slush::Component::Component;
 

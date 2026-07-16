@@ -13,7 +13,7 @@ namespace Slush
 	class AnimationComponent : public Component
 	{
 	public:
-		COMPONENT_HELPER("Animation", "animation");
+		COMPONENT_HELPER("Animation", "animation", 1);
 
 		using Component::Component;
 		~AnimationComponent();

@@ -3,6 +3,7 @@ Entity Prefab
 	version 1 
 	sprite 
 	{ 
+		version 1 
 		color -1 
 		size 
 		{ 
@@ -190,5 +191,6 @@ Entity Prefab
 	} 
 	animation 
 	{ 
+		version 1 
 	} 
 } 

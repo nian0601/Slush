@@ -8,7 +8,7 @@
 #include <EntitySystem\EntityPrefab.h>
 #include "WeaponComponent.h"
 
-void PickupComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void PickupComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseIntField("type", myType);
 	aComponentHandle.ParseIntField("value", myValue);

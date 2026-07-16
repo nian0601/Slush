@@ -12,7 +12,7 @@ class NPCControllerComponent : public Slush::Component
 public:
 	struct Data : public Slush::Component::BaseData
 	{
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 
 		float myMovementSpeed = 100.f;
@@ -20,7 +20,7 @@ public:
 		FW_String mySpawnAnimationID;
 	};
 
-	COMPONENT_HELPER("NPC Controller", "npccontroller");
+	COMPONENT_HELPER("NPC Controller", "npccontroller", 1);
 
 	NPCControllerComponent(Slush::Entity& aEntity, const Slush::EntityPrefab& anEntityPrefab);
 

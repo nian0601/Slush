@@ -98,9 +98,8 @@ void StatsUpgradeData::BuildUI()
 
 //////////////////////////////////////////////////////////////////////////
 
-void StatsComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void StatsComponent::Data::OnParse(Slush::AssetParser::Handle /*aComponentHandle*/, unsigned int /*aVersion*/)
 {
-	aComponentHandle;
 }
 
 void StatsComponent::Data::OnBuildUI()

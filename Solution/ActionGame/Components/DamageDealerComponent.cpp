@@ -8,7 +8,7 @@
 #include "ActionGameGlobals.h"
 #include "EntitySystem\EntityManager.h"
 
-void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseIntField("damage", myDamage);
 	aComponentHandle.ParseStringField("prefab", myImpactPrefab);

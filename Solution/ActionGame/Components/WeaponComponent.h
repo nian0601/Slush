@@ -78,14 +78,14 @@ class WeaponComponent : public Slush::Component
 public:
 	struct Data : public Slush::Component::BaseData
 	{
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 
 		FW_String myWeaponDataAsset;
 	};
 
 public:
-	COMPONENT_HELPER("Weapon", "weaponcomponent");
+	COMPONENT_HELPER("Weapon", "weaponcomponent", 1);
 
 	WeaponComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~WeaponComponent();

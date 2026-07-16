@@ -4,7 +4,7 @@
 
 #include <Physics\PhysicsWorld.h>
 
-void RemoveOnCollisionComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void RemoveOnCollisionComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	const char* const* serializationNames = CollisionUtils::GetSerializationNames();
 	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)

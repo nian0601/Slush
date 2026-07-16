@@ -11,14 +11,14 @@ class TargetingComponent : public Slush::Component
 public:
 	struct Data : public Slush::Component::BaseData
 	{
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 
 		int myTargetFlag = CollisionUtils::COL_ENVIRONMENT;
 	};
 
 public:
-	COMPONENT_HELPER("Targeting", "targeting");
+	COMPONENT_HELPER("Targeting", "targeting", 1);
 
 	TargetingComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 

@@ -3,6 +3,7 @@ Entity Prefab
 	version 1 
 	sprite 
 	{ 
+		version 1 
 		color -1 
 		textureID Enemy_002_B 
 		size 
@@ -27,20 +28,24 @@ Entity Prefab
 	} 
 	animation 
 	{ 
+		version 1 
 	} 
 	health 
 	{ 
+		version 1 
 		maxhealth 500 
 		graceperiodduration 0.000 
 	} 
 	npccontroller 
 	{ 
+		version 1 
 		movementspeed 150.000 
 		maxshootingdistance 800.000 
 		spawnanimation Spawn 
 	} 
 	physics 
 	{ 
+		version 1 
 		isStatic 0 
 		isSensor 0 
 		matchSprite 0 
@@ -63,15 +68,18 @@ Entity Prefab
 	} 
 	targeting 
 	{ 
+		version 1 
 		targetflag 1 
 	} 
 	damagedealer 
 	{ 
+		version 1 
 		damage 10 
 		prefab none 
 	} 
 	drops 
 	{ 
+		version 1 
 		drop 
 		{ 
 			weight 100 
@@ -80,6 +88,7 @@ Entity Prefab
 	} 
 	characteranimation 
 	{ 
+		version 1 
 		animationSetID enemy_melee_boss_animations 
 	} 
 } 

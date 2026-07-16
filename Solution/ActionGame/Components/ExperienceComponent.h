@@ -10,7 +10,7 @@ namespace Slush
 class ExperienceComponent : public Slush::Component
 {
 public:
-	COMPONENT_HELPER("Experience", "experience");
+	COMPONENT_HELPER("Experience", "experience", 1);
 
 	ExperienceComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~ExperienceComponent();

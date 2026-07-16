@@ -7,7 +7,7 @@
 #include "EntitySystem/EntityComponentEvents.h"
 #include <Graphics/RectSprite.h>
 
-void HealthComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void HealthComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseIntField("maxhealth", myMaxHealth);
 	aComponentHandle.ParseFloatField("graceperiodduration", myGracePeriodDuration);

@@ -7,44 +7,6 @@
 
 namespace Slush
 {
-	void EntityPrefab::ComponentData::Parse(AssetParser::Handle aRootHandle)
-	{
-		if (aRootHandle.IsReading())
-		{
-			AssetParser::Handle componentHandle = aRootHandle.ParseChildElement(myComponentDataName);
-			if (componentHandle.IsValid())
-			{
-				myEnabled = true;
-				OnParse(componentHandle);
-			}
-		}
-		else
-		{
-			if (myEnabled)
-			{
-				AssetParser::Handle componentHandle = aRootHandle.ParseChildElement(myComponentDataName);
-				if (componentHandle.IsValid())
-					OnParse(componentHandle);
-			}
-		}
-	}
-
-	void EntityPrefab::ComponentData::BuildUI()
-	{
-		FW_String label = myComponentLabel;
-		label += " Component";
-
-		if (myEnabled)
-		{
-			if (ImGui::CollapsingHeader(label.GetBuffer(), &myEnabled))
-			{
-				ImGui::Indent();
-				OnBuildUI();
-				ImGui::Unindent();
-			}
-		}
-	}
-
 	EntityPrefab::EntityPrefab(const char* aName, unsigned int aAssetID)
 		: DataAsset(aName, aAssetID)
 		, myName(aName)
@@ -62,11 +24,20 @@ namespace Slush
 
 	void EntityPrefab::OnParse(AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 	{
+		myAnyComponentNeedsUpgrade = false;
 		for (Component::BaseData* data : myComponentBaseDatas)
 		{
-			if (data)
-				data->Parse(aRootHandle);
+			if (data && data->Parse(aRootHandle))
+			{
+				myAnyComponentNeedsUpgrade = true;
+				SLUSH_WARNING("[Asset] '%s' (Entity Prefab): component '%s' needs upgrading, resaving to upgrade", myAssetName.GetBuffer(), data->myComponentLabel);
+			}
 		}
+	}
+
+	bool EntityPrefab::NeedsUpgrade(unsigned int aLoadedVersion) const
+	{
+		return DataAsset::NeedsUpgrade(aLoadedVersion) || myAnyComponentNeedsUpgrade;
 	}
 
 	void EntityPrefab::BuildUI()

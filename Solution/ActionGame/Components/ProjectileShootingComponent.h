@@ -10,7 +10,7 @@ class ProjectileShootingComponent : public Slush::Component
 public:
 	struct Data : public Slush::Component::BaseData
 	{
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 
 		float myCooldown = 1.f;
@@ -20,7 +20,7 @@ public:
 	};
 
 public:
-	COMPONENT_HELPER("Projectile Shooting", "projectileshooting");
+	COMPONENT_HELPER("Projectile Shooting", "projectileshooting", 1);
 
 	ProjectileShootingComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 

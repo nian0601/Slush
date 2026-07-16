@@ -6,7 +6,7 @@
 #include <Physics\PhysicsWorld.h>
 #include <float.h>
 
-void TargetingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void TargetingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseIntField("targetflag", myTargetFlag);
 }

@@ -14,7 +14,7 @@
 #include <Core\Assets\AssetStorage.h>
 
 
-void CharacterAnimationComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void CharacterAnimationComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	if (aComponentHandle.HasField("animationSetID") || !aComponentHandle.IsReading())
 		aComponentHandle.ParseStringField("animationSetID", myAnimationSetID);

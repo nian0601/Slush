@@ -12,14 +12,14 @@ namespace Slush
 	class SpriteComponent : public Component
 	{
 	public:
-		COMPONENT_HELPER("Sprite", "sprite");
+		COMPONENT_HELPER("Sprite", "sprite", 1);
 
 		struct Data : public Component::BaseData
 		{
 			Data();
 			~Data();
 
-			void OnParse(AssetParser::Handle aComponentHandle) override;
+			void OnParse(AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 			void OnBuildUI() override;
 
 			Vector2f mySize;

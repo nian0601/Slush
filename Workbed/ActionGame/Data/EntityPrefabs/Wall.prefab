@@ -3,6 +3,7 @@ Entity Prefab
 	version 1 
 	physics 
 	{ 
+		version 1 
 		isStatic 1 
 		isSensor 0 
 		matchSprite 0 

@@ -3,6 +3,7 @@ Entity Prefab
 	version 1 
 	sprite 
 	{ 
+		version 1 
 		color -1 
 		size 
 		{ 
@@ -154,9 +155,11 @@ Entity Prefab
 	} 
 	animation 
 	{ 
+		version 1 
 	} 
 	physics 
 	{ 
+		version 1 
 		isStatic 0 
 		isSensor 0 
 		matchSprite 0 
@@ -179,6 +182,7 @@ Entity Prefab
 	} 
 	removeoncollision 
 	{ 
+		version 1 
 		environment 1 
 		player 0 
 		npc 1 
@@ -188,11 +192,13 @@ Entity Prefab
 	} 
 	damagedealer 
 	{ 
+		version 1 
 		damage 10 
 		prefab Small_Explosion_Violet 
 	} 
 	timedremoval 
 	{ 
+		version 1 
 		duration 4.000 
 	} 
 } 

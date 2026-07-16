@@ -12,7 +12,7 @@ namespace Slush
 class HealthBarComponent : public Slush::Component
 {
 public:
-	COMPONENT_HELPER("Health Bar", "healthbar");
+	COMPONENT_HELPER("Health Bar", "healthbar", 1);
 
 	HealthBarComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
 	~HealthBarComponent();

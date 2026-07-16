@@ -273,7 +273,7 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 
 //////////////////////////////////////////////////////////////////////////
 
-void WeaponComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void WeaponComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseStringField("weapondata", myWeaponDataAsset);
 }

@@ -2,7 +2,7 @@
 
 #include "TimedRemovalComponent.h"
 
-void TimedRemovalComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle)
+void TimedRemovalComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseFloatField("duration", myDuration);
 }

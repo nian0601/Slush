@@ -15,7 +15,7 @@ namespace Slush
 	public:
 		struct Data : public Component::BaseData
 		{
-			void OnParse(AssetParser::Handle aComponentHandle) override;
+			void OnParse(AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 			void OnBuildUI() override;
 
 			virtual void OnParseCollisionFlags(AssetParser::Handle aComponentHandle) { aComponentHandle; }
@@ -32,7 +32,7 @@ namespace Slush
 		};
 
 	public:
-		COMPONENT_HELPER("Physics", "physics");
+		COMPONENT_HELPER("Physics", "physics", 1);
 
 		PhysicsComponent(Entity& aEntity, const EntityPrefab& anEntityPrefab);
 		~PhysicsComponent();

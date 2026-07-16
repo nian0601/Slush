@@ -11,13 +11,13 @@ public:
 	{
 		Data() { myCollisionFlags.Fill(false); }
 
-		void OnParse(Slush::AssetParser::Handle aComponentHandle) override;
+		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
 
 		FW_StaticArray<bool, CollisionUtils::COLLISIONFLAG_COUNT> myCollisionFlags;
 	};
 public:
-	COMPONENT_HELPER("Remove On Collision", "removeoncollision");
+	COMPONENT_HELPER("Remove On Collision", "removeoncollision", 1);
 
 	using Slush::Component::Component;
 

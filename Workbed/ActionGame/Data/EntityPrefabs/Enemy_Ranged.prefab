@@ -3,6 +3,7 @@ Entity Prefab
 	version 1 
 	sprite 
 	{ 
+		version 1 
 		color -1 
 		textureID Enemy_003_A 
 		size 
@@ -27,9 +28,11 @@ Entity Prefab
 	} 
 	animation 
 	{ 
+		version 1 
 	} 
 	projectileshooting 
 	{ 
+		version 1 
 		cooldown 1.000 
 		projectilespeed 600.000 
 		projectilespawnoffset 35.000 
@@ -37,17 +40,20 @@ Entity Prefab
 	} 
 	health 
 	{ 
+		version 1 
 		maxhealth 50 
 		graceperiodduration 0.000 
 	} 
 	npccontroller 
 	{ 
+		version 1 
 		movementspeed 100.000 
 		maxshootingdistance 800.000 
 		spawnanimation Spawn 
 	} 
 	physics 
 	{ 
+		version 1 
 		isStatic 0 
 		isSensor 0 
 		matchSprite 0 
@@ -70,15 +76,18 @@ Entity Prefab
 	} 
 	targeting 
 	{ 
+		version 1 
 		targetflag 1 
 	} 
 	damagedealer 
 	{ 
+		version 1 
 		damage 10 
 		prefab none 
 	} 
 	drops 
 	{ 
+		version 1 
 		drop 
 		{ 
 			weight 100 
@@ -92,6 +101,7 @@ Entity Prefab
 	} 
 	characteranimation 
 	{ 
+		version 1 
 		animationSetID ranged_enemy_animations 
 	} 
 } 

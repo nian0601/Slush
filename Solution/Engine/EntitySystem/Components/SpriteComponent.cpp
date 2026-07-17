@@ -9,8 +9,6 @@
 
 #include "Graphics/Animation/Animation.h"
 
-#include "Core/Assets/AssetStorage.h"
-
 #include "Graphics/CircleSprite.h"
 #include "Graphics/RectSprite.h"
 #include "Graphics/Texture.h"
@@ -63,7 +61,7 @@ namespace Slush
 
 		if (mySpriteType == SpriteType::Static)
 		{
-			aComponentHandle.ParseStringField("textureID", myTextureID);
+			myTexture.Parse(aComponentHandle, "textureID");
 
 			AssetParser::Handle textureRectHandle = aComponentHandle.ParseChildElement("textureRect");
 			if (textureRectHandle.IsValid())
@@ -81,6 +79,11 @@ namespace Slush
 			animationHandle.ParseBoolField("removeentityafteranimation", myRemoveEntityAfterAnimation);
 			myAnimation->OnParse(animationHandle, 0); // embedded inline, not a standalone loaded Animation asset, no version context of its own
 		}
+	}
+
+	void SpriteComponent::Data::ResolveDependencies()
+	{
+		myTexture.ResolveDependency();
 	}
 
 	void SpriteComponent::Data::OnBuildUI()
@@ -108,7 +111,7 @@ namespace Slush
 		if (mySpriteType == SpriteType::Static)
 		{
 			ImGui::BeginGroup();
-			ImGui::InputText("TextureID", &myTextureID);
+			ImGui::Text("TextureID: %s", myTexture.GetName().GetBuffer());
 			ImGui::InputInt2("TextureRectPos", &myTextureRectPos.x);
 			ImGui::InputInt2("TextureRectSize", &myTextureRectSize.x);
 
@@ -117,32 +120,28 @@ namespace Slush
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (Asset* asset = ImGui::AcceptDraggedAsset(GetAssetID<Texture>()))
-					myTextureID = asset->GetAssetName();
+					myTexture.Set(static_cast<Texture*>(asset));
 
 				if (const ImGuiPayload* imguiPayload = ImGui::AcceptDragDropPayload("TextureDragPayload"))
 				{
 					TextureDragPayload* payload = static_cast<TextureDragPayload*>(imguiPayload->Data);
 					myTextureRectPos = payload->myTextureRect.myTopLeft;
 					myTextureRectSize = payload->myTextureRect.myExtents;
-					myTextureID = payload->myTexture->GetAssetName();
+					myTexture.Set(payload->myTexture);
 				}
 
 				ImGui::EndDragDropTarget();
 			}
 
-			if (!myTextureID.Empty())
+			if (const Texture* texture = myTexture.Get())
 			{
-				AssetRegistry& assets = AssetRegistry::GetInstance();
-				if (const Texture* texture = assets.GetAsset<Texture>(myTextureID.GetBuffer()))
-				{
-					sf::FloatRect texRect;
-					texRect.position.x = static_cast<float>(myTextureRectPos.x);
-					texRect.position.y = static_cast<float>(myTextureRectPos.y);
-					texRect.size.x = static_cast<float>(mySize.x);
-					texRect.size.y = static_cast<float>(mySize.y);
+				sf::FloatRect texRect;
+				texRect.position.x = static_cast<float>(myTextureRectPos.x);
+				texRect.position.y = static_cast<float>(myTextureRectPos.y);
+				texRect.size.x = static_cast<float>(mySize.x);
+				texRect.size.y = static_cast<float>(mySize.y);
 
-					ImGui::Image(*texture->GetSFMLTexture(), { texRect.size.x, texRect.size.y }, texRect);
-				}
+				ImGui::Image(*texture->GetSFMLTexture(), { texRect.size.x, texRect.size.y }, texRect);
 			}
 		}
 		else if (mySpriteType == SpriteType::Animated)
@@ -170,15 +169,14 @@ namespace Slush
 
 		if (spriteData.mySpriteType == Data::Static)
 		{
-			AssetRegistry& assets = AssetRegistry::GetInstance();
-			if (const Texture* texture = assets.GetAsset<Texture>(spriteData.myTextureID.GetBuffer()))
+			if (const Texture* texture = spriteData.myTexture.Get())
 			{
 				mySprite->SetTexture(*texture);
 				mySprite->SetOutlineColor(0x00000000);
 			}
 			else
 			{
-				SLUSH_ERROR("[Entity] %i failed to load texture '%s'", anEntityPrefab.GetAssetName().GetBuffer(), spriteData.myTextureID.GetBuffer());
+				SLUSH_ERROR("[Entity] %i failed to load texture '%s'", anEntityPrefab.GetAssetName().GetBuffer(), spriteData.myTexture.GetName().GetBuffer());
 			}
 
 			if (spriteData.myTextureRectSize.x > 0)

@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClInclude Include="Core\Assets\Asset.h" />
     <ClInclude Include="Core\Assets\AssetParser.h" />
+    <ClInclude Include="Core\Assets\AssetReference.h" />
     <ClInclude Include="Core\Assets\AssetStorage.h" />
     <ClInclude Include="Core\Assets\DataAsset.h" />
     <ClInclude Include="Core\Assets\DependencyTracker.h" />

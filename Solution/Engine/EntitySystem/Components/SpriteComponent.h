@@ -1,11 +1,13 @@
 #pragma once
 
 #include "EntitySystem/Component.h"
+#include "Core/Assets/AssetReference.h"
 
 namespace Slush
 {
 	class Animation;
 	class BaseSprite;
+	class Texture;
 
 	struct AnimationRuntime;
 
@@ -21,6 +23,7 @@ namespace Slush
 
 			void OnParse(AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 			void OnBuildUI() override;
+			void ResolveDependencies() override;
 
 			Vector2f mySize;
 			int myColor = 0xFFFFFFFF;
@@ -38,7 +41,7 @@ namespace Slush
 			bool myLoopAnimation = true;
 			bool myRemoveEntityAfterAnimation = true;
 
-			FW_String myTextureID;
+			AssetReference<Texture> myTexture;
 			Vector2i myTextureRectPos;
 			Vector2i myTextureRectSize;
 

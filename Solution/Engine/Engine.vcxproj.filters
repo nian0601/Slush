@@ -59,6 +59,7 @@
     <ClInclude Include="UI\UILayout.h" />
     <ClInclude Include="UI\UIEditorDockable.h" />
     <ClInclude Include="Core\Assets\AssetParser.h" />
+    <ClInclude Include="Core\Assets\AssetReference.h" />
     <ClInclude Include="Core\Assets\AssetStorage.h" />
     <ClInclude Include="Core\Assets\Asset.h" />
     <ClInclude Include="Core\Assets\DataAsset.h" />

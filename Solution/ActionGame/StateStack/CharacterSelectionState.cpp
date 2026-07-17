@@ -45,6 +45,13 @@ Slush::IGameState::GameStateResult CharacterSelectionState::Update()
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& charAssets = assets.GetAllAssets<CharacterInfo>();
 
+	if (ActionGameGlobals::GetInstance().myDebugSettings.mySkipStartScreen && !charAssets.IsEmpty())
+	{
+		CharacterInfo* charInfo = static_cast<CharacterInfo*>(charAssets[0]);
+		myStateStack->PushSubState(new LevelState(*charInfo));
+		return Slush::IGameState::KEEP;
+	}
+
 	Slush::DynamicUIBuilder uiBuilder;
 
 	uiBuilder.Start();

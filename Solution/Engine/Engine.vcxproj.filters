@@ -62,6 +62,7 @@
     <ClInclude Include="Core\Assets\AssetStorage.h" />
     <ClInclude Include="Core\Assets\Asset.h" />
     <ClInclude Include="Core\Assets\DataAsset.h" />
+    <ClInclude Include="Core\Assets\DependencyTracker.h" />
     <ClInclude Include="UI\UIRect.h" />
     <ClInclude Include="Core\Dockables\ContentBrowserDockable.h" />
     <ClInclude Include="imgui\imgui_user.h" />
@@ -142,6 +143,7 @@
     <ClCompile Include="Core\Assets\AssetParser.cpp" />
     <ClCompile Include="Core\Assets\Asset.cpp" />
     <ClCompile Include="Core\Assets\DataAsset.cpp" />
+    <ClCompile Include="Core\Assets\DependencyTracker.cpp" />
     <ClCompile Include="UI\UIRect.cpp" />
     <ClCompile Include="Core\Dockables\ContentBrowserDockable.cpp" />
     <ClCompile Include="Core\Assets\AssetStorage.cpp" />

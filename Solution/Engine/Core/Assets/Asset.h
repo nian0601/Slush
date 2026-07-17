@@ -11,6 +11,7 @@ namespace Slush
 		virtual void Load(const char* aFilePath);
 		virtual void Save();
 		virtual void BuildUI() {};
+		virtual void ResolveDependencies() {};
 
 		virtual const char* GetTypeName() const = 0;
 		virtual const char* GetTypeExtention() const = 0;

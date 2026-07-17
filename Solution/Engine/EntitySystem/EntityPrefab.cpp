@@ -40,6 +40,13 @@ namespace Slush
 		return DataAsset::NeedsUpgrade(aLoadedVersion) || myAnyComponentNeedsUpgrade;
 	}
 
+	void EntityPrefab::ResolveDependencies()
+	{
+		for (Component::BaseData* data : myComponentBaseDatas)
+			if (data && data->myEnabled)
+				data->ResolveDependencies();
+	}
+
 	void EntityPrefab::BuildUI()
 	{
 		FW_GrowingArray<MissingComponent> missingComponents;

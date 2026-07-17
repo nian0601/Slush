@@ -26,6 +26,7 @@ namespace Slush
 
 		void OnParse(AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 		bool NeedsUpgrade(unsigned int aLoadedVersion) const override;
+		void ResolveDependencies() override;
 
 		void BuildUI() override;
 		void BuildMissingComponentsUI(const FW_GrowingArray<MissingComponent>& someMissingComponents);

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "AssetStorage.h"
+#include "DependencyTracker.h"
 
 namespace Slush
 {
@@ -22,6 +23,17 @@ namespace Slush
 	{
 		for (IAssetStorage* storage : myAssetStorages)
 			storage->LoadAllAssets();
+
+		DependencyTracker& dependencyTracker = DependencyTracker::GetInstance();
+		for (IAssetStorage* storage : myAssetStorages)
+		{
+			for (Asset* asset : storage->GetAllAssets())
+			{
+				dependencyTracker.BeginTrackingAsset(asset);
+				asset->ResolveDependencies();
+				dependencyTracker.EndTrackingAsset();
+			}
+		}
 	}
 
 	Slush::IAssetStorage& AssetRegistry::GetAssetStorage(unsigned int aAssetTypeID)

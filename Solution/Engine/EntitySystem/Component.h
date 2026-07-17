@@ -41,6 +41,7 @@ namespace Slush
 			// Returns true if the on-disk version was behind myCurrentComponentVersion (reading only; always false when writing).
 			bool Parse(AssetParser::Handle aRootHandle);
 			virtual void OnParse(AssetParser::Handle /*aComponentHandle*/, unsigned int /*aVersion*/) {}
+			virtual void ResolveDependencies() {}
 
 			void BuildUI();
 			virtual void OnBuildUI() {};

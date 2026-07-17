@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntitySystem/Component.h"
+#include "Core\Assets\AssetReference.h"
 
 #include <Core\Time.h>
 #include <FW_Vector2.h>
@@ -12,11 +13,12 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
+		void ResolveDependencies() override;
 
 		float myCooldown = 1.f;
 		float myProjectileSpeed = 500.f;
 		float myProjectileSpawnOffset = 35.f;
-		FW_String myProjectileEntityPrefab;
+		Slush::AssetReference<Slush::EntityPrefab> myProjectileEntityPrefab;
 	};
 
 public:

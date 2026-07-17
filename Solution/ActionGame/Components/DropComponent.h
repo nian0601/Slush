@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntitySystem/Component.h"
+#include "Core\Assets\AssetReference.h"
 
 class DropComponent : public Slush::Component
 {
@@ -11,11 +12,12 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
+		void ResolveDependencies() override;
 
 		struct DropItem
 		{
 			int myWeight = 1;
-			FW_String myPrefabName;
+			Slush::AssetReference<Slush::EntityPrefab> myPrefab;
 		};
 		FW_GrowingArray<DropItem> myDrops;
 	};

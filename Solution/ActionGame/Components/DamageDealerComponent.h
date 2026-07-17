@@ -2,6 +2,7 @@
 
 #include "EntitySystem/Component.h"
 #include "EntitySystem/EntityHandle.h"
+#include "Core\Assets\AssetReference.h"
 
 class DamageDealerComponent : public Slush::Component
 {
@@ -10,9 +11,10 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
+		void ResolveDependencies() override;
 
 		int myDamage = 10;
-		FW_String myImpactPrefab;
+		Slush::AssetReference<Slush::EntityPrefab> myImpactPrefab;
 	};
 public:
 	COMPONENT_HELPER("Damage Dealer", "damagedealer", 1);

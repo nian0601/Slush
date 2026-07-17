@@ -74,7 +74,11 @@ void Level::Restart()
 	myEnemyWaveData = &myLevelData->myEnemyWaves[0];
 	myWaveTimer.Start(3.f);
 
-	Slush::Entity* player = myEntityManager.CreateEntity(myLevelData->myPlayerStartPosition, myLevelData->myPlayerEntityPrefab);
+	Slush::Entity* player = nullptr;
+	if (Slush::EntityPrefab* playerPrefab = myLevelData->myPlayerEntityPrefab.Get())
+		player = myEntityManager.CreateEntity(myLevelData->myPlayerStartPosition, *playerPrefab);
+
+	FW_ASSERT(player, "Level has no valid player - check LevelData's player prefab reference");
 	myPlayerHandle = player->myHandle;
 
 	myTilemap->CreateWallEntities(myEntityManager);
@@ -135,8 +139,11 @@ void Level::HandleEnemyWaves()
 		}
 
 		int enemyPick = FW_RandInt(0, myEnemyWaveData->myEnemyPrefabs.Count() -1);
+		Slush::EntityPrefab* prefab = myEnemyWaveData->myEnemyPrefabs[enemyPick].Get();
+		if (!prefab)
+			continue;
 
-		Slush::Entity* enemy = myEntityManager.CreateEntity(position, myEnemyWaveData->myEnemyPrefabs[enemyPick]);
+		Slush::Entity* enemy = myEntityManager.CreateEntity(position, *prefab);
 		if (ProjectileShootingComponent* projShoot = enemy->GetComponent<ProjectileShootingComponent>())
 			projShoot->TriggerCooldown();
 

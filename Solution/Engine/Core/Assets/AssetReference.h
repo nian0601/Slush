@@ -21,13 +21,27 @@ namespace Slush
 			aHandle.ParseStringField(aFieldName, myAssetName);
 		}
 
+		// For arrays of repeated same-named fields (e.g. several sibling "prefab" elements), where
+		// GetField()-based lookup (used by Parse()/ParseStringField) would always find the first one.
+		// Reading needs by-index access; writing already appends one field per call, so it reuses Parse().
+		void ParseAtIndex(AssetParser::Handle aHandle, const char* aFieldName, int anIndex)
+		{
+			if (aHandle.IsReading())
+				aHandle.GetStringFieldAtIndex(anIndex, myAssetName);
+			else
+				Parse(aHandle, aFieldName);
+		}
+
 		void ResolveDependency()
 		{
 			myAsset = nullptr;
 			if (!myAssetName.Empty())
 			{
 				myAsset = AssetRegistry::GetInstance().GetAsset<AssetType>(myAssetName);
-				DependencyTracker::GetInstance().RegisterDependency(GetAssetID<AssetType>(), myAssetName);
+				if (myAsset)
+					DependencyTracker::GetInstance().RegisterDependency(GetAssetID<AssetType>(), myAssetName);
+				else
+					SLUSH_ERROR("AssetReference: '%s' references %s '%s', which doesn't exist", DependencyTracker::GetInstance().GetCurrentAssetName().GetBuffer(), AssetType::GetAssetTypeName(), myAssetName.GetBuffer());
 			}
 		}
 

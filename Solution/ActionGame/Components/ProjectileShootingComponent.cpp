@@ -14,7 +14,12 @@ void ProjectileShootingComponent::Data::OnParse(Slush::AssetParser::Handle aComp
 	aComponentHandle.ParseFloatField("cooldown", myCooldown);
 	aComponentHandle.ParseFloatField("projectilespeed", myProjectileSpeed);
 	aComponentHandle.ParseFloatField("projectilespawnoffset", myProjectileSpawnOffset);
-	aComponentHandle.ParseStringField("projectiletype", myProjectileEntityPrefab);
+	myProjectileEntityPrefab.Parse(aComponentHandle, "projectiletype");
+}
+
+void ProjectileShootingComponent::Data::ResolveDependencies()
+{
+	myProjectileEntityPrefab.ResolveDependency();
 }
 
 void ProjectileShootingComponent::Data::OnBuildUI()
@@ -28,12 +33,12 @@ void ProjectileShootingComponent::Data::OnBuildUI()
 	ImGui::SetNextItemWidth(100.f);
 	ImGui::InputFloat("Projectile Spawn Offset", &myProjectileSpawnOffset, 0.1f, 1.f, "%.2f");
 
-	ImGui::InputText("ProjectileType", &myProjectileEntityPrefab);
+	ImGui::Text("ProjectileType: %s", myProjectileEntityPrefab.GetName().GetBuffer());
 
 	if (ImGui::BeginDragDropTarget())
 	{
 		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
-			myProjectileEntityPrefab = asset->GetAssetName();
+			myProjectileEntityPrefab.Set(static_cast<Slush::EntityPrefab*>(asset));
 
 		ImGui::EndDragDropTarget();
 	}
@@ -55,8 +60,12 @@ bool ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 
 	const ProjectileShootingComponent::Data& shootingData = myEntityPrefab.GetComponentData<ProjectileShootingComponent>();
 
+	Slush::EntityPrefab* prefab = shootingData.myProjectileEntityPrefab.Get();
+	if (!prefab)
+		return true;
+
 	Vector2f projPosition = myEntity.myPosition + aDirection * shootingData.myProjectileSpawnOffset;
-	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, shootingData.myProjectileEntityPrefab.GetBuffer());
+	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, *prefab);
 	projectile->GetComponent<Slush::PhysicsComponent>()->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
 	projectile->GetComponent<Slush::SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 

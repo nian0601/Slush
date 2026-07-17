@@ -23,6 +23,7 @@ public:
 	WeaponData(const char* aName, unsigned int aAssetID);
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
+	void ResolveDependencies() override;
 	void BuildUI();
 
 	struct RankData
@@ -37,7 +38,7 @@ public:
 			bool myEnable = false;
 			float myBaseProjectileSpeed = 750.f;
 			int myBaseProjectileCount = 1;
-			FW_String myProjectilePrefab;
+			Slush::AssetReference<Slush::EntityPrefab> myProjectilePrefab;
 		};
 		ProjectileData myProjectileData;
 	};

@@ -11,7 +11,12 @@
 void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseIntField("damage", myDamage);
-	aComponentHandle.ParseStringField("prefab", myImpactPrefab);
+	myImpactPrefab.Parse(aComponentHandle, "prefab");
+}
+
+void DamageDealerComponent::Data::ResolveDependencies()
+{
+	myImpactPrefab.ResolveDependency();
 }
 
 void DamageDealerComponent::Data::OnBuildUI()
@@ -19,12 +24,12 @@ void DamageDealerComponent::Data::OnBuildUI()
 	ImGui::SetNextItemWidth(100.f);
 	ImGui::InputInt("Damage", &myDamage);
 
-	ImGui::InputText("Prefab", &myImpactPrefab);
+	ImGui::Text("Prefab: %s", myImpactPrefab.GetName().GetBuffer());
 
 	if (ImGui::BeginDragDropTarget())
 	{
 		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
-			myImpactPrefab = asset->GetAssetName();
+			myImpactPrefab.Set(static_cast<Slush::EntityPrefab*>(asset));
 
 		ImGui::EndDragDropTarget();
 	}
@@ -69,6 +74,6 @@ void DamageDealerComponent::OnCollision(Slush::Entity& aOtherEntity, const Vecto
 		otherHealth->DealDamage(myDamage);
 
 	const Data& data = myEntityPrefab.GetComponentData<DamageDealerComponent>();
-	if (!data.myImpactPrefab.Empty())
-		ActionGameGlobals::GetInstance().GetEntityManager().CreateEntity(aContactPosition, data.myImpactPrefab.GetBuffer());
+	if (Slush::EntityPrefab* prefab = data.myImpactPrefab.Get())
+		ActionGameGlobals::GetInstance().GetEntityManager().CreateEntity(aContactPosition, *prefab);
 }

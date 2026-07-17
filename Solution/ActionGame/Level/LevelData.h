@@ -1,5 +1,11 @@
 #pragma once
 #include <Core\Assets\DataAsset.h>
+#include <Core\Assets\AssetReference.h>
+
+namespace Slush
+{
+	class EntityPrefab;
+}
 
 struct EnemyWaveData
 {
@@ -7,7 +13,7 @@ struct EnemyWaveData
 	int myMinEnemyCount = 2;
 	int myMaxEnemyCount = 5;
 
-	FW_GrowingArray<FW_String> myEnemyPrefabs;
+	FW_GrowingArray<Slush::AssetReference<Slush::EntityPrefab>> myEnemyPrefabs;
 };
 
 class LevelData : public Slush::DataAsset
@@ -18,10 +24,11 @@ public:
 	LevelData(const char* aName, unsigned int aAssetID);
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
+	void ResolveDependencies() override;
 	void BuildUI() override;
 
 	Vector2f myPlayerStartPosition;
-	FW_String myPlayerEntityPrefab;
+	Slush::AssetReference<Slush::EntityPrefab> myPlayerEntityPrefab;
 
 	FW_GrowingArray<EnemyWaveData> myEnemyWaves;
 

@@ -29,6 +29,12 @@ namespace Slush
 		myCurrentAsset = nullptr;
 	}
 
+	const FW_String& DependencyTracker::GetCurrentAssetName() const
+	{
+		FW_ASSERT(myCurrentAsset != nullptr, "[DependencyTracker] GetCurrentAssetName called outside of a BeginTrackingAsset/EndTrackingAsset pair");
+		return myCurrentAsset->GetAssetName();
+	}
+
 	void DependencyTracker::RegisterDependency(unsigned int aTypeID, const FW_String& aName)
 	{
 		FW_ASSERT(myCurrentAsset != nullptr, "[DependencyTracker] RegisterDependency called outside of a BeginTrackingAsset/EndTrackingAsset pair");

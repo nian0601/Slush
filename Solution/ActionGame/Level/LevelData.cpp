@@ -3,6 +3,7 @@
 #include "LevelData.h"
 #include <ActionGameGlobals.h>
 #include <Core\Assets\AssetStorage.h>
+#include <EntitySystem\EntityPrefab.h>
 
 LevelData::LevelData(const char* aName, unsigned int aAssetID)
 	: DataAsset(aName, aAssetID)
@@ -17,17 +18,26 @@ void LevelData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*a
 		OnSave(aRootHandle);
 }
 
+void LevelData::ResolveDependencies()
+{
+	myPlayerEntityPrefab.ResolveDependency();
+
+	for (EnemyWaveData& waveData : myEnemyWaves)
+		for (Slush::AssetReference<Slush::EntityPrefab>& prefab : waveData.myEnemyPrefabs)
+			prefab.ResolveDependency();
+}
+
 void LevelData::BuildUI()
 {
 	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
 
 	ImGui::InputFloat2("Player Position", &myPlayerStartPosition.x);
-	ImGui::InputText("Player Prefab", &myPlayerEntityPrefab);
+	ImGui::Text("Player Prefab: %s", myPlayerEntityPrefab.GetName().GetBuffer());
 
 	if (ImGui::BeginDragDropTarget())
 	{
 		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
-			myPlayerEntityPrefab = asset->GetAssetName();
+			myPlayerEntityPrefab.Set(static_cast<Slush::EntityPrefab*>(asset));
 
 		ImGui::EndDragDropTarget();
 	}
@@ -59,11 +69,11 @@ void LevelData::BuildUI()
 						}
 
 						ImGui::SameLine();
-						ImGui::InputText("", &waveData.myEnemyPrefabs[j]);
+						ImGui::Text("%s", waveData.myEnemyPrefabs[j].GetName().GetBuffer());
 						if (ImGui::BeginDragDropTarget())
 						{
 							if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
-								waveData.myEnemyPrefabs[j] = asset->GetAssetName();
+								waveData.myEnemyPrefabs[j].Set(static_cast<Slush::EntityPrefab*>(asset));
 
 							ImGui::EndDragDropTarget();
 						}
@@ -72,7 +82,7 @@ void LevelData::BuildUI()
 					}
 
 					if (ImGui::Button("Add Enemy.."))
-						waveData.myEnemyPrefabs.Add("");
+						waveData.myEnemyPrefabs.Add();
 
 					ImGui::TreePop();
 				}
@@ -89,7 +99,7 @@ void LevelData::BuildUI()
 void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
 {
 	aRootHandle.ParseVec2fField("playerStartPosition", myPlayerStartPosition);
-	aRootHandle.ParseStringField("playerEntityPrefab", myPlayerEntityPrefab);
+	myPlayerEntityPrefab.Parse(aRootHandle, "playerEntityPrefab");
 
 	Slush::AssetParser::Handle enemyWavesHandle = aRootHandle.ParseChildElement("enemyWaves");
 	if (enemyWavesHandle.IsValid())
@@ -110,7 +120,7 @@ void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
 			int numEnemyPrefabs = prefabHandle.GetNumFields();
 			waveData.myEnemyPrefabs.Reserve(numEnemyPrefabs);
 			for (int j = 0; j < numEnemyPrefabs; ++j)
-				prefabHandle.GetStringFieldAtIndex(j, waveData.myEnemyPrefabs[j]);
+				waveData.myEnemyPrefabs[j].ParseAtIndex(prefabHandle, "prefab", j);
 		}
 	}
 }
@@ -118,7 +128,7 @@ void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
 void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 {
 	aRootHandle.ParseVec2fField("playerStartPosition", myPlayerStartPosition);
-	aRootHandle.ParseStringField("playerEntityPrefab", myPlayerEntityPrefab);
+	myPlayerEntityPrefab.Parse(aRootHandle, "playerEntityPrefab");
 
 	Slush::AssetParser::Handle enemyWavesHandle = aRootHandle.ParseChildElement("enemyWaves");
 	if (enemyWavesHandle.IsValid())
@@ -132,8 +142,8 @@ void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 			waveHandle.ParseIntField("maxEnemyCount", waveData.myMaxEnemyCount);
 
 			Slush::AssetParser::Handle prefabHandle = waveHandle.ParseChildElement("enemyPrefabs");
-			for (FW_String& prefab : waveData.myEnemyPrefabs)
-				prefabHandle.ParseStringField("prefab", prefab);
+			for (Slush::AssetReference<Slush::EntityPrefab>& prefab : waveData.myEnemyPrefabs)
+				prefab.Parse(prefabHandle, "prefab");
 		}
 	}
 }

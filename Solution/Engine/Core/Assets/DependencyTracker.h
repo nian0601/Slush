@@ -17,6 +17,7 @@ namespace Slush
 
 		void BeginTrackingAsset(Asset* anAsset);
 		void EndTrackingAsset();
+		const FW_String& GetCurrentAssetName() const;
 
 		void RegisterDependency(unsigned int aTypeID, const FW_String& aName);
 

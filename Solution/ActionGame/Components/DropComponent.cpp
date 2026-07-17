@@ -22,8 +22,14 @@ void DropComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, u
 			dropHandle = aComponentHandle.ParseChildElement("drop");
 
 		dropHandle.ParseIntField("weight", myDrops[i].myWeight);
-		dropHandle.ParseStringField("prefab", myDrops[i].myPrefabName);
+		myDrops[i].myPrefab.Parse(dropHandle, "prefab");
 	}
+}
+
+void DropComponent::Data::ResolveDependencies()
+{
+	for (DropItem& drop : myDrops)
+		drop.myPrefab.ResolveDependency();
 }
 
 void DropComponent::Data::OnBuildUI()
@@ -46,13 +52,12 @@ void DropComponent::Data::OnBuildUI()
 			ImGui::SliderInt("", &drop.myWeight, 0, 100);
 
 			ImGui::SameLine();
-			ImGui::SetNextItemWidth(200.f);
-			ImGui::InputText("Prefab", &drop.myPrefabName);
+			ImGui::Text("Prefab: %s", drop.myPrefab.GetName().GetBuffer());
 
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
-					drop.myPrefabName = asset->GetAssetName();
+					drop.myPrefab.Set(static_cast<Slush::EntityPrefab*>(asset));
 
 				ImGui::EndDragDropTarget();
 			}
@@ -84,8 +89,9 @@ void DropComponent::OnDeath()
 	{
 		if (item.myWeight > pick)
 		{
-			Slush::EntityManager& entityManager = ActionGameGlobals::GetInstance().GetEntityManager();
-			entityManager.CreateEntity(myEntity.myPosition, item.myPrefabName);
+			if (Slush::EntityPrefab* prefab = item.myPrefab.Get())
+				ActionGameGlobals::GetInstance().GetEntityManager().CreateEntity(myEntity.myPosition, *prefab);
+
 			return;
 		}
 

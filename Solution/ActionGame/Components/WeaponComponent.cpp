@@ -27,7 +27,8 @@ void WeaponData::RankData::OnParse(Slush::AssetParser::Handle aRootHandle)
 	projectileHandle.ParseOptionalBoolField("enable", myProjectileData.myEnable, true);
 	projectileHandle.ParseOptionalFloatField("baseprojectilespeed", myProjectileData.myBaseProjectileSpeed, myProjectileData.myEnable);
 	projectileHandle.ParseOptionalIntField("baseprojectilcount", myProjectileData.myBaseProjectileCount, myProjectileData.myEnable);
-	projectileHandle.ParseOptionalStringField("projectilePrefab", myProjectileData.myProjectilePrefab, myProjectileData.myEnable);
+	if (projectileHandle.IsReading() || myProjectileData.myEnable)
+		myProjectileData.myProjectilePrefab.Parse(projectileHandle, "projectilePrefab");
 }
 
 WeaponData::WeaponData(const char* aName, unsigned int aAssetID)
@@ -67,6 +68,12 @@ void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*
 
 		myRanks[i].OnParse(rankHandle);
 	}
+}
+
+void WeaponData::ResolveDependencies()
+{
+	for (RankData& rank : myRanks)
+		rank.myProjectileData.myProjectilePrefab.ResolveDependency();
 }
 
 void WeaponData::BuildUI()
@@ -148,12 +155,11 @@ void WeaponData::BuildUI()
 					ImGui::InputInt("Base Projectile Count", &rankData.myProjectileData.myBaseProjectileCount);
 					rankData.myProjectileData.myBaseProjectileCount = FW_Clamp(rankData.myProjectileData.myBaseProjectileCount, 1, 20);
 
-					ImGui::SetNextItemWidth(150.f);
-					ImGui::InputText("ProjectilePrefab", &rankData.myProjectileData.myProjectilePrefab);
+					ImGui::Text("ProjectilePrefab: %s", rankData.myProjectileData.myProjectilePrefab.GetName().GetBuffer());
 					if (ImGui::BeginDragDropTarget())
 					{
 						if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
-							rankData.myProjectileData.myProjectilePrefab = asset->GetAssetName();
+							rankData.myProjectileData.myProjectilePrefab.Set(static_cast<Slush::EntityPrefab*>(asset));
 
 						ImGui::EndDragDropTarget();
 					}
@@ -255,7 +261,11 @@ void Weapon::RunProjectileLogic()
 
 void Weapon::ShootProjectile(const Vector2f& aDirection)
 {
-	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, myRankData->myProjectileData.myProjectilePrefab.GetBuffer());
+	Slush::EntityPrefab* prefab = myRankData->myProjectileData.myProjectilePrefab.Get();
+	if (!prefab)
+		return;
+
+	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, *prefab);
 	projectile->GetComponent<Slush::PhysicsComponent>()->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
 	projectile->GetComponent<Slush::SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())

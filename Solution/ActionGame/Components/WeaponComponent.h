@@ -7,6 +7,7 @@
 #include <FW_GrowingArray.h>
 
 #include "Core\Assets\DataAsset.h"
+#include "Core\Assets\AssetReference.h"
 
 namespace Slush
 {
@@ -80,8 +81,9 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
+		void ResolveDependencies() override;
 
-		FW_String myWeaponDataAsset;
+		Slush::AssetReference<WeaponData> myWeaponData;
 	};
 
 public:

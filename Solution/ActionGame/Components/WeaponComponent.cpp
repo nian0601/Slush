@@ -275,16 +275,21 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 
 void WeaponComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
-	aComponentHandle.ParseStringField("weapondata", myWeaponDataAsset);
+	myWeaponData.Parse(aComponentHandle, "weapondata");
+}
+
+void WeaponComponent::Data::ResolveDependencies()
+{
+	myWeaponData.ResolveDependency();
 }
 
 void WeaponComponent::Data::OnBuildUI()
 {
-	ImGui::InputText("WeaponData", &myWeaponDataAsset);
+	ImGui::Text("WeaponData: %s", myWeaponData.GetName().GetBuffer());
 	if (ImGui::BeginDragDropTarget())
 	{
 		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<WeaponData>()))
-			myWeaponDataAsset = asset->GetAssetName();
+			myWeaponData.Set(static_cast<WeaponData*>(asset));
 
 		ImGui::EndDragDropTarget();
 	}
@@ -295,7 +300,7 @@ WeaponComponent::WeaponComponent(Slush::Entity& anEntity, const Slush::EntityPre
 	: Slush::Component(anEntity, anEntityPrefab)
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-	WeaponData* startingWeapon = assets.GetAsset<WeaponData>(anEntityPrefab.GetComponentData<WeaponComponent>().myWeaponDataAsset.GetBuffer());
+	WeaponData* startingWeapon = anEntityPrefab.GetComponentData<WeaponComponent>().myWeaponData.Get();
 
 	myWeapons.Add(new Weapon(myEntity, *startingWeapon));
 

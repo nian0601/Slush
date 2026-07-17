@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntitySystem/Component.h"
+#include "Core\Assets\AssetReference.h"
 #include <FW_Vector2.h>
 
 class CharacterAnimationSet;
@@ -13,8 +14,9 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
+		void ResolveDependencies() override;
 
-		FW_String myAnimationSetID;
+		Slush::AssetReference<CharacterAnimationSet> myAnimationSetID;
 	};
 
 public:

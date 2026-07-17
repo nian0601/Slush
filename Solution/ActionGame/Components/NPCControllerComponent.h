@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EntitySystem/Component.h"
+#include "Core\Assets\AssetReference.h"
 
 namespace Slush
 {
@@ -14,10 +15,11 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
+		void ResolveDependencies() override;
 
 		float myMovementSpeed = 100.f;
 		float myMaxShootingDistance = 800.f;
-		FW_String mySpawnAnimationID;
+		Slush::AssetReference<Slush::Animation> mySpawnAnimationID;
 	};
 
 	COMPONENT_HELPER("NPC Controller", "npccontroller", 1);

@@ -5,7 +5,6 @@
 #include "TargetingComponent.h"
 
 #include <Physics\PhysicsWorld.h>
-#include "Core\Assets\AssetStorage.h"
 #include "Graphics\Animation\Animation.h"
 #include "CharacterAnimationComponent.h"
 #include "Graphics\BaseSprite.h"
@@ -17,20 +16,24 @@ void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponent
 {
 	aComponentHandle.ParseFloatField("movementspeed", myMovementSpeed);
 	aComponentHandle.ParseFloatField("maxshootingdistance", myMaxShootingDistance);
-	aComponentHandle.ParseStringField("spawnanimation", mySpawnAnimationID);
+	mySpawnAnimationID.Parse(aComponentHandle, "spawnanimation");
+}
 
+void NPCControllerComponent::Data::ResolveDependencies()
+{
+	mySpawnAnimationID.ResolveDependency();
 }
 
 void NPCControllerComponent::Data::OnBuildUI()
 {
 	ImGui::InputFloat("Movement Speed", &myMovementSpeed);
 	ImGui::InputFloat("Shooting Distance", &myMaxShootingDistance);
-	ImGui::InputText("Spawning Animation", &mySpawnAnimationID);
+	ImGui::Text("Spawning Animation: %s", mySpawnAnimationID.GetName().GetBuffer());
 
 	if (ImGui::BeginDragDropTarget())
 	{
 		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::Animation>()))
-			mySpawnAnimationID = asset->GetAssetName();
+			mySpawnAnimationID.Set(static_cast<Slush::Animation*>(asset));
 
 		ImGui::EndDragDropTarget();
 	}
@@ -42,11 +45,7 @@ NPCControllerComponent::NPCControllerComponent(Slush::Entity& aEntity, const Slu
 	: Slush::Component(aEntity, anEntityPrefab)
 	, myData(static_cast<const Data&>(*anEntityPrefab.GetComponentBaseData<NPCControllerComponent>()))
 {
-	if (!myData.mySpawnAnimationID.Empty())
-	{
-		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-		mySpawnAnimation = assets.GetAsset<Slush::Animation>(myData.mySpawnAnimationID.GetBuffer());
-	}
+	mySpawnAnimation = myData.mySpawnAnimationID.Get();
 }
 
 void NPCControllerComponent::OnEnterWorld()

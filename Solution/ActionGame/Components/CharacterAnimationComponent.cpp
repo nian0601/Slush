@@ -11,23 +11,27 @@
 #include <Graphics\Animation\AnimationRuntime.h>
 #include <Graphics\BaseSprite.h>
 #include <ActionGameGlobals.h>
-#include <Core\Assets\AssetStorage.h>
 
 
 void CharacterAnimationComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	if (aComponentHandle.HasField("animationSetID") || !aComponentHandle.IsReading())
-		aComponentHandle.ParseStringField("animationSetID", myAnimationSetID);
+		myAnimationSetID.Parse(aComponentHandle, "animationSetID");
+}
+
+void CharacterAnimationComponent::Data::ResolveDependencies()
+{
+	myAnimationSetID.ResolveDependency();
 }
 
 void CharacterAnimationComponent::Data::OnBuildUI()
 {
-	ImGui::InputText("AnimationSetID", &myAnimationSetID);
+	ImGui::Text("AnimationSetID: %s", myAnimationSetID.GetName().GetBuffer());
 
 	if (ImGui::BeginDragDropTarget())
 	{
 		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<CharacterAnimationSet>()))
-			myAnimationSetID = asset->GetAssetName();
+			myAnimationSetID.Set(static_cast<CharacterAnimationSet*>(asset));
 
 		ImGui::EndDragDropTarget();
 	}
@@ -36,10 +40,8 @@ void CharacterAnimationComponent::Data::OnBuildUI()
 CharacterAnimationComponent::CharacterAnimationComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
 	: Slush::Component(anEntity, anEntityPrefab)
 {
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-
 	const CharacterAnimationComponent::Data& data = anEntityPrefab.GetComponentData<CharacterAnimationComponent>();
-	myAnimationSet = assets.GetAsset<CharacterAnimationSet>(data.myAnimationSetID.GetBuffer());
+	myAnimationSet = data.myAnimationSetID.Get();
 }
 
 CharacterAnimationComponent::~CharacterAnimationComponent()

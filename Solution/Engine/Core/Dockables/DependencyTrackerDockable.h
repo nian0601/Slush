@@ -18,9 +18,9 @@ namespace Slush
 		void OnBuildUI() override;
 
 	private:
-		void BuildDependentsPane();
-		void BuildMiddlePane();
-		void BuildDependenciesPane();
+		void BuildDependentsPane(Slush::Asset*& outPendingSelection);
+		void BuildMiddlePane(Slush::Asset*& outPendingSelection);
+		void BuildDependenciesPane(Slush::Asset*& outPendingSelection);
 
 		Slush::Asset* ResolveAssetFromKey(const FW_String& aKey) const;
 		static FW_String BuildAssetLabel(const Slush::Asset* anAsset);

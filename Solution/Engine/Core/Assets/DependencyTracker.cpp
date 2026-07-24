@@ -42,8 +42,8 @@ namespace Slush
 		FW_String dependentKey = MakeKey(myCurrentAsset->GetAssetTypeID(), myCurrentAsset->GetAssetName());
 		FW_String dependencyKey = MakeKey(aTypeID, aName);
 
-		myDependencies[dependentKey].Add(dependencyKey);
-		myDependents[dependencyKey].Add(dependentKey);
+		myDependencies[dependentKey].AddUnique(dependencyKey);
+		myDependents[dependencyKey].AddUnique(dependentKey);
 	}
 
 	const FW_GrowingArray<FW_String>& DependencyTracker::GetDependencies(unsigned int aTypeID, const FW_String& aName) const

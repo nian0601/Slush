@@ -12,28 +12,33 @@ namespace Slush
 
 	void DependencyTrackerDockable::OnBuildUI()
 	{
+		Slush::Asset* pendingSelection = nullptr;
+
 		const ImVec2 avail = ImGui::GetContentRegionAvail();
 		const float leftWidth = avail.x * 0.25f;
 		const float middleWidth = avail.x * 0.35f;
 
 		ImGui::BeginChild("DependencyTracker_Dependents", ImVec2(leftWidth, 0), ImGuiChildFlags_Borders);
-		BuildDependentsPane();
+		BuildDependentsPane(pendingSelection);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
 		ImGui::BeginChild("DependencyTracker_AssetList", ImVec2(middleWidth, 0), ImGuiChildFlags_Borders);
-		BuildMiddlePane();
+		BuildMiddlePane(pendingSelection);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
 		ImGui::BeginChild("DependencyTracker_Dependencies", ImVec2(0, 0), ImGuiChildFlags_Borders);
-		BuildDependenciesPane();
+		BuildDependenciesPane(pendingSelection);
 		ImGui::EndChild();
+
+		if (pendingSelection)
+			mySelectedAsset = pendingSelection;
 	}
 
-	void DependencyTrackerDockable::BuildDependentsPane()
+	void DependencyTrackerDockable::BuildDependentsPane(Slush::Asset*& outPendingSelection)
 	{
 		ImGui::TextDisabled("Dependents");
 		ImGui::Separator();
@@ -51,11 +56,12 @@ namespace Slush
 			if (!asset)
 				continue;
 
-			ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), false);
+			if (ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), asset == mySelectedAsset))
+				outPendingSelection = asset;
 		}
 	}
 
-	void DependencyTrackerDockable::BuildMiddlePane()
+	void DependencyTrackerDockable::BuildMiddlePane(Slush::Asset*& outPendingSelection)
 	{
 		static ImGuiTextFilter assetFilter;
 
@@ -82,13 +88,13 @@ namespace Slush
 					continue;
 
 				if (ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), asset == mySelectedAsset))
-					mySelectedAsset = asset;
+					outPendingSelection = asset;
 			}
 		}
 		ImGui::EndChild();
 	}
 
-	void DependencyTrackerDockable::BuildDependenciesPane()
+	void DependencyTrackerDockable::BuildDependenciesPane(Slush::Asset*& outPendingSelection)
 	{
 		ImGui::TextDisabled("Dependencies");
 		ImGui::Separator();
@@ -106,7 +112,8 @@ namespace Slush
 			if (!asset)
 				continue;
 
-			ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), false);
+			if (ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), asset == mySelectedAsset))
+				outPendingSelection = asset;
 		}
 	}
 

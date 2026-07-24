@@ -11,7 +11,7 @@ Turn a rough task description into a fully-scoped GitHub issue draft, through ex
 
 ## Core rule: never assume or infer
 
-Ask. Do not guess scope, priority, project, affected files, or acceptance criteria from the initial description, even when a guess seems obvious. The purpose of this skill is to reach a genuinely solid shared understanding before anything is written to GitHub — a wrong assumption here becomes a wrong issue that `/work-issue` later executes against without noticing.
+Ask. Do not guess scope, priority, project, affected files, or acceptance criteria from the initial description, even when a guess seems obvious. The purpose of this skill is to reach a genuinely solid shared understanding before anything is written to GitHub — a wrong assumption here becomes a wrong issue that `/implement-issue` later executes against without noticing.
 
 ## Flow
 
@@ -27,7 +27,7 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
    - **Verification**: how to tell each phase, and the issue as a whole, is actually done (build passes, specific manual test, `SkipStartScreen` playtest, etc. — see CLAUDE.md's Testing section for the conventions already established).
    - Anything else that stays ambiguous after the above — keep asking rather than filling a gap with a plausible-sounding default.
 
-4. **Break the work into phases**, following the phased-work convention already in CLAUDE.md: small, independently buildable/testable chunks, one thing per phase. For **each** phase, write enough detail that `/work-issue` can act on it directly later without re-deriving context or asking the user to re-explain — not a one-line title. Capture, per phase:
+4. **Break the work into phases**, following the phased-work convention already in CLAUDE.md: small, independently buildable/testable chunks, one thing per phase. For **each** phase, write enough detail that `/implement-issue` can act on it directly later without re-deriving context or asking the user to re-explain — not a one-line title. Capture, per phase:
    - What changes, and why.
    - The specific files/systems involved, as far as already known from the codebase check in step 2.
    - The approach/design decision that applies to this phase, and why, if a non-obvious alternative was rejected during clarification.

@@ -1,6 +1,6 @@
 ---
-name: work-issue
-description: This skill should be used when the user asks to "work on issue #N", "start issue 123", "let's do this github issue", pastes a github.com/nian0601/Slush/issues/N URL, or wants to resume implementing a specific GitHub issue on the Slush repo.
+name: implement-issue
+description: This skill should be used when the user asks to "work on issue #N", "implement issue 123", "start issue 123", "let's do this github issue", pastes a github.com/nian0601/Slush/issues/N URL, or wants to resume implementing a specific GitHub issue on the Slush repo.
 argument-hint: [issue-number-or-url]
 allowed-tools: Bash(gh:*), Agent, AskUserQuestion
 ---

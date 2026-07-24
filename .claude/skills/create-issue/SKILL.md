@@ -7,7 +7,7 @@ allowed-tools: Bash(gh:*), AskUserQuestion, Write
 
 # Create a GitHub issue on nian0601/Slush
 
-Write an issue to GitHub with the correct labels and a body detailed enough that `/work-issue` can act on it later without further clarification.
+Write an issue to GitHub with the correct labels and a body detailed enough that `/implement-issue` can act on it later without further clarification.
 
 ## Two entry paths
 

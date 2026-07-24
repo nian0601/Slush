@@ -80,9 +80,9 @@ Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Thr
 
 Four project skills (`.claude/skills/`) drive the workflow:
 
-- `/plan-issue` — exhaustively clarifies a task before it's filed. Never assumes or infers scope, priority, or project — always asks. Breaks the work into phases, each with enough self-contained detail (files/systems, approach, verification) that `/work-issue` can act on it later without re-deriving context. Confirms the full draft with the user before creating anything.
+- `/plan-issue` — exhaustively clarifies a task before it's filed. Never assumes or infers scope, priority, or project — always asks. Breaks the work into phases, each with enough self-contained detail (files/systems, approach, verification) that `/implement-issue` can act on it later without re-deriving context. Confirms the full draft with the user before creating anything.
 - `/create-issue` — writes a drafted (or quick, unplanned) issue to GitHub via `gh issue create`, with the label taxonomy above and a per-phase checklist body.
 - `/find-issue <time budget>` — lists open issues, shortlists by priority and a coarse size-vs-budget heuristic, and proposes the best fit for confirmation rather than starting work automatically.
-- `/work-issue <number-or-url>` — loads an issue's phase breakdown and works through it phase by phase, pausing for review between each per the phased-work convention above. Runs an automatic code-review pass against the issue's own description near the end, before proposing to close it.
+- `/implement-issue <number-or-url>` — loads an issue's phase breakdown and works through it phase by phase, pausing for review between each per the phased-work convention above. Runs an automatic code-review pass against the issue's own description near the end, before proposing to close it.
 
 Closing an issue or checking off a phase in its body follows the same standing-permission rule as `git commit`: never do it without the user's go-ahead in that turn.

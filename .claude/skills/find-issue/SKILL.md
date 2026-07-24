@@ -32,4 +32,4 @@ Recommend an open issue that fits a stated time budget, weighted by priority —
    gh issue view <number> --repo nian0601/Slush --json body
    ```
 
-6. Present the top candidate — number, title, URL, and a one-line reason it was picked (priority + why the size looks like a fit) — plus a runner-up if it's a close call. **Ask the user to confirm before starting work.** Do not automatically invoke `/work-issue`.
+6. Present the top candidate — number, title, URL, and a one-line reason it was picked (priority + why the size looks like a fit) — plus a runner-up if it's a close call. **Ask the user to confirm before starting work.** Do not automatically invoke `/implement-issue`.

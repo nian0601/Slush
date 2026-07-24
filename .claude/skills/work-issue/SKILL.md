@@ -23,11 +23,10 @@ Load a GitHub issue's phase breakdown and implement it phase by phase, per the r
 
 4. **Work through remaining phases one at a time.** Implement a phase, verify it (build/run/whatever the phase's own verification note specifies), then **stop and wait for explicit review** before touching the next phase — this is a hard rule, not a suggestion, matching how every other phased change in this repo is handled.
 
-5. **After a phase is reviewed and committed** (only if the user asked for the commit — same commit-approval rule as everywhere else in this repo), check its box in the issue body. Fetch the current body, flip that phase's `- [ ]` to `- [x]`, write it to a temp file, then:
+5. **After a phase is reviewed and committed** (only if the user asked for the commit — same commit-approval rule as everywhere else in this repo), check its box in the issue body — this follows automatically from the commit approval, no separate go-ahead needed. Get the commit SHA (`git rev-parse --short HEAD`), fetch the current issue body, flip that phase's `- [ ]` to `- [x]` and append the short SHA in backticks to the end of the phase's title line (e.g. `- [x] **Phase 1: <title>** (`8e63edf`)`) so a later code-review pass can find exactly what changed for that phase, write it to a temp file, then:
    ```
    gh issue edit <number> --repo nian0601/Slush --body-file <tmpfile>
    ```
-   This edit itself needs the user's go-ahead in that turn — treat updating the tracker with the same care as `git commit`, don't do it silently.
 
 6. **Once every phase is checked off and committed**, run an automatic review pass before proposing to close the issue:
    - Prefer invoking the existing `code-review` skill if it can be given the issue's title/body as extra context for what the changes are supposed to accomplish (e.g. at `high` effort, without `--fix`).

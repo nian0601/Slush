@@ -16,7 +16,7 @@ void StatsUpgradeData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned 
 		StatData& statData = myStatDatas[i];
 		statHandle.ParseIntField("maxupgrades", statData.myMaxUpgrades);
 		statHandle.ParseFloatField("increaseperupgrade", statData.myIncreasePerUpgrade);
-		statHandle.ParseStringField("icon", statData.myIconTextureID);
+		statData.myIconTexture.Parse(statHandle, "icon");
 		Slush::AssetParser::Handle textureRectHandle = statHandle.ParseChildElement("iconTextureRect");
 		if (textureRectHandle.IsValid())
 		{
@@ -29,6 +29,12 @@ void StatsUpgradeData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned 
 				statData.myIconTextureRect = MakeRectFromTopLeft(statData.myIconTextureRect.myTopLeft, statData.myIconTextureRect.myExtents);
 		}
 	}
+}
+
+void StatsUpgradeData::ResolveDependencies()
+{
+	for (StatData& statData : myStatDatas)
+		statData.myIconTexture.ResolveDependency();
 }
 
 void StatsUpgradeData::BuildUI()
@@ -46,29 +52,25 @@ void StatsUpgradeData::BuildUI()
 
 			StatData& statData = myStatDatas[i];
 
-			if (statData.myIconTextureID.Empty())
+			if (const Slush::Texture* texture = statData.myIconTexture.Get())
+			{
+				sf::FloatRect texRect;
+				texRect.position.x = static_cast<float>(statData.myIconTextureRect.myTopLeft.x);
+				texRect.position.y = static_cast<float>(statData.myIconTextureRect.myTopLeft.y);
+				texRect.size.x = static_cast<float>(statData.myIconTextureRect.myExtents.x);
+				texRect.size.y = static_cast<float>(statData.myIconTextureRect.myExtents.y);
+
+				sf::Vector2f size;
+				size.x = static_cast<float>(FW_Max(statData.myIconTextureRect.myExtents.x, 48));
+				size.y = static_cast<float>(FW_Max(statData.myIconTextureRect.myExtents.y, 48));
+
+				ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
+			}
+			else
 			{
 				ImGui::BeginDisabled(true);
 				ImGui::Button("Icon", { 64, 64 });
 				ImGui::EndDisabled();
-			}
-			else
-			{
-				Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-				if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(statData.myIconTextureID))
-				{
-					sf::FloatRect texRect;
-					texRect.position.x = static_cast<float>(statData.myIconTextureRect.myTopLeft.x);
-					texRect.position.y = static_cast<float>(statData.myIconTextureRect.myTopLeft.y);
-					texRect.size.x = static_cast<float>(statData.myIconTextureRect.myExtents.x);
-					texRect.size.y = static_cast<float>(statData.myIconTextureRect.myExtents.y);
-
-					sf::Vector2f size;
-					size.x = static_cast<float>(FW_Max(statData.myIconTextureRect.myExtents.x, 48));
-					size.y = static_cast<float>(FW_Max(statData.myIconTextureRect.myExtents.y, 48));
-
-					ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
-				}
 			}
 
 			if (ImGui::BeginDragDropTarget())
@@ -76,7 +78,7 @@ void StatsUpgradeData::BuildUI()
 				if (const ImGuiPayload* imguiPayload = ImGui::AcceptDragDropPayload("TextureDragPayload"))
 				{
 					Slush::TextureDragPayload* payload = static_cast<Slush::TextureDragPayload*>(imguiPayload->Data);
-					statData.myIconTextureID = payload->myTexture->GetAssetName();
+					statData.myIconTexture.Set(payload->myTexture);
 					statData.myIconTextureRect = payload->myTextureRect;
 				}
 

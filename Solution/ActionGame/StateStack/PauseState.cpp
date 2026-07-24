@@ -101,7 +101,6 @@ void PauseState::BuildStatsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 	Slush::Entity* player = myPlayerHandle.Get();
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
 
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	const StatsUpgradeData* upgradeData = stats->GetUpgradeData();
 
 	aUIBUilder.OpenElement(myUIBackgroundStyle).SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
@@ -121,7 +120,7 @@ void PauseState::BuildStatsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 		style.EnableButtonInteraction(0xFF888888);
 
 		const StatsUpgradeData::StatData& statdata = upgradeData->myStatDatas[statType];
-		if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(statdata.myIconTextureID))
+		if (const Slush::Texture* iconTexture = statdata.myIconTexture.Get())
 			aUIBUilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
 
 		FW_String upgradeValue;
@@ -141,8 +140,6 @@ void PauseState::BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
 	const FW_GrowingArray<Weapon*>& weapons = weaponComponent->GetWeapons();
 
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-
 	aUIBUilder.OpenElement(myUIBackgroundStyle).SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
 	for (const Weapon* weapon : weapons)
 	{
@@ -159,7 +156,7 @@ void PauseState::BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 		style.SetOutlineThickness(-1.f);
 		style.EnableButtonInteraction(0xFF888888);
 
-		if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(weaponData.myIconTextureID))
+		if (const Slush::Texture* iconTexture = weaponData.myIconTexture.Get())
 			aUIBUilder.Image(iconTexture, { 45, 45 }, weaponData.myIconTextureRect);
 
 		FW_String weaponName = weaponData.myName;
@@ -174,9 +171,6 @@ void PauseState::BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 
 void PauseState::BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBuilder)
 {
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-	const FW_GrowingArray<Slush::Asset*>& charAssets = assets.GetAllAssets<CharacterInfo>();
-
 	aUIBuilder.OpenElement().SetAlingment(Slush::UIElementStyle::CENTER);
 	
 	Slush::UIElementStyle& style = aUIBuilder.OpenElement(myCharacterInfo.myName.GetBuffer());
@@ -187,7 +181,7 @@ void PauseState::BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBuilder)
 	style.SetColor(0x00333333);
 	style.SetOutlineColor(0x00000000);
 
-	if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(myCharacterInfo.myPortaitTextureID))
+	if (const Slush::Texture* iconTexture = myCharacterInfo.myPortaitTexture.Get())
 		aUIBuilder.Image(iconTexture, myCharacterInfo.myPortaitTextureRect.myExtents, myCharacterInfo.myPortaitTextureRect);
 
 	aUIBuilder.Text(myCharacterInfo.myName.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);

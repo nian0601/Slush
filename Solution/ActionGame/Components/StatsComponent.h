@@ -3,6 +3,12 @@
 #include "EntitySystem/Component.h"
 
 #include "Core\Assets\DataAsset.h"
+#include "Core\Assets\AssetReference.h"
+
+namespace Slush
+{
+	class Texture;
+}
 
 enum StatType
 {
@@ -19,7 +25,7 @@ public:
 	{
 		int myMaxUpgrades = 10;
 		float myIncreasePerUpgrade = 1.f;
-		FW_String myIconTextureID;
+		Slush::AssetReference<Slush::Texture> myIconTexture;
 		Recti myIconTextureRect;
 	};
 
@@ -28,6 +34,7 @@ public:
 	using Slush::DataAsset::DataAsset;
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
+	void ResolveDependencies() override;
 	void BuildUI();
 
 	FW_StaticArray<StatData, StatType::NUM_STATS> myStatDatas;

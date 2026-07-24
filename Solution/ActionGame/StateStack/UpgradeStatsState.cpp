@@ -70,7 +70,6 @@ Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
 
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	const StatsUpgradeData* upgradeData = stats->GetUpgradeData();
 
 	Slush::DynamicUIBuilder uiBuilder;
@@ -100,7 +99,7 @@ Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 		style.EnableButtonInteraction(0xFF888888);
 
 		const StatsUpgradeData::StatData& statdata = upgradeData->myStatDatas[myUpgradeOptions[i]];
-		if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(statdata.myIconTextureID))
+		if (const Slush::Texture* iconTexture = statdata.myIconTexture.Get())
 			uiBuilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
 
 		uiBuilder.Text(myUpgradeLabels[i].GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);

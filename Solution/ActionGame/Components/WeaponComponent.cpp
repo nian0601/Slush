@@ -40,7 +40,7 @@ WeaponData::WeaponData(const char* aName, unsigned int aAssetID)
 void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
 	aRootHandle.ParseStringField("name", myName);
-	aRootHandle.ParseStringField("icon", myIconTextureID);
+	myIconTexture.Parse(aRootHandle, "icon");
 	Slush::AssetParser::Handle textureRectHandle = aRootHandle.ParseChildElement("iconTextureRect");
 	if (textureRectHandle.IsValid())
 	{
@@ -72,6 +72,8 @@ void WeaponData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*
 
 void WeaponData::ResolveDependencies()
 {
+	myIconTexture.ResolveDependency();
+
 	for (RankData& rank : myRanks)
 		rank.myProjectileData.myProjectilePrefab.ResolveDependency();
 }
@@ -80,29 +82,25 @@ void WeaponData::BuildUI()
 {
 	ImGui::InputText("Name", &myName);
 
-	if (myIconTextureID.Empty())
+	if (const Slush::Texture* texture = myIconTexture.Get())
+	{
+		sf::FloatRect texRect;
+		texRect.position.x = static_cast<float>(myIconTextureRect.myTopLeft.x);
+		texRect.position.y = static_cast<float>(myIconTextureRect.myTopLeft.y);
+		texRect.size.x = static_cast<float>(myIconTextureRect.myExtents.x);
+		texRect.size.y = static_cast<float>(myIconTextureRect.myExtents.y);
+
+		sf::Vector2f size;
+		size.x = static_cast<float>(FW_Max(myIconTextureRect.myExtents.x, 48));
+		size.y = static_cast<float>(FW_Max(myIconTextureRect.myExtents.y, 48));
+
+		ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
+	}
+	else
 	{
 		ImGui::BeginDisabled(true);
 		ImGui::Button("Icon", { 64, 64 });
 		ImGui::EndDisabled();
-	}
-	else
-	{
-		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-		if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(myIconTextureID.GetBuffer()))
-		{
-			sf::FloatRect texRect;
-			texRect.position.x = static_cast<float>(myIconTextureRect.myTopLeft.x);
-			texRect.position.y = static_cast<float>(myIconTextureRect.myTopLeft.y);
-			texRect.size.x = static_cast<float>(myIconTextureRect.myExtents.x);
-			texRect.size.y = static_cast<float>(myIconTextureRect.myExtents.y);
-
-			sf::Vector2f size;
-			size.x = static_cast<float>(FW_Max(myIconTextureRect.myExtents.x, 48));
-			size.y = static_cast<float>(FW_Max(myIconTextureRect.myExtents.y, 48));
-
-			ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
-		}
 	}
 
 	if (ImGui::BeginDragDropTarget())
@@ -110,7 +108,7 @@ void WeaponData::BuildUI()
 		if (const ImGuiPayload* imguiPayload = ImGui::AcceptDragDropPayload("TextureDragPayload"))
 		{
 			Slush::TextureDragPayload* payload = static_cast<Slush::TextureDragPayload*>(imguiPayload->Data);
-			myIconTextureID = payload->myTexture->GetAssetName();
+			myIconTexture.Set(payload->myTexture);
 			myIconTextureRect = payload->myTextureRect;
 		}
 
@@ -410,7 +408,6 @@ void WeaponComponent::HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder)
 		.SetColor(0xAA121212)
 		.SetAlingment(Slush::UIElementStyle::CENTER);
 
-	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	for (const WeaponData* potentialUpgrade : myUpgradeSelection)
 	{
 		Weapon* weapon = GetWeapon(potentialUpgrade);
@@ -426,7 +423,7 @@ void WeaponComponent::HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder)
 		style.SetOutlineThickness(-1.f);
 		style.EnableButtonInteraction(0xFF888888);
 
-		if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(potentialUpgrade->myIconTextureID))
+		if (const Slush::Texture* iconTexture = potentialUpgrade->myIconTexture.Get())
 			aUIBuilder.Image(iconTexture, { 45, 45 }, potentialUpgrade->myIconTextureRect);
 
 		FW_String text = potentialUpgrade->myName;

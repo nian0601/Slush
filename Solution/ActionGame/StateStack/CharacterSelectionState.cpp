@@ -117,7 +117,7 @@ void CharacterSelectionState::BuildCharacterDisplay(Slush::DynamicUIBuilder& aUI
 		style.SetOutlineThickness(-1.f);
 		style.EnableButtonInteraction(0xFF888888);
 
-		if (const Slush::Texture* iconTexture = assets.GetAsset<Slush::Texture>(charInfo->myPortaitTextureID))
+		if (const Slush::Texture* iconTexture = charInfo->myPortaitTexture.Get())
 			aUIBUilder.Image(iconTexture, charInfo->myPortaitTextureRect.myExtents, charInfo->myPortaitTextureRect);
 
 		aUIBUilder.Text(charInfo->myName.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);

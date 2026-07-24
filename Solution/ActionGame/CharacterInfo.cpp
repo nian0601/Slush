@@ -8,8 +8,8 @@
 void CharacterInfo::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
 	aRootHandle.ParseStringField("charactername", myName);
-	aRootHandle.ParseStringField("characterentityprefab", myCharacterEntityPrefabID);
-	aRootHandle.ParseStringField("portrait", myPortaitTextureID);
+	myCharacterEntityPrefab.Parse(aRootHandle, "characterentityprefab");
+	myPortaitTexture.Parse(aRootHandle, "portrait");
 	Slush::AssetParser::Handle textureRectHandle = aRootHandle.ParseChildElement("portraitTextureRect");
 	if (textureRectHandle.IsValid())
 	{
@@ -23,37 +23,39 @@ void CharacterInfo::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int
 	}
 }
 
+void CharacterInfo::ResolveDependencies()
+{
+	myPortaitTexture.ResolveDependency();
+	myCharacterEntityPrefab.ResolveDependency();
+}
+
 void CharacterInfo::BuildUI()
 {
 	ImGui::BeginGroup();
 
-	if (myPortaitTextureID.Empty())
+	if (const Slush::Texture* texture = myPortaitTexture.Get())
+	{
+		sf::FloatRect texRect;
+		texRect.position.x = static_cast<float>(myPortaitTextureRect.myTopLeft.x);
+		texRect.position.y = static_cast<float>(myPortaitTextureRect.myTopLeft.y);
+		texRect.size.x = static_cast<float>(myPortaitTextureRect.myExtents.x);
+		texRect.size.y = static_cast<float>(myPortaitTextureRect.myExtents.y);
+
+		sf::Vector2f size;
+		size.x = static_cast<float>(FW_Max(myPortaitTextureRect.myExtents.x, 48));
+		size.y = static_cast<float>(FW_Max(myPortaitTextureRect.myExtents.y, 48));
+
+		ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
+	}
+	else
 	{
 		ImGui::BeginDisabled(true);
 		ImGui::Button("Icon", { 64, 64 });
 		ImGui::EndDisabled();
 	}
-	else
-	{
-		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-		if (const Slush::Texture* texture = assets.GetAsset<Slush::Texture>(myPortaitTextureID))
-		{
-			sf::FloatRect texRect;
-			texRect.position.x = static_cast<float>(myPortaitTextureRect.myTopLeft.x);
-			texRect.position.y = static_cast<float>(myPortaitTextureRect.myTopLeft.y);
-			texRect.size.x = static_cast<float>(myPortaitTextureRect.myExtents.x);
-			texRect.size.y = static_cast<float>(myPortaitTextureRect.myExtents.y);
-
-			sf::Vector2f size;
-			size.x = static_cast<float>(FW_Max(myPortaitTextureRect.myExtents.x, 48));
-			size.y = static_cast<float>(FW_Max(myPortaitTextureRect.myExtents.y, 48));
-
-			ImGui::Image(*texture->GetSFMLTexture(), size, texRect);
-		}
-	}
 
 	ImGui::InputText("Character Name", &myName);
-	ImGui::InputText("Character Prefab", &myCharacterEntityPrefabID);
+	ImGui::Text("Character Prefab: %s", myCharacterEntityPrefab.GetName().GetBuffer());
 
 	ImGui::EndGroup();
 
@@ -62,12 +64,12 @@ void CharacterInfo::BuildUI()
 		if (const ImGuiPayload* imguiPayload = ImGui::AcceptDragDropPayload("TextureDragPayload"))
 		{
 			Slush::TextureDragPayload* payload = static_cast<Slush::TextureDragPayload*>(imguiPayload->Data);
-			myPortaitTextureID = payload->myTexture->GetAssetName();
+			myPortaitTexture.Set(payload->myTexture);
 			myPortaitTextureRect = payload->myTextureRect;
 		}
 
 		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<Slush::EntityPrefab>()))
-			myCharacterEntityPrefabID = asset->GetAssetName();
+			myCharacterEntityPrefab.Set(static_cast<Slush::EntityPrefab*>(asset));
 
 		ImGui::EndDragDropTarget();
 	}

@@ -44,7 +44,7 @@ public:
 	};
 
 	FW_String myName;
-	FW_String myIconTextureID;
+	Slush::AssetReference<Slush::Texture> myIconTexture;
 	Recti myIconTextureRect;
 
 	FW_GrowingArray<RankData> myRanks;

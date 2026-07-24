@@ -3,6 +3,13 @@
 #include <float.h>
 
 #include "Core\Assets\DataAsset.h"
+#include "Core\Assets\AssetReference.h"
+
+namespace Slush
+{
+	class Texture;
+	class EntityPrefab;
+}
 
 class CharacterInfo : public Slush::DataAsset
 {
@@ -11,10 +18,11 @@ public:
 	using Slush::DataAsset::DataAsset;
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
+	void ResolveDependencies() override;
 	void BuildUI();
 
-	FW_String myPortaitTextureID;
+	Slush::AssetReference<Slush::Texture> myPortaitTexture;
 	Recti myPortaitTextureRect;
 	FW_String myName;
-	FW_String myCharacterEntityPrefabID;
+	Slush::AssetReference<Slush::EntityPrefab> myCharacterEntityPrefab;
 };

@@ -66,6 +66,7 @@
     <ClInclude Include="Core\Assets\DependencyTracker.h" />
     <ClInclude Include="UI\UIRect.h" />
     <ClInclude Include="Core\Dockables\ContentBrowserDockable.h" />
+    <ClInclude Include="Core\Dockables\DependencyTrackerDockable.h" />
     <ClInclude Include="imgui\imgui_user.h" />
     <ClInclude Include="Graphics\Animation\AnimationTrack.h" />
     <ClInclude Include="Graphics\Animation\Interpolator.h" />
@@ -147,6 +148,7 @@
     <ClCompile Include="Core\Assets\DependencyTracker.cpp" />
     <ClCompile Include="UI\UIRect.cpp" />
     <ClCompile Include="Core\Dockables\ContentBrowserDockable.cpp" />
+    <ClCompile Include="Core\Dockables\DependencyTrackerDockable.cpp" />
     <ClCompile Include="Core\Assets\AssetStorage.cpp" />
     <ClCompile Include="imgui\imgui_user.cpp" />
     <ClCompile Include="Graphics\Animation\AnimationTrack.cpp" />

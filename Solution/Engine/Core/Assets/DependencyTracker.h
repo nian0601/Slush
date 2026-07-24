@@ -24,6 +24,9 @@ namespace Slush
 		const FW_GrowingArray<FW_String>& GetDependencies(unsigned int aTypeID, const FW_String& aName) const;
 		const FW_GrowingArray<FW_String>& GetDependents(unsigned int aTypeID, const FW_String& aName) const;
 
+		// Inverse of MakeKey - splits a "<typeID>:<name>" key back into its parts. Returns false if aKey isn't a well-formed key.
+		static bool ParseKey(const FW_String& aKey, unsigned int& outTypeID, FW_String& outName);
+
 	private:
 		DependencyTracker() {}
 		~DependencyTracker() {}

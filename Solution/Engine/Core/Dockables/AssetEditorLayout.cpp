@@ -8,6 +8,7 @@
 #include "Core/Dockables/TextureViewerDockable.h"
 #include "Core/Dockables/LogDockable.h"
 #include "Core/Dockables/ContentBrowserDockable.h"
+#include "Core/Dockables/DependencyTrackerDockable.h"
 
 namespace Slush
 {
@@ -18,6 +19,7 @@ namespace Slush
 		AddDockable(new TextureViewerDockable());
 		AddDockable(new AssetEditorDockable());
 		AddDockable(new ContentBrowserDockable());
+		AddDockable(new DependencyTrackerDockable());
 	}
 
 	AssetEditorLayout::~AssetEditorLayout()

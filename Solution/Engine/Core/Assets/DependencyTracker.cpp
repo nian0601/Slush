@@ -74,4 +74,16 @@ namespace Slush
 		key += aName;
 		return key;
 	}
+
+	bool DependencyTracker::ParseKey(const FW_String& aKey, unsigned int& outTypeID, FW_String& outName)
+	{
+		const int separatorIndex = aKey.Find(":");
+		if (separatorIndex == FW_String::NotFound)
+			return false;
+
+		const FW_String typeIDStr = aKey.SubStr(0, separatorIndex - 1);
+		outTypeID = static_cast<unsigned int>(atoi(typeIDStr.GetBuffer()));
+		outName = aKey.SubStr(separatorIndex + 1, aKey.Length() - 1);
+		return true;
+	}
 }

@@ -57,6 +57,20 @@ namespace Slush
 
 	void DependencyTrackerDockable::BuildMiddlePane()
 	{
+		static ImGuiTextFilter assetFilter;
+
+		// Fixed-height, non-scrolling row for the search field so it stays put while the list below scrolls.
+		ImGui::BeginChild("DependencyTracker_AssetSearch", ImVec2(0, ImGui::GetFrameHeightWithSpacing()), ImGuiChildFlags_None);
+		const float clearButtonWidth = ImGui::GetFrameHeight();
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - clearButtonWidth - ImGui::GetStyle().ItemSpacing.x);
+		if (ImGui::InputText("##AssetSearch", assetFilter.InputBuf, IM_ARRAYSIZE(assetFilter.InputBuf)))
+			assetFilter.Build();
+		ImGui::SameLine();
+		if (ImGui::Button("X", ImVec2(clearButtonWidth, 0)))
+			assetFilter.Clear();
+		ImGui::EndChild();
+
+		ImGui::BeginChild("DependencyTracker_AssetListScroll", ImVec2(0, 0), ImGuiChildFlags_None);
 		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 		const FW_GrowingArray<IAssetStorage*>& storages = assetRegistry.GetAllAssetStorages();
 		for (IAssetStorage* storage : storages)
@@ -64,10 +78,14 @@ namespace Slush
 			const FW_GrowingArray<Asset*>& assets = storage->GetAllAssets();
 			for (Asset* asset : assets)
 			{
+				if (!assetFilter.PassFilter(asset->GetAssetName().GetBuffer()))
+					continue;
+
 				if (ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), asset == mySelectedAsset))
 					mySelectedAsset = asset;
 			}
 		}
+		ImGui::EndChild();
 	}
 
 	void DependencyTrackerDockable::BuildDependenciesPane()

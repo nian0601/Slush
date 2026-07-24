@@ -83,7 +83,9 @@ namespace Slush
 
 		const FW_String typeIDStr = aKey.SubStr(0, separatorIndex - 1);
 		outTypeID = static_cast<unsigned int>(atoi(typeIDStr.GetBuffer()));
-		outName = aKey.SubStr(separatorIndex + 1, aKey.Length() - 1);
+		// FW_String::Length() returns character count minus one (see FW_String.h), so it IS the
+		// last valid index already - do not subtract another 1 here or the last character gets dropped.
+		outName = aKey.SubStr(separatorIndex + 1, aKey.Length());
 		return true;
 	}
 }

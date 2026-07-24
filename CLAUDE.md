@@ -67,3 +67,20 @@ Solo project — commit directly to `main`, no branch/PR convention to follow.
 Claude should never run `git commit` without the user explicitly asking for it in that turn. Creating/editing/staging files does not need separate approval — only the commit itself does.
 
 For engine-sized changes (new subsystems, cross-cutting refactors), prefer landing the work as multiple small, independently buildable/testable phases rather than one large commit — it makes the result much easier to review and test. After finishing and verifying each phase, stop and wait for explicit user review before starting the next phase — the user decides whether to commit, iterate further, or adjust the phase as-is before any further work begins. Never chain into the next phase on your own.
+
+## Issue tracking
+
+Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Three label groups:
+
+- **Priority**: `priority:p0` (drop-everything/blocking) through `priority:p3` (low/someday); `priority:p2` is the normal default.
+- **Size**: `size:s`/`size:m`/`size:l`, derived from the number of phases in the issue's plan — `size:s` for fewer than 4 phases, `size:m` for 4-7, `size:l` for 8+.
+- **Project**: `project:engine` or `project:actiongame` — which part of the codebase the issue belongs to. Just these two for now; revisit if it needs to be more granular (e.g. per-game, as BossMonster/TopDownGame become active) or dropped.
+
+Four project skills (`.claude/skills/`) drive the workflow:
+
+- `/plan-issue` — exhaustively clarifies a task before it's filed. Never assumes or infers scope, priority, or project — always asks. Breaks the work into phases, each with enough self-contained detail (files/systems, approach, verification) that `/work-issue` can act on it later without re-deriving context. Confirms the full draft with the user before creating anything.
+- `/create-issue` — writes a drafted (or quick, unplanned) issue to GitHub via `gh issue create`, with the label taxonomy above and a per-phase checklist body.
+- `/find-issue <time budget>` — lists open issues, shortlists by priority and a coarse size-vs-budget heuristic, and proposes the best fit for confirmation rather than starting work automatically.
+- `/work-issue <number-or-url>` — loads an issue's phase breakdown and works through it phase by phase, pausing for review between each per the phased-work convention above. Runs an automatic code-review pass against the issue's own description near the end, before proposing to close it.
+
+Closing an issue or checking off a phase in its body follows the same standing-permission rule as `git commit`: never do it without the user's go-ahead in that turn.

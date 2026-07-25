@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdio>
+
 #include "FW_String.h"
 #include "FW_GrowingArray.h"
 #include "FW_Vector3.h"
@@ -66,11 +68,19 @@ namespace Slush
 			FW_String myMessage;
 		};
 
+		Logger();
+		~Logger();
+
 		void AddMessage(Severity aSeverity, const char *aFormattedString, ...);
 
 		const FW_GrowingArray<LogEntry>& GetEntries() const { return myEntries; }
 	private:
+		void Flush();
+
 		FW_GrowingArray<LogEntry> myEntries;
+
+		FILE* myLogFile = nullptr;
+		int myFlushedEntryCount = 0;
 	};
 }
 

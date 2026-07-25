@@ -60,3 +60,6 @@ Application/Raytracer/Data/Video
 /ProgressTracking
 /Solution/.vs/Solution
 *.recipe
+
+# Runtime-generated per-session log
+debuglog.txt

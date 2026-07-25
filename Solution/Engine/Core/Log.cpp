@@ -4,8 +4,38 @@
 #include <time.h>
 #include <sys/timeb.h>
 
+#include <FW_FileSystem.h>
+
 namespace Slush
 {
+	Logger::Logger()
+	{
+		FW_FileSystem::CreateFolderIfNecessary("data/debug/debuglog.txt");
+
+		FW_String absoluteLogPath;
+		FW_FileSystem::GetAbsoluteFilePath("data/debug/debuglog.txt", absoluteLogPath);
+
+		fopen_s(&myLogFile, absoluteLogPath.GetBuffer(), "w");
+	}
+
+	Logger::~Logger()
+	{
+		if (myLogFile)
+			fclose(myLogFile);
+	}
+
+	void Logger::Flush()
+	{
+		for (int i = myFlushedEntryCount; i < myEntries.Count(); ++i)
+		{
+			const LogEntry& entry = myEntries[i];
+			fprintf(myLogFile, "[%s] %s\n", Logger::GetSeverityText(entry.mySeverity), entry.myMessage.GetBuffer());
+		}
+
+		myFlushedEntryCount = myEntries.Count();
+		fflush(myLogFile);
+	}
+
 	void Logger::AddMessage(Severity aSeverity, const char *aFormattedString, ...)
 	{
 		//Get time and store as string in buf
@@ -39,5 +69,8 @@ namespace Slush
 		entry.myMessage += tstructMilli.millitm;
 		entry.myMessage += "]: ";
 		entry.myMessage += buffer;
+
+		if (myEntries.Count() - myFlushedEntryCount > 25)
+			Flush();
 	}
 }

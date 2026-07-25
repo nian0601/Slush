@@ -64,7 +64,7 @@ Claude's own in-application verification is limited to: launching the built exe,
 
 ## Repo etiquette
 
-Solo project — commit directly to `main`, no branch/PR convention to follow.
+Solo project — commit directly to `main`, no branch/PR convention to follow. The one sanctioned exception: `/implement-issue` does its work on a transient `issue-<N>` branch inside a git worktree, fast-forwarded back into `main` and deleted once the issue is done — never a long-lived branch.
 
 Claude should never run `git commit` without the user explicitly asking for it in that turn. Creating/editing/staging files does not need separate approval — only the commit itself does.
 

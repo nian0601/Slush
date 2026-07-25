@@ -78,6 +78,8 @@ namespace Slush
 	{
 		FW_SAFE_DELETE(myInput);
 		FW_SAFE_DELETE(myWindow);
+
+		myLogger->ForceFlush();
 		FW_SAFE_DELETE(myLogger);
 	}
 
@@ -88,6 +90,7 @@ namespace Slush
 		while (myWindow->PumpEvents())
 		{
 			Time::Update();
+			myLogger->Update();
 
 			ImGuiIO& imguiIO = ImGui::GetIO();
 

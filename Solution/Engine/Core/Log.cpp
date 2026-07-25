@@ -36,6 +36,17 @@ namespace Slush
 		fflush(myLogFile);
 	}
 
+	void Logger::Update()
+	{
+		if (myFlushTimer.IsStarted() && myFlushTimer.HasExpired() && myEntries.Count() > myFlushedEntryCount)
+			Flush();
+	}
+
+	void Logger::ForceFlush()
+	{
+		Flush();
+	}
+
 	void Logger::AddMessage(Severity aSeverity, const char *aFormattedString, ...)
 	{
 		//Get time and store as string in buf
@@ -69,6 +80,8 @@ namespace Slush
 		entry.myMessage += tstructMilli.millitm;
 		entry.myMessage += "]: ";
 		entry.myMessage += buffer;
+
+		myFlushTimer.Start(3.f);
 
 		if (myEntries.Count() - myFlushedEntryCount > 25)
 			Flush();

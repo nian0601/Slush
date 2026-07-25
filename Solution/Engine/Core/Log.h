@@ -7,6 +7,7 @@
 #include "FW_Vector3.h"
 #include "FW_Math.h"
 #include "Core/Engine.h"
+#include "Core/Time.h"
 
 
 namespace Slush
@@ -73,6 +74,9 @@ namespace Slush
 
 		void AddMessage(Severity aSeverity, const char *aFormattedString, ...);
 
+		void Update();
+		void ForceFlush();
+
 		const FW_GrowingArray<LogEntry>& GetEntries() const { return myEntries; }
 	private:
 		void Flush();
@@ -81,6 +85,8 @@ namespace Slush
 
 		FILE* myLogFile = nullptr;
 		int myFlushedEntryCount = 0;
+
+		Timer myFlushTimer;
 	};
 }
 

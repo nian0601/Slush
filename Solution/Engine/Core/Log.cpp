@@ -16,6 +16,7 @@ namespace Slush
 		FW_FileSystem::GetAbsoluteFilePath("data/debug/debuglog.txt", absoluteLogPath);
 
 		fopen_s(&myLogFile, absoluteLogPath.GetBuffer(), "w");
+		FW_ASSERT(myLogFile != nullptr, "Failed to open debuglog.txt for writing");
 	}
 
 	Logger::~Logger()

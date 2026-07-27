@@ -17,12 +17,12 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
 1. **Get the raw description.** Use `$ARGUMENTS` if given; otherwise ask what the task is.
 
-2. **Ground the questions in the actual codebase.** Before asking the user something answerable by reading code, check first — use Read/Grep/Glob to look at the relevant files/systems. Don't make the user restate what's already visible in the repo.
+2. **Interview the user** Interview user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependnecies between decisions one-by-one. If a question can be answered by exploring the codebase, explore the codebase instead.
 
 3. **Clarify exhaustively**, using `AskUserQuestion` (structured choices) or plain follow-up questions (open-ended points) as fits each question. Cover, at minimum:
    - **Goal and scope**: what problem this solves, what the end state looks like, explicit non-goals (what's deliberately out of scope).
    - **Priority** — always ask; offer `p0` (drop-everything/blocking) through `p3` (low/someday) with `p2` described as the normal default, but let the user pick. Never pick it silently.
-   - **Project** — always ask which label applies: `project:engine` or `project:actiongame`.
+   - **Project** — only ask if its not clear which project the plan belongs to: `project:engine` or `project:actiongame`.
    - **Approach/design decisions**, where more than one reasonable approach exists — surface the options and their trade-offs rather than picking one.
    - **Verification**: how to tell each phase, and the issue as a whole, is actually done (build passes, specific manual test, `SkipStartScreen` playtest, etc. — see CLAUDE.md's Testing section for the conventions already established).
    - Anything else that stays ambiguous after the above — keep asking rather than filling a gap with a plausible-sounding default.

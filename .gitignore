@@ -63,3 +63,6 @@ Application/Raytracer/Data/Video
 
 # Runtime-generated per-session log
 debuglog.txt
+
+# /implement-issue's transient per-issue git worktrees
+/.worktrees/

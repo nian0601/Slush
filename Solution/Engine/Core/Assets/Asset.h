@@ -1,5 +1,6 @@
 #pragma once
 #include <FW_TypeID.h>
+#include "imgui/Fonts/IconsFontAwesome7.h"
 
 namespace Slush
 {
@@ -16,6 +17,7 @@ namespace Slush
 		virtual const char* GetTypeName() const = 0;
 		virtual const char* GetTypeExtention() const = 0;
 		virtual const char* GetTypeFolder() const = 0;
+		virtual const char* GetTypeIcon() const = 0;
 		virtual unsigned int GetCurrentAssetVersion() const = 0;
 
 		const FW_String& GetAssetName() const { return myAssetName; }
@@ -30,13 +32,15 @@ namespace Slush
 		unsigned int myAssetTypeID = INT_MAX;
 	};
 
-#define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder, Version)\
+#define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder, AssetIcon, Version)\
 	static const char* GetAssetTypeName() { return AssetName; }\
 	static const char* GetAssetTypeExtention() { return AssetExtention; }\
 	static const char* GetAssetTypeFolder() { return AssetFolder; }\
+	static const char* GetAssetTypeIcon() { return AssetIcon; }\
 	const char* GetTypeName() const override { return GetAssetTypeName(); }\
 	const char* GetTypeExtention() const override { return GetAssetTypeExtention(); }\
 	const char* GetTypeFolder() const override { return GetAssetTypeFolder(); }\
+	const char* GetTypeIcon() const override { return GetAssetTypeIcon(); }\
 	unsigned int GetCurrentAssetVersion() const override { return Version; }\
 
 

@@ -14,7 +14,7 @@ namespace Slush
 class CharacterInfo : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("CharacterInfo", "charinfo", "data/characterinfo", 1);
+	DEFINE_ASSET("CharacterInfo", "charinfo", "data/characterinfo", ICON_FA_ID_CARD, 1);
 	using Slush::DataAsset::DataAsset;
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;

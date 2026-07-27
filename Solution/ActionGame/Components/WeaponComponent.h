@@ -19,7 +19,7 @@ namespace Slush
 class WeaponData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("WeaponData", "weapondata", "data/weapondata", 1);
+	DEFINE_ASSET("WeaponData", "weapondata", "data/weapondata", ICON_FA_CROSSHAIRS, 1);
 	WeaponData(const char* aName, unsigned int aAssetID);
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;

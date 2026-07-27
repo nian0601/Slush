@@ -19,6 +19,7 @@ namespace Slush
 		virtual void LoadAllAssets() = 0;
 
 		virtual const char* GetAssetTypeName() const = 0;
+		virtual const char* GetAssetTypeIcon() const = 0;
 		unsigned virtual int GetAssetTypeID() const = 0;
 
 		virtual const Asset* GetAsset(const char* aName) const = 0;
@@ -46,6 +47,7 @@ namespace Slush
 		AssetType* GetAsset(const FW_String& aName);
 
 		const char* GetAssetTypeName() const override { return AssetType::GetAssetTypeName(); }
+		const char* GetAssetTypeIcon() const override { return AssetType::GetAssetTypeIcon(); }
 		unsigned int GetAssetTypeID() const override { return myAssetTypeID; }
 		const FW_GrowingArray<Asset*>& GetAllAssets() const override { return myAssets; }
 

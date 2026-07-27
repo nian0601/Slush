@@ -5,7 +5,7 @@ namespace Slush
 {
 	struct UILayout : public DataAsset
 	{
-		DEFINE_ASSET("UI Layout", "uilayout", "data/uilayouts", 1);
+		DEFINE_ASSET("UI Layout", "uilayout", "data/uilayouts", ICON_FA_TABLE_CELLS, 1);
 		using DataAsset::DataAsset;
 
 		void OnParse(AssetParser::Handle aRootHandle, unsigned int aVersion) override;

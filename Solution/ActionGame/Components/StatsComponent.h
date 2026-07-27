@@ -30,7 +30,7 @@ public:
 	};
 
 public:
-	DEFINE_ASSET("StatsUpgradeData", "statsdata", "data/statsdata", 1);
+	DEFINE_ASSET("StatsUpgradeData", "statsdata", "data/statsdata", ICON_FA_CHART_LINE, 1);
 	using Slush::DataAsset::DataAsset;
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;

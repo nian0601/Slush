@@ -19,7 +19,7 @@ namespace Slush
 		};
 
 	public:
-		DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs", 1);
+		DEFINE_ASSET("Entity Prefab", "prefab", "data/entityprefabs", ICON_FA_CUBE, 1);
 
 		EntityPrefab(const char* aName, unsigned int aAssetID);
 		~EntityPrefab();

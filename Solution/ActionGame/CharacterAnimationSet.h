@@ -12,7 +12,7 @@ namespace Slush
 class CharacterAnimationSet : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("CharacterAnimationSet", "charanimset", "data/characteranimationsets", 1);
+	DEFINE_ASSET("CharacterAnimationSet", "charanimset", "data/characteranimationsets", ICON_FA_LAYER_GROUP, 1);
 	CharacterAnimationSet(const char* aName, unsigned int aAssetID);
 	~CharacterAnimationSet();
 

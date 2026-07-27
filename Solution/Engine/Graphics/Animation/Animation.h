@@ -14,7 +14,7 @@ namespace Slush
 	class Animation : public DataAsset
 	{
 	public:
-		DEFINE_ASSET("Animation", "anim", "data/animations", 1);
+		DEFINE_ASSET("Animation", "anim", "data/animations", ICON_FA_FILM, 1);
 		Animation(const char* aName, unsigned int aAssetID);
 		~Animation();
 

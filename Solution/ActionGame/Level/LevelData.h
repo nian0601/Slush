@@ -19,7 +19,7 @@ struct EnemyWaveData
 class LevelData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("LevelData", "ldata", "data/levels/", 1);
+	DEFINE_ASSET("LevelData", "ldata", "data/levels/", ICON_FA_MAP, 1);
 
 	LevelData(const char* aName, unsigned int aAssetID);
 

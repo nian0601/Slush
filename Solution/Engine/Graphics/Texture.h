@@ -13,7 +13,7 @@ namespace Slush
 	class Texture : public Asset
 	{
 	public:
-		DEFINE_ASSET("Texture", "png", "data/textures", 1);
+		DEFINE_ASSET("Texture", "png", "data/textures", ICON_FA_IMAGE, 1);
 
 		using Asset::Asset;
 		~Texture();

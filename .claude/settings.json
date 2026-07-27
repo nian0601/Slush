@@ -1,5 +1,8 @@
 {
   "worktree": {
     "baseRef": "head"
+  },
+  "permissions": {
+    "deny": ["AskUserQuestion"]
   }
 }

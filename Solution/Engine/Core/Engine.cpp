@@ -12,6 +12,8 @@
 #include <string>
 #include <FW_FileSystem.h>
 
+#include "imgui/Fonts/IconsFontAwesome7.h"
+
 namespace Slush
 {
 	void ReplaceAllOccurancesInString(std::string& aString, const std::string& aSomethingToReplace, const std::string& aNewString)
@@ -70,8 +72,18 @@ namespace Slush
 
 		ImGuiIO& imguiIO = ImGui::GetIO();
 		imguiIO.Fonts->AddFontFromFileTTF(path.GetBuffer(), 20.f);
+
+		FW_String iconFontPath = "Data/fa-solid-900.otf";
+		FW_FileSystem::GetAbsoluteFilePath(iconFontPath, iconFontPath);
+
+		static const ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+		ImFontConfig iconFontConfig;
+		iconFontConfig.MergeMode = true;
+		iconFontConfig.PixelSnapH = true;
+		imguiIO.Fonts->AddFontFromFileTTF(iconFontPath.GetBuffer(), 20.f, &iconFontConfig, iconRanges);
+
 		ImGui::SFML::UpdateFontTexture();
-		
+
 	}
 
 	void Engine::Shutdown()

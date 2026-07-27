@@ -18,13 +18,13 @@ namespace Slush
 		const float leftWidth = avail.x * 0.25f;
 		const float middleWidth = avail.x * 0.35f;
 
-		ImGui::BeginChild("DependencyTracker_Dependents", ImVec2(leftWidth, 0), ImGuiChildFlags_Borders);
+		ImGui::BeginChild("DependencyTracker_Dependents", ImVec2(leftWidth, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
 		BuildDependentsPane(pendingSelection);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
-		ImGui::BeginChild("DependencyTracker_AssetList", ImVec2(middleWidth, 0), ImGuiChildFlags_Borders);
+		ImGui::BeginChild("DependencyTracker_AssetList", ImVec2(middleWidth, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
 		BuildMiddlePane(pendingSelection);
 		ImGui::EndChild();
 
@@ -50,15 +50,20 @@ namespace Slush
 		}
 
 		const FW_GrowingArray<FW_String>& dependents = DependencyTracker::GetInstance().GetDependents(mySelectedAsset->GetAssetTypeID(), mySelectedAsset->GetAssetName());
+		bool anyRendered = false;
 		for (const FW_String& key : dependents)
 		{
 			Slush::Asset* asset = ResolveAssetFromKey(key);
 			if (!asset)
 				continue;
 
+			anyRendered = true;
 			if (ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), asset == mySelectedAsset))
 				outPendingSelection = asset;
 		}
+
+		if (!anyRendered)
+			ImGui::TextDisabled("<no dependents>");
 	}
 
 	void DependencyTrackerDockable::BuildMiddlePane(Slush::Asset*& outPendingSelection)
@@ -106,15 +111,20 @@ namespace Slush
 		}
 
 		const FW_GrowingArray<FW_String>& dependencies = DependencyTracker::GetInstance().GetDependencies(mySelectedAsset->GetAssetTypeID(), mySelectedAsset->GetAssetName());
+		bool anyRendered = false;
 		for (const FW_String& key : dependencies)
 		{
 			Slush::Asset* asset = ResolveAssetFromKey(key);
 			if (!asset)
 				continue;
 
+			anyRendered = true;
 			if (ImGui::Selectable(BuildAssetLabel(asset).GetBuffer(), asset == mySelectedAsset))
 				outPendingSelection = asset;
 		}
+
+		if (!anyRendered)
+			ImGui::TextDisabled("<no dependencies>");
 	}
 
 	Slush::Asset* DependencyTrackerDockable::ResolveAssetFromKey(const FW_String& aKey) const

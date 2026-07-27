@@ -57,6 +57,25 @@
 *.iobj
 Application/Raytracer/Data/Video
 *.lib
+
+# Vendored SFML .lib subset actually referenced by the build (see Engine.vcxproj
+# AdditionalDependencies) — committed so fresh git worktrees can link without
+# manually copying SFML/lib/ from the primary checkout.
+!SFML/lib/sfml-graphics-s-d.lib
+!SFML/lib/sfml-graphics-s.lib
+!SFML/lib/sfml-window-s-d.lib
+!SFML/lib/sfml-window-s.lib
+!SFML/lib/sfml-system-s-d.lib
+!SFML/lib/sfml-system-s.lib
+!SFML/lib/sfml-audio-s-d.lib
+!SFML/lib/sfml-audio-s.lib
+!SFML/lib/freetype.lib
+!SFML/lib/FLAC.lib
+!SFML/lib/vorbisenc.lib
+!SFML/lib/vorbisfile.lib
+!SFML/lib/vorbis.lib
+!SFML/lib/ogg.lib
+
 /ProgressTracking
 /Solution/.vs/Solution
 *.recipe

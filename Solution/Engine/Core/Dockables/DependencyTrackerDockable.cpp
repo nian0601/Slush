@@ -131,6 +131,8 @@ namespace Slush
 	FW_String DependencyTrackerDockable::BuildAssetLabel(const Slush::Asset* anAsset)
 	{
 		FW_String label;
+		label += anAsset->GetTypeIcon();
+		label += " ";
 		label += anAsset->GetAssetName();
 		label += " (";
 		label += anAsset->GetTypeName();

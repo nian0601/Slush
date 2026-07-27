@@ -59,7 +59,11 @@ namespace Slush
 						continue;
 					}
 
-					if (ImGui::BeginTabItem(assetData.myAsset->GetAssetName().GetBuffer(), &assetData.myShouldKeep))
+					FW_String tabLabel = assetData.myAsset->GetTypeIcon();
+					tabLabel += " ";
+					tabLabel += assetData.myAsset->GetAssetName();
+
+					if (ImGui::BeginTabItem(tabLabel.GetBuffer(), &assetData.myShouldKeep))
 					{
 						if (ImGui::BeginMenuBar())
 						{
@@ -136,7 +140,12 @@ namespace Slush
 
 			const FW_GrowingArray<Slush::IAssetStorage*>& assetStorages = Slush::AssetRegistry::GetInstance().GetAllAssetStorages();
 			for (Slush::IAssetStorage* storage : assetStorages)
-				ourAssetTypeNames.Add(storage->GetAssetTypeName());
+			{
+				FW_String typeLabel = storage->GetAssetTypeIcon();
+				typeLabel += " ";
+				typeLabel += storage->GetAssetTypeName();
+				ourAssetTypeNames.Add(typeLabel);
+			}
 		}
 
 		if (ImGui::BeginPopupModal("New_Prefab_Popup"))

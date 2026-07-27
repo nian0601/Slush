@@ -58,7 +58,11 @@ namespace Slush
 					ImGui::TableNextRow();
 					ImGui::TableSetColumnIndex(0);
 
-					ImGui::Selectable(asset->GetAssetName().GetBuffer(), false, ImGuiSelectableFlags_SpanAllColumns);
+					FW_String label = asset->GetTypeIcon();
+					label += " ";
+					label += asset->GetAssetName();
+
+					ImGui::Selectable(label.GetBuffer(), false, ImGuiSelectableFlags_SpanAllColumns);
 					ImGui::BeingDraggedAsset(*asset, j);
 
 

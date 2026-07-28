@@ -115,6 +115,9 @@ namespace Slush
 			if(!imguiIO.WantCaptureKeyboard)
 				myInput->UpdateKeyboard();
 
+			if (CommandLineArgs::GetInstance().HasFlag("-usedebuginput"))
+				myInput->PollDebugInputFile();
+
 			if (!imguiIO.WantCaptureMouse || myByPassImGUIInputRestriction)
 			{
 				myInput->UpdateMouse(*myWindow->GetRenderWindow());

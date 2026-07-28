@@ -2,4 +2,10 @@
 	<PropertyGroup>
 		<RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
 	</PropertyGroup>
+	<ItemDefinitionGroup>
+		<Link>
+			<SubSystem>Windows</SubSystem>
+			<EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
+		</Link>
+	</ItemDefinitionGroup>
 </Project>

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Core/Engine.h"
+#include "Core/CommandLineArgs.h"
 #include "Core/Input.h"
 #include "Core/Time.h"
 #include "Core/IApp.h"
@@ -66,6 +67,9 @@ namespace Slush
 		myInput = new Input();
 		Time::Init();
 
+		if (CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
+			myWindow->Hide();
+
 		
 		FW_String path = "Data/NotoSans.ttf";
 		FW_FileSystem::GetAbsoluteFilePath(path, path);
@@ -88,6 +92,8 @@ namespace Slush
 
 	void Engine::Shutdown()
 	{
+		CommandLineArgs::Destroy();
+
 		FW_SAFE_DELETE(myInput);
 		FW_SAFE_DELETE(myWindow);
 

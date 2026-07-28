@@ -4,6 +4,7 @@
 #include <FW_Includes.h>
 
 #include "Core/IApp.h"
+#include "Core/CommandLineArgs.h"
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Core/Time.h"
@@ -101,9 +102,11 @@ private:
 };
 
 #include <FW_UnitTestSuite.h>
-int main()
+int main(int argc, char** argv)
 {
 	FW_UnitTestSuite::RunTests();
+
+	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.Initialize();

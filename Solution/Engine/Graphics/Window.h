@@ -29,6 +29,8 @@ namespace Slush
 
 		void Close() { myShouldBeOpen = false; }
 
+		void Hide();
+
 		void StartOffscreenBuffer();
 		void EndOffscreenBuffer();
 

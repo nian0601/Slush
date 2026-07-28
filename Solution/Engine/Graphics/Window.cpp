@@ -77,6 +77,11 @@ namespace Slush
 		FW_SAFE_DELETE(myRectShape);
 	}
 
+	void Window::Hide()
+	{
+		myRenderWindow->setVisible(false);
+	}
+
 	bool Window::PumpEvents()
 	{
 		if (!myShouldBeOpen)

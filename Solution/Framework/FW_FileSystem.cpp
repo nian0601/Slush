@@ -208,6 +208,11 @@ namespace FW_FileSystem
 		return true;
 	}
 
+	bool RenameFile(const FW_String& aSourcePath, const FW_String& aDestinationPath)
+	{
+		return MoveFileExA(aSourcePath.GetBuffer(), aDestinationPath.GetBuffer(), MOVEFILE_REPLACE_EXISTING) != 0;
+	}
+
 	bool UpdateFileInfo(FileInfo& aFileInfo)
 	{
 		FileInfo newInfo;

@@ -41,6 +41,7 @@ namespace FW_FileSystem
 	void GetFileExtention(const FW_String& aFilePath, FW_String& aExtentionOut);
 	void RemoveFileExtention(const FW_String& aFilePath, FW_String& aNameOut);
 	bool GetFileInfo(const FW_String& aFilePath, FileInfo& aFileInfoOut);
+	bool RenameFile(const FW_String& aSourcePath, const FW_String& aDestinationPath);
 
 	bool UpdateFileInfo(FileInfo& aFileInfo);
 	bool UpdateFileInfo(FW_GrowingArray<FileInfo>& someFiles);

@@ -19,8 +19,6 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include "SFMLHelpers.h"
 
-#include <filesystem>
-
 namespace Slush
 {
 	sf::Color GetSFMLColor(int aHexColor)
@@ -243,8 +241,12 @@ namespace Slush
 		FW_String absolutePreviousPath;
 		FW_FileSystem::GetAbsoluteFilePath("data/debug/screenshot_previous.png", absolutePreviousPath);
 
-		if (std::filesystem::exists(absoluteScreenshotPath.GetBuffer()))
-			std::filesystem::rename(absoluteScreenshotPath.GetBuffer(), absolutePreviousPath.GetBuffer());
+		FW_FileSystem::FileInfo existingScreenshotInfo;
+		if (FW_FileSystem::GetFileInfo(absoluteScreenshotPath, existingScreenshotInfo))
+		{
+			if (!FW_FileSystem::RenameFile(absoluteScreenshotPath, absolutePreviousPath))
+				SLUSH_ERROR("SaveScreenshot: failed to rotate '%s' to '%s'", absoluteScreenshotPath.GetBuffer(), absolutePreviousPath.GetBuffer());
+		}
 
 		bool saveSuccess = image.saveToFile(absoluteScreenshotPath.GetBuffer());
 		FW_ASSERT(saveSuccess);

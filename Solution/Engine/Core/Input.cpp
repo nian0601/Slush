@@ -155,7 +155,7 @@ namespace Slush
 		myMousePosition.y = static_cast<int>(myMousePositionf.y + 0.5f);
 	}
 
-	void Input::PollDebugInputFile()
+	void Input::PollDebugInputFile(bool aIsImGuiCapturingKeyboard)
 	{
 		FW_String absolutePath;
 		FW_FileSystem::GetAbsoluteFilePath("data/debug/debug_input.txt", absolutePath);
@@ -171,6 +171,9 @@ namespace Slush
 		while (fgets(lineBuffer, sizeof(lineBuffer), file))
 		{
 			hadContent = true;
+
+			if (aIsImGuiCapturingKeyboard)
+				continue;
 
 			FW_String line = lineBuffer;
 			FW_FileSystem::TrimBeginAndEnd(line);
@@ -194,6 +197,9 @@ namespace Slush
 		}
 
 		fclose(file);
+
+		if (hadContent && aIsImGuiCapturingKeyboard)
+			SLUSH_ERROR("PollDebugInputFile: discarded debug_input.txt, ImGui has captured keyboard input");
 
 		if (hadContent)
 		{

@@ -74,7 +74,7 @@ namespace Slush
 		bool IsKeyDown(KeyCode aKey)const { return myKeyStates[aKey] == KEYSTATE_DOWN; }
 
 		void InjectKeyClick(KeyCode aKey) { myKeyStates[aKey] = KEYSTATE_PRESSED; }
-		void PollDebugInputFile();
+		void PollDebugInputFile(bool aIsImGuiCapturingKeyboard);
 
 		bool WasMousePressed(MouseButton aMouseButton) const { return myMouseStates[aMouseButton] == KEYSTATE_PRESSED; }
 		bool WasMouseReleased(MouseButton aMouseButton) const { return myMouseStates[aMouseButton] == KEYSTATE_RELEASED; }

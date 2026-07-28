@@ -21,8 +21,8 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
 3. **Clarify exhaustively**, using `AskUserQuestion` (structured choices) or plain follow-up questions (open-ended points) as fits each question. Cover, at minimum:
    - **Goal and scope**: what problem this solves, what the end state looks like, explicit non-goals (what's deliberately out of scope).
-   - **Priority** — always ask; offer `p0` (drop-everything/blocking) through `p3` (low/someday) with `p2` described as the normal default, but let the user pick. Never pick it silently.
-   - **Project** — only ask if its not clear which project the plan belongs to: `project:engine` or `project:actiongame`.
+   - **Priority** — always ask; scale and default are in CLAUDE.md's Issue tracking section — never pick it silently.
+   - **Project** — only ask if it's not clear which project the plan belongs to (values in CLAUDE.md's Issue tracking section).
    - **Approach/design decisions**, where more than one reasonable approach exists — surface the options and their trade-offs rather than picking one.
    - **Verification**: how to tell each phase, and the issue as a whole, is actually done (build passes, specific manual test, `SkipStartScreen` playtest, etc. — see CLAUDE.md's Testing section for the conventions already established).
    - Anything else that stays ambiguous after the above — keep asking rather than filling a gap with a plausible-sounding default.
@@ -35,7 +35,7 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
    A phase entry should read like a subsection of an implementation plan, not a changelog line.
 
-5. **Assemble the full draft**: title, one-paragraph summary, priority label, project label, and the phase-by-phase breakdown from step 4. Compute the size label from the phase count (`size:s` for fewer than 4 phases, `size:m` for 4-7, `size:l` for 8+) and include it for visibility, though `create-issue` recomputes it independently.
+5. **Assemble the full draft**: title, one-paragraph summary, priority label, project label, and the phase-by-phase breakdown from step 4. Compute the size label from the phase count (thresholds in CLAUDE.md's Issue tracking section) and include it for visibility, though `create-issue` recomputes it independently.
 
 6. **Show the complete draft to the user and ask for explicit go-ahead** before doing anything else. If the user wants changes, revise in place and show the updated draft again — don't hand off a stale version. Do not proceed on an implicit "looks fine" inferred from tone; get a clear confirmation.
 

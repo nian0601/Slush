@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Communication style
+
+Prefer short, plain language over grammatical polish. Fragments and dropped words are fine if the meaning lands — brevity wins when it conflicts with grammar. Applies to explanations, status updates, and commit messages; code comments follow the separate (also terse) rules under Code style.
+
 ## Project overview
 
 Slush is a personal, hand-rolled C++ game engine (namespace `Slush`) built on vendored **SFML** (`SFML/`) for windowing/graphics/audio and vendored **Dear ImGui** (`Solution/Engine/imgui/`) for editor tooling. It's a single Visual Studio solution (`Solution/Solution.sln`) containing:
@@ -9,8 +13,6 @@ Slush is a personal, hand-rolled C++ game engine (namespace `Slush`) built on ve
 - `Solution/Engine/` — shared engine code (windowing, input, rendering, asset system, ImGui-based editor dockables)
 - `Solution/Framework/` — low-level, STL-avoiding utility library (containers, math, string/hashing, file I/O, assertions, unit tests) — all types prefixed `FW_`
 - `Solution/ActionGame/`, `Solution/BossMonster/`, `Solution/TopDownGame/` — separate game executables built on Engine + Framework
-
-`TopDownGame` currently hosts the in-progress navmesh generation/cutting work (`Navmesh.h/.cpp`, `FW_Intersection.h`).
 
 ## Build
 
@@ -20,7 +22,7 @@ Windows-only, no CMake. Use MSBuild directly (find its path via `vswhere` if not
 "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" Solution\Solution.sln /p:Configuration=Debug /p:Platform=x86 /m
 ```
 
-Use `Platform=x86` (not `x64`) — the vendored SFML libs in `SFML/lib/` are only built for x86, so `x64` configs don't fully build (see WIP state below). `x86` builds all three game executables cleanly.
+Use `Platform=x86` (not `x64`) — the vendored SFML libs in `SFML/lib/` are only built for x86, so `x64` configs don't fully build. `x86` builds all three game executables cleanly. (x64 support is incomplete beyond the libs too: `Engine.vcxproj`'s x64 configs are missing PCH settings, the `SFML_STATIC` define, and library dependencies — stick to `x86` until that's all ported over.)
 
 Adding new files through Visual Studio's Solution Explorer ("Add > New Item"/"Existing Item") automatically updates the relevant `.vcxproj`, so no extra step is needed for new files to show up in CLI builds.
 
@@ -57,11 +59,6 @@ For changes that could affect actual gameplay (entity spawning, component constr
 
 Every Slush game launches as a `Windows`-subsystem executable (see `Directory.Build.props`), so no console window ever appears alongside the SFML one. Claude's own in-application verification should launch with `-hidewindow` for a genuinely headless run (no SFML window, no console) rather than a normal visible launch. Input should be delivered by also launching with `-usedebuginput` and writing `Input::KeyCode` integer values (see the enum in `Solution/Engine/Core/Input.h`), one per line, to `Workbed/<Game>/Data/debug/debug_input.txt` — this is polled every frame and is the only injection path that works while the window is hidden; the old approach of physically sending a keypress to a focused, visible window is no longer necessary. For visual confirmation, inject `Input::KeyCode::_F12`'s value to trigger the in-engine screenshot capability instead of an OS-level screenshot, then read `Workbed/<Game>/Data/debug/screenshot.png` (and `screenshot_previous.png`, the prior capture, for before/after comparisons). Simulating mouse movement/clicks to drive the UI (selecting list rows, dragging, clicking buttons) is still out of scope for Claude to do itself — it's slow, fragile (coordinates drift across window moves/resizes, DPI, stale docking layouts), and easy to misread. For any verification step that needs more interaction than a keypress, describe what to check and hand it to the user to click through manually rather than automating it.
 
-## Current WIP state
-
-- Navmesh cutting (`Navmesh.cpp`) is under active development and known incomplete: cutting arbitrary convex shapes mostly works, but resulting vertices aren't guaranteed to land exactly at cut positions.
-- The `x64` platform doesn't fully build: `Engine.vcxproj`'s x64 configs are missing PCH settings, the `SFML_STATIC` define, and library dependencies, and the vendored SFML libs (`SFML/lib/`) are x86-only. Use `Platform=x86` until x64 SFML libs are vendored and the vcxproj configs are ported over.
-
 ## Repo etiquette
 
 Solo project — commit directly to `main`, no branch/PR convention to follow. The one sanctioned exception: `/implement-issue` does its work on a transient `issue-<N>` branch inside a git worktree, fast-forwarded back into `main` and deleted once the issue is done — never a long-lived branch.
@@ -72,17 +69,18 @@ For engine-sized changes (new subsystems, cross-cutting refactors), prefer landi
 
 ## Issue tracking
 
-Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Three label groups:
+Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Three label groups, plus one standalone tag:
 
 - **Priority**: `priority:p0` (drop-everything/blocking) through `priority:p3` (low/someday); `priority:p2` is the normal default.
 - **Size**: `size:s`/`size:m`/`size:l`, derived from the number of phases in the issue's plan — `size:s` for fewer than 4 phases, `size:m` for 4-7, `size:l` for 8+.
 - **Project**: `project:engine` or `project:actiongame` — which part of the codebase the issue belongs to. Just these two for now; revisit if it needs to be more granular (e.g. per-game, as BossMonster/TopDownGame become active) or dropped.
+- **`no-plan`**: an additional tag on issues filed without a phase breakdown (quick/direct path, or a deliberately unplanned issue) — layered on top of whatever priority/size/project labels still apply.
 
 Four project skills (`.claude/skills/`) drive the workflow:
 
 - `/plan-issue` — exhaustively clarifies a task before it's filed. Never assumes or infers scope, priority, or project — always asks. Breaks the work into phases, each with enough self-contained detail (files/systems, approach, verification) that `/implement-issue` can act on it later without re-deriving context. Confirms the full draft with the user before creating anything.
 - `/create-issue` — writes a drafted (or quick, unplanned) issue to GitHub via `gh issue create`, with the label taxonomy above and a per-phase checklist body.
 - `/find-issue <time budget>` — lists open issues, shortlists by priority and a coarse size-vs-budget heuristic, and proposes the best fit for confirmation rather than starting work automatically.
-- `/implement-issue <number-or-url>` — loads an issue's phase breakdown and works through it phase by phase, pausing for review between each per the phased-work convention above. Runs an automatic code-review pass against the issue's own description near the end, before proposing to close it.
+- `/implement-issue <number-or-url>` — loads an issue's phase breakdown and works through it phase by phase autonomously by default: commits and moves on whenever a phase's own verification passes cleanly, stopping only if something unexpected comes up (a deliberate, scoped exception to the phased-work convention above — see the skill for the exact stop conditions). Runs an automatic code-review pass and an end-of-run summary before proposing to merge/close.
 
-Closing an issue or checking off a phase in its body follows the same standing-permission rule as `git commit`: never do it without the user's go-ahead in that turn.
+Closing an issue and merging its branch back into `main` follow the same standing-permission rule as `git commit`: never do either without the user's go-ahead in that turn. Checking off a phase happens automatically as part of `/implement-issue`'s autonomous run.

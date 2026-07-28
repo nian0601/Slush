@@ -7,7 +7,7 @@ allowed-tools: Bash(gh:*), Bash(git:*), Agent, AskUserQuestion
 
 # Work an issue on nian0601/Slush (in an isolated worktree)
 
-Implement a GitHub issue's phase breakdown phase by phase, directly in this session, per the repo's standing phased-work convention (see CLAUDE.md: small reviewable phases, stop after each for explicit review, never auto-chain to the next one). Do the work isolated in a git worktree on a transient `issue-<N>` branch (CLAUDE.md's standing convention), fast-forwarded back into `main` and deleted once the issue is done. Building and running the game inside the worktree doesn't collide with the primary checkout: `Directory.Build.props`'s `RepoRoot` resolves per-checkout, so each worktree gets its own `Workbed\`/`Build_Output\`.
+Implement a GitHub issue's phase breakdown phase by phase, directly in this session. Unlike CLAUDE.md's general phased-work convention (small reviewable phases, stop after each for explicit review, never auto-chain), **this skill runs the phase loop and the automatic code-review pass autonomously by default**: implement a phase, verify it, and if verification passes with nothing unforeseen, commit and move straight to the next phase without waiting for approval. This is a deliberate, scoped exception granted specifically to this skill — see Step 5 for the exact conditions that still halt the run and fall back to report-and-wait. Merging the finished branch into `main` (Step 7) and closing the issue (Step 8) always require your explicit go-ahead regardless — autonomy never extends that far. Do the work isolated in a git worktree on a transient `issue-<N>` branch (CLAUDE.md's standing convention), fast-forwarded back into `main` and deleted once the issue is done. Building and running the game inside the worktree doesn't collide with the primary checkout: `Directory.Build.props`'s `RepoRoot` resolves per-checkout, so each worktree gets its own `Workbed\`/`Build_Output\`.
 
 If you want concurrent work on something else, run `/implement-issue` in a separate Claude Code session/instance — this skill doesn't manage concurrency itself.
 
@@ -29,17 +29,26 @@ If you want concurrent work on something else, run `/implement-issue` in a separ
 
 4. **Move into the worktree for the rest of this issue.** Resolve and remember the worktree's absolute path, then `cd` there via the Bash tool — its cwd persists across calls in this session (confirmed: this only holds while the path stays inside the repo tree), so every subsequent Bash call (build, `git add`/`commit`, `gh issue edit`, etc.) runs there implicitly with no repeated `cd`. Standing rule for the rest of this issue: Edit/Write/Read take absolute paths per call, not a persistent cwd, so **every** file edit must be prefixed with the worktree's absolute path (e.g. `<worktree-path>/Solution/...`) — never the primary checkout's copy of the same relative path.
 
-5. **Work through phases one at a time:**
-   - Parse the phase checklist out of the issue body — each phase is a `- [ ]`/`- [x]` list item with its detail attached underneath (see the `create-issue` skill for the exact body format). Already-`[x]` phases are done; treat the first unchecked phase as the resume point. If a phase genuinely lacks enough detail to act on, ask rather than guessing.
-   - Implement the phase, verify it per that phase's own verification note (use the Bash tool, not PowerShell, for MSBuild/exe commands so you stay within the pre-approved permission rules), then **stop and report back to the user**. This is a hard rule, not a suggestion: never auto-chain to the next phase, and never commit without being told to.
-   - Once told to commit a phase, commit it, then check its box in the issue body: get the commit SHA (`git rev-parse --short HEAD`), fetch the current issue body, flip that phase's `- [ ]` to `- [x]` and append the short SHA in backticks to the end of the phase's title line (e.g. `- [x] **Phase 1: <title>** (`8e63edf`)`), write it to a temp file, then `gh issue edit <N> --repo nian0601/Slush --body-file <tmpfile>`. Then move to the next phase and repeat.
+5. **Work through phases autonomously, one at a time:**
+   - Parse the phase checklist out of the issue body — each phase is a `- [ ]`/`- [x]` list item with its detail attached underneath (see the `create-issue` skill for the exact body format). Already-`[x]` phases are done; treat the first unchecked phase as the resume point.
+   - Implement the phase, then verify it per that phase's own verification note (use the Bash tool, not PowerShell, for MSBuild/exe commands so you stay within the pre-approved permission rules).
+   - **If verification passes and nothing unforeseen came up**, commit immediately, then check its box in the issue body: get the commit SHA (`git rev-parse --short HEAD`), fetch the current issue body, flip that phase's `- [ ]` to `- [x]` and append the short SHA in backticks to the end of the phase's title line (e.g. `- [x] **Phase 1: <title>** (`8e63edf`)`), write it to a temp file, then `gh issue edit <N> --repo nian0601/Slush --body-file <tmpfile>`. Then move straight to the next phase — no need to stop or ask.
+   - **Stop and report back to the user instead of continuing** if, on any phase:
+     - its own verification step fails (build error, assertion, wrong output, etc.) and the fix isn't obviously safe to make unilaterally
+     - the phase body lacks enough detail to implement without guessing
+     - implementing it surfaces a design decision or tradeoff the issue text doesn't resolve
+     - anything else comes up that would normally warrant an `AskUserQuestion`
 
-6. **Once every phase is checked off and committed**, run an automatic review pass (still cwd'd in the worktree, so the diff is worktree-relative against the pre-issue base):
+     When this happens, report the problem clearly and wait for direction before resuming — do not silently skip or improvise past it.
+   - Keep a short running note of anything notable hit while working autonomously (a build error that needed fixing, a judgment call made, an assumption filled in) — it feeds the end-of-run summary in Step 6.
+
+6. **Once every phase is checked off and committed, continue straight into an automatic review pass** — no stop in between (still cwd'd in the worktree, so the diff is worktree-relative against the pre-issue base):
    - Prefer invoking the existing `code-review` skill with the issue's title/body as extra context (e.g. at `high` effort, without `--fix`).
    - If it can't take extra context that way, fall back to a direct `Agent` call with a code-reviewer-style prompt containing the issue's full text plus the actual diff (`git diff` against the pre-issue state), asking it to flag correctness problems specifically against what the issue asked for, reporting through `ReportFindings`.
-   - This step **reports findings, it does not auto-fix them.** Report them and stop.
+   - This step **reports findings, it does not auto-fix them.**
+   - **Then produce one end-of-run summary** covering: which phases were completed, any notable issues hit during the autonomous run and how they were resolved (from the running notes kept in Step 5), and the review pass's findings. End it with a clear, explicit reminder to review the committed changes in the worktree/branch before deciding whether the issue is actually finished or needs more work. **Stop here — do not proceed into Step 7 on your own.**
 
-7. **Merge back to `main` and clean up** — do this in the primary checkout, not the worktree (`main` is checked out there, not in the worktree; git refuses to touch a branch checked out in another worktree from outside it):
+7. **Ask before merging back to `main`** (same standing-permission rule as a commit — never do this without being asked in that turn). Once approved, do the merge in the primary checkout, not the worktree (`main` is checked out there, not in the worktree; git refuses to touch a branch checked out in another worktree from outside it):
    ```
    cd <primary-checkout-path>
    git merge --ff-only issue-<N>

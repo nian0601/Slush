@@ -129,6 +129,9 @@ namespace Slush
 			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
 				myWindow->ToggleEditorUI();
 
+			if (myInput->WasKeyPressed(Slush::Input::_F12))
+				myWindow->RequestScreenshot();
+
 			myWindow->RenderFade();
 
 			myWindow->Present();

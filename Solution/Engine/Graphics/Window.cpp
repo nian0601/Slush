@@ -19,6 +19,8 @@
 #include <SFML/Graphics/VertexArray.hpp>
 #include "SFMLHelpers.h"
 
+#include <filesystem>
+
 namespace Slush
 {
 	sf::Color GetSFMLColor(int aHexColor)
@@ -213,7 +215,39 @@ namespace Slush
 			myFadeData.myFadeTexture->update(myOffscreenBuffer->getTexture());
 
 		myRenderWindow->display();
+
+		if (myScreenshotRequested)
+		{
+			myScreenshotRequested = false;
+			SaveScreenshot();
+		}
+
 		myRenderWindow->clear();
+	}
+
+	void Window::SaveScreenshot()
+	{
+		sf::Texture texture;
+		bool resizeSuccess = texture.resize(myRenderWindow->getSize());
+		FW_ASSERT(resizeSuccess);
+		texture.update(*myRenderWindow);
+
+		sf::Image image = texture.copyToImage();
+
+		FW_String screenshotPath = "data/debug/screenshot.png";
+		FW_FileSystem::CreateFolderIfNecessary(screenshotPath);
+
+		FW_String absoluteScreenshotPath;
+		FW_FileSystem::GetAbsoluteFilePath(screenshotPath, absoluteScreenshotPath);
+
+		FW_String absolutePreviousPath;
+		FW_FileSystem::GetAbsoluteFilePath("data/debug/screenshot_previous.png", absolutePreviousPath);
+
+		if (std::filesystem::exists(absoluteScreenshotPath.GetBuffer()))
+			std::filesystem::rename(absoluteScreenshotPath.GetBuffer(), absolutePreviousPath.GetBuffer());
+
+		bool saveSuccess = image.saveToFile(absoluteScreenshotPath.GetBuffer());
+		FW_ASSERT(saveSuccess);
 	}
 
 	void Window::StartOffscreenBuffer()

@@ -25,6 +25,8 @@ namespace Slush
 		void StartFade(float aDuration);
 		void RenderFade();
 
+		void RequestScreenshot() { myScreenshotRequested = true; }
+
 		void Present();
 
 		void Close() { myShouldBeOpen = false; }
@@ -59,6 +61,8 @@ namespace Slush
 		void SaveAppLayoutConfig();
 		void LoadAppLayoutConfig();
 
+		void SaveScreenshot();
+
 		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
 
 		Rectf myWindowRect;
@@ -69,6 +73,7 @@ namespace Slush
 		sf::RenderWindow* myRenderWindow = nullptr;
 		bool myShouldBeOpen = true;
 		bool myDisplayImGUIDemo = false;
+		bool myScreenshotRequested = false;
 		IAppLayout* myAppLayout = nullptr;
 
 		sf::RenderTarget* myActiveRenderTarget = nullptr;

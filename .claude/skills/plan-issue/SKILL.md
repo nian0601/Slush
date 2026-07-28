@@ -17,7 +17,7 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
 1. **Get the raw description.** Use `$ARGUMENTS` if given; otherwise ask what the task is.
 
-2. **Interview the user** Interview user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependnecies between decisions one-by-one. If a question can be answered by exploring the codebase, explore the codebase instead.
+2. **Interview the user** Interview user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependnecies between decisions one-by-one. If a question can be answered by exploring the codebase, explore the codebase instead. Ask the questions one by one, do not flood the user with all questions at once.
 
 3. **Clarify exhaustively**, using `AskUserQuestion` (structured choices) or plain follow-up questions (open-ended points) as fits each question. Cover, at minimum:
    - **Goal and scope**: what problem this solves, what the end state looks like, explicit non-goals (what's deliberately out of scope).

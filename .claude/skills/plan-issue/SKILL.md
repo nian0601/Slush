@@ -17,15 +17,17 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
 1. **Get the raw description.** Use `$ARGUMENTS` if given; otherwise ask what the task is.
 
-2. **Interview the user** Interview user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependnecies between decisions one-by-one. If a question can be answered by exploring the codebase, explore the codebase instead. Ask the questions one by one, do not flood the user with all questions at once.
+2. **Interview the user** Interview user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommendation. If a question can be answered by exploring the codebase, explore the codebase instead. Ask the questions one by one, do not flood the user with all questions at once.
 
-3. **Clarify exhaustively**, using `AskUserQuestion` (structured choices) or plain follow-up questions (open-ended points) as fits each question. Cover, at minimum:
+3. **Clarify exhaustively**, using plain follow-up questions (open-ended points) as fits each question. Cover, at minimum:
    - **Goal and scope**: what problem this solves, what the end state looks like, explicit non-goals (what's deliberately out of scope).
    - **Priority** — always ask; scale and default are in CLAUDE.md's Issue tracking section — never pick it silently.
    - **Project** — only ask if it's not clear which project the plan belongs to (values in CLAUDE.md's Issue tracking section).
    - **Approach/design decisions**, where more than one reasonable approach exists — surface the options and their trade-offs rather than picking one.
    - **Verification**: how to tell each phase, and the issue as a whole, is actually done (build passes, specific manual test, `SkipStartScreen` playtest, etc. — see CLAUDE.md's Testing section for the conventions already established).
    - Anything else that stays ambiguous after the above — keep asking rather than filling a gap with a plausible-sounding default.
+
+   Do not proceed to the next step until there are no unanswered questions remaining.
 
 4. **Break the work into phases**, following the phased-work convention already in CLAUDE.md: small, independently buildable/testable chunks, one thing per phase. For **each** phase, write enough detail that `/implement-issue` can act on it directly later without re-deriving context or asking the user to re-explain — not a one-line title. Capture, per phase:
    - What changes, and why.
@@ -35,7 +37,7 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
    A phase entry should read like a subsection of an implementation plan, not a changelog line.
 
-5. **Assemble the full draft**: title, one-paragraph summary, priority label, project label, and the phase-by-phase breakdown from step 4. Compute the size label from the phase count (thresholds in CLAUDE.md's Issue tracking section) and include it for visibility, though `create-issue` recomputes it independently.
+5. **Assemble the full draft**: title, one-paragraph summary, priority label, project label, and the phase-by-phase breakdown from step 4. Make a holistic judgment call on the size label, the same way priority is judged rather than mechanically derived: look at the assembled phase breakdown and estimate realistic wall-clock implementation time, then bucket it against CLAUDE.md's Issue tracking section anchors. This label is the source of truth — `create-issue` carries it through as-is rather than recomputing it.
 
 6. **Show the complete draft to the user and ask for explicit go-ahead** before doing anything else. If the user wants changes, revise in place and show the updated draft again — don't hand off a stale version. Do not proceed on an implicit "looks fine" inferred from tone; get a clear confirmation.
 

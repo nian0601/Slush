@@ -18,7 +18,7 @@ Write an issue to GitHub with the correct labels and a body detailed enough that
 
 1. Determine which path applies and gather the required fields: title, body summary, priority label, project label, optional phase list.
 
-2. **Compute the size label** from the number of phases (thresholds in CLAUDE.md's Issue tracking section). No phase list → `size:s` unless the user said otherwise.
+2. **Determine the size label.** On a `plan-issue` handoff, the draft already carries a size label — a holistic judgment call `plan-issue` made, not a formula — so carry it through as-is; don't recompute it. On the direct/quick path, there's no phase list to base a judgment on, so no size label.
 
    **No phase list also means no plan**: add the `no-plan` label whenever the issue is being filed without a phase breakdown — whether that's the direct/quick path, or a deliberately-unplanned issue mentioned during a `plan-issue` handoff (e.g. a related future-work issue the user wants tracked but not scoped yet). If a phase list is present, do not add `no-plan`.
 

@@ -43,8 +43,7 @@ If you want concurrent work on something else, run `/implement-issue` in a separ
    - Keep a short running note of anything notable hit while working autonomously (a build error that needed fixing, a judgment call made, an assumption filled in) — it feeds the end-of-run summary in Step 6.
 
 6. **Once every phase is checked off and committed, continue straight into an automatic review pass** — no stop in between (still cwd'd in the worktree, so the diff is worktree-relative against the pre-issue base):
-   - Prefer invoking the existing `code-review` skill with the issue's title/body as extra context (e.g. at `high` effort, without `--fix`).
-   - If it can't take extra context that way, fall back to a direct `Agent` call with a code-reviewer-style prompt containing the issue's full text plus the actual diff (`git diff` against the pre-issue state), asking it to flag correctness problems specifically against what the issue asked for, reporting through `ReportFindings`.
+   - Use a direct `Agent` call with a code-reviewer-style prompt containing the issue's full text plus the actual diff (`git diff` against the pre-issue state), asking it to flag correctness problems specifically against what the issue asked for, reporting through `ReportFindings`.
    - This step **reports findings, it does not auto-fix them.**
    - **Then produce one end-of-run summary** covering: which phases were completed, any notable issues hit during the autonomous run and how they were resolved (from the running notes kept in Step 5), and the review pass's findings. End it with a clear, explicit reminder to review the committed changes in the worktree/branch before deciding whether the issue is actually finished or needs more work. **Stop here — do not proceed into Step 7 on your own.**
 

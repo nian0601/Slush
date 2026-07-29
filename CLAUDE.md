@@ -72,7 +72,7 @@ For engine-sized changes (new subsystems, cross-cutting refactors), prefer landi
 Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Three label groups, plus one standalone tag:
 
 - **Priority**: `priority:p0` (drop-everything/blocking) through `priority:p3` (low/someday); `priority:p2` is the normal default.
-- **Size**: `size:s`/`size:m`/`size:l`, derived from the number of phases in the issue's plan — `size:s` for fewer than 4 phases, `size:m` for 4-7, `size:l` for 8+.
+- **Size**: `size:s`/`size:m`/`size:l`, a holistic judgment call made by `plan-issue` on the assembled phase breakdown — how long the plan would realistically take to implement, not a mechanical count. Rough anchors (sessions share no memory of past calls, so these keep the judgment calibrated): `size:s` ≈ under a couple hours, `size:m` ≈ half a day to a day, `size:l` ≈ multiple days/sessions.
 - **Project**: `project:engine` or `project:actiongame` — which part of the codebase the issue belongs to. Just these two for now; revisit if it needs to be more granular (e.g. per-game, as BossMonster/TopDownGame become active) or dropped.
 - **`no-plan`**: an additional tag on issues filed without a phase breakdown (quick/direct path, or a deliberately unplanned issue) — layered on top of whatever priority/size/project labels still apply.
 

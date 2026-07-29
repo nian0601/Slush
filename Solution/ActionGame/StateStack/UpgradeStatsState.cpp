@@ -7,6 +7,7 @@
 #include "Components\StatsComponent.h"
 #include "EntitySystem\Entity.h"
 #include "Graphics\Window.h"
+#include "Graphics\Renderer.h"
 
 UpgradeStatsState::UpgradeStatsState(Slush::EntityHandle aPlayerHandle)
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
@@ -27,8 +28,7 @@ UpgradeStatsState::UpgradeStatsState(Slush::EntityHandle aPlayerHandle)
 	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 
-	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	window.StartFade(0.15f);
+	Slush::Engine::GetInstance().GetWindow().GetRenderer().StartFade(0.15f);
 
 	Slush::Entity* player = myPlayerHandle.Get();
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();

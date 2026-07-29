@@ -1,12 +1,15 @@
 #include "stdafx.h"
 
 #include "Graphics/Renderer.h"
+#include "Graphics/SFMLHelpers.h"
+#include "Core/Time.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics/Texture.hpp>
 
 namespace Slush
 {
@@ -29,6 +32,10 @@ namespace Slush
 		myRectShape = new sf::RectangleShape();
 
 		myActiveRenderTarget = myRenderWindow;
+
+		myFadeData.myFadeTexture = new sf::Texture();
+		bool resizeSuccess = myFadeData.myFadeTexture->resize({ 1920, 1080 });
+		FW_ASSERT(resizeSuccess);
 	}
 
 	Renderer::~Renderer()
@@ -36,6 +43,7 @@ namespace Slush
 		FW_SAFE_DELETE(myOffscreenBuffer);
 		FW_SAFE_DELETE(myCircleShape);
 		FW_SAFE_DELETE(myRectShape);
+		FW_SAFE_DELETE(myFadeData.myFadeTexture);
 	}
 
 	void Renderer::StartOffscreenBuffer()
@@ -115,5 +123,37 @@ namespace Slush
 
 		myCircleShape->setFillColor(GetSFMLColor(aColor));
 		GetActiveRenderTarget()->draw(*myCircleShape);
+	}
+
+	void Renderer::StartFade(float aDuration)
+	{
+		myFadeData.myIsFading = true;
+		myFadeData.myRemainingTime = aDuration;
+		myFadeData.myTotalTime = aDuration;
+	}
+
+	void Renderer::RenderFade()
+	{
+		if (myFadeData.myIsFading)
+		{
+			myFadeData.myRemainingTime -= Time::GetDelta();
+			if (myFadeData.myRemainingTime <= 0.f)
+				myFadeData.myIsFading = false;
+		}
+
+		if (myFadeData.myIsFading)
+		{
+			float alpha = FW_Max(0.f, myFadeData.myRemainingTime / myFadeData.myTotalTime);
+			sf::RectangleShape rect;
+			rect.setTexture(myFadeData.myFadeTexture);
+			rect.setSize({ 1920.f, 1080.f });
+			rect.setFillColor(SFMLHelpers::GetColor(FW_Float_To_ARGB(alpha, 1.f, 1.f, 1.f)));
+			myOffscreenBuffer->draw(rect);
+		}
+
+		myOffscreenBuffer->display();
+
+		if (!myFadeData.myIsFading)
+			myFadeData.myFadeTexture->update(myOffscreenBuffer->getTexture());
 	}
 }

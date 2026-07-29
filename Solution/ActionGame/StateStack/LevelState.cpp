@@ -10,6 +10,7 @@
 #include "Level\Level.h"
 #include "StateStack/StateStack.h"
 #include "Graphics\Window.h"
+#include "Graphics\Renderer.h"
 #include "PauseState.h"
 #include "Core\Input.h"
 
@@ -26,8 +27,7 @@ LevelState::LevelState(const CharacterInfo& aCharacterInfo)
 	myLevel = new Level(aCharacterInfo);
 	myLevel->Restart();
 
-	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	window.StartFade(0.15f);
+	Slush::Engine::GetInstance().GetWindow().GetRenderer().StartFade(0.15f);
 }
 
 LevelState::~LevelState()
@@ -39,8 +39,7 @@ LevelState::~LevelState()
 
 void LevelState::ResumeState()
 {
-	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	window.StartFade(0.15f);
+	Slush::Engine::GetInstance().GetWindow().GetRenderer().StartFade(0.15f);
 }
 
 Slush::IGameState::GameStateResult LevelState::Update()

@@ -4,6 +4,7 @@
 #include "ActionGameGlobals.h"
 #include "EntitySystem\Entity.h"
 #include "Graphics\Window.h"
+#include "Graphics\Renderer.h"
 #include "Components\StatsComponent.h"
 #include "Core\Assets\AssetStorage.h"
 #include "Components\WeaponComponent.h"
@@ -33,8 +34,7 @@ PauseState::PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& a
 	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFF888888);
 
-	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	window.StartFade(0.15f);
+	Slush::Engine::GetInstance().GetWindow().GetRenderer().StartFade(0.15f);
 }
 
 Slush::IGameState::GameStateResult PauseState::Update()

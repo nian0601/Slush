@@ -3,7 +3,6 @@
 namespace sf
 {
 	class RenderWindow;
-	class Texture;
 }
 
 namespace Slush
@@ -19,8 +18,6 @@ namespace Slush
 
 		bool PumpEvents();
 		void RenderOffscreenBufferToImGUI();
-		void StartFade(float aDuration);
-		void RenderFade();
 
 		void RequestScreenshot() { myScreenshotRequested = true; }
 
@@ -62,14 +59,5 @@ namespace Slush
 		bool myDisplayImGUIDemo = false;
 		bool myScreenshotRequested = false;
 		IAppLayout* myAppLayout = nullptr;
-
-		struct FadeData
-		{
-			sf::Texture* myFadeTexture = nullptr;
-			bool myIsFading = false;
-			float myRemainingTime = 0.f;
-			float myTotalTime = 0.f;
-		};
-		FadeData myFadeData;
 	};
 }

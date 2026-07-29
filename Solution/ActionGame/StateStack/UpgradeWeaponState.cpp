@@ -5,6 +5,7 @@
 #include "EntitySystem\Entity.h"
 #include "ActionGameGlobals.h"
 #include "Graphics\Window.h"
+#include "Graphics\Renderer.h"
 
 UpgradeWeaponState::UpgradeWeaponState(Slush::EntityHandle aPlayerHandle)
 	: myFont(ActionGameGlobals::GetInstance().GetFont())
@@ -25,8 +26,7 @@ UpgradeWeaponState::UpgradeWeaponState(Slush::EntityHandle aPlayerHandle)
 	myUIButtonStyle.SetOutlineThickness(-1.f);
 	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 
-	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-	window.StartFade(0.15f);
+	Slush::Engine::GetInstance().GetWindow().GetRenderer().StartFade(0.15f);
 }
 
 Slush::IGameState::GameStateResult UpgradeWeaponState::Update()

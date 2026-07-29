@@ -17,7 +17,6 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui-SFML.h"
 #include <FW_FileSystem.h>
-#include "SFMLHelpers.h"
 
 namespace Slush
 {
@@ -29,11 +28,6 @@ namespace Slush
 
 		myRenderWindow = new sf::RenderWindow(sf::VideoMode({ aWidth, aHeight }), "Slush Engine");
 		myRenderer = new Renderer(myRenderWindow);
-
-		//myFadeData.myFadeTexture = new sf::Texture({ 1920, 1080 });
-		myFadeData.myFadeTexture = new sf::Texture();
-		bool resizeSuccess = myFadeData.myFadeTexture->resize({ 1920, 1080 });
-		FW_ASSERT(resizeSuccess);
 
 		ImGui::SFML::Init(*myRenderWindow, false);
 		
@@ -57,7 +51,6 @@ namespace Slush
 
 		FW_SAFE_DELETE(myRenderer);
 		FW_SAFE_DELETE(myRenderWindow);
-		FW_SAFE_DELETE(myFadeData.myFadeTexture);
 	}
 
 	void Window::Hide()
@@ -94,13 +87,6 @@ namespace Slush
 		if (myShowEditorUI)
 			ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());
 
-		if (myFadeData.myIsFading)
-		{
-			myFadeData.myRemainingTime -= Time::GetDelta();
-			if (myFadeData.myRemainingTime <= 0.f)
-				myFadeData.myIsFading = false;
-		}
-
 		return true;
 	}
 
@@ -119,28 +105,6 @@ namespace Slush
 
 		ImTextureID textureID = myRenderer->GetOffscreenBuffer()->getTexture().getNativeHandle();
 		ImGui::Image(textureID, { myGameViewRect.myExtents.x, myGameViewRect.myExtents.y }, { 0, 1 }, { 1, 0 });
-	}
-
-	void Window::StartFade(float aDuration)
-	{
-		myFadeData.myIsFading = true;
-		myFadeData.myRemainingTime = aDuration;
-		myFadeData.myTotalTime = aDuration;
-	}
-
-	void Window::RenderFade()
-	{
-		if (myFadeData.myIsFading)
-		{
-			float alpha = FW_Max(0.f, myFadeData.myRemainingTime / myFadeData.myTotalTime);
-			sf::RectangleShape rect;
-			rect.setTexture(myFadeData.myFadeTexture);
-			rect.setSize({ 1920.f, 1080.f });
-			rect.setFillColor(SFMLHelpers::GetColor(FW_Float_To_ARGB(alpha, 1.f, 1.f, 1.f)));
-			myRenderer->GetOffscreenBuffer()->draw(rect);
-		}
-
-		myRenderer->GetOffscreenBuffer()->display();
 	}
 
 	void Window::Present()
@@ -194,9 +158,6 @@ namespace Slush
 
 			myRenderWindow->draw(rect);
 		}
-
-		if (!myFadeData.myIsFading)
-			myFadeData.myFadeTexture->update(myRenderer->GetOffscreenBuffer()->getTexture());
 
 		myRenderWindow->display();
 

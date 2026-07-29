@@ -5,6 +5,7 @@ namespace sf
 	class RenderWindow;
 	class RenderTexture;
 	class RenderTarget;
+	class Texture;
 	class CircleShape;
 	class RectangleShape;
 }
@@ -29,6 +30,9 @@ namespace Slush
 		void RenderRect(const Rectf& aRect, int aColor = 0xFFFFFFFF, float aRotationInRadians = 0.f);
 		void RenderCircle(const Vector2f& aCenter, float aRadius, int aColor = 0xFFFFFFFF);
 
+		void StartFade(float aDuration);
+		void RenderFade();
+
 	private:
 		sf::RenderWindow* myRenderWindow = nullptr;
 
@@ -37,5 +41,14 @@ namespace Slush
 
 		sf::CircleShape* myCircleShape = nullptr;
 		sf::RectangleShape* myRectShape = nullptr;
+
+		struct FadeData
+		{
+			sf::Texture* myFadeTexture = nullptr;
+			bool myIsFading = false;
+			float myRemainingTime = 0.f;
+			float myTotalTime = 0.f;
+		};
+		FadeData myFadeData;
 	};
 }

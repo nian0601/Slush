@@ -8,6 +8,7 @@
 #include "Core/Log.h"
 
 #include "Graphics/Window.h"
+#include "Graphics/Renderer.h"
 
 #include <windows.h>
 #include <string>
@@ -132,7 +133,7 @@ namespace Slush
 			if (myInput->WasKeyPressed(Slush::Input::_F12))
 				myWindow->RequestScreenshot();
 
-			myWindow->RenderFade();
+			myWindow->GetRenderer().RenderFade();
 
 			myWindow->Present();
 		}

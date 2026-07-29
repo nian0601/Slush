@@ -33,6 +33,7 @@
       <Filter>Services</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Window.h" />
+    <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Core\CommandLineArgs.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\IApp.h" />
@@ -111,6 +112,7 @@
       <Filter>Services</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Window.cpp" />
+    <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Core\CommandLineArgs.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\Log.cpp" />

@@ -195,6 +195,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Core\Time.h" />
     <ClInclude Include="Graphics\Window.h" />
+    <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="UI\UIButton.h" />
     <ClInclude Include="UI\UIEditorDockable.h" />
@@ -274,6 +275,7 @@
     </ClCompile>
     <ClCompile Include="Core\Time.cpp" />
     <ClCompile Include="Graphics\Window.cpp" />
+    <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UIEditorDockable.cpp" />

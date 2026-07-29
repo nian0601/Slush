@@ -3,17 +3,14 @@
 namespace sf
 {
 	class RenderWindow;
-	class RenderTexture;
-	class RenderTarget;
 	class Texture;
-	class CircleShape;
-	class RectangleShape;
 }
 
 namespace Slush
 {
 	class IAppLayout;
 	class Dockable;
+	class Renderer;
 	class Window
 	{
 	public:
@@ -33,9 +30,6 @@ namespace Slush
 
 		void Hide();
 
-		void StartOffscreenBuffer();
-		void EndOffscreenBuffer();
-
 		void ToggleEditorUI() { myShowEditorUI = !myShowEditorUI; }
 
 		void SetAppLayout(IAppLayout* aLayout);
@@ -44,15 +38,7 @@ namespace Slush
 		void RenderAppLayout();
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
-		sf::RenderTexture* GetOffscreenBuffer() const { return myOffscreenBuffer; }
-
-		sf::RenderTarget* GetActiveRenderTarget() const { return myActiveRenderTarget; }
-
-		void RenderLine(const Vector2i& aStart, const Vector2i& aEnd, int aColor = 0xFFFFFFFF);
-		void RenderLine(const Vector2f& aStart, const Vector2f& aEnd, int aColor = 0xFFFFFFFF);
-		void RenderTriangle(const Vector2f& aV1, const Vector2f& aV2, const Vector2f& aV3, int aColor = 0xFFFFFFFF);
-		void RenderRect(const Rectf& aRect, int aColor = 0xFFFFFFFF, float aRotationInRadians = 0.f);
-		void RenderCircle(const Vector2f& aCenter, float aRadius, int aColor = 0xFFFFFFFF);
+		Renderer& GetRenderer() const { return *myRenderer; }
 
 		Rectf GetWindowRect() const { return myWindowRect; }
 		Rectf GetGameViewRect() const { return myGameViewRect; }
@@ -71,13 +57,11 @@ namespace Slush
 		bool myShowEditorUI = true;
 
 		sf::RenderWindow* myRenderWindow = nullptr;
+		Renderer* myRenderer = nullptr;
 		bool myShouldBeOpen = true;
 		bool myDisplayImGUIDemo = false;
 		bool myScreenshotRequested = false;
 		IAppLayout* myAppLayout = nullptr;
-
-		sf::RenderTarget* myActiveRenderTarget = nullptr;
-		sf::RenderTexture* myOffscreenBuffer = nullptr;
 
 		struct FadeData
 		{
@@ -87,8 +71,5 @@ namespace Slush
 			float myTotalTime = 0.f;
 		};
 		FadeData myFadeData;
-
-		sf::CircleShape* myCircleShape = nullptr;
-		sf::RectangleShape* myRectShape = nullptr;
 	};
 }

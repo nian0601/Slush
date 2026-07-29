@@ -129,9 +129,6 @@ namespace Slush
 			anApp.Render();
 			myWindow->RenderAppLayout();
 
-			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
-				myWindow->ToggleEditorUI();
-
 			if (myInput->WasKeyPressed(Slush::Input::_F12))
 				myWindow->RequestScreenshot();
 

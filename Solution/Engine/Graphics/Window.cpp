@@ -3,6 +3,7 @@
 #include "Graphics/Window.h"
 #include "Core/Log.h"
 #include "Core/Engine.h"
+#include "Core/Input.h"
 #include "Core/Time.h"
 #include "Core/Dockables/Dockable.h"
 #include "Core/Dockables/IAppLayout.h"
@@ -104,6 +105,9 @@ namespace Slush
 				myRenderWindow->setView(sf::View(visibleArea));
 			}
 		}
+
+		if (Slush::Engine::GetInstance().GetInput().WasKeyPressed(Slush::Input::HYPHEN))
+			ToggleEditorUI();
 
 		if (myShowEditorUI)
 			ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());

@@ -4,6 +4,7 @@
 #include <FW_Vector2.h>
 #include <FW_Math.h>
 #include "Graphics\Window.h"
+#include "Graphics\Renderer.h"
 
 namespace Slush
 {
@@ -233,13 +234,13 @@ namespace Slush
 
 	void PhysicsWorld::RenderContacts()
 	{
-		Window& window = Engine::GetInstance().GetWindow();
+		Renderer& renderer = Engine::GetInstance().GetWindow().GetRenderer();
 		for (const Manifold& manifold : myManifolds)
 		{
 			for (int i = 0; i < manifold.myContactCount; ++i)
 			{
-				window.RenderLine(manifold.myContacts[i], manifold.myContacts[i] + manifold.myHitNormal * manifold.myPenetrationDepth, 0xFFFF0000);
-				window.RenderCircle(manifold.myContacts[i], 3.f);
+				renderer.RenderLine(manifold.myContacts[i], manifold.myContacts[i] + manifold.myHitNormal * manifold.myPenetrationDepth, 0xFFFF0000);
+				renderer.RenderCircle(manifold.myContacts[i], 3.f);
 			}
 		}
 	}

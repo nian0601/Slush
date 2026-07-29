@@ -4,6 +4,7 @@
 #include "Core/CommandLineArgs.h"
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
+#include "Graphics/Renderer.h"
 #include "Core/Input.h"
 
 #include "Navmesh.h"
@@ -34,12 +35,12 @@ public:
 
 	void Render() override
 	{
-		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.StartOffscreenBuffer();
+		Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
+		renderer.StartOffscreenBuffer();
 
 		myNavmesh.Render();
 
-		window.EndOffscreenBuffer();
+		renderer.EndOffscreenBuffer();
 	}
 
 private:

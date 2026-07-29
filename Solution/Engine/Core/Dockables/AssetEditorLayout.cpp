@@ -3,6 +3,7 @@
 #include "AssetEditorLayout.h"
 
 #include "Graphics/Window.h"
+#include "Graphics/Renderer.h"
 
 #include "Core/Dockables/AssetEditorDockable.h"
 #include "Core/Dockables/TextureViewerDockable.h"
@@ -33,10 +34,10 @@ namespace Slush
 	void AssetEditorLayout::OnRender()
 	{
 		Slush::Engine& engine = Slush::Engine::GetInstance();
-		engine.GetWindow().StartOffscreenBuffer();
+		engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
 
 
-		engine.GetWindow().EndOffscreenBuffer();
+		engine.GetWindow().GetRenderer().EndOffscreenBuffer();
 	}
 }

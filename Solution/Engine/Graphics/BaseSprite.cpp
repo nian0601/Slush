@@ -5,6 +5,7 @@
 #include "Graphics/BaseSprite.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Window.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/SFMLHelpers.h"
 
 #include <SFML/Graphics/Shape.hpp>
@@ -121,12 +122,12 @@ namespace Slush
 
 	void BaseSprite::Render()
 	{
-		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myShape);
+		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myShape);
 	}
 
 	void BaseSprite::Render(float x, float y)
 	{
 		SetPosition(x, y);
-		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myShape);
+		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myShape);
 	}
 }

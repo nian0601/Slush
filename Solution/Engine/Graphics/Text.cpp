@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Graphics/Text.h"
 #include "Graphics/Window.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/Font.h"
 #include "Graphics/SFMLHelpers.h"
 
@@ -161,11 +162,11 @@ namespace Slush
 	void Text::Render(float x, float y)
 	{
 		SetPosition(x, y);
-		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myText);
+		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myText);
 	}
 
 	void Text::Render()
 	{
-		Engine::GetInstance().GetWindow().GetActiveRenderTarget()->draw(*myText);
+		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myText);
 	}
 }

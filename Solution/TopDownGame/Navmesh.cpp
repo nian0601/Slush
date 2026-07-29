@@ -2,6 +2,7 @@
 
 #include "Navmesh.h"
 #include "Graphics\Window.h"
+#include "Graphics\Renderer.h"
 #include "Core\Input.h"
 #include "FW_Intersection.h"
 
@@ -57,7 +58,7 @@ void Navmesh::Update()
 void Navmesh::Render()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
-	Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
 
 	const Vector2f& mousePos = engine.GetInput().GetMousePositionf();
 	
@@ -113,30 +114,30 @@ void Navmesh::Render()
 
 		if (collision)
 		{
-			window.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, 0xFFFFFFFF);
+			renderer.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, 0xFFFFFFFF);
 		}
 		else
 		{
-			window.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, faceColor);
+			renderer.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, faceColor);
 		}
-		
+
 	}
 
 	for (Edge* edge : myEdges)
 	{
-		window.RenderLine(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, lineColor);
+		renderer.RenderLine(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, lineColor);
 	}
 
 	for (const Vector2f& intersect : intersections)
-		window.RenderCircle(intersect, 3.f, 0xFFFF0000);
+		renderer.RenderCircle(intersect, 3.f, 0xFFFF0000);
 
 	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
 	{
-		window.RenderLine(myCutPositions[i], myCutPositions[i+1], 0xFF000000);
+		renderer.RenderLine(myCutPositions[i], myCutPositions[i+1], 0xFF000000);
 	}
 
 	if (!myCutPositions.IsEmpty())
-		window.RenderLine(myCutPositions.GetLast(), mousePos, 0xFF000000);
+		renderer.RenderLine(myCutPositions.GetLast(), mousePos, 0xFF000000);
 }
 
 Navmesh::Vertex* Navmesh::GetVertex(int x, int y) const

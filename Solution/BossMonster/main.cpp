@@ -11,6 +11,7 @@
 #include "Core/Assets/AssetStorage.h"
 
 #include "Graphics/Window.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Font.h"
 
@@ -82,13 +83,13 @@ public:
 	void Render() override
 	{
 		Slush::Engine& engine = Slush::Engine::GetInstance();
-		engine.GetWindow().StartOffscreenBuffer();
+		engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
 		myHeroCard->Render();
 		myRoomCard->Render();
 		myBossCard->Render();
 
-		engine.GetWindow().EndOffscreenBuffer();
+		engine.GetWindow().GetRenderer().EndOffscreenBuffer();
 	}
 
 private:

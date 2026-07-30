@@ -95,16 +95,16 @@ namespace Slush
 		struct LegacyTrackInfo
 		{
 			const char* myName;
-			ClipType myType;
+			AnimationClip::Type myType;
 		};
 
 		static const LegacyTrackInfo legacyTracks[] =
 		{
-			{ "outlinetrack", ClipType::Outline },
-			{ "scaletrack", ClipType::Scale },
-			{ "postiontrack", ClipType::Position },
-			{ "colortrack", ClipType::Color },
-			{ "spritesheettrack", ClipType::SpriteSheet },
+			{ "outlinetrack", AnimationClip::Type::Outline },
+			{ "scaletrack", AnimationClip::Type::Scale },
+			{ "postiontrack", AnimationClip::Type::Position },
+			{ "colortrack", AnimationClip::Type::Color },
+			{ "spritesheettrack", AnimationClip::Type::SpriteSheet },
 		};
 
 		for (const LegacyTrackInfo& info : legacyTracks)
@@ -179,7 +179,7 @@ namespace Slush
 	{
 		for (const AnimationTrack* track : myTracks)
 		{
-			if (const AnimationClip* clip = track->GetFirstClipOfType(ClipType::SpriteSheet))
+			if (const AnimationClip* clip = track->GetFirstClipOfType(AnimationClip::Type::SpriteSheet))
 				return clip;
 		}
 
@@ -190,7 +190,7 @@ namespace Slush
 	{
 		for (AnimationTrack* track : myTracks)
 		{
-			if (track->HasClipOfType(ClipType::SpriteSheet))
+			if (track->HasClipOfType(AnimationClip::Type::SpriteSheet))
 				return *track;
 		}
 
@@ -250,7 +250,7 @@ namespace Slush
 							startEndX.y = myToolData.myFrameCount.x;
 
 						for (int x = startEndX.x; x < startEndX.y; ++x)
-							spritesheetTrack.Frame(ClipType::SpriteSheet, { x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
+							spritesheetTrack.Frame(AnimationClip::Type::SpriteSheet, { x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
 					}
 
 					myToolData.myPreviewSprite->SetSize(static_cast<float>(myToolData.myFrameSize.x), static_cast<float>(myToolData.myFrameSize.y));
@@ -413,7 +413,7 @@ namespace Slush
 		{
 			for (const AnimationRuntimeTrackData& trackData : myToolData.myRuntime->myTrackData)
 			{
-				if (trackData.myIsActive && trackData.myActiveClipType == ClipType::SpriteSheet)
+				if (trackData.myIsActive && trackData.myActiveClipType == AnimationClip::Type::SpriteSheet)
 				{
 					frameRect = trackData.myFrameRect;
 					break;

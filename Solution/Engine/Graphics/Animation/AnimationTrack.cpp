@@ -49,9 +49,9 @@ namespace Slush
 		ImGui::DragFloat("##EndTime", &myStartEndTime.y, 0.01f, 0.f, 1.f);
 	}
 
-	AnimationClip* CreateClip(ClipType aType)
+	AnimationClip* AnimationClip::CreateClip(Type aType)
 	{
-		if (aType == ClipType::SpriteSheet)
+		if (aType == Type::SpriteSheet)
 			return new SpriteSheetClip();
 
 		return new FloatClip(aType);
@@ -174,7 +174,7 @@ namespace Slush
 		RemoveAllClips();
 	}
 
-	AnimationTrack& AnimationTrack::Linear(ClipType aType, float aDuration, float aStart, float aEnd)
+	AnimationTrack& AnimationTrack::Linear(AnimationClip::Type aType, float aDuration, float aStart, float aEnd)
 	{
 		AnimationClip& clip = AddClip(aType, aDuration);
 		static_cast<FloatClip&>(clip).myInterpolator.MakeLinear(aStart, aEnd);
@@ -182,7 +182,7 @@ namespace Slush
 		return *this;
 	}
 
-	AnimationTrack& AnimationTrack::Constant(ClipType aType, float aDuration, float aValue)
+	AnimationTrack& AnimationTrack::Constant(AnimationClip::Type aType, float aDuration, float aValue)
 	{
 		AnimationClip& clip = AddClip(aType, aDuration);
 		static_cast<FloatClip&>(clip).myInterpolator.MakeConstant(aValue);
@@ -190,16 +190,16 @@ namespace Slush
 		return *this;
 	}
 
-	AnimationTrack& AnimationTrack::Wait(ClipType aType, float aDuration)
+	AnimationTrack& AnimationTrack::Wait(AnimationClip::Type aType, float aDuration)
 	{
 		float waitValue = 0.f;
-		if (myClips.Count() > 0 && myClips.GetLast()->GetType() != ClipType::SpriteSheet)
+		if (myClips.Count() > 0 && myClips.GetLast()->GetType() != AnimationClip::Type::SpriteSheet)
 			waitValue = static_cast<FloatClip*>(myClips.GetLast())->myInterpolator.myEndValue;
 
 		return Constant(aType, aDuration, waitValue);
 	}
 
-	AnimationTrack& AnimationTrack::Frame(ClipType aType, const Vector2i& aFramePosition, const Vector2i& aFrameSize, float aFPS)
+	AnimationTrack& AnimationTrack::Frame(AnimationClip::Type aType, const Vector2i& aFramePosition, const Vector2i& aFrameSize, float aFPS)
 	{
 		AnimationClip& clip = AddClip(aType, 1.f / aFPS);
 		static_cast<SpriteSheetClip&>(clip).myFrameRect = MakeRectFromTopLeft(aFramePosition * aFrameSize, aFrameSize);
@@ -219,7 +219,7 @@ namespace Slush
 		AnimationClip::State state = clip->Update(anElapsedTime, aTrackData.myValue);
 
 		aTrackData.myActiveClipType = clip->GetType();
-		if (clip->GetType() == ClipType::SpriteSheet)
+		if (clip->GetType() == AnimationClip::Type::SpriteSheet)
 			aTrackData.myFrameRect = static_cast<SpriteSheetClip*>(clip)->myFrameRect;
 
 		if (state == AnimationClip::State::Finished)
@@ -235,7 +235,7 @@ namespace Slush
 		myEndTime = 0.f;
 	}
 
-	const AnimationClip* AnimationTrack::GetFirstClipOfType(ClipType aType) const
+	const AnimationClip* AnimationTrack::GetFirstClipOfType(AnimationClip::Type aType) const
 	{
 		for (AnimationClip* clip : myClips)
 		{
@@ -246,7 +246,7 @@ namespace Slush
 		return nullptr;
 	}
 
-	bool AnimationTrack::HasClipOfType(ClipType aType) const
+	bool AnimationTrack::HasClipOfType(AnimationClip::Type aType) const
 	{
 		return GetFirstClipOfType(aType) != nullptr;
 	}
@@ -264,7 +264,7 @@ namespace Slush
 				int typeAsInt = 0;
 				clipHandle.ParseIntField("type", typeAsInt);
 
-				myClips[i] = CreateClip(static_cast<ClipType>(typeAsInt));
+				myClips[i] = AnimationClip::CreateClip(static_cast<AnimationClip::Type>(typeAsInt));
 				myClips[i]->OnParse(clipHandle);
 			}
 		}
@@ -282,7 +282,7 @@ namespace Slush
 		}
 	}
 
-	void AnimationTrack::OnParseLegacy(const char* aTrackName, ClipType aType, AssetParser::Handle aRootHandle)
+	void AnimationTrack::OnParseLegacy(const char* aTrackName, AnimationClip::Type aType, AssetParser::Handle aRootHandle)
 	{
 		AssetParser::Handle trackHandle = aRootHandle.ParseChildElement(aTrackName);
 		if (!trackHandle.IsValid())
@@ -292,7 +292,7 @@ namespace Slush
 		myClips.Reserve(numClips);
 		for (int i = 0; i < numClips; ++i)
 		{
-			myClips[i] = CreateClip(aType);
+			myClips[i] = AnimationClip::CreateClip(aType);
 			myClips[i]->OnParse(trackHandle.GetChildElementAtIndex(i));
 		}
 	}
@@ -318,9 +318,9 @@ namespace Slush
 		}
 	}
 
-	AnimationClip& AnimationTrack::AddClip(ClipType aType, float aDuration)
+	AnimationClip& AnimationTrack::AddClip(AnimationClip::Type aType, float aDuration)
 	{
-		AnimationClip* clip = CreateClip(aType);
+		AnimationClip* clip = AnimationClip::CreateClip(aType);
 		clip->SetStartTimeAndDuration(myEndTime, aDuration);
 
 		for (AnimationClip* existingClip : myClips)

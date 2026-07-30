@@ -19,7 +19,7 @@ namespace Slush
 		bool myIsActive = false;
 		float myValue = FLT_MAX;
 		int myCurrentClip = 0;
-		ClipType myActiveClipType = ClipType::Outline;
+		AnimationClip::Type myActiveClipType = AnimationClip::Type::Outline;
 
 		Recti myFrameRect;
 		const Texture* myPreviousTexture = nullptr;

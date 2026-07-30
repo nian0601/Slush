@@ -113,26 +113,26 @@ namespace Slush
 
 			switch (trackData.myActiveClipType)
 			{
-			case ClipType::Outline:
+			case AnimationClip::Type::Outline:
 				sprite.SetOutlineThickness(trackData.myValue);
 				break;
 
-			case ClipType::Scale:
+			case AnimationClip::Type::Scale:
 				sprite.SetScale(trackData.myValue);
 				break;
 
-			case ClipType::Position:
+			case AnimationClip::Type::Position:
 				aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, trackData.myValue);
 				myEntity.myPosition = aRuntimeData.myCurrentPosition;
 				if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
 					phys->myObject->SetPosition(myEntity.myPosition);
 				break;
 
-			case ClipType::Color:
+			case AnimationClip::Type::Color:
 				sprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, trackData.myValue));
 				break;
 
-			case ClipType::SpriteSheet:
+			case AnimationClip::Type::SpriteSheet:
 				sprite.SetTextureRect(trackData.myFrameRect.myTopLeft.x, trackData.myFrameRect.myTopLeft.y, trackData.myFrameRect.myExtents.x, trackData.myFrameRect.myExtents.y);
 				break;
 			}

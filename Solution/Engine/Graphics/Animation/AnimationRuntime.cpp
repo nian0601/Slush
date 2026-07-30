@@ -42,7 +42,7 @@ namespace Slush
 			AnimationRuntimeTrackData& trackData = myTrackData.Add();
 			trackData.Start(aSprite);
 
-			if (anAnimation.myTracks[i]->HasClipOfType(ClipType::Outline) || anAnimation.myTracks[i]->HasClipOfType(ClipType::Scale))
+			if (anAnimation.myTracks[i]->HasClipOfType(AnimationClip::Type::Outline) || anAnimation.myTracks[i]->HasClipOfType(AnimationClip::Type::Scale))
 				trackData.myValue = 1.f;
 		}
 

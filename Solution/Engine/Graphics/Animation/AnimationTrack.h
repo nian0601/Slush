@@ -6,15 +6,6 @@ namespace Slush
 {
 	struct AnimationRuntimeTrackData;
 
-	enum ClipType
-	{
-		Outline,
-		Scale,
-		Position,
-		Color,
-		SpriteSheet,
-	};
-
 	class AnimationClip
 	{
 	public:
@@ -25,10 +16,21 @@ namespace Slush
 			Finished,
 		};
 
-		AnimationClip(ClipType aType) : myType(aType) {}
+		enum Type
+		{
+			Outline,
+			Scale,
+			Position,
+			Color,
+			SpriteSheet,
+		};
+
+		static AnimationClip* CreateClip(Type aType);
+
+		AnimationClip(Type aType) : myType(aType) {}
 		virtual ~AnimationClip() {}
 
-		ClipType GetType() const { return myType; }
+		Type GetType() const { return myType; }
 
 		void SetStartTimeAndDuration(float aStartTime, float aDuration);
 
@@ -45,15 +47,13 @@ namespace Slush
 		void BuildTimeRowsUI();
 
 	private:
-		ClipType myType;
+		Type myType;
 	};
-
-	AnimationClip* CreateClip(ClipType aType);
 
 	class FloatClip : public AnimationClip
 	{
 	public:
-		FloatClip(ClipType aType) : AnimationClip(aType) {}
+		FloatClip(Type aType) : AnimationClip(aType) {}
 
 		State Update(float anElapsedTime, float& outValue) const override;
 
@@ -66,7 +66,7 @@ namespace Slush
 	class SpriteSheetClip : public AnimationClip
 	{
 	public:
-		SpriteSheetClip() : AnimationClip(ClipType::SpriteSheet) {}
+		SpriteSheetClip() : AnimationClip(Type::SpriteSheet) {}
 
 		State Update(float anElapsedTime, float& outValue) const override;
 
@@ -86,24 +86,24 @@ namespace Slush
 		AnimationTrack& operator=(const AnimationTrack&) = delete;
 		~AnimationTrack();
 
-		AnimationTrack& Linear(ClipType aType, float aDuration, float aStart, float aEnd);
-		AnimationTrack& Constant(ClipType aType, float aDuration, float aValue);
-		AnimationTrack& Wait(ClipType aType, float aDuration);
-		AnimationTrack& Frame(ClipType aType, const Vector2i& aFramePosition, const Vector2i& aFrameSize, float aFPS);
+		AnimationTrack& Linear(AnimationClip::Type aType, float aDuration, float aStart, float aEnd);
+		AnimationTrack& Constant(AnimationClip::Type aType, float aDuration, float aValue);
+		AnimationTrack& Wait(AnimationClip::Type aType, float aDuration);
+		AnimationTrack& Frame(AnimationClip::Type aType, const Vector2i& aFramePosition, const Vector2i& aFrameSize, float aFPS);
 
 		bool Update(float anElapsedTime, AnimationRuntimeTrackData& aTrackData) const;
 		bool HasClips() const { return !myClips.IsEmpty(); }
 		void RemoveAllClips();
 
-		const AnimationClip* GetFirstClipOfType(ClipType aType) const;
-		bool HasClipOfType(ClipType aType) const;
+		const AnimationClip* GetFirstClipOfType(AnimationClip::Type aType) const;
+		bool HasClipOfType(AnimationClip::Type aType) const;
 
 		void OnParse(AssetParser::Handle aTrackHandle);
-		void OnParseLegacy(const char* aTrackName, ClipType aType, AssetParser::Handle aRootHandle);
+		void OnParseLegacy(const char* aTrackName, AnimationClip::Type aType, AssetParser::Handle aRootHandle);
 		void BuildUI(const char* aTrackName, AnimationClip*& outSelectedClip);
 
 	protected:
-		AnimationClip& AddClip(ClipType aType, float aDuration);
+		AnimationClip& AddClip(AnimationClip::Type aType, float aDuration);
 
 		FW_GrowingArray<AnimationClip*> myClips;
 		float myEndTime = 0.f;

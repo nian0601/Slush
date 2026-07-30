@@ -15,6 +15,8 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
 ## Flow
 
+If the skill was started as a hand-over from a grilling-session, then go to step 3 and use the information from the hand-over as 'grilling-result'
+
 1. **Get the raw description.** Use `$ARGUMENTS` if given; otherwise ask what the task is.
 
 2. **Interview the user** Do a grilling-session based on the task-description. Make sure that questions about verification is raised

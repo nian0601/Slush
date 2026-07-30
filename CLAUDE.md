@@ -65,7 +65,7 @@ Solo project — commit directly to `main`, no branch/PR convention to follow. T
 
 Claude should never run `git commit` without the user explicitly asking for it in that turn. Creating/editing/staging files does not need separate approval — only the commit itself does.
 
-For engine-sized changes (new subsystems, cross-cutting refactors), prefer landing the work as multiple small, independently buildable/testable phases rather than one large commit — it makes the result much easier to review and test. After finishing and verifying each phase, stop and wait for explicit user review before starting the next phase — the user decides whether to commit, iterate further, or adjust the phase as-is before any further work begins. Never chain into the next phase on your own.
+For engine-sized changes (new subsystems, cross-cutting refactors), prefer landing the work as multiple independently buildable/testable phases rather than one large commit. Each phase should result in a runnable and testable executable, dont update function-signatures or interface without updating callsites. After finishing and verifying each phase, stop and wait for explicit user review before starting the next phase — the user decides whether to commit, iterate further, or adjust the phase as-is before any further work begins. Never chain into the next phase on your own.
 
 ## Issue tracking
 

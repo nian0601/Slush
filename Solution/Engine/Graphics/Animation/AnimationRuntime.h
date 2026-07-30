@@ -1,6 +1,9 @@
 #pragma once
+#include <FW_GrowingArray.h>
 #include <FW_Vector2.h>
 #include <float.h>
+
+#include "AnimationTrack.h"
 
 namespace Slush
 {
@@ -10,24 +13,16 @@ namespace Slush
 
 	struct AnimationRuntimeTrackData
 	{
-		virtual void Start(BaseSprite& aSprite);
-		virtual void End(BaseSprite& aSprite) { aSprite; };
-		virtual void SetFrameRect(const Recti&) {}
+		void Start(BaseSprite& aSprite);
+		void End(BaseSprite& aSprite);
 
 		bool myIsActive = false;
 		float myValue = FLT_MAX;
 		int myCurrentClip = 0;
-	};
-
-	struct SpritesheetRuntimeTrackData : public AnimationRuntimeTrackData
-	{
-		void Start(BaseSprite& aSprite) override;
-		void End(BaseSprite& aSprite) override;
-		void SetFrameRect(const Recti& aFrameRect) override { myFrameRect = aFrameRect; }
+		ClipType myActiveClipType = ClipType::Outline;
 
 		Recti myFrameRect;
-
-		const Texture* myPreviousTexture;
+		const Texture* myPreviousTexture = nullptr;
 		Recti myPreviousFrameRect;
 	};
 
@@ -50,11 +45,7 @@ namespace Slush
 
 		float myElapsedTime = 0.f;
 
-		AnimationRuntimeTrackData myOutlineData;
-		AnimationRuntimeTrackData myScaleData;
-		AnimationRuntimeTrackData myPositionData;
-		AnimationRuntimeTrackData myColorData;
-		SpritesheetRuntimeTrackData mySpritesheetData;
+		FW_GrowingArray<AnimationRuntimeTrackData> myTrackData;
 
 		Vector2f myStartPosition;
 		Vector2f myEndPosition;

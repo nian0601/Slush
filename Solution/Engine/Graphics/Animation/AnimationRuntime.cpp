@@ -6,26 +6,19 @@
 
 namespace Slush
 {
-	void AnimationRuntimeTrackData::Start(BaseSprite& /*aSprite*/)
+	void AnimationRuntimeTrackData::Start(BaseSprite& aSprite)
 	{
 		myIsActive = false;
 		myValue = 0.f;
 		myCurrentClip = 0;
-	}
-
-	void SpritesheetRuntimeTrackData::Start(BaseSprite& aSprite)
-	{
-		AnimationRuntimeTrackData::Start(aSprite);
 
 		myPreviousTexture = aSprite.GetTexture();
 		myPreviousFrameRect = aSprite.GetTextureRect();
 		myFrameRect = MakeRect(0, 0, 0, 0);
 	}
 
-	void SpritesheetRuntimeTrackData::End(BaseSprite& aSprite)
+	void AnimationRuntimeTrackData::End(BaseSprite& aSprite)
 	{
-		AnimationRuntimeTrackData::End(aSprite);
-
 		if (myPreviousTexture)
 			aSprite.SetTexture(*myPreviousTexture);
 
@@ -38,18 +31,20 @@ namespace Slush
 	void AnimationRuntime::Start(BaseSprite& aSprite, const Animation& anAnimation)
 	{
 		if (myState == Running)
-			Stop(aSprite, anAnimation);	
+			Stop(aSprite, anAnimation);
 
 		myState = Running;
 		myElapsedTime = 0.f;
 
-		myOutlineData.Start(aSprite);
-		myOutlineData.myValue = 1.f;
-		myScaleData.Start(aSprite);
-		myScaleData.myValue = 1.f;
-		myPositionData.Start(aSprite);
-		myColorData.Start(aSprite);
-		mySpritesheetData.Start(aSprite);
+		myTrackData.RemoveAll();
+		for (int i = 0; i < anAnimation.myTracks.Count(); ++i)
+		{
+			AnimationRuntimeTrackData& trackData = myTrackData.Add();
+			trackData.Start(aSprite);
+
+			if (anAnimation.myTracks[i]->HasClipOfType(ClipType::Outline) || anAnimation.myTracks[i]->HasClipOfType(ClipType::Scale))
+				trackData.myValue = 1.f;
+		}
 
 		if (anAnimation.myTexture)
 			aSprite.SetTexture(*anAnimation.myTexture);
@@ -58,6 +53,8 @@ namespace Slush
 	void AnimationRuntime::Stop(BaseSprite& aSprite, const Animation& /*anAnimation*/)
 	{
 		myState = NotStarted;
-		mySpritesheetData.End(aSprite);
+
+		for (int i = 0; i < myTrackData.Count(); ++i)
+			myTrackData[i].End(aSprite);
 	}
 }

@@ -8,7 +8,6 @@
 namespace Slush
 {
 	struct AnimationRuntime;
-	struct AnimationRuntimeTrackData;
 	class RectSprite;
 	class Texture;
 
@@ -32,7 +31,6 @@ namespace Slush
 
 	private:
 		void ParseLegacyTracks(AssetParser::Handle aRootHandle);
-		bool UpdateTrackOfType(ClipType aType, float anElapsedTime, AnimationRuntimeTrackData& aTrackData) const;
 		AnimationTrack& FindOrCreateSpritesheetTrack();
 
 		void HandleSpritesheetImport();

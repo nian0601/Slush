@@ -163,25 +163,11 @@ namespace Slush
 		aRuntimeData.myElapsedTime += Time::GetDelta();
 
 		bool anyTrackActive = false;
-		anyTrackActive |= UpdateTrackOfType(ClipType::Outline, aRuntimeData.myElapsedTime, aRuntimeData.myOutlineData);
-		anyTrackActive |= UpdateTrackOfType(ClipType::Scale, aRuntimeData.myElapsedTime, aRuntimeData.myScaleData);
-		anyTrackActive |= UpdateTrackOfType(ClipType::Position, aRuntimeData.myElapsedTime, aRuntimeData.myPositionData);
-		anyTrackActive |= UpdateTrackOfType(ClipType::Color, aRuntimeData.myElapsedTime, aRuntimeData.myColorData);
-		anyTrackActive |= UpdateTrackOfType(ClipType::SpriteSheet, aRuntimeData.myElapsedTime, aRuntimeData.mySpritesheetData);
+		for (int i = 0; i < myTracks.Count(); ++i)
+			anyTrackActive |= myTracks[i]->Update(aRuntimeData.myElapsedTime, aRuntimeData.myTrackData[i]);
 
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
-	}
-
-	bool Animation::UpdateTrackOfType(ClipType aType, float anElapsedTime, AnimationRuntimeTrackData& aTrackData) const
-	{
-		for (const AnimationTrack* track : myTracks)
-		{
-			if (track->HasClipOfType(aType))
-				return track->Update(anElapsedTime, aTrackData);
-		}
-
-		return false;
 	}
 
 	bool Animation::HasSpriteSheetClip() const
@@ -425,7 +411,14 @@ namespace Slush
 		Recti frameRect = static_cast<const SpriteSheetClip*>(FindFirstSpriteSheetClip())->myFrameRect;
 		if (myToolData.myRuntime->myState != AnimationRuntime::NotStarted)
 		{
-			frameRect = myToolData.myRuntime->mySpritesheetData.myFrameRect;
+			for (const AnimationRuntimeTrackData& trackData : myToolData.myRuntime->myTrackData)
+			{
+				if (trackData.myIsActive && trackData.myActiveClipType == ClipType::SpriteSheet)
+				{
+					frameRect = trackData.myFrameRect;
+					break;
+				}
+			}
 
 			if (myToolData.myRuntime->IsFinished() && myToolData.myRuntime->myIsLooping)
 			{

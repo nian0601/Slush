@@ -106,27 +106,36 @@ namespace Slush
 	{
 		BaseSprite& sprite = myEntity.GetComponent<SpriteComponent>()->GetSprite();
 
-		if (aRuntimeData.myOutlineData.myIsActive)
-			sprite.SetOutlineThickness(aRuntimeData.myOutlineData.myValue);
-
-		if (aRuntimeData.myScaleData.myIsActive)
-			sprite.SetScale(aRuntimeData.myScaleData.myValue);
-
-		if (aRuntimeData.myPositionData.myIsActive)
+		for (AnimationRuntimeTrackData& trackData : aRuntimeData.myTrackData)
 		{
-			aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, aRuntimeData.myPositionData.myValue);
-			myEntity.myPosition = aRuntimeData.myCurrentPosition;
-			if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
-				phys->myObject->SetPosition(myEntity.myPosition);
-		}
+			if (!trackData.myIsActive)
+				continue;
 
-		if (aRuntimeData.myColorData.myIsActive)
-			sprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, aRuntimeData.myColorData.myValue));
+			switch (trackData.myActiveClipType)
+			{
+			case ClipType::Outline:
+				sprite.SetOutlineThickness(trackData.myValue);
+				break;
 
-		if (aRuntimeData.mySpritesheetData.myIsActive)
-		{
-			const Recti& texRect = aRuntimeData.mySpritesheetData.myFrameRect;
-			sprite.SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
+			case ClipType::Scale:
+				sprite.SetScale(trackData.myValue);
+				break;
+
+			case ClipType::Position:
+				aRuntimeData.myCurrentPosition = FW_Lerp(aRuntimeData.myStartPosition, aRuntimeData.myEndPosition, trackData.myValue);
+				myEntity.myPosition = aRuntimeData.myCurrentPosition;
+				if (PhysicsComponent* phys = myEntity.GetComponent<PhysicsComponent>())
+					phys->myObject->SetPosition(myEntity.myPosition);
+				break;
+
+			case ClipType::Color:
+				sprite.SetFillColor(FW_Interpolate_Color(aRuntimeData.myStartColor, aRuntimeData.myEndColor, trackData.myValue));
+				break;
+
+			case ClipType::SpriteSheet:
+				sprite.SetTextureRect(trackData.myFrameRect.myTopLeft.x, trackData.myFrameRect.myTopLeft.y, trackData.myFrameRect.myExtents.x, trackData.myFrameRect.myExtents.y);
+				break;
+			}
 		}
 	}
 

@@ -218,8 +218,9 @@ namespace Slush
 		AnimationClip* clip = myClips[aTrackData.myCurrentClip];
 		AnimationClip::State state = clip->Update(anElapsedTime, aTrackData.myValue);
 
+		aTrackData.myActiveClipType = clip->GetType();
 		if (clip->GetType() == ClipType::SpriteSheet)
-			aTrackData.SetFrameRect(static_cast<SpriteSheetClip*>(clip)->myFrameRect);
+			aTrackData.myFrameRect = static_cast<SpriteSheetClip*>(clip)->myFrameRect;
 
 		if (state == AnimationClip::State::Finished)
 			++aTrackData.myCurrentClip;

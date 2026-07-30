@@ -63,11 +63,11 @@ namespace Slush
 	{
 		BaseSprite& sprite = myEntity.GetComponent<SpriteComponent>()->GetSprite();
 
-		if (anAnimation.mySpritesheetTrack.HasClips())
+		if (anAnimation.HasSpriteSheetClip())
 		{
 			for (int i = 0; i < myRunningAnimations.Count(); ++i)
 			{
-				if (myRunningAnimations[i].myAnimation->mySpritesheetTrack.HasClips())
+				if (myRunningAnimations[i].myAnimation->HasSpriteSheetClip())
 				{
 					if (!aOverrideSpriteSheetAnimation)
 						return nullptr;

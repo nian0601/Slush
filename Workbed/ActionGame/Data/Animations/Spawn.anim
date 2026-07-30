@@ -1,17 +1,21 @@
 Animation 
 { 
-	version 1 
-	scaletrack 
+	version 2 
+	tracks 
 	{ 
-		clip 
+		track 
 		{ 
-			starttime 0.000 
-			endtime 0.250 
-			interpolator 
+			clip 
 			{ 
-				startvalue 0.000 
-				endvalue 1.000 
 				type 1 
+				starttime 0.000 
+				endtime 0.250 
+				interpolator 
+				{ 
+					startvalue 0.000 
+					endvalue 1.000 
+					type 1 
+				} 
 			} 
 		} 
 	} 

@@ -1,28 +1,33 @@
 Animation 
 { 
-	version 1 
-	colortrack 
+	version 2 
+	tracks 
 	{ 
-		clip 
+		track 
 		{ 
-			starttime 0.000 
-			endtime 0.100 
-			interpolator 
+			clip 
 			{ 
-				startvalue 0.000 
-				endvalue 1.000 
-				type 1 
+				type 3 
+				starttime 0.000 
+				endtime 0.100 
+				interpolator 
+				{ 
+					startvalue 0.000 
+					endvalue 1.000 
+					type 1 
+				} 
 			} 
-		} 
-		clip 
-		{ 
-			starttime 0.100 
-			endtime 0.200 
-			interpolator 
+			clip 
 			{ 
-				startvalue 1.000 
-				endvalue 0.000 
-				type 1 
+				type 3 
+				starttime 0.100 
+				endtime 0.200 
+				interpolator 
+				{ 
+					startvalue 1.000 
+					endvalue 0.000 
+					type 1 
+				} 
 			} 
 		} 
 	} 

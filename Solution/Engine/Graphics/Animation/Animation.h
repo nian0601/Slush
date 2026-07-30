@@ -8,13 +8,14 @@
 namespace Slush
 {
 	struct AnimationRuntime;
+	struct AnimationRuntimeTrackData;
 	class RectSprite;
 	class Texture;
 
 	class Animation : public DataAsset
 	{
 	public:
-		DEFINE_ASSET("Animation", "anim", "data/animations", ICON_FA_FILM, 1);
+		DEFINE_ASSET("Animation", "anim", "data/animations", ICON_FA_FILM, 2);
 		Animation(const char* aName, unsigned int aAssetID);
 		~Animation();
 
@@ -23,14 +24,17 @@ namespace Slush
 
 		void Update(AnimationRuntime& aRuntimeData) const;
 
-		AnimationTrack myOutlineTrack;
-		AnimationTrack myScaleTrack;
-		AnimationTrack myPositionTrack;
-		AnimationTrack myColorTrack;
-		SpritesheetTrack mySpritesheetTrack;
+		bool HasSpriteSheetClip() const;
+		const AnimationClip* FindFirstSpriteSheetClip() const;
+
+		FW_GrowingArray<AnimationTrack*> myTracks;
 		const Texture* myTexture = nullptr;
 
 	private:
+		void ParseLegacyTracks(AssetParser::Handle aRootHandle);
+		bool UpdateTrackOfType(ClipType aType, float anElapsedTime, AnimationRuntimeTrackData& aTrackData) const;
+		AnimationTrack& FindOrCreateSpritesheetTrack();
+
 		void HandleSpritesheetImport();
 		void HandleTextureInteraction();
 		void HandlePreview();

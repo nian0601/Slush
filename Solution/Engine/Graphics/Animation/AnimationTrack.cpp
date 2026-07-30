@@ -215,7 +215,12 @@ namespace Slush
 			return false;
 		}
 
-		AnimationClip::State state = myClips[aTrackData.myCurrentClip]->Update(anElapsedTime, aTrackData.myValue);
+		AnimationClip* clip = myClips[aTrackData.myCurrentClip];
+		AnimationClip::State state = clip->Update(anElapsedTime, aTrackData.myValue);
+
+		if (clip->GetType() == ClipType::SpriteSheet)
+			aTrackData.SetFrameRect(static_cast<SpriteSheetClip*>(clip)->myFrameRect);
+
 		if (state == AnimationClip::State::Finished)
 			++aTrackData.myCurrentClip;
 
@@ -229,30 +234,65 @@ namespace Slush
 		myEndTime = 0.f;
 	}
 
-	void AnimationTrack::OnParse(const char* aTrackName, ClipType aType, AssetParser::Handle aHandle)
+	const AnimationClip* AnimationTrack::GetFirstClipOfType(ClipType aType) const
 	{
-		if (aHandle.IsWriting() && myClips.IsEmpty())
-			return;
-
-		AssetParser::Handle trackHandle = aHandle.ParseChildElement(aTrackName);
-
-		if (trackHandle.IsReading())
+		for (AnimationClip* clip : myClips)
 		{
-			int numClips = trackHandle.GetNumChildElements();
-			myClips.Reserve(numClips);
-			for (int i = 0; i < numClips; ++i)
-				myClips[i] = CreateClip(aType);
+			if (clip->GetType() == aType)
+				return clip;
 		}
 
-		for (int i = 0; i < myClips.Count(); ++i)
-		{
-			AssetParser::Handle clipHandle;
-			if (trackHandle.IsReading())
-				clipHandle = trackHandle.GetChildElementAtIndex(i);
-			else
-				clipHandle = trackHandle.ParseChildElement("clip");
+		return nullptr;
+	}
 
-			myClips[i]->OnParse(clipHandle);
+	bool AnimationTrack::HasClipOfType(ClipType aType) const
+	{
+		return GetFirstClipOfType(aType) != nullptr;
+	}
+
+	void AnimationTrack::OnParse(AssetParser::Handle aTrackHandle)
+	{
+		if (aTrackHandle.IsReading())
+		{
+			int numClips = aTrackHandle.GetNumChildElements();
+			myClips.Reserve(numClips);
+			for (int i = 0; i < numClips; ++i)
+			{
+				AssetParser::Handle clipHandle = aTrackHandle.GetChildElementAtIndex(i);
+
+				int typeAsInt = 0;
+				clipHandle.ParseIntField("type", typeAsInt);
+
+				myClips[i] = CreateClip(static_cast<ClipType>(typeAsInt));
+				myClips[i]->OnParse(clipHandle);
+			}
+		}
+		else
+		{
+			for (int i = 0; i < myClips.Count(); ++i)
+			{
+				AssetParser::Handle clipHandle = aTrackHandle.ParseChildElement("clip");
+
+				int typeAsInt = static_cast<int>(myClips[i]->GetType());
+				clipHandle.ParseIntField("type", typeAsInt);
+
+				myClips[i]->OnParse(clipHandle);
+			}
+		}
+	}
+
+	void AnimationTrack::OnParseLegacy(const char* aTrackName, ClipType aType, AssetParser::Handle aRootHandle)
+	{
+		AssetParser::Handle trackHandle = aRootHandle.ParseChildElement(aTrackName);
+		if (!trackHandle.IsValid())
+			return;
+
+		int numClips = trackHandle.GetNumChildElements();
+		myClips.Reserve(numClips);
+		for (int i = 0; i < numClips; ++i)
+		{
+			myClips[i] = CreateClip(aType);
+			myClips[i]->OnParse(trackHandle.GetChildElementAtIndex(i));
 		}
 	}
 
@@ -293,35 +333,4 @@ namespace Slush
 
 		return *clip;
 	}
-
-	//////////////////////////////////////////////////////////////////////////
-
-	bool SpritesheetTrack::Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData) const
-	{
-		if (aTrackData.myCurrentClip >= myClips.Count())
-		{
-			aTrackData.myIsActive = false;
-			return false;
-		}
-
-		AnimationClip* clip = myClips[aTrackData.myCurrentClip];
-		AnimationClip::State state = clip->Update(anElapsedTime, aTrackData.myValue);
-
-		aTrackData.myFrameRect = static_cast<SpriteSheetClip*>(clip)->myFrameRect;
-
-		if (state == AnimationClip::State::Finished)
-			++aTrackData.myCurrentClip;
-
-		aTrackData.myIsActive = state != AnimationClip::State::NotStarted;
-		return true;
-	}
-
-	const Slush::AnimationClip* SpritesheetTrack::GetFirstClip() const
-	{
-		if (myClips.IsEmpty())
-			return nullptr;
-
-		return myClips[0];
-	}
-
 }

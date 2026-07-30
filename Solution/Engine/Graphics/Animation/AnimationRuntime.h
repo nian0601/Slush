@@ -12,6 +12,7 @@ namespace Slush
 	{
 		virtual void Start(BaseSprite& aSprite);
 		virtual void End(BaseSprite& aSprite) { aSprite; };
+		virtual void SetFrameRect(const Recti&) {}
 
 		bool myIsActive = false;
 		float myValue = FLT_MAX;
@@ -22,6 +23,7 @@ namespace Slush
 	{
 		void Start(BaseSprite& aSprite) override;
 		void End(BaseSprite& aSprite) override;
+		void SetFrameRect(const Recti& aFrameRect) override { myFrameRect = aFrameRect; }
 
 		Recti myFrameRect;
 

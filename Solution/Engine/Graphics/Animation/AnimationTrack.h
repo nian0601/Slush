@@ -5,7 +5,6 @@
 namespace Slush
 {
 	struct AnimationRuntimeTrackData;
-	struct SpritesheetRuntimeTrackData;
 
 	enum ClipType
 	{
@@ -77,9 +76,14 @@ namespace Slush
 		Recti myFrameRect;
 	};
 
+	// Owns its clips (deleted via RemoveAllClips) - stored via Animation::myTracks as
+	// owned pointers, so it's never copied; delete copy/assign to make that explicit.
 	class AnimationTrack
 	{
 	public:
+		AnimationTrack() = default;
+		AnimationTrack(const AnimationTrack&) = delete;
+		AnimationTrack& operator=(const AnimationTrack&) = delete;
 		~AnimationTrack();
 
 		AnimationTrack& Linear(ClipType aType, float aDuration, float aStart, float aEnd);
@@ -91,7 +95,11 @@ namespace Slush
 		bool HasClips() const { return !myClips.IsEmpty(); }
 		void RemoveAllClips();
 
-		void OnParse(const char* aTrackName, ClipType aType, AssetParser::Handle aHandle);
+		const AnimationClip* GetFirstClipOfType(ClipType aType) const;
+		bool HasClipOfType(ClipType aType) const;
+
+		void OnParse(AssetParser::Handle aTrackHandle);
+		void OnParseLegacy(const char* aTrackName, ClipType aType, AssetParser::Handle aRootHandle);
 		void BuildUI(const char* aTrackName, AnimationClip*& outSelectedClip);
 
 	protected:
@@ -99,13 +107,5 @@ namespace Slush
 
 		FW_GrowingArray<AnimationClip*> myClips;
 		float myEndTime = 0.f;
-	};
-
-	class SpritesheetTrack : public AnimationTrack
-	{
-	public:
-		bool Update(float anElapsedTime, SpritesheetRuntimeTrackData& aTrackData) const;
-
-		const AnimationClip* GetFirstClip() const;
 	};
 }

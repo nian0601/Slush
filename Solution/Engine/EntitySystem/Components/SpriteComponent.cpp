@@ -193,7 +193,7 @@ namespace Slush
 			rect->SetOutlineColor(0xFF000000);
 			rect->SetOutlineThickness(0.f);
 
-			if (const AnimationClip* clip = myAnimation->mySpritesheetTrack.GetFirstClip())
+			if (const AnimationClip* clip = myAnimation->FindFirstSpriteSheetClip())
 			{
 				Recti texRect = static_cast<const SpriteSheetClip*>(clip)->myFrameRect;
 				mySprite->SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);

@@ -14,6 +14,8 @@ namespace Slush
 	Animation::Animation(const char* aName, unsigned int aAssetID)
 		: DataAsset(aName, aAssetID)
 	{
+		myTracks.Add(new AnimationTrack());
+
 		myToolData.myRuntime = new AnimationRuntime();
 		myToolData.myPreviewSprite = new RectSprite();
 		myToolData.myPreviewSprite->SetSize(98.f, 98.f);
@@ -21,20 +23,34 @@ namespace Slush
 
 	Animation::~Animation()
 	{
+		myTracks.DeleteAll();
+
 		FW_SAFE_DELETE(myToolData.myPreviewSprite);
 		FW_SAFE_DELETE(myToolData.myRuntime);
 	}
 
-	void Animation::OnParse(AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
+	void Animation::OnParse(AssetParser::Handle aRootHandle, unsigned int aVersion)
 	{
-		myOutlineTrack.OnParse("outlinetrack", ClipType::Outline, aRootHandle);
-		myScaleTrack.OnParse("scaletrack", ClipType::Scale, aRootHandle);
-		myPositionTrack.OnParse("postiontrack", ClipType::Position, aRootHandle);
-		myColorTrack.OnParse("colortrack", ClipType::Color, aRootHandle);
-		mySpritesheetTrack.OnParse("spritesheettrack", ClipType::SpriteSheet, aRootHandle);
-
 		if (aRootHandle.IsReading())
 		{
+			myTracks.DeleteAll();
+
+			if (aVersion < 2)
+			{
+				ParseLegacyTracks(aRootHandle);
+			}
+			else
+			{
+				AssetParser::Handle tracksHandle = aRootHandle.ParseChildElement("tracks");
+				int numTracks = tracksHandle.GetNumChildElements();
+				for (int i = 0; i < numTracks; ++i)
+				{
+					AnimationTrack* track = new AnimationTrack();
+					track->OnParse(tracksHandle.GetChildElementAtIndex(i));
+					myTracks.Add(track);
+				}
+			}
+
 			if (aRootHandle.HasField("spritesheettexture"))
 			{
 				FW_String texID;
@@ -46,7 +62,7 @@ namespace Slush
 				myTexture = assets.GetAsset<Slush::Texture>(texID.GetBuffer());
 				FW_ASSERT(myTexture != nullptr, "Invalid texture used for spritesheet-animation");
 
-				if (const AnimationClip* clip = mySpritesheetTrack.GetFirstClip())
+				if (const AnimationClip* clip = FindFirstSpriteSheetClip())
 				{
 					Recti frameRect = static_cast<const SpriteSheetClip*>(clip)->myFrameRect;
 
@@ -57,11 +73,49 @@ namespace Slush
 		}
 		else
 		{
+			AssetParser::Handle tracksHandle = aRootHandle.ParseChildElement("tracks");
+			for (int i = 0; i < myTracks.Count(); ++i)
+			{
+				if (!myTracks[i]->HasClips())
+					continue;
+
+				myTracks[i]->OnParse(tracksHandle.ParseChildElement("track"));
+			}
+
 			if (myTexture)
 			{
 				FW_String texID = myTexture->GetAssetName();
 				aRootHandle.ParseStringField("spritesheettexture", texID);
 			}
+		}
+	}
+
+	void Animation::ParseLegacyTracks(AssetParser::Handle aRootHandle)
+	{
+		struct LegacyTrackInfo
+		{
+			const char* myName;
+			ClipType myType;
+		};
+
+		static const LegacyTrackInfo legacyTracks[] =
+		{
+			{ "outlinetrack", ClipType::Outline },
+			{ "scaletrack", ClipType::Scale },
+			{ "postiontrack", ClipType::Position },
+			{ "colortrack", ClipType::Color },
+			{ "spritesheettrack", ClipType::SpriteSheet },
+		};
+
+		for (const LegacyTrackInfo& info : legacyTracks)
+		{
+			AnimationTrack* legacyTrack = new AnimationTrack();
+			legacyTrack->OnParseLegacy(info.myName, info.myType, aRootHandle);
+
+			if (legacyTrack->HasClips())
+				myTracks.Add(legacyTrack);
+			else
+				delete legacyTrack;
 		}
 	}
 
@@ -73,11 +127,12 @@ namespace Slush
 		timelineLable += GetAssetName();
 		if (ImGui::BeginTimeline(timelineLable.GetBuffer(), 1.f))
 		{
-			myOutlineTrack.BuildUI("Outline", myToolData.mySelectedClip);
-			myScaleTrack.BuildUI("Scale", myToolData.mySelectedClip);
-			myPositionTrack.BuildUI("Position", myToolData.mySelectedClip);
-			myColorTrack.BuildUI("Color", myToolData.mySelectedClip);
-			mySpritesheetTrack.BuildUI("SpriteSheet", myToolData.mySelectedClip);
+			for (int i = 0; i < myTracks.Count(); ++i)
+			{
+				FW_String trackLabel = "Track ";
+				trackLabel += i;
+				myTracks[i]->BuildUI(trackLabel.GetBuffer(), myToolData.mySelectedClip);
+			}
 
 			if (ImGui::BeginDragDropTarget())
 			{
@@ -108,14 +163,60 @@ namespace Slush
 		aRuntimeData.myElapsedTime += Time::GetDelta();
 
 		bool anyTrackActive = false;
-		anyTrackActive |= myOutlineTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myOutlineData);
-		anyTrackActive |= myScaleTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myScaleData);
-		anyTrackActive |= myPositionTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myPositionData);
-		anyTrackActive |= myColorTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.myColorData);
-		anyTrackActive |= mySpritesheetTrack.Update(aRuntimeData.myElapsedTime, aRuntimeData.mySpritesheetData);
+		anyTrackActive |= UpdateTrackOfType(ClipType::Outline, aRuntimeData.myElapsedTime, aRuntimeData.myOutlineData);
+		anyTrackActive |= UpdateTrackOfType(ClipType::Scale, aRuntimeData.myElapsedTime, aRuntimeData.myScaleData);
+		anyTrackActive |= UpdateTrackOfType(ClipType::Position, aRuntimeData.myElapsedTime, aRuntimeData.myPositionData);
+		anyTrackActive |= UpdateTrackOfType(ClipType::Color, aRuntimeData.myElapsedTime, aRuntimeData.myColorData);
+		anyTrackActive |= UpdateTrackOfType(ClipType::SpriteSheet, aRuntimeData.myElapsedTime, aRuntimeData.mySpritesheetData);
 
 		if (!anyTrackActive)
 			aRuntimeData.myState = AnimationRuntime::Finished;
+	}
+
+	bool Animation::UpdateTrackOfType(ClipType aType, float anElapsedTime, AnimationRuntimeTrackData& aTrackData) const
+	{
+		for (const AnimationTrack* track : myTracks)
+		{
+			if (track->HasClipOfType(aType))
+				return track->Update(anElapsedTime, aTrackData);
+		}
+
+		return false;
+	}
+
+	bool Animation::HasSpriteSheetClip() const
+	{
+		return FindFirstSpriteSheetClip() != nullptr;
+	}
+
+	const AnimationClip* Animation::FindFirstSpriteSheetClip() const
+	{
+		for (const AnimationTrack* track : myTracks)
+		{
+			if (const AnimationClip* clip = track->GetFirstClipOfType(ClipType::SpriteSheet))
+				return clip;
+		}
+
+		return nullptr;
+	}
+
+	AnimationTrack& Animation::FindOrCreateSpritesheetTrack()
+	{
+		for (AnimationTrack* track : myTracks)
+		{
+			if (track->HasClipOfType(ClipType::SpriteSheet))
+				return *track;
+		}
+
+		for (AnimationTrack* track : myTracks)
+		{
+			if (!track->HasClips())
+				return *track;
+		}
+
+		AnimationTrack* newTrack = new AnimationTrack();
+		myTracks.Add(newTrack);
+		return *newTrack;
 	}
 
 	void Animation::HandleSpritesheetImport()
@@ -146,7 +247,8 @@ namespace Slush
 				ImGui::BeginDisabled(cantImport);
 				if (ImGui::Button("Import"))
 				{
-					mySpritesheetTrack.RemoveAllClips();
+					AnimationTrack& spritesheetTrack = FindOrCreateSpritesheetTrack();
+					spritesheetTrack.RemoveAllClips();
 
 					for (int y = myToolData.myStartFrameIndex.y; y <= myToolData.myEndFrameIndex.y; ++y)
 					{
@@ -162,7 +264,7 @@ namespace Slush
 							startEndX.y = myToolData.myFrameCount.x;
 
 						for (int x = startEndX.x; x < startEndX.y; ++x)
-							mySpritesheetTrack.Frame(ClipType::SpriteSheet, { x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
+							spritesheetTrack.Frame(ClipType::SpriteSheet, { x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
 					}
 
 					myToolData.myPreviewSprite->SetSize(static_cast<float>(myToolData.myFrameSize.x), static_cast<float>(myToolData.myFrameSize.y));
@@ -293,7 +395,7 @@ namespace Slush
 
 	void Animation::HandlePreview()
 	{
-		if (!mySpritesheetTrack.HasClips())
+		if (!HasSpriteSheetClip())
 			return;
 
 		FW_ASSERT(myTexture);
@@ -320,7 +422,7 @@ namespace Slush
 		ImGui::DragFloat("Preview Scale", &myToolData.myPreviewScale, 1.f, 0.1f, 10.f, "%.1f");
 
 
-		Recti frameRect = static_cast<const SpriteSheetClip*>(mySpritesheetTrack.GetFirstClip())->myFrameRect;
+		Recti frameRect = static_cast<const SpriteSheetClip*>(FindFirstSpriteSheetClip())->myFrameRect;
 		if (myToolData.myRuntime->myState != AnimationRuntime::NotStarted)
 		{
 			frameRect = myToolData.myRuntime->mySpritesheetData.myFrameRect;

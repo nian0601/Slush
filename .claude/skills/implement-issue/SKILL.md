@@ -31,7 +31,7 @@ If you want concurrent work on something else, run `/implement-issue` in a separ
 
 5. **Work through phases autonomously, one at a time:**
    - Parse the phase checklist out of the issue body — each phase is a `- [ ]`/`- [x]` list item with its detail attached underneath (see the `create-issue` skill for the exact body format). Already-`[x]` phases are done; treat the first unchecked phase as the resume point.
-   - Implement the phase, then verify it per that phase's own verification note (use the Bash tool, not PowerShell, for MSBuild/exe commands so you stay within the pre-approved permission rules).
+   - Implement the phase, then verify it per that phase's own verification note (use the Bash tool, not PowerShell, for MSBuild/exe commands so you stay within the pre-approved permission rules). Any MSBuild invocation run here must add `/nodeReuse:false` alongside `/m` — without it, MSBuild's worker nodes linger after the build finishes with their cwd inside the worktree, and Windows won't let `git worktree remove` (Step 7) delete a directory that's still a running process's cwd.
    - **If verification passes and nothing unforeseen came up**, commit immediately, then check its box in the issue body: get the commit SHA (`git rev-parse --short HEAD`), fetch the current issue body, flip that phase's `- [ ]` to `- [x]` and append the short SHA in backticks to the end of the phase's title line (e.g. `- [x] **Phase 1: <title>** (`8e63edf`)`), write it to a temp file, then `gh issue edit <N> --repo nian0601/Slush --body-file <tmpfile>`. Then move straight to the next phase — no need to stop or ask.
    - **Stop and report back to the user instead of continuing** if, on any phase:
      - its own verification step fails (build error, assertion, wrong output, etc.) and the fix isn't obviously safe to make unilaterally
@@ -52,7 +52,7 @@ If you want concurrent work on something else, run `/implement-issue` in a separ
    cd <primary-checkout-path>
    git merge --ff-only issue-<N>
    ```
-   - On success: `git worktree remove <worktree-path>`, then `git branch -d issue-<N>`.
+   - On success: `git worktree remove <worktree-path>`, then `git branch -d issue-<N>`. If removal fails with a file-in-use/access-denied error (e.g. a leftover `mspdbsrv.exe` from a build that got interrupted rather than completed), find processes whose command line/module path references the worktree's absolute path, terminate those specifically, then retry the removal — don't reach for `git worktree remove --force` or manually delete the directory. If it still won't clear, stop and report to the user rather than forcing it.
    - On failure (main diverged): `cd` back into the worktree, `git rebase main`, rebuild, and re-verify; if the rebase itself produces conflicts, **stop and ask** rather than resolving them silently. Once it's clean, `cd` back to the primary checkout and retry the merge.
 
 8. **Ask before closing** (same standing-permission rule as a commit — never do this without being asked in that turn):

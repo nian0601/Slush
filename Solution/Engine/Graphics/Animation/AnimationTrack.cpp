@@ -193,7 +193,7 @@ namespace Slush
 	AnimationTrack& AnimationTrack::Wait(ClipType aType, float aDuration)
 	{
 		float waitValue = 0.f;
-		if (myClips.Count() > 0)
+		if (myClips.Count() > 0 && myClips.GetLast()->GetType() != ClipType::SpriteSheet)
 			waitValue = static_cast<FloatClip*>(myClips.GetLast())->myInterpolator.myEndValue;
 
 		return Constant(aType, aDuration, waitValue);

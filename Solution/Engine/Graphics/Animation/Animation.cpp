@@ -163,7 +163,7 @@ namespace Slush
 		aRuntimeData.myElapsedTime += Time::GetDelta();
 
 		bool anyTrackActive = false;
-		for (int i = 0; i < myTracks.Count(); ++i)
+		for (int i = 0; i < myTracks.Count() && i < aRuntimeData.myTrackData.Count(); ++i)
 			anyTrackActive |= myTracks[i]->Update(aRuntimeData.myElapsedTime, aRuntimeData.myTrackData[i]);
 
 		if (!anyTrackActive)

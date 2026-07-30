@@ -20,6 +20,8 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 2. **Interview the user** Do a grilling-session based on the task-description. Make sure that questions about verification is raised
    - **Verification**: how to tell each phase, and the issue as a whole, is actually done (build passes, specific manual test, `SkipStartScreen` playtest, etc. — see CLAUDE.md's Testing section for the conventions already established).
 
+   While interviewing, watch for terminology drift: conflicting uses of the same word, unclear/ambiguous language, or a concept that keeps getting re-described without ever being given a specific name. Check `.claude/terminology.md` for an existing definition first. If a concept genuinely needs a new term, propose a name and definition and confirm it with the user before adding it to `.claude/terminology.md` — never add a term unilaterally.
+
 3. **Break grilling-result into phases**, following the phased-work convention already in CLAUDE.md: small, independently buildable/testable chunks. For **each** phase, write enough detail that `/implement-issue` can act on it directly later without re-deriving context or asking the user to re-explain — not a one-line title. Capture, per phase:
    - What changes, and why.
    - The specific files/systems involved, as far as already known from the codebase check in step 2.

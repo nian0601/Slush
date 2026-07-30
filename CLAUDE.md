@@ -6,6 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Prefer short, plain language over grammatical polish. Fragments and dropped words are fine if the meaning lands — brevity wins when it conflicts with grammar. Applies to explanations, status updates, and commit messages; code comments follow the separate (also terse) rules under Code style.
 
+## Terminology
+
+@.claude/terminology.md
+
+Grilling and planning sessions (`grilling`, `plan-issue`, `plan-issue-with-grill`) actively watch for terminology drift — conflicting uses of the same word, unclear language, or a concept getting re-described repeatedly without ever being given a specific name — and flag it; see those skills for the exact behavior. Any other session should still check this glossary before relying on a term it defines.
+
 ## Project overview
 
 Slush is a personal, hand-rolled C++ game engine (namespace `Slush`) built on vendored **SFML** (`SFML/`) for windowing/graphics/audio and vendored **Dear ImGui** (`Solution/Engine/imgui/`) for editor tooling. It's a single Visual Studio solution (`Solution/Solution.sln`) containing:

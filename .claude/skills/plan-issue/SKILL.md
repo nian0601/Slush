@@ -19,6 +19,8 @@ Ask. Do not guess scope, priority, project, affected files, or acceptance criter
 
 2. **Interview the user** Interview user relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommendation. If a question can be answered by exploring the codebase, explore the codebase instead. Ask the questions one by one, do not flood the user with all questions at once.
 
+   While interviewing, watch for terminology drift: conflicting uses of the same word, unclear/ambiguous language, or a concept that keeps getting re-described without ever being given a specific name. Check `.claude/terminology.md` for an existing definition first. If a concept genuinely needs a new term, propose a name and definition and confirm it with the user before adding it to `.claude/terminology.md` — never add a term unilaterally.
+
 3. **Clarify exhaustively**, using plain follow-up questions (open-ended points) as fits each question. Cover, at minimum:
    - **Goal and scope**: what problem this solves, what the end state looks like, explicit non-goals (what's deliberately out of scope).
    - **Priority** — always ask; scale and default are in CLAUDE.md's Issue tracking section — never pick it silently.

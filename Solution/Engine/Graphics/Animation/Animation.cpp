@@ -27,11 +27,11 @@ namespace Slush
 
 	void Animation::OnParse(AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 	{
-		myOutlineTrack.OnParse("outlinetrack", aRootHandle);
-		myScaleTrack.OnParse("scaletrack", aRootHandle);
-		myPositionTrack.OnParse("postiontrack", aRootHandle);
-		myColorTrack.OnParse("colortrack", aRootHandle);
-		mySpritesheetTrack.OnParse("spritesheettrack", aRootHandle);
+		myOutlineTrack.OnParse("outlinetrack", ClipType::Outline, aRootHandle);
+		myScaleTrack.OnParse("scaletrack", ClipType::Scale, aRootHandle);
+		myPositionTrack.OnParse("postiontrack", ClipType::Position, aRootHandle);
+		myColorTrack.OnParse("colortrack", ClipType::Color, aRootHandle);
+		mySpritesheetTrack.OnParse("spritesheettrack", ClipType::SpriteSheet, aRootHandle);
 
 		if (aRootHandle.IsReading())
 		{
@@ -48,7 +48,7 @@ namespace Slush
 
 				if (const AnimationClip* clip = mySpritesheetTrack.GetFirstClip())
 				{
-					Recti frameRect = clip->myFrameRect;
+					Recti frameRect = static_cast<const SpriteSheetClip*>(clip)->myFrameRect;
 
 					myToolData.myFrameSize = frameRect.myExtents;
 					myToolData.myPreviewSprite->SetSize(static_cast<float>(myToolData.myFrameSize.x), static_cast<float>(myToolData.myFrameSize.y));
@@ -162,7 +162,7 @@ namespace Slush
 							startEndX.y = myToolData.myFrameCount.x;
 
 						for (int x = startEndX.x; x < startEndX.y; ++x)
-							mySpritesheetTrack.Frame({ x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
+							mySpritesheetTrack.Frame(ClipType::SpriteSheet, { x, y }, myToolData.myFrameSize, static_cast<float>(myToolData.myFPS));
 					}
 
 					myToolData.myPreviewSprite->SetSize(static_cast<float>(myToolData.myFrameSize.x), static_cast<float>(myToolData.myFrameSize.y));
@@ -320,7 +320,7 @@ namespace Slush
 		ImGui::DragFloat("Preview Scale", &myToolData.myPreviewScale, 1.f, 0.1f, 10.f, "%.1f");
 
 
-		Recti frameRect = mySpritesheetTrack.GetFirstClip()->myFrameRect;
+		Recti frameRect = static_cast<const SpriteSheetClip*>(mySpritesheetTrack.GetFirstClip())->myFrameRect;
 		if (myToolData.myRuntime->myState != AnimationRuntime::NotStarted)
 		{
 			frameRect = myToolData.myRuntime->mySpritesheetData.myFrameRect;

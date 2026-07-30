@@ -11,28 +11,111 @@ namespace Slush
 		myStartEndTime.y = myStartEndTime.x + aDuration;
 	}
 
-	AnimationClip::State AnimationClip::Update(float anElapsedTime, float& outValue) const
+	void AnimationClip::OnParse(AssetParser::Handle aHandle)
+	{
+		aHandle.ParseFloatField("starttime", myStartEndTime.x);
+		aHandle.ParseFloatField("endtime", myStartEndTime.y);
+	}
+
+	AnimationClip::State AnimationClip::GetTimeState(float anElapsedTime, float& outProgress) const
 	{
 		if (anElapsedTime < myStartEndTime.x)
 			return State::NotStarted;
 
 		if (anElapsedTime >= myStartEndTime.y)
 		{
-			outValue = myInterpolator.GetValue(1.f);
+			outProgress = 1.f;
 			return State::Finished;
 		}
 
-		float progress = FW_UnLerp(myStartEndTime.x, myStartEndTime.y, anElapsedTime);
-		outValue = myInterpolator.GetValue(progress);
-
+		outProgress = FW_UnLerp(myStartEndTime.x, myStartEndTime.y, anElapsedTime);
 		return State::Running;
 	}
 
-	void AnimationClip::OnParse(AssetParser::Handle aHandle)
+	void AnimationClip::BuildTimeRowsUI()
 	{
-		aHandle.ParseFloatField("starttime", myStartEndTime.x);
-		aHandle.ParseFloatField("endtime", myStartEndTime.y);
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("Start Time");
+
+		ImGui::TableSetColumnIndex(1);
+		ImGui::DragFloat("##StartTime", &myStartEndTime.x, 0.01f, 0.f, 1.f);
+
+		ImGui::TableNextRow();
+		ImGui::TableSetColumnIndex(0);
+		ImGui::Text("End Time");
+
+		ImGui::TableSetColumnIndex(1);
+		ImGui::DragFloat("##EndTime", &myStartEndTime.y, 0.01f, 0.f, 1.f);
+	}
+
+	AnimationClip* CreateClip(ClipType aType)
+	{
+		if (aType == ClipType::SpriteSheet)
+			return new SpriteSheetClip();
+
+		return new FloatClip(aType);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	AnimationClip::State FloatClip::Update(float anElapsedTime, float& outValue) const
+	{
+		float progress = 0.f;
+		State state = GetTimeState(anElapsedTime, progress);
+		outValue = myInterpolator.GetValue(progress);
+		return state;
+	}
+
+	void FloatClip::OnParse(AssetParser::Handle aHandle)
+	{
+		AnimationClip::OnParse(aHandle);
 		myInterpolator.OnParse(aHandle);
+	}
+
+	void FloatClip::BuildUI()
+	{
+		static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable;
+		if (ImGui::BeginTable("table_scrolly", 2, flags))
+		{
+			ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+			ImGui::TableSetupColumn("Field", ImGuiTableColumnFlags_None);
+			ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_None);
+			ImGui::TableHeadersRow();
+
+			BuildTimeRowsUI();
+
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("Interpolator");
+
+			ImGui::TableSetColumnIndex(1);
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragFloat("##InterpolatorStart", &myInterpolator.myStartValue, 0.01f, 0.f, 1.f);
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(50);
+			ImGui::DragFloat("##InterpolatorEnd", &myInterpolator.myEndValue, 0.01f, 0.f, 1.f);
+			ImGui::SameLine();
+			const char* interpolatorTypes[] = { "None", "Linear", "Constant" };
+			ImGui::Combo("##Interpolator", &myInterpolator.myType, interpolatorTypes, IM_ARRAYSIZE(interpolatorTypes));
+
+			ImGui::EndTable();
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	AnimationClip::State SpriteSheetClip::Update(float anElapsedTime, float& outValue) const
+	{
+		float progress = 0.f;
+		State state = GetTimeState(anElapsedTime, progress);
+		outValue = 0.f;
+		return state;
+	}
+
+	void SpriteSheetClip::OnParse(AssetParser::Handle aHandle)
+	{
+		AnimationClip::OnParse(aHandle);
 
 		AssetParser::Handle frameRectHandle;
 		if (aHandle.IsReading())
@@ -49,7 +132,7 @@ namespace Slush
 		}
 	}
 
-	void AnimationClip::BuildUI()
+	void SpriteSheetClip::BuildUI()
 	{
 		static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable;
 		if (ImGui::BeginTable("table_scrolly", 2, flags))
@@ -59,35 +142,7 @@ namespace Slush
 			ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_None);
 			ImGui::TableHeadersRow();
 
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Start Time");
-
-			ImGui::TableSetColumnIndex(1);
-			ImGui::DragFloat("##StartTime", &myStartEndTime.x, 0.01f, 0.f, 1.f);
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("End Time");
-
-			ImGui::TableSetColumnIndex(1);
-			ImGui::DragFloat("##EndTime", &myStartEndTime.y, 0.01f, 0.f, 1.f);
-
-
-			ImGui::TableNextRow();
-			ImGui::TableSetColumnIndex(0);
-			ImGui::Text("Interpolator");
-
-			ImGui::TableSetColumnIndex(1);
-			ImGui::SetNextItemWidth(50);
-			ImGui::DragFloat("##InterpolatorStart", &myInterpolator.myStartValue, 0.01f, 0.f, 1.f);
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(50);
-			ImGui::DragFloat("##InterpolatorEnd", &myInterpolator.myEndValue, 0.01f, 0.f, 1.f);
-			ImGui::SameLine();
-			const char* interpolatorTypes[] = { "None", "Linear", "Constant" };
-			ImGui::Combo("##Interpolator", &myInterpolator.myType, interpolatorTypes, IM_ARRAYSIZE(interpolatorTypes));
-
+			BuildTimeRowsUI();
 
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
@@ -114,35 +169,40 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	AnimationTrack& AnimationTrack::Linear(float aDuration, float aStart, float aEnd)
+	AnimationTrack::~AnimationTrack()
 	{
-		AnimationClip& clip = AddClip(aDuration);
-		clip.myInterpolator.MakeLinear(aStart, aEnd);
+		RemoveAllClips();
+	}
+
+	AnimationTrack& AnimationTrack::Linear(ClipType aType, float aDuration, float aStart, float aEnd)
+	{
+		AnimationClip& clip = AddClip(aType, aDuration);
+		static_cast<FloatClip&>(clip).myInterpolator.MakeLinear(aStart, aEnd);
 
 		return *this;
 	}
 
-	AnimationTrack& AnimationTrack::Constant(float aDuration, float aValue)
+	AnimationTrack& AnimationTrack::Constant(ClipType aType, float aDuration, float aValue)
 	{
-		AnimationClip& clip = AddClip(aDuration);
-		clip.myInterpolator.MakeConstant(aValue);
+		AnimationClip& clip = AddClip(aType, aDuration);
+		static_cast<FloatClip&>(clip).myInterpolator.MakeConstant(aValue);
 
 		return *this;
 	}
 
-	AnimationTrack& AnimationTrack::Wait(float aDuration)
+	AnimationTrack& AnimationTrack::Wait(ClipType aType, float aDuration)
 	{
 		float waitValue = 0.f;
 		if (myClips.Count() > 0)
-			waitValue = myClips.GetLast().myInterpolator.myEndValue;
+			waitValue = static_cast<FloatClip*>(myClips.GetLast())->myInterpolator.myEndValue;
 
-		return Constant(aDuration, waitValue);
+		return Constant(aType, aDuration, waitValue);
 	}
 
-	AnimationTrack& AnimationTrack::Frame(const Vector2i& aFramePosition, const Vector2i& aFrameSize, float aFPS)
+	AnimationTrack& AnimationTrack::Frame(ClipType aType, const Vector2i& aFramePosition, const Vector2i& aFrameSize, float aFPS)
 	{
-		AnimationClip& clip = AddClip(1.f / aFPS);
-		clip.myFrameRect = MakeRectFromTopLeft(aFramePosition * aFrameSize, aFrameSize);
+		AnimationClip& clip = AddClip(aType, 1.f / aFPS);
+		static_cast<SpriteSheetClip&>(clip).myFrameRect = MakeRectFromTopLeft(aFramePosition * aFrameSize, aFrameSize);
 
 		return *this;
 	}
@@ -155,7 +215,7 @@ namespace Slush
 			return false;
 		}
 
-		AnimationClip::State state = myClips[aTrackData.myCurrentClip].Update(anElapsedTime, aTrackData.myValue);
+		AnimationClip::State state = myClips[aTrackData.myCurrentClip]->Update(anElapsedTime, aTrackData.myValue);
 		if (state == AnimationClip::State::Finished)
 			++aTrackData.myCurrentClip;
 
@@ -165,11 +225,11 @@ namespace Slush
 
 	void AnimationTrack::RemoveAllClips()
 	{
-		myClips.RemoveAll();
+		myClips.DeleteAll();
 		myEndTime = 0.f;
 	}
 
-	void AnimationTrack::OnParse(const char* aTrackName, AssetParser::Handle aHandle)
+	void AnimationTrack::OnParse(const char* aTrackName, ClipType aType, AssetParser::Handle aHandle)
 	{
 		if (aHandle.IsWriting() && myClips.IsEmpty())
 			return;
@@ -180,6 +240,8 @@ namespace Slush
 		{
 			int numClips = trackHandle.GetNumChildElements();
 			myClips.Reserve(numClips);
+			for (int i = 0; i < numClips; ++i)
+				myClips[i] = CreateClip(aType);
 		}
 
 		for (int i = 0; i < myClips.Count(); ++i)
@@ -190,9 +252,7 @@ namespace Slush
 			else
 				clipHandle = trackHandle.ParseChildElement("clip");
 
-			AnimationClip& clip = myClips[i];
-
-			clip.OnParse(clipHandle);
+			myClips[i]->OnParse(clipHandle);
 		}
 	}
 
@@ -205,9 +265,9 @@ namespace Slush
 				for (int i = 0; i < myClips.Count(); ++i)
 				{
 					ImGui::PushID(i);
-					if (ImGui::TimelineEvent("clip", &myClips[i].myStartEndTime.x, &myClips[i] == outSelectedClip))
+					if (ImGui::TimelineEvent("clip", &myClips[i]->myStartEndTime.x, myClips[i] == outSelectedClip))
 					{
-						outSelectedClip = &myClips[i];
+						outSelectedClip = myClips[i];
 					}
 					ImGui::PopID();
 				}
@@ -217,14 +277,21 @@ namespace Slush
 		}
 	}
 
-	AnimationClip& AnimationTrack::AddClip(float aDuration)
+	AnimationClip& AnimationTrack::AddClip(ClipType aType, float aDuration)
 	{
-		AnimationClip& clip = myClips.Add();
-		clip.SetStartTimeAndDuration(myEndTime, aDuration);
+		AnimationClip* clip = CreateClip(aType);
+		clip->SetStartTimeAndDuration(myEndTime, aDuration);
+
+		for (AnimationClip* existingClip : myClips)
+		{
+			bool overlaps = clip->myStartEndTime.x < existingClip->myStartEndTime.y && existingClip->myStartEndTime.x < clip->myStartEndTime.y;
+			FW_ASSERT(!overlaps, "AnimationTrack: new clip overlaps with an existing clip in this track");
+		}
 
 		myEndTime += aDuration;
+		myClips.Add(clip);
 
-		return clip;
+		return *clip;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -237,9 +304,10 @@ namespace Slush
 			return false;
 		}
 
-		AnimationClip::State state = myClips[aTrackData.myCurrentClip].Update(anElapsedTime, aTrackData.myValue);
+		AnimationClip* clip = myClips[aTrackData.myCurrentClip];
+		AnimationClip::State state = clip->Update(anElapsedTime, aTrackData.myValue);
 
-		aTrackData.myFrameRect = myClips[aTrackData.myCurrentClip].myFrameRect;
+		aTrackData.myFrameRect = static_cast<SpriteSheetClip*>(clip)->myFrameRect;
 
 		if (state == AnimationClip::State::Finished)
 			++aTrackData.myCurrentClip;
@@ -253,7 +321,7 @@ namespace Slush
 		if (myClips.IsEmpty())
 			return nullptr;
 
-		return &myClips[0];
+		return myClips[0];
 	}
 
 }

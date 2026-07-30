@@ -195,7 +195,7 @@ namespace Slush
 
 			if (const AnimationClip* clip = myAnimation->mySpritesheetTrack.GetFirstClip())
 			{
-				Recti texRect = clip->myFrameRect;
+				Recti texRect = static_cast<const SpriteSheetClip*>(clip)->myFrameRect;
 				mySprite->SetTextureRect(texRect.myTopLeft.x, texRect.myTopLeft.y, texRect.myExtents.x, texRect.myExtents.y);
 			}
 			else

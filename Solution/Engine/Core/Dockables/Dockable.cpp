@@ -25,7 +25,7 @@ namespace Slush
 		if (myEnableHorizontalScrolling)
 			windowFlags |= ImGuiWindowFlags_HorizontalScrollbar;
 
-		if (ImGui::Begin(myUniqueIDName.GetBuffer(), NULL, windowFlags))
+		if (ImGui::Begin(myUniqueIDName.GetBuffer(), myIsClosable ? &myIsOpen : NULL, windowFlags))
 			OnBuildUI();
 
 		ImGui::End();

@@ -41,6 +41,10 @@ These conventions differ from typical C++ defaults — follow them in this codeb
 - An enum/helper-functions pair that's conceptually owned by a single component (e.g. `CollisionFlag` living in `PhysicsComponent.h/.cpp`) should stay colocated with that component rather than being pulled into its own file. Reserve a dedicated file (like `EntityType.h/.cpp`) for types that are genuinely shared by many independent components with no single owner
 - Prefer exposing a getter on the owning `Component` (e.g. `PhysicsComponent::GetCollisionFlag()`) over having other components call `EntityPrefab::GetComponentData<T>()` themselves
 - `FW_StaticArray<Type, Size>`'s default constructor does **not** zero-initialize elements — if a `Data` struct has one and needs a known default (e.g. all-`false`), give `Data` an explicit constructor that calls `.Fill(...)`
+- `AssetReference<T>::ResolveDependency()` logs resolution failures centrally (naming the holding asset via `DependencyTracker::GetCurrentAssetName()`). Call sites are bare `if (T* p = ref.Get()) …` — no per-call-site fallback, no per-call-site logging, and never spawn a placeholder empty entity
+- Exception: use a hard `FW_ASSERT` where the asset is a genuine invariant rather than a recoverable absence (e.g. `Level::Restart()`'s player spawn)
+- `AssetReference<T>` deliberately exposes no mutable string accessor — editor UI renders it read-only (`ImGui::Text`), not `ImGui::InputText`
+- Hoist a singleton's `Foo::GetInstance()` into a local reference before repeated or looped calls rather than re-invoking it per call (`AssetRegistry`, `ComponentRegistry`, `DependencyTracker`, `Engine` all use this singleton shape)
 
 ## Testing
 

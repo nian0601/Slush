@@ -9,6 +9,19 @@ allowed-tools: AskUserQuestion, Read, Grep, Glob, Skill
 
 Turn a rough task description into a fully-scoped GitHub issue draft, through exhaustive clarification with the user, then hand off to the `create-issue` skill once — and only once — the user explicitly confirms the draft.
 
+## Before anything else: model check
+
+This skill is meant to run on **Opus** — planning work, worth the Opus budget. Your active model is stated in your environment context ("You are powered by the model named …").
+
+- Running an Opus model: continue silently, don't mention it.
+- Anything else (Sonnet, Haiku, Fable): **stop before doing any other work** — no questions, no file reads — and print exactly this, then end the turn and wait:
+
+  > This skill normally runs on Opus, but the session is on **<model>**. Run `/model opus` to switch (it sticks for the whole session, including follow-ups), or say "continue" to run on <model> anyway.
+
+  Do not proceed until the user answers. Never try to switch the model yourself.
+
+  Exception: if this skill was started as a hand-over from a grilling-session, that session already ran this same check — skip it and continue.
+
 ## Core rule: never assume or infer
 
 Ask. Do not guess scope, priority, project, affected files, or acceptance criteria from the initial description, even when a guess seems obvious. The purpose of this skill is to reach a genuinely solid shared understanding before anything is written to GitHub — a wrong assumption here becomes a wrong issue that `/implement-issue` later executes against without noticing.

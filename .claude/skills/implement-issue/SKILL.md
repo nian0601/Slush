@@ -11,6 +11,17 @@ Implement a GitHub issue's phase breakdown phase by phase, directly in this sess
 
 If you want concurrent work on something else, run `/implement-issue` in a separate Claude Code session/instance — this skill doesn't manage concurrency itself.
 
+## Before anything else: model check
+
+This skill is meant to run on **Sonnet** — implementation work against an already-planned phase breakdown, not worth Opus budget. It also runs autonomously across many phases, so a wrong-model start here is the most expensive one to miss. Your active model is stated in your environment context ("You are powered by the model named …").
+
+- Running a Sonnet model: continue silently, don't mention it.
+- Anything else (Opus, Haiku, Fable): **stop before doing any other work** — no `gh` calls, no file reads, no worktree — and print exactly this, then end the turn and wait:
+
+  > This skill normally runs on Sonnet, but the session is on **<model>**. Run `/model sonnet` to switch (it sticks for the whole session, including follow-ups), or say "continue" to run on <model> anyway.
+
+  Do not proceed until the user answers. Never try to switch the model yourself.
+
 ## Steps
 
 1. **Resolve the issue number** from `$1`/`$ARGUMENTS` or a URL pasted in the user's message.

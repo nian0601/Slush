@@ -9,6 +9,17 @@ allowed-tools: Bash(gh:*)
 
 Recommend an open issue that fits a stated time budget, weighted by priority — without silently starting work on it.
 
+## Before anything else: model check
+
+This skill is meant to run on **Sonnet** — mechanical work, not worth Opus budget. Your active model is stated in your environment context ("You are powered by the model named …").
+
+- Running a Sonnet model: continue silently, don't mention it.
+- Anything else (Opus, Haiku, Fable): **stop before doing any other work** — no `gh` calls, no file reads — and print exactly this, then end the turn and wait:
+
+  > This skill normally runs on Sonnet, but the session is on **<model>**. Run `/model sonnet` to switch (it sticks for the whole session, including follow-ups), or say "continue" to run on <model> anyway.
+
+  Do not proceed until the user answers. Never try to switch the model yourself.
+
 ## Steps
 
 1. Parse the time budget from `$ARGUMENTS`/`$1` or the user's message (e.g. "3h", "90 minutes", "most of the day").

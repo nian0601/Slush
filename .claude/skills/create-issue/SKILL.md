@@ -9,6 +9,19 @@ allowed-tools: Bash(gh:*), AskUserQuestion, Write
 
 Write an issue to GitHub with the correct labels and a body detailed enough that `/implement-issue` can act on it later without further clarification.
 
+## Before anything else: model check
+
+This skill is meant to run on **Sonnet** — mechanical work, not worth Opus budget. Your active model is stated in your environment context ("You are powered by the model named …").
+
+- Running a Sonnet model: continue silently, don't mention it.
+- Anything else (Opus, Haiku, Fable): **stop before doing any other work** — no `gh` calls, no file reads — and print exactly this, then end the turn and wait:
+
+  > This skill normally runs on Sonnet, but the session is on **<model>**. Run `/model sonnet` to switch (it sticks for the whole session, including follow-ups), or say "continue" to run on <model> anyway.
+
+  Do not proceed until the user answers. Never try to switch the model yourself.
+
+  This applies on the `plan-issue` handoff path too — a planning session that ran on Opus lands here still on Opus, which is exactly the case worth catching. The confirmed draft is already in the conversation, so switching costs nothing.
+
 ## Two entry paths
 
 - **Handoff from `plan-issue`**: title, summary, priority, project, and a detailed phase-by-phase breakdown are already confirmed and present in the conversation. Use them as-is — do not re-ask anything already settled.

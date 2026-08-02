@@ -82,7 +82,7 @@ Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Thr
 - **Project**: `project:engine` or `project:actiongame` — which part of the codebase the issue belongs to. Just these two for now; revisit if it needs to be more granular (e.g. per-game, as BossMonster/TopDownGame become active) or dropped.
 - **`no-plan`**: an additional tag on issues filed without a phase breakdown (quick/direct path, or a deliberately unplanned issue) — layered on top of whatever priority/size/project labels still apply.
 
-Four project skills (`.claude/skills/`) drive the workflow:
+Project skills (now living in the global `~/.claude/skills/` repo, shared across projects) drive the workflow:
 
 - `/plan-issue` — exhaustively clarifies a task before it's filed. Never assumes or infers scope, priority, or project — always asks. Breaks the work into phases, each with enough self-contained detail (files/systems, approach, verification) that `/implement-issue` can act on it later without re-deriving context. Confirms the full draft with the user before creating anything.
 - `/create-issue` — writes a drafted (or quick, unplanned) issue to GitHub via `gh issue create`, with the label taxonomy above and a per-phase checklist body.

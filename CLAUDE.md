@@ -34,6 +34,10 @@ Adding new files through Visual Studio's Solution Explorer ("Add > New Item"/"Ex
 
 Always build via `Solution.sln`, not by pointing MSBuild at an individual `.vcxproj` — project-level `IncludePath`s rely on `$(SolutionDir)`, which isn't resolved correctly when a project is built standalone (e.g. `Engine.vcxproj` alone fails with `Cannot open include file: 'FW_Includes.h'`).
 
+Building inside a git worktree (e.g. `/implement-issue`'s per-issue worktrees) doesn't collide with the primary checkout: `Directory.Build.props`'s `RepoRoot` resolves per-checkout, so each worktree gets its own `Workbed\`/`Build_Output\`.
+
+Every MSBuild invocation must add `/nodeReuse:false` alongside `/m` — without it, MSBuild's worker nodes linger after the build finishes with their cwd wherever the build ran, and Windows won't let `git worktree remove` delete a directory that's still a running process's cwd. If a build gets interrupted rather than completing, `mspdbsrv.exe` (MSBuild's shared PDB-writing server) can similarly be left running with a worktree's directory as its module path and block removal the same way. If `git worktree remove` fails with a file-in-use/access-denied error, find processes whose command line/module path references the worktree's absolute path and terminate those specifically — don't reach for `git worktree remove --force` or manually delete the directory. If it still won't clear, stop and report rather than forcing it.
+
 ## Code style
 
 These conventions differ from typical C++ defaults — follow them in this codebase:

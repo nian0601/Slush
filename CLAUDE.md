@@ -1,16 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Communication style
-
-Prefer short, plain language over grammatical polish. Fragments and dropped words are fine if the meaning lands — brevity wins when it conflicts with grammar. Applies to explanations, status updates, and commit messages; code comments follow the separate (also terse) rules under Code style.
-
-## Terminology
-
-@.claude/terminology.md
-
-Grilling and planning sessions (`grilling`, `plan-issue`, `plan-issue-with-grill`) actively watch for terminology drift — conflicting uses of the same word, unclear language, or a concept getting re-described repeatedly without ever being given a specific name — and flag it; see those skills for the exact behavior. Any other session should still check this glossary before relying on a term it defines.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository. Global preferences (communication style, git-commit safety, naming/formatting conventions) live in `~/.claude/CLAUDE.md`; workflow-tooling rules (terminology, issue label taxonomy, phased-work convention) live in `~/.claude/skills/shared/workflow.md`. This file covers only what's specific to this repo.
 
 ## Project overview
 
@@ -40,15 +30,10 @@ Every MSBuild invocation must add `/nodeReuse:false` alongside `/m` — without 
 
 ## Code style
 
-These conventions differ from typical C++ defaults — follow them in this codebase:
+These conventions differ from typical C++ defaults — follow them in this codebase (naming/brace/indentation conventions are global, see `~/.claude/CLAUDE.md`):
 
-- Member variables: `my` + PascalCase (`myVertices`, `myHasAnchor`). The `my` prefix is reserved for member variables only — local variables declared inside a function body must not use it.
-- Function parameters: `a`/`an` + PascalCase (`aVertex`, `anExpression`)
-- Types/functions/methods: PascalCase (`GetVertex`, `CreateEdge`)
 - Framework-library types are prefixed `FW_` (`FW_Vector2`, `FW_GrowingArray`, `FW_Intersection`) instead of being namespaced under a nested namespace — some are `namespace FW_Xxx { }` blocks, others are `FW_Xxx`-prefixed template classes
 - Engine/game code uses a real namespace: `Slush::`
-- Braces: Allman style (opening brace on its own line)
-- Indentation: tabs, not spaces
 - `#pragma once` for header guards, never `#ifndef`
 - Framework code prefers custom containers (`FW_GrowingArray`, `FW_String`) over STL equivalents; `std::string`/STL do show up occasionally in Engine/game code
 - Assertions use the `FW_ASSERT` macro (`Solution/Framework/FW_Assert.h`), not `<cassert>`
@@ -75,22 +60,6 @@ Solo project — commit directly to `main`, no branch/PR convention to follow. T
 
 Claude should never run `git commit` without the user explicitly asking for it in that turn. Creating/editing/staging files does not need separate approval — only the commit itself does.
 
-For engine-sized changes (new subsystems, cross-cutting refactors), prefer landing the work as multiple independently buildable/testable phases rather than one large commit. Each phase should result in a runnable and testable executable, dont update function-signatures or interface without updating callsites. After finishing and verifying each phase, stop and wait for explicit user review before starting the next phase — the user decides whether to commit, iterate further, or adjust the phase as-is before any further work begins. Never chain into the next phase on your own.
-
 ## Issue tracking
 
-Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Three label groups, plus one standalone tag:
-
-- **Priority**: `priority:p0` (drop-everything/blocking) through `priority:p3` (low/someday); `priority:p2` is the normal default.
-- **Size**: `size:s`/`size:m`/`size:l`, a holistic judgment call made by `plan-issue` on the assembled phase breakdown — how long the plan would realistically take to implement, not a mechanical count. Rough anchors (sessions share no memory of past calls, so these keep the judgment calibrated): `size:s` ≈ under a couple hours, `size:m` ≈ half a day to a day, `size:l` ≈ multiple days/sessions.
-- **Project**: `project:engine` or `project:actiongame` — which part of the codebase the issue belongs to. Just these two for now; revisit if it needs to be more granular (e.g. per-game, as BossMonster/TopDownGame become active) or dropped.
-- **`no-plan`**: an additional tag on issues filed without a phase breakdown (quick/direct path, or a deliberately unplanned issue) — layered on top of whatever priority/size/project labels still apply.
-
-Project skills (now living in the global `~/.claude/skills/` repo, shared across projects) drive the workflow:
-
-- `/plan-issue` — exhaustively clarifies a task before it's filed. Never assumes or infers scope, priority, or project — always asks. Breaks the work into phases, each with enough self-contained detail (files/systems, approach, verification) that `/implement-issue` can act on it later without re-deriving context. Confirms the full draft with the user before creating anything.
-- `/create-issue` — writes a drafted (or quick, unplanned) issue to GitHub via `gh issue create`, with the label taxonomy above and a per-phase checklist body.
-- `/find-issue <time budget>` — lists open issues, shortlists by priority and a coarse size-vs-budget heuristic, and proposes the best fit for confirmation rather than starting work automatically.
-- `/implement-issue <number-or-url>` — loads an issue's phase breakdown and works through it phase by phase autonomously by default: commits and moves on whenever a phase's own verification passes cleanly, stopping only if something unexpected comes up (a deliberate, scoped exception to the phased-work convention above — see the skill for the exact stop conditions). Runs an automatic code-review pass and an end-of-run summary before proposing to merge/close.
-
-Closing an issue and merging its branch back into `main` follow the same standing-permission rule as `git commit`: never do either without the user's go-ahead in that turn. Checking off a phase happens automatically as part of `/implement-issue`'s autonomous run.
+Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Valid `project:` label values: `project:engine` (Slush Engine/Framework code), `project:actiongame` (ActionGame-specific code), `project:tooling` (Claude Code skills, CLAUDE.md, repo workflow tooling). Revisit if this needs to be more granular (e.g. per-game, as BossMonster/TopDownGame become active) or consolidated.

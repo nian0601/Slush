@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "AssetEditorDockable.h"
+#include "Core/Dockables/IAppLayout.h"
 #include <imgui\ImGuiWidgets.h>
 
 namespace Slush
@@ -15,13 +16,120 @@ namespace Slush
 	{
 		for (int i = 0; i < myAssets.Count();)
 		{
-			if (!myAssets[i].myShouldKeep)
+			AssetData& data = myAssets[i];
+			if (!data.myShouldKeep)
 			{
-				myAssets.RemoveNonCyclicAtIndex(i);
+				// A tab's X sets myShouldKeep false directly (ImGui::BeginTabItem). With unsaved changes,
+				// revert that and ask for confirmation first instead of discarding silently.
+				if (data.myAsset && data.myAsset->HasUnsavedChanges())
+				{
+					data.myShouldKeep = true;
+
+					myAssetsPendingCloseConfirmation.RemoveAll();
+					myAssetsPendingCloseConfirmation.Add(data.myAsset);
+					myWantToOpenUnsavedChangesPopup = true;
+					myIsConfirmingAppClose = false;
+
+					++i;
+				}
+				else
+				{
+					myAssets.RemoveNonCyclicAtIndex(i);
+				}
 			}
 			else
 			{
 				++i;
+			}
+		}
+	}
+
+	bool AssetEditorDockable::HasUnsavedChanges() const
+	{
+		for (const AssetData& data : myAssets)
+		{
+			if (data.myAsset && data.myAsset->HasUnsavedChanges())
+				return true;
+		}
+
+		return false;
+	}
+
+	void AssetEditorDockable::OnCloseRequested()
+	{
+		myAssetsPendingCloseConfirmation.RemoveAll();
+		for (AssetData& data : myAssets)
+		{
+			if (data.myAsset && data.myAsset->HasUnsavedChanges())
+				myAssetsPendingCloseConfirmation.Add(data.myAsset);
+		}
+
+		myWantToOpenUnsavedChangesPopup = true;
+		myIsConfirmingAppClose = true;
+	}
+
+	void AssetEditorDockable::OnBuildModals()
+	{
+		if (myWantToOpenUnsavedChangesPopup)
+		{
+			ImGui::OpenPopup("Unsaved Changes");
+			myWantToOpenUnsavedChangesPopup = false;
+		}
+
+		if (ImGui::BeginPopupModal("Unsaved Changes", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("The following assets have unsaved changes:");
+			for (Slush::Asset* asset : myAssetsPendingCloseConfirmation)
+				ImGui::BulletText("%s", asset->GetAssetName().GetBuffer());
+
+			if (ImGui::Button("Save All"))
+			{
+				for (Slush::Asset* asset : myAssetsPendingCloseConfirmation)
+					asset->Save();
+
+				CloseTabsForAssets(myAssetsPendingCloseConfirmation);
+				myAssetsPendingCloseConfirmation.RemoveAll();
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Close Without Saving"))
+			{
+				CloseTabsForAssets(myAssetsPendingCloseConfirmation);
+				myAssetsPendingCloseConfirmation.RemoveAll();
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				if (myIsConfirmingAppClose && myOwnerLayout)
+					myOwnerLayout->CancelCloseRequest();
+
+				myAssetsPendingCloseConfirmation.RemoveAll();
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void AssetEditorDockable::CloseTabsForAssets(const FW_GrowingArray<Slush::Asset*>& someAssets)
+	{
+		// Removes directly rather than setting myShouldKeep = false: confirmation already happened here,
+		// and "Close Without Saving" leaves HasUnsavedChanges() true, which would make OnUpdate()'s own
+		// myShouldKeep-false interception immediately revert the close and reopen this same popup.
+		for (Slush::Asset* asset : someAssets)
+		{
+			for (int i = 0; i < myAssets.Count(); ++i)
+			{
+				if (myAssets[i].myAsset == asset)
+				{
+					myAssets.RemoveNonCyclicAtIndex(i);
+					break;
+				}
 			}
 		}
 	}

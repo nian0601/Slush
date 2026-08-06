@@ -21,6 +21,8 @@ namespace Slush
 			SLUSH_WARNING("[Asset] '%s' (%s) is version %u, current is %u, resaving to upgrade", myAssetName.GetBuffer(), GetTypeName(), loadedVersion, GetCurrentAssetVersion());
 			Save();
 		}
+
+		MarkAsSaved();
 	}
 
 	void DataAsset::Save()
@@ -39,5 +41,7 @@ namespace Slush
 		filepath += ".";
 		filepath += GetTypeExtention();
 		parser.FinishWriting(filepath.GetBuffer());
+
+		MarkAsSaved();
 	}
 }

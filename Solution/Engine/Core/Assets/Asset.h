@@ -25,11 +25,16 @@ namespace Slush
 		const FW_String& GetAbsoluteFilePath() const { return myAbsoluteFilePath; }
 		unsigned int GetAssetTypeID() const { return myAssetTypeID; }
 
+		bool HasUnsavedChanges() const { return myHasUnsavedChanges; }
+		void MarkAsUnsaved() { myHasUnsavedChanges = true; }
+		void MarkAsSaved() { myHasUnsavedChanges = false; }
+
 	protected:
 		FW_String myAssetName;
 		FW_String myFilePath;
 		FW_String myAbsoluteFilePath;
 		unsigned int myAssetTypeID = INT_MAX;
+		bool myHasUnsavedChanges = false;
 	};
 
 #define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder, AssetIcon, Version)\

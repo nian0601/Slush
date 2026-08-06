@@ -7,7 +7,7 @@
 namespace Slush
 {
 	DependencyTrackerDockable::DependencyTrackerDockable()
-		: Slush::DockableBase<DependencyTrackerDockable>(false, true)
+		: Slush::DockableBase<DependencyTrackerDockable>(false, true, Vector2f(1200.0f, 700.0f))
 	{
 	}
 
@@ -28,22 +28,25 @@ namespace Slush
 		Slush::Asset* pendingSelection = nullptr;
 
 		const ImVec2 avail = ImGui::GetContentRegionAvail();
-		const float leftWidth = avail.x * 0.25f;
 		const float middleWidth = avail.x * 0.35f;
+		const float leftWidth = (avail.x - middleWidth) * 0.5f;
 
-		ImGui::BeginChild("DependencyTracker_Dependents", ImVec2(leftWidth, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
+		// NoSavedSettings: this dockable is only ever opened on-demand, never present in the default
+		// layout, so persisting a manually-resized pane split across sessions isn't worth the ini clutter
+		// it leaves behind once the tracker's closed.
+		ImGui::BeginChild("DependencyTracker_Dependents", ImVec2(leftWidth, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX, ImGuiWindowFlags_NoSavedSettings);
 		BuildDependentsPane(pendingSelection);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
-		ImGui::BeginChild("DependencyTracker_AssetList", ImVec2(middleWidth, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
+		ImGui::BeginChild("DependencyTracker_AssetList", ImVec2(middleWidth, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX, ImGuiWindowFlags_NoSavedSettings);
 		BuildMiddlePane(pendingSelection);
 		ImGui::EndChild();
 
 		ImGui::SameLine();
 
-		ImGui::BeginChild("DependencyTracker_Dependencies", ImVec2(0, 0), ImGuiChildFlags_Borders);
+		ImGui::BeginChild("DependencyTracker_Dependencies", ImVec2(0, 0), ImGuiChildFlags_Borders, ImGuiWindowFlags_NoSavedSettings);
 		BuildDependenciesPane(pendingSelection);
 		ImGui::EndChild();
 

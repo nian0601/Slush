@@ -130,7 +130,7 @@ namespace Slush
 			anApp.Render();
 			myWindow->RenderAppLayout();
 
-			if (myInput->WasKeyPressed(Slush::Input::_F12))
+			if (myInput->WasKeyPressed(Slush::Input::_F10))
 				myWindow->RequestScreenshot();
 
 			myWindow->GetRenderer().RenderFade();

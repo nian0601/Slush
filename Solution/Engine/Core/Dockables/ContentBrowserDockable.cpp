@@ -3,6 +3,8 @@
 
 #include "Core/Engine.h"
 #include "Core/Input.h"
+#include "Core/Dockables/DependencyTrackerDockable.h"
+#include "Core/Dockables/IAppLayout.h"
 #include "Graphics/Window.h"
 #include <UI/UILayout.h>
 
@@ -65,6 +67,15 @@ namespace Slush
 					ImGui::Selectable(label.GetBuffer(), false, ImGuiSelectableFlags_SpanAllColumns);
 					ImGui::BeingDraggedAsset(*asset, j);
 
+					ImGui::PushID(asset);
+					if (ImGui::BeginPopupContextItem("AssetContextMenu"))
+					{
+						if (ImGui::MenuItem("Show Dependencies"))
+							myOwnerLayout->OpenOrCreateDockable<DependencyTrackerDockable>()->SetSelectedAsset(asset);
+
+						ImGui::EndPopup();
+					}
+					ImGui::PopID();
 
 					ImGui::TableSetColumnIndex(1);
 					ImGui::Text("%s", asset->GetTypeName());

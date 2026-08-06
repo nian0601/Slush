@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "AssetEditorDockable.h"
+#include <imgui\ImGuiWidgets.h>
 
 namespace Slush
 {
@@ -61,6 +62,8 @@ namespace Slush
 
 					FW_String tabLabel = assetData.myAsset->GetTypeIcon();
 					tabLabel += " ";
+					if (assetData.myAsset->HasUnsavedChanges())
+						tabLabel += "*";
 					tabLabel += assetData.myAsset->GetAssetName();
 
 					if (ImGui::BeginTabItem(tabLabel.GetBuffer(), &assetData.myShouldKeep))
@@ -79,7 +82,10 @@ namespace Slush
 							ImGui::EndMenuBar();
 						}
 
-						assetData.myAsset->BuildUI();
+						{
+							Slush::AssetEditScope editScope(*assetData.myAsset);
+							assetData.myAsset->BuildUI();
+						}
 
 						ImGui::EndTabItem();
 					}

@@ -4,6 +4,7 @@
 #include <ActionGameGlobals.h>
 #include <Core\Assets\AssetStorage.h>
 #include <EntitySystem\EntityPrefab.h>
+#include <imgui\ImGuiWidgets.h>
 
 LevelData::LevelData(const char* aName, unsigned int aAssetID)
 	: DataAsset(aName, aAssetID)
@@ -31,7 +32,7 @@ void LevelData::BuildUI()
 {
 	ActionGameGlobals& globals = ActionGameGlobals::GetInstance();
 
-	ImGui::InputFloat2("Player Position", &myPlayerStartPosition.x);
+	Slush::ImGuiWidgets::InputFloat2("Player Position", &myPlayerStartPosition.x);
 	ImGui::Text("Player Prefab: %s", myPlayerEntityPrefab.GetName().GetBuffer());
 
 	if (ImGui::BeginDragDropTarget())
@@ -51,16 +52,16 @@ void LevelData::BuildUI()
 			ImGui::PushID(i);
 			if (ImGui::TreeNode("Wave"))
 			{
-				ImGui::InputFloat("Duration", &waveData.myDuration);
-				ImGui::InputInt("Min Enemy Count", &waveData.myMinEnemyCount);
-				ImGui::InputInt("Max Enemy Count", &waveData.myMaxEnemyCount);
+				Slush::ImGuiWidgets::InputFloat("Duration", &waveData.myDuration);
+				Slush::ImGuiWidgets::InputInt("Min Enemy Count", &waveData.myMinEnemyCount);
+				Slush::ImGuiWidgets::InputInt("Max Enemy Count", &waveData.myMaxEnemyCount);
 
 				if (ImGui::TreeNode("Enemy Prefas"))
 				{
 					for (int j = 0; j < waveData.myEnemyPrefabs.Count(); ++j)
 					{
 						ImGui::PushID(j);
-						if (ImGui::Button("-", { 25, 0 }))
+						if (Slush::ImGuiWidgets::Button("-", { 25, 0 }))
 						{
 							waveData.myEnemyPrefabs.RemoveNonCyclicAtIndex(j);
 							--j;
@@ -81,7 +82,7 @@ void LevelData::BuildUI()
 						ImGui::PopID();
 					}
 
-					if (ImGui::Button("Add Enemy.."))
+					if (Slush::ImGuiWidgets::Button("Add Enemy.."))
 						waveData.myEnemyPrefabs.Add();
 
 					ImGui::TreePop();

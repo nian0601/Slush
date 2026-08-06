@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "UIEditorDockable.h"
 
+#include "Core/CommandLineArgs.h"
 #include "Core/Engine.h"
 #include "Core/Dockables/IAppLayout.h"
 #include "Graphics/Window.h"
@@ -130,6 +131,18 @@ namespace Slush
 
 	void UIEditorDockable::OnCloseRequested()
 	{
+		// No user around to click a popup - log which asset is being discarded, by name, and resolve
+		// immediately instead of opening one that would otherwise hang the close forever.
+		if (Slush::CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
+		{
+			Slush::UILayout* layout = myUILayoutStorage.GetAsset("StartGame");
+			if (layout)
+				SLUSH_ERROR("[UI Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", layout->GetAssetName().GetBuffer());
+
+			myUnsavedChangesAcknowledged = true;
+			return;
+		}
+
 		myWantToOpenUnsavedChangesPopup = true;
 	}
 

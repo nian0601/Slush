@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "AssetEditorDockable.h"
+#include "Core/CommandLineArgs.h"
 #include "Core/Dockables/IAppLayout.h"
 #include <imgui\ImGuiWidgets.h>
 
@@ -14,6 +15,10 @@ namespace Slush
 
 	void AssetEditorDockable::OnUpdate()
 	{
+		// Accumulate every tab closed with unsaved changes this frame into one combined popup - a single
+		// RemoveAll()+Add() per iteration would drop all but the last if more than one tab were X'd at once.
+		bool foundUnsavedTabToClose = false;
+
 		for (int i = 0; i < myAssets.Count();)
 		{
 			AssetData& data = myAssets[i];
@@ -25,7 +30,11 @@ namespace Slush
 				{
 					data.myShouldKeep = true;
 
-					myAssetsPendingCloseConfirmation.RemoveAll();
+					if (!foundUnsavedTabToClose)
+					{
+						myAssetsPendingCloseConfirmation.RemoveAll();
+						foundUnsavedTabToClose = true;
+					}
 					myAssetsPendingCloseConfirmation.Add(data.myAsset);
 					myWantToOpenUnsavedChangesPopup = true;
 					myIsConfirmingAppClose = false;
@@ -62,6 +71,18 @@ namespace Slush
 		{
 			if (data.myAsset && data.myAsset->HasUnsavedChanges())
 				myAssetsPendingCloseConfirmation.Add(data.myAsset);
+		}
+
+		// No user around to click a popup - log which assets are being discarded, by name, and resolve
+		// immediately instead of opening one that would otherwise hang the close forever.
+		if (Slush::CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
+		{
+			for (Slush::Asset* asset : myAssetsPendingCloseConfirmation)
+				SLUSH_ERROR("[Asset Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", asset->GetAssetName().GetBuffer());
+
+			CloseTabsForAssets(myAssetsPendingCloseConfirmation);
+			myAssetsPendingCloseConfirmation.RemoveAll();
+			return;
 		}
 
 		myWantToOpenUnsavedChangesPopup = true;

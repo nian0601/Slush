@@ -17,6 +17,7 @@
 
 #include <Physics\PhysicsWorld.h>
 #include "UI/UIManager.h"
+#include <imgui\ImGuiWidgets.h>
 
 void WeaponData::RankData::OnParse(Slush::AssetParser::Handle aRootHandle)
 {
@@ -80,7 +81,7 @@ void WeaponData::ResolveDependencies()
 
 void WeaponData::BuildUI()
 {
-	ImGui::InputText("Name", &myName);
+	Slush::ImGuiWidgets::InputText("Name", &myName);
 
 	if (const Slush::Texture* texture = myIconTexture.Get())
 	{
@@ -131,10 +132,10 @@ void WeaponData::BuildUI()
 			{
 				ImGui::Indent();
 				ImGui::SetNextItemWidth(150.f);
-				ImGui::InputFloat("Base Cooldown", &rankData.myBaseCooldown, 0.05f, 0.1f, "%.2f");
+				Slush::ImGuiWidgets::InputFloat("Base Cooldown", &rankData.myBaseCooldown, 0.05f, 0.1f, "%.2f");
 
 				ImGui::SetNextItemWidth(150.f);
-				ImGui::InputInt("Base Damage", &rankData.myBaseDamage);
+				Slush::ImGuiWidgets::InputInt("Base Damage", &rankData.myBaseDamage);
 				ImGui::Unindent();
 			}
 
@@ -142,15 +143,15 @@ void WeaponData::BuildUI()
 			{
 				ImGui::Indent();
 				ImGui::SetNextItemWidth(150.f);
-				ImGui::Checkbox("Enable", &rankData.myProjectileData.myEnable);
+				Slush::ImGuiWidgets::Checkbox("Enable", &rankData.myProjectileData.myEnable);
 
 				if (rankData.myProjectileData.myEnable)
 				{
 					ImGui::SetNextItemWidth(150.f);
-					ImGui::InputFloat("Base Projectile Speed", &rankData.myProjectileData.myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
+					Slush::ImGuiWidgets::InputFloat("Base Projectile Speed", &rankData.myProjectileData.myBaseProjectileSpeed, 1.f, 100.f, "%.2f");
 
 					ImGui::SetNextItemWidth(150.f);
-					ImGui::InputInt("Base Projectile Count", &rankData.myProjectileData.myBaseProjectileCount);
+					Slush::ImGuiWidgets::InputInt("Base Projectile Count", &rankData.myProjectileData.myBaseProjectileCount);
 					rankData.myProjectileData.myBaseProjectileCount = FW_Clamp(rankData.myProjectileData.myBaseProjectileCount, 1, 20);
 
 					ImGui::Text("ProjectilePrefab: %s", rankData.myProjectileData.myProjectilePrefab.GetName().GetBuffer());
@@ -177,7 +178,7 @@ void WeaponData::BuildUI()
 		ImGui::PopID();
 	}
 
-	if (ImGui::Button("Add Rank"))
+	if (Slush::ImGuiWidgets::Button("Add Rank"))
 		myRanks.Add(myRanks.GetLast());
 }
 

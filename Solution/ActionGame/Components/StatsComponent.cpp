@@ -3,6 +3,7 @@
 #include "StatsComponent.h"
 #include "Graphics\Texture.h"
 #include "Core\Assets\AssetStorage.h"
+#include <imgui\ImGuiWidgets.h>
 
 void StatsUpgradeData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
@@ -86,10 +87,10 @@ void StatsUpgradeData::BuildUI()
 			}
 
 			ImGui::SetNextItemWidth(100.f);
-			ImGui::InputInt("Max Upgrades", &statData.myMaxUpgrades);
+			Slush::ImGuiWidgets::InputInt("Max Upgrades", &statData.myMaxUpgrades);
 
 			ImGui::SetNextItemWidth(100.f);
-			ImGui::InputFloat("Increase Per Upgrade", &statData.myIncreasePerUpgrade, 0.05f, 1.f, "%.2f");
+			Slush::ImGuiWidgets::InputFloat("Increase Per Upgrade", &statData.myIncreasePerUpgrade, 0.05f, 1.f, "%.2f");
 
 			ImGui::Unindent();
 		}

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "CollisionFlag.h"
+#include <imgui\ImGuiWidgets.h>
 
 namespace CollisionUtils
 {
@@ -53,13 +54,13 @@ void GamePhysicsData::OnParseCollisionFlags(Slush::AssetParser::Handle aComponen
 void GamePhysicsData::OnBuildCollisionFlagsUI()
 {
 	const char* const* names = CollisionUtils::GetNames();
-	ImGui::Combo("Collision Flag", &myCollisionFlag, names, CollisionUtils::COLLISIONFLAG_COUNT);
+	Slush::ImGuiWidgets::Combo("Collision Flag", &myCollisionFlag, names, CollisionUtils::COLLISIONFLAG_COUNT);
 
 	ImGui::Text("Collides With:");
 	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
 	{
 		bool flagSet = (myCollidesWithMask & (1u << i)) != 0;
-		if (ImGui::Checkbox(names[i], &flagSet))
+		if (Slush::ImGuiWidgets::Checkbox(names[i], &flagSet))
 		{
 			if (flagSet)
 				myCollidesWithMask |= 1u << i;

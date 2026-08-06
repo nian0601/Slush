@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "IAppLayout.h"
 #include "Dockable.h"
-#include "Core/CommandLineArgs.h"
 
 namespace Slush
 {
@@ -70,17 +69,9 @@ namespace Slush
 
 		myCloseRequestBlocker = nullptr;
 
-		if (CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
-		{
-			for (Dockable* dockable : myDockables)
-			{
-				if (dockable->HasUnsavedChanges())
-					SLUSH_ERROR("[%s] Closing with unsaved changes under -hidewindow, discarding them", dockable->GetName());
-			}
-
-			return CloseRequestResult::Resolved;
-		}
-
+		// Under -hidewindow, each Dockable's own OnCloseRequested() detects that itself and resolves
+		// synchronously (logging by asset name, not just Dockable name) instead of opening a popup that
+		// would otherwise hang forever with no input to click it - see AssetEditorDockable/UIEditorDockable.
 		for (Dockable* dockable : myDockables)
 		{
 			if (dockable->HasUnsavedChanges())

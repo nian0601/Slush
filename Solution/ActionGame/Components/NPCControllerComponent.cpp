@@ -11,6 +11,7 @@
 #include "EntitySystem\Components\AnimationComponent.h"
 #include "EntitySystem\Components\PhysicsComponent.h"
 #include "EntitySystem\Components\SpriteComponent.h"
+#include <imgui\ImGuiWidgets.h>
 
 void NPCControllerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -26,8 +27,8 @@ void NPCControllerComponent::Data::ResolveDependencies()
 
 void NPCControllerComponent::Data::OnBuildUI()
 {
-	ImGui::InputFloat("Movement Speed", &myMovementSpeed);
-	ImGui::InputFloat("Shooting Distance", &myMaxShootingDistance);
+	Slush::ImGuiWidgets::InputFloat("Movement Speed", &myMovementSpeed);
+	Slush::ImGuiWidgets::InputFloat("Shooting Distance", &myMaxShootingDistance);
 	ImGui::Text("Spawning Animation: %s", mySpawnAnimationID.GetName().GetBuffer());
 
 	if (ImGui::BeginDragDropTarget())

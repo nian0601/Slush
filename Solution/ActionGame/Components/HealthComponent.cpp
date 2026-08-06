@@ -6,6 +6,7 @@
 
 #include "EntitySystem/EntityComponentEvents.h"
 #include <Graphics/RectSprite.h>
+#include <imgui\ImGuiWidgets.h>
 
 void HealthComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -15,8 +16,8 @@ void HealthComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle,
 
 void HealthComponent::Data::OnBuildUI()
 {
-	ImGui::InputInt("Max Health", &myMaxHealth);
-	ImGui::InputFloat("Grace Period Duration", &myGracePeriodDuration);
+	Slush::ImGuiWidgets::InputInt("Max Health", &myMaxHealth);
+	Slush::ImGuiWidgets::InputFloat("Grace Period Duration", &myGracePeriodDuration);
 }
 
 //////////////////////////////////////////////////////////////////////////

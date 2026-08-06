@@ -13,6 +13,7 @@
 #include "Graphics/RectSprite.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Animation/AnimationRuntime.h"
+#include <imgui\ImGuiWidgets.h>
 
 namespace Slush
 {
@@ -88,9 +89,9 @@ namespace Slush
 
 	void SpriteComponent::Data::OnBuildUI()
 	{
-		ImGui::ColorEdit4("Color", myFloatColor);
+		Slush::ImGuiWidgets::ColorEdit4("Color", myFloatColor);
 		myColor = FW_Float_To_ARGB(myFloatColor[3], myFloatColor[0], myFloatColor[1], myFloatColor[2]);
-		ImGui::InputFloat2("Size", &mySize.x, "%.2f");
+		Slush::ImGuiWidgets::InputFloat2("Size", &mySize.x, "%.2f");
 
 		const char* spriteTypeNames[] = { "None", "Static", "Animation" };
 
@@ -99,7 +100,7 @@ namespace Slush
 			for (int i = 0; i < IM_ARRAYSIZE(spriteTypeNames); ++i)
 			{
 				const bool is_selected = (mySpriteType== i);
-				if (ImGui::Selectable(spriteTypeNames[i], is_selected))
+				if (Slush::ImGuiWidgets::Selectable(spriteTypeNames[i], is_selected))
 					mySpriteType = static_cast<SpriteType>(i);
 
 				if (is_selected)
@@ -112,8 +113,8 @@ namespace Slush
 		{
 			ImGui::BeginGroup();
 			ImGui::Text("TextureID: %s", myTexture.GetName().GetBuffer());
-			ImGui::InputInt2("TextureRectPos", &myTextureRectPos.x);
-			ImGui::InputInt2("TextureRectSize", &myTextureRectSize.x);
+			Slush::ImGuiWidgets::InputInt2("TextureRectPos", &myTextureRectPos.x);
+			Slush::ImGuiWidgets::InputInt2("TextureRectSize", &myTextureRectSize.x);
 
 			ImGui::EndGroup();
 
@@ -146,9 +147,9 @@ namespace Slush
 		}
 		else if (mySpriteType == SpriteType::Animated)
 		{
-			ImGui::Checkbox("Loop Animation", &myLoopAnimation);
+			Slush::ImGuiWidgets::Checkbox("Loop Animation", &myLoopAnimation);
 			ImGui::SameLine();
-			ImGui::Checkbox("Remove Entity After Animation", &myRemoveEntityAfterAnimation);
+			Slush::ImGuiWidgets::Checkbox("Remove Entity After Animation", &myRemoveEntityAfterAnimation);
 			myAnimation->BuildUI();
 		}
 	}

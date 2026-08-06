@@ -4,6 +4,7 @@
 
 #include "Graphics/Texture.h"
 #include "Core/Assets/AssetStorage.h"
+#include <imgui\ImGuiWidgets.h>
 
 void CharacterInfo::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
 {
@@ -54,7 +55,7 @@ void CharacterInfo::BuildUI()
 		ImGui::EndDisabled();
 	}
 
-	ImGui::InputText("Character Name", &myName);
+	Slush::ImGuiWidgets::InputText("Character Name", &myName);
 	ImGui::Text("Character Prefab: %s", myCharacterEntityPrefab.GetName().GetBuffer());
 
 	ImGui::EndGroup();

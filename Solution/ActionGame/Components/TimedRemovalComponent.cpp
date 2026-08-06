@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "TimedRemovalComponent.h"
+#include <imgui\ImGuiWidgets.h>
 
 void TimedRemovalComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -9,7 +10,7 @@ void TimedRemovalComponent::Data::OnParse(Slush::AssetParser::Handle aComponentH
 
 void TimedRemovalComponent::Data::OnBuildUI()
 {
-	ImGui::InputFloat("Duration", &myDuration);
+	Slush::ImGuiWidgets::InputFloat("Duration", &myDuration);
 }
 
 //////////////////////////////////////////////////////////////////////////

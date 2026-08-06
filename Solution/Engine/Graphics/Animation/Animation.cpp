@@ -7,6 +7,7 @@
 #include "Graphics/Texture.h"
 #include "Core/Assets/AssetStorage.h"
 #include "Core/Time.h"
+#include "imgui/ImGuiWidgets.h"
 
 namespace Slush
 {
@@ -231,7 +232,7 @@ namespace Slush
 
 				const bool cantImport  = myToolData.myEndFrameIndex.x == -1;
 				ImGui::BeginDisabled(cantImport);
-				if (ImGui::Button("Import"))
+				if (Slush::ImGuiWidgets::Button("Import"))
 				{
 					AnimationTrack& spritesheetTrack = FindOrCreateSpritesheetTrack();
 					spritesheetTrack.RemoveAllClips();

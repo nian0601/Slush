@@ -2,6 +2,7 @@
 #include "AnimationTrack.h"
 #include "AnimationRuntime.h"
 #include "..\Texture.h"
+#include <imgui\ImGuiWidgets.h>
 
 namespace Slush
 {
@@ -39,14 +40,14 @@ namespace Slush
 		ImGui::Text("Start Time");
 
 		ImGui::TableSetColumnIndex(1);
-		ImGui::DragFloat("##StartTime", &myStartEndTime.x, 0.01f, 0.f, 1.f);
+		Slush::ImGuiWidgets::DragFloat("##StartTime", &myStartEndTime.x, 0.01f, 0.f, 1.f);
 
 		ImGui::TableNextRow();
 		ImGui::TableSetColumnIndex(0);
 		ImGui::Text("End Time");
 
 		ImGui::TableSetColumnIndex(1);
-		ImGui::DragFloat("##EndTime", &myStartEndTime.y, 0.01f, 0.f, 1.f);
+		Slush::ImGuiWidgets::DragFloat("##EndTime", &myStartEndTime.y, 0.01f, 0.f, 1.f);
 	}
 
 	AnimationClip* AnimationClip::CreateClip(Type aType)
@@ -91,13 +92,13 @@ namespace Slush
 
 			ImGui::TableSetColumnIndex(1);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragFloat("##InterpolatorStart", &myInterpolator.myStartValue, 0.01f, 0.f, 1.f);
+			Slush::ImGuiWidgets::DragFloat("##InterpolatorStart", &myInterpolator.myStartValue, 0.01f, 0.f, 1.f);
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragFloat("##InterpolatorEnd", &myInterpolator.myEndValue, 0.01f, 0.f, 1.f);
+			Slush::ImGuiWidgets::DragFloat("##InterpolatorEnd", &myInterpolator.myEndValue, 0.01f, 0.f, 1.f);
 			ImGui::SameLine();
 			const char* interpolatorTypes[] = { "None", "Linear", "Constant" };
-			ImGui::Combo("##Interpolator", &myInterpolator.myType, interpolatorTypes, IM_ARRAYSIZE(interpolatorTypes));
+			Slush::ImGuiWidgets::Combo("##Interpolator", &myInterpolator.myType, interpolatorTypes, IM_ARRAYSIZE(interpolatorTypes));
 
 			ImGui::EndTable();
 		}
@@ -150,16 +151,16 @@ namespace Slush
 
 			ImGui::TableSetColumnIndex(1);
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragInt("##FrameRectX", &myFrameRect.myTopLeft.x);
+			Slush::ImGuiWidgets::DragInt("##FrameRectX", &myFrameRect.myTopLeft.x);
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragInt("##FrameRectY", &myFrameRect.myTopLeft.y);
+			Slush::ImGuiWidgets::DragInt("##FrameRectY", &myFrameRect.myTopLeft.y);
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragInt("##FrameRectW", &myFrameRect.myExtents.x);
+			Slush::ImGuiWidgets::DragInt("##FrameRectW", &myFrameRect.myExtents.x);
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(50);
-			ImGui::DragInt("##FrameRectH", &myFrameRect.myExtents.y);
+			Slush::ImGuiWidgets::DragInt("##FrameRectH", &myFrameRect.myExtents.y);
 
 			myFrameRect = MakeRectFromTopLeft(myFrameRect.myTopLeft, myFrameRect.myExtents);
 

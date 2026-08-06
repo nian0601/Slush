@@ -8,6 +8,7 @@
 
 #include <Physics\PhysicsWorld.h>
 #include <Graphics\BaseSprite.h>
+#include <imgui\ImGuiWidgets.h>
 
 void ProjectileShootingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -25,13 +26,13 @@ void ProjectileShootingComponent::Data::ResolveDependencies()
 void ProjectileShootingComponent::Data::OnBuildUI()
 {
 	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputFloat("Cooldown", &myCooldown, 0.1f, 1.f, "%.2f");
+	Slush::ImGuiWidgets::InputFloat("Cooldown", &myCooldown, 0.1f, 1.f, "%.2f");
 
 	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputFloat("Projectile Speed", &myProjectileSpeed, 1.f, 10.f, "%.2f");
+	Slush::ImGuiWidgets::InputFloat("Projectile Speed", &myProjectileSpeed, 1.f, 10.f, "%.2f");
 
 	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputFloat("Projectile Spawn Offset", &myProjectileSpawnOffset, 0.1f, 1.f, "%.2f");
+	Slush::ImGuiWidgets::InputFloat("Projectile Spawn Offset", &myProjectileSpawnOffset, 0.1f, 1.f, "%.2f");
 
 	ImGui::Text("ProjectileType: %s", myProjectileEntityPrefab.GetName().GetBuffer());
 

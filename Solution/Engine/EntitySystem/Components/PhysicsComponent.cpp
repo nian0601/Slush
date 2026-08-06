@@ -7,6 +7,7 @@
 #include "EntitySystem/EntityManager.h"
 #include "EntitySystem/EntityPrefab.h"
 #include <Physics/PhysicsWorld.h>
+#include <imgui\ImGuiWidgets.h>
 
 namespace Slush
 {
@@ -29,12 +30,12 @@ namespace Slush
 
 	void PhysicsComponent::Data::OnBuildUI()
 	{
-		ImGui::Checkbox("Is Static", &myStatic);
-		ImGui::Checkbox("Is Sensor", &mySensor);
-		ImGui::Checkbox("Match Sprite", &myMatchSprite);
+		Slush::ImGuiWidgets::Checkbox("Is Static", &myStatic);
+		Slush::ImGuiWidgets::Checkbox("Is Sensor", &mySensor);
+		Slush::ImGuiWidgets::Checkbox("Match Sprite", &myMatchSprite);
 
-		ImGui::InputFloat("Radius", &myRadius, 1.f, 10.f, "%.2f");
-		ImGui::InputFloat2("Size", &mySize.x, "%.2f");
+		Slush::ImGuiWidgets::InputFloat("Radius", &myRadius, 1.f, 10.f, "%.2f");
+		Slush::ImGuiWidgets::InputFloat2("Size", &mySize.x, "%.2f");
 
 		OnBuildCollisionFlagsUI();
 	}

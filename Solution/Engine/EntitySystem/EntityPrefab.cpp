@@ -4,6 +4,7 @@
 
 #include <FW_FileSystem.h>
 #include "ComponentRegistry.h"
+#include <imgui\ImGuiWidgets.h>
 
 namespace Slush
 {
@@ -76,7 +77,7 @@ namespace Slush
 		if (ImGui::BeginPopup("add_component_popup"))
 		{
 			for (int i = 0; i < someMissingComponents.Count(); ++i)
-				if (ImGui::Selectable(someMissingComponents[i].myLabel.GetBuffer()))
+				if (Slush::ImGuiWidgets::Selectable(someMissingComponents[i].myLabel.GetBuffer()))
 					*someMissingComponents[i].myEnabledFlag = true;
 
 			ImGui::EndPopup();

@@ -7,6 +7,7 @@
 #include "CollisionFlag.h"
 #include "ActionGameGlobals.h"
 #include "EntitySystem\EntityManager.h"
+#include <imgui\ImGuiWidgets.h>
 
 void DamageDealerComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -22,7 +23,7 @@ void DamageDealerComponent::Data::ResolveDependencies()
 void DamageDealerComponent::Data::OnBuildUI()
 {
 	ImGui::SetNextItemWidth(100.f);
-	ImGui::InputInt("Damage", &myDamage);
+	Slush::ImGuiWidgets::InputInt("Damage", &myDamage);
 
 	ImGui::Text("Prefab: %s", myImpactPrefab.GetName().GetBuffer());
 

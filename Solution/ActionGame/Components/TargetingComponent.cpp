@@ -5,6 +5,7 @@
 
 #include <Physics\PhysicsWorld.h>
 #include <float.h>
+#include <imgui\ImGuiWidgets.h>
 
 void TargetingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -13,7 +14,7 @@ void TargetingComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHand
 
 void TargetingComponent::Data::OnBuildUI()
 {
-	ImGui::Combo("Target Flag", &myTargetFlag, CollisionUtils::GetNames(), CollisionUtils::COLLISIONFLAG_COUNT);
+	Slush::ImGuiWidgets::Combo("Target Flag", &myTargetFlag, CollisionUtils::GetNames(), CollisionUtils::COLLISIONFLAG_COUNT);
 }
 
 //////////////////////////////////////////////////////////////////////////

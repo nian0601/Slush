@@ -3,6 +3,7 @@
 #include "RemoveOnCollisionComponent.h"
 
 #include <Physics\PhysicsWorld.h>
+#include <imgui\ImGuiWidgets.h>
 
 void RemoveOnCollisionComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -17,7 +18,7 @@ void RemoveOnCollisionComponent::Data::OnBuildUI()
 	const char* const* names = CollisionUtils::GetNames();
 	for (int i = 0; i < CollisionUtils::COLLISIONFLAG_COUNT; ++i)
 	{
-		ImGui::Checkbox(names[i], &myCollisionFlags[i]);
+		Slush::ImGuiWidgets::Checkbox(names[i], &myCollisionFlags[i]);
 	}
 }
 

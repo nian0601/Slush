@@ -7,6 +7,7 @@
 #include "CollisionFlag.h"
 #include <EntitySystem\EntityPrefab.h>
 #include "WeaponComponent.h"
+#include <imgui\ImGuiWidgets.h>
 
 void PickupComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -17,8 +18,8 @@ void PickupComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle,
 void PickupComponent::Data::OnBuildUI()
 {
 	const char* pickupTypes[] = { "Experience", "Health", "Weapon Upgrade"};
-	ImGui::Combo("Type", &myType, pickupTypes, IM_ARRAYSIZE(pickupTypes));
-	ImGui::InputInt("Value", &myValue);
+	Slush::ImGuiWidgets::Combo("Type", &myType, pickupTypes, IM_ARRAYSIZE(pickupTypes));
+	Slush::ImGuiWidgets::InputInt("Value", &myValue);
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -4,6 +4,7 @@
 #include <EntitySystem\EntityPrefab.h>
 #include <ActionGameGlobals.h>
 #include <EntitySystem\EntityManager.h>
+#include <imgui\ImGuiWidgets.h>
 
 void DropComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
@@ -40,7 +41,7 @@ void DropComponent::Data::OnBuildUI()
 
 		DropItem& drop = myDrops[i];
 
-		if (ImGui::Button(" X "))
+		if (Slush::ImGuiWidgets::Button(" X "))
 		{
 			myDrops.RemoveNonCyclicAtIndex(i);
 			--i;
@@ -49,7 +50,7 @@ void DropComponent::Data::OnBuildUI()
 		{
 			ImGui::SameLine();
 			ImGui::SetNextItemWidth(50.f);
-			ImGui::SliderInt("", &drop.myWeight, 0, 100);
+			Slush::ImGuiWidgets::SliderInt("", &drop.myWeight, 0, 100);
 
 			ImGui::SameLine();
 			ImGui::Text("Prefab: %s", drop.myPrefab.GetName().GetBuffer());
@@ -66,7 +67,7 @@ void DropComponent::Data::OnBuildUI()
 		ImGui::PopID();
 	}
 
-	if (ImGui::Button("Add.."))
+	if (Slush::ImGuiWidgets::Button("Add.."))
 		myDrops.Add();
 }
 

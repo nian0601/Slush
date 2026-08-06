@@ -195,6 +195,14 @@ namespace Slush
 						tabLabel += "*";
 					tabLabel += assetData.myAsset->GetAssetName();
 
+					// "###" pins the tab's ImGui ID to something that doesn't include the asterisk - without
+					// it, BeginTabItem() derives the ID from the full label, so toggling the asterisk changes
+					// the ID and ImGui treats it as a brand new tab, resetting every child widget's state
+					// (collapsed headers, tree nodes, ...) inside it.
+					tabLabel += "###";
+					tabLabel += assetData.myAsset->GetTypeIcon();
+					tabLabel += assetData.myAsset->GetAssetName();
+
 					if (ImGui::BeginTabItem(tabLabel.GetBuffer(), &assetData.myShouldKeep))
 					{
 						if (ImGui::BeginMenuBar())

@@ -19,7 +19,17 @@ namespace Slush
 	protected:
 		void OnBuildUI() override;
 
+		bool HasUnsavedChanges() const override;
+		void OnCloseRequested() override;
+		void OnBuildModals() override;
+
 	private:
 		Slush::AssetStorage<Slush::UILayout>& myUILayoutStorage;
+
+		bool myWantToOpenUnsavedChangesPopup = false;
+
+		// "Close Without Saving" deliberately never clears UILayout::HasUnsavedChanges() - reopening it
+		// must still show it as unsaved. This is what actually lets a later close attempt proceed instead.
+		bool myUnsavedChangesAcknowledged = false;
 	};
 }

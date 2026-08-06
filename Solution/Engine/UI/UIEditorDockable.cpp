@@ -2,7 +2,9 @@
 #include "UIEditorDockable.h"
 
 #include "Core/Engine.h"
+#include "Core/Dockables/IAppLayout.h"
 #include "Graphics/Window.h"
+#include <imgui\ImGuiWidgets.h>
 
 namespace Slush
 {
@@ -32,10 +34,12 @@ namespace Slush
 			layout->Save();
 		}
 
-		if (ImGui::Button("Add Button"))
+		Slush::AssetEditScope editScope(*layout);
+
+		if (Slush::ImGuiWidgets::Button("Add Button"))
 			layout->myButtons.Add();
 
-		if (ImGui::Button("Add Rect"))
+		if (Slush::ImGuiWidgets::Button("Add Rect"))
 			layout->myRects.Add();
 
 		for (int i = 0; i < layout->myButtons.Count(); ++i)
@@ -50,23 +54,23 @@ namespace Slush
 			realLabel += i;
 			if (ImGui::CollapsingHeader(realLabel.GetBuffer()))
 			{
-				ImGui::InputText("Identifier", &button.myIdentifier);
-				
-				ImGui::DragInt2("Position", &button.myPosition.x, 1, 0, 2560);
-				ImGui::DragInt2("Size", &button.mySize.x, 1, 0, 2560);
+				Slush::ImGuiWidgets::InputText("Identifier", &button.myIdentifier);
 
-				ImGui::InputText("Tet", &button.myText);
+				Slush::ImGuiWidgets::DragInt2("Position", &button.myPosition.x, 1, 0, 2560);
+				Slush::ImGuiWidgets::DragInt2("Size", &button.mySize.x, 1, 0, 2560);
 
-				ImGui::ColorEdit4("Color", button.myFloatColor);
+				Slush::ImGuiWidgets::InputText("Tet", &button.myText);
+
+				Slush::ImGuiWidgets::ColorEdit4("Color", button.myFloatColor);
 				button.myColor = FW_Float_To_ARGB(button.myFloatColor[3], button.myFloatColor[0], button.myFloatColor[1], button.myFloatColor[2]);
 
-				ImGui::ColorEdit4("Hover Color", button.myHoverFloatColor);
+				Slush::ImGuiWidgets::ColorEdit4("Hover Color", button.myHoverFloatColor);
 				button.myHoverColor = FW_Float_To_ARGB(button.myHoverFloatColor[3], button.myHoverFloatColor[0], button.myHoverFloatColor[1], button.myHoverFloatColor[2]);
 
-				ImGui::ColorEdit4("Pressed Color", button.myPressedFloatColor);
+				Slush::ImGuiWidgets::ColorEdit4("Pressed Color", button.myPressedFloatColor);
 				button.myPressedColor = FW_Float_To_ARGB(button.myPressedFloatColor[3], button.myPressedFloatColor[0], button.myPressedFloatColor[1], button.myPressedFloatColor[2]);
 
-				if (ImGui::Button("Remove Button"))
+				if (Slush::ImGuiWidgets::Button("Remove Button"))
 				{
 					layout->myButtons.RemoveCyclicAtIndex(i);
 					--i;
@@ -93,16 +97,16 @@ namespace Slush
 			{
 				//ImGui::InputText("Identifier", &button.myIdentifier);
 
-				ImGui::DragInt2("Position", &rect.myPosition.x, 1, 0, 2560);
-				ImGui::DragInt2("Size", &rect.mySize.x, 1, 0, 2560);
+				Slush::ImGuiWidgets::DragInt2("Position", &rect.myPosition.x, 1, 0, 2560);
+				Slush::ImGuiWidgets::DragInt2("Size", &rect.mySize.x, 1, 0, 2560);
 
-				ImGui::ColorEdit4("Color", rect.myFloatColor);
+				Slush::ImGuiWidgets::ColorEdit4("Color", rect.myFloatColor);
 				rect.myColor = FW_Float_To_ARGB(rect.myFloatColor[3], rect.myFloatColor[0], rect.myFloatColor[1], rect.myFloatColor[2]);
 
-				ImGui::ColorEdit4("Outline Color", rect.myFloatOutlineColor);
+				Slush::ImGuiWidgets::ColorEdit4("Outline Color", rect.myFloatOutlineColor);
 				rect.myOutlineColor = FW_Float_To_ARGB(rect.myFloatOutlineColor[3], rect.myFloatOutlineColor[0], rect.myFloatOutlineColor[1], rect.myFloatOutlineColor[2]);
 
-				if (ImGui::Button("Remove Rect"))
+				if (Slush::ImGuiWidgets::Button("Remove Rect"))
 				{
 					layout->myRects.RemoveCyclicAtIndex(i);
 					--i;
@@ -112,6 +116,67 @@ namespace Slush
 			}
 
 			ImGui::PopID();
+		}
+	}
+
+	bool UIEditorDockable::HasUnsavedChanges() const
+	{
+		if (myUnsavedChangesAcknowledged)
+			return false;
+
+		Slush::UILayout* layout = myUILayoutStorage.GetAsset("StartGame");
+		return layout && layout->HasUnsavedChanges();
+	}
+
+	void UIEditorDockable::OnCloseRequested()
+	{
+		myWantToOpenUnsavedChangesPopup = true;
+	}
+
+	void UIEditorDockable::OnBuildModals()
+	{
+		if (myWantToOpenUnsavedChangesPopup)
+		{
+			ImGui::OpenPopup("Unsaved Changes##UIEditor");
+			myWantToOpenUnsavedChangesPopup = false;
+		}
+
+		if (ImGui::BeginPopupModal("Unsaved Changes##UIEditor", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			Slush::UILayout* layout = myUILayoutStorage.GetAsset("StartGame");
+
+			ImGui::Text("The following assets have unsaved changes:");
+			if (layout)
+				ImGui::BulletText("%s", layout->GetAssetName().GetBuffer());
+
+			if (ImGui::Button("Save All"))
+			{
+				if (layout)
+					layout->Save();
+
+				myUnsavedChangesAcknowledged = true;
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Close Without Saving"))
+			{
+				myUnsavedChangesAcknowledged = true;
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Cancel"))
+			{
+				if (myOwnerLayout)
+					myOwnerLayout->CancelCloseRequest();
+
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup();
 		}
 	}
 }

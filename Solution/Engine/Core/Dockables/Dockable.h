@@ -40,6 +40,12 @@ namespace Slush
 		virtual void OnUpdate() {};
 		virtual void OnBuildUI() {};
 
+		// Opt-in close-confirmation mechanism, resolved by IAppLayout::RequestClose(). No-op by default,
+		// so a Dockable that never overrides these is unaffected by a pending Window::Close().
+		virtual bool HasUnsavedChanges() const { return false; }
+		virtual void OnCloseRequested() {}
+		virtual void OnBuildModals() {}
+
 		// This simply an incrementing counter for each dockable that gets created.
 		// Used mainly to generate unique ImGUI-hashes so that we can have multiple copies of the same Dockable
 		int myDockableID = 0;

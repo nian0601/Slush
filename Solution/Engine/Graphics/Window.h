@@ -23,7 +23,9 @@ namespace Slush
 
 		void Present();
 
-		void Close() { myShouldBeOpen = false; }
+		// Single chokepoint for every way of quitting - resolves any unsaved changes (via the owning
+		// IAppLayout's Dockables) before actually closing. With no unsaved changes, closes immediately.
+		void Close();
 
 		void Hide();
 
@@ -46,6 +48,9 @@ namespace Slush
 
 		void SaveScreenshot();
 
+		// Called every frame (from Present()) while a close is pending, until it's resolved or cancelled.
+		void UpdatePendingClose();
+
 		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
 
 		Rectf myWindowRect;
@@ -56,6 +61,7 @@ namespace Slush
 		sf::RenderWindow* myRenderWindow = nullptr;
 		Renderer* myRenderer = nullptr;
 		bool myShouldBeOpen = true;
+		bool myCloseRequested = false;
 		bool myDisplayImGUIDemo = false;
 		bool myScreenshotRequested = false;
 		IAppLayout* myAppLayout = nullptr;

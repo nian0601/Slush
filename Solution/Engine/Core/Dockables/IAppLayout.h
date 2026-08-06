@@ -15,6 +15,26 @@ namespace Slush
 
 		const FW_String& GetName() const { return myName; }
 
+		bool HasUnsavedChanges() const;
+
+		enum class CloseRequestResult
+		{
+			StillPending,
+			Cancelled,
+			Resolved,
+		};
+
+		// Drives the close-confirmation flow one Dockable at a time - call every frame while a close
+		// is pending. The first Dockable in list order with unsaved changes becomes "the blocker" and
+		// gets OnCloseRequested() exactly once; subsequent calls just wait on it until it either
+		// resolves itself (HasUnsavedChanges() goes false - re-scans for the next blocker) or a
+		// Dockable calls CancelCloseRequest() from its own confirmation UI (aborts the whole attempt).
+		CloseRequestResult RequestClose();
+
+		// Called by a Dockable's own close-confirmation UI (e.g. a Cancel button) to abort the whole
+		// close attempt currently in progress, not just its own popup.
+		void CancelCloseRequest() { myCloseWasCancelled = true; }
+
 		template <typename T>
 		T* FindDockable()
 		{
@@ -49,5 +69,8 @@ namespace Slush
 		FW_String myName;
 		FW_GrowingArray<Dockable*> myDockables;
 		int myNextDockableID = 0;
+
+		Dockable* myCloseRequestBlocker = nullptr;
+		bool myCloseWasCancelled = false;
 	};
 }

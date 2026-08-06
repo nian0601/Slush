@@ -69,7 +69,7 @@ namespace Slush
 
 			if (event->is<sf::Event::Closed>())
 			{
-				return false;
+				Close();
 			}
 			else if (const auto* resized = event->getIf<sf::Event::Resized>())
 			{
@@ -109,6 +109,8 @@ namespace Slush
 
 	void Window::Present()
 	{
+		UpdatePendingClose();
+
 		if (myShowEditorUI)
 		{
 			if (ImGui::BeginMainMenuBar())
@@ -197,6 +199,47 @@ namespace Slush
 
 		bool saveSuccess = image.saveToFile(absoluteScreenshotPath.GetBuffer());
 		FW_ASSERT(saveSuccess);
+	}
+
+	void Window::Close()
+	{
+		if (!myAppLayout || !myAppLayout->HasUnsavedChanges())
+		{
+			myShouldBeOpen = false;
+			return;
+		}
+
+		myCloseRequested = true;
+	}
+
+	void Window::UpdatePendingClose()
+	{
+		if (!myCloseRequested)
+			return;
+
+		if (!myAppLayout)
+		{
+			myShouldBeOpen = false;
+			myCloseRequested = false;
+			return;
+		}
+
+		// Window::Present() only updates the app layout inside 'if (myShowEditorUI)' - force it on so a
+		// quit initiated from the game view still gets to draw and take input on the confirmation popup.
+		myShowEditorUI = true;
+
+		switch (myAppLayout->RequestClose())
+		{
+		case IAppLayout::CloseRequestResult::Resolved:
+			myShouldBeOpen = false;
+			myCloseRequested = false;
+			break;
+		case IAppLayout::CloseRequestResult::Cancelled:
+			myCloseRequested = false;
+			break;
+		case IAppLayout::CloseRequestResult::StillPending:
+			break;
+		}
 	}
 
 	void Window::SetAppLayout(IAppLayout* aLayout)

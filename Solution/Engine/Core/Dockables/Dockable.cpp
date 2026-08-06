@@ -35,5 +35,10 @@ namespace Slush
 			OnBuildUI();
 
 		ImGui::End();
+
+		// Outside the Begin/End pair - OnBuildUI() only runs when Begin() returns true, but a modal
+		// popup (e.g. an unsaved-changes prompt) must still draw even if this dockable is collapsed
+		// or hidden behind another tab.
+		OnBuildModals();
 	}
 }

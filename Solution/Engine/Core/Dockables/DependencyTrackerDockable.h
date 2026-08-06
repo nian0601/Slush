@@ -8,11 +8,13 @@ namespace Slush
 {
 	class Asset;
 
-	class DependencyTrackerDockable : public Slush::Dockable
+	class DependencyTrackerDockable : public Slush::DockableBase<DependencyTrackerDockable>
 	{
 	public:
 		DependencyTrackerDockable();
 		const char* GetName() const override { return "Dependency Tracker"; }
+
+		void SetSelectedAsset(Slush::Asset* anAsset);
 
 	protected:
 		void OnBuildUI() override;
@@ -26,5 +28,6 @@ namespace Slush
 		static FW_String BuildAssetLabel(const Slush::Asset* anAsset);
 
 		Slush::Asset* mySelectedAsset = nullptr;
+		bool myWantsFocus = false;
 	};
 }

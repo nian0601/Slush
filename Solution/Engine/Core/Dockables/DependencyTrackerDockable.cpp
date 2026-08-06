@@ -7,11 +7,24 @@
 namespace Slush
 {
 	DependencyTrackerDockable::DependencyTrackerDockable()
+		: Slush::DockableBase<DependencyTrackerDockable>(false, true)
 	{
+	}
+
+	void DependencyTrackerDockable::SetSelectedAsset(Slush::Asset* anAsset)
+	{
+		mySelectedAsset = anAsset;
+		myWantsFocus = true;
 	}
 
 	void DependencyTrackerDockable::OnBuildUI()
 	{
+		if (myWantsFocus)
+		{
+			ImGui::SetWindowFocus(myUniqueIDName.GetBuffer());
+			myWantsFocus = false;
+		}
+
 		Slush::Asset* pendingSelection = nullptr;
 
 		const ImVec2 avail = ImGui::GetContentRegionAvail();

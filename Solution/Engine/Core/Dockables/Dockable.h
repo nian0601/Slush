@@ -21,7 +21,10 @@ namespace Slush
 		bool WantsToClose() const { return myIsClosable && !myIsOpen; }
 
 	protected:
-		Dockable(bool aShowMenuBar = false, bool anIsClosable = false, unsigned int aDockableTypeID = 0)
+		// 0xFFFFFFFF marks "no type ID assigned" - FW_TypeID<Dockable>::GetID<T>() hands out real IDs
+		// starting at 0, so a plain 0 default here would collide with whichever DockableBase<T> subclass
+		// happens to be the first one ever queried.
+		Dockable(bool aShowMenuBar = false, bool anIsClosable = false, unsigned int aDockableTypeID = 0xFFFFFFFF)
 			: myShowMenuBar(aShowMenuBar)
 			, myDockableTypeID(aDockableTypeID)
 			, myIsClosable(anIsClosable)
@@ -41,7 +44,7 @@ namespace Slush
 		bool myEnableHorizontalScrolling = false;
 
 	private:
-		unsigned int myDockableTypeID = 0;
+		unsigned int myDockableTypeID = 0xFFFFFFFF;
 		bool myIsClosable = false;
 		bool myIsOpen = true;
 	};

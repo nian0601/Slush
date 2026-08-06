@@ -205,11 +205,17 @@ namespace Slush
 	{
 		if (!myAppLayout || !myAppLayout->HasUnsavedChanges())
 		{
-			myShouldBeOpen = false;
+			ConfirmClose("no unsaved changes");
 			return;
 		}
 
 		myCloseRequested = true;
+	}
+
+	void Window::ConfirmClose(const char* aReason)
+	{
+		SLUSH_INFO("[Window] Closing gracefully (%s)", aReason);
+		myShouldBeOpen = false;
 	}
 
 	void Window::UpdatePendingClose()
@@ -219,7 +225,7 @@ namespace Slush
 
 		if (!myAppLayout)
 		{
-			myShouldBeOpen = false;
+			ConfirmClose("no app layout");
 			myCloseRequested = false;
 			return;
 		}
@@ -231,7 +237,7 @@ namespace Slush
 		switch (myAppLayout->RequestClose())
 		{
 		case IAppLayout::CloseRequestResult::Resolved:
-			myShouldBeOpen = false;
+			ConfirmClose("unsaved changes resolved");
 			myCloseRequested = false;
 			break;
 		case IAppLayout::CloseRequestResult::Cancelled:

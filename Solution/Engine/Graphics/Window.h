@@ -51,6 +51,10 @@ namespace Slush
 		// Called every frame (from Present()) while a close is pending, until it's resolved or cancelled.
 		void UpdatePendingClose();
 
+		// Single point where myShouldBeOpen actually flips false, so there's always a log line marking
+		// a graceful shutdown - useful for telling it apart from a crash or a forcibly-killed process.
+		void ConfirmClose(const char* aReason);
+
 		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
 
 		Rectf myWindowRect;

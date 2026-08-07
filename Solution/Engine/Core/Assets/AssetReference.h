@@ -52,7 +52,6 @@ namespace Slush
 			myAssetName = anAsset ? anAsset->GetAssetName() : "";
 		}
 
-		bool IsSet() const { return myAsset != nullptr; }
 		AssetType* Get() const { return myAsset; }
 		AssetType* operator->() const { FW_ASSERT(myAsset, "AssetReference: dereferenced before ResolveDependency() or unset"); return myAsset; }
 		operator AssetType*() const { return myAsset; }

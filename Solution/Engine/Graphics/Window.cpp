@@ -259,12 +259,6 @@ namespace Slush
 		LoadAppLayoutConfig();
 	}
 
-	void Window::UpdateAppLayout()
-	{
-		if (myAppLayout)
-			myAppLayout->Update();
-	}
-
 	void Window::RenderAppLayout()
 	{
 		if (myAppLayout)

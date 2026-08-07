@@ -199,13 +199,8 @@ namespace Slush
 		template <typename AssetType>
 		const AssetType* GetAsset(const FW_String& aAssetName) const;
 
-		template <typename AssetType>
-		const AssetType* GetAsset(int aAssetIndex) const;
-
 		const FW_GrowingArray<IAssetStorage*>& GetAllAssetStorages() const { return myAssetStorages; }
-		
-		template <typename AssetType>
-		IAssetStorage& GetAssetStorage();
+
 		IAssetStorage& GetAssetStorage(unsigned int aAssetTypeID);
 
 	private:
@@ -260,24 +255,4 @@ namespace Slush
 		return GetAsset<AssetType>(aAssetName.GetBuffer());
 	}
 
-	template <typename AssetType>
-	inline const AssetType* AssetRegistry::GetAsset(int aAssetIndex) const
-	{
-		int assetID = GetAssetID<AssetType>();
-		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
-
-		const FW_GrowingArray<Asset*> assets = myAssetStorages[assetID]->GetAllAssets();
-		FW_ASSERT(aAssetIndex >= 0 && aAssetIndex < assets.Count(), "Invalid AssetID");
-
-		return static_cast<const AssetType*>(assets[aAssetIndex]);
-	}
-
-	template <typename AssetType>
-	inline IAssetStorage& AssetRegistry::GetAssetStorage()
-	{
-		int assetID = GetAssetID<AssetType>();
-		FW_ASSERT(assetID < myAssetStorages.Count(), "AssetType is not registered");
-
-		return *myAssetStorages[assetID];
-	}
 }

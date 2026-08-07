@@ -32,7 +32,6 @@ namespace Slush
 
 		void SetText(const char* aText);
 		void SetText(const FW_String& aString);
-		void SetFont(const Font& aFont);
 
 		void SetCharacterSize(int aSizeInPixesl);
 

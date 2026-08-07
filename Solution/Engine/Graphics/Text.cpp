@@ -73,14 +73,6 @@ namespace Slush
 		SetText(aString.GetBuffer());
 	}
 
-	void Text::SetFont(const Font& aFont)
-	{
-		if(const sf::Font* sfmlFont = aFont.GetSFMLFont())
-			myText->setFont(*sfmlFont);
-		else
-			SLUSH_ERROR("Text: Invalid font passed to SetFont")
-	}
-
 	void Text::SetCharacterSize(int aSizeInPixesl)
 	{
 		myText->setCharacterSize(aSizeInPixesl);

@@ -48,9 +48,6 @@ namespace Slush
 		FW_GrowingArray<Component*> myPackedComponents;
 
 		void CreateComponents(const EntityPrefab& aPrefab);
-
-		template <typename ComponentType>
-		void CreateComponent(const EntityPrefab& aPrefab);
 	};
 
 	template <typename ComponentType>
@@ -69,14 +66,4 @@ namespace Slush
 		return static_cast<const ComponentType*>(myComponents[id]);
 	}
 
-	template <typename ComponentType>
-	inline void Entity::CreateComponent(const EntityPrefab& aPrefab)
-	{
-		if (aPrefab.Has<ComponentType>())
-		{
-			int index = GetComponentID<ComponentType>();
-			myComponents[index] = new ComponentType(*this, aPrefab);
-			myPackedComponents.Add(myComponents[index]);
-		}
-	}
 }

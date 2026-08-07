@@ -33,7 +33,6 @@ namespace Slush
 
 		void SetAppLayout(IAppLayout* aLayout);
 
-		void UpdateAppLayout();
 		void RenderAppLayout();
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }

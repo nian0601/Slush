@@ -71,7 +71,7 @@ namespace Slush
 
 		// Under -hidewindow, each Dockable's own OnCloseRequested() detects that itself and resolves
 		// synchronously (logging by asset name, not just Dockable name) instead of opening a popup that
-		// would otherwise hang forever with no input to click it - see AssetEditorDockable/UIEditorDockable.
+		// would otherwise hang forever with no input to click it - see AssetEditorDockable.
 		for (Dockable* dockable : myDockables)
 		{
 			if (dockable->HasUnsavedChanges())

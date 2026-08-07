@@ -59,7 +59,6 @@
     <ClInclude Include="UI\UIManager.h" />
     <ClInclude Include="UI\UIWidget.h" />
     <ClInclude Include="UI\UILayout.h" />
-    <ClInclude Include="UI\UIEditorDockable.h" />
     <ClInclude Include="Core\Assets\AssetParser.h" />
     <ClInclude Include="Core\Assets\AssetReference.h" />
     <ClInclude Include="Core\Assets\AssetStorage.h" />
@@ -146,7 +145,6 @@
     <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
     <ClCompile Include="UI\UILayout.cpp" />
-    <ClCompile Include="UI\UIEditorDockable.cpp" />
     <ClCompile Include="Core\Assets\AssetParser.cpp" />
     <ClCompile Include="Core\Assets\Asset.cpp" />
     <ClCompile Include="Core\Assets\DataAsset.cpp" />

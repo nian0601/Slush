@@ -198,11 +198,8 @@
     <ClInclude Include="Graphics\Window.h" />
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\Texture.h" />
-    <ClInclude Include="UI\UIButton.h" />
     <ClInclude Include="UI\UILayout.h" />
     <ClInclude Include="UI\UIManager.h" />
-    <ClInclude Include="UI\UIRect.h" />
-    <ClInclude Include="UI\UIWidget.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Assets\Asset.cpp" />
@@ -278,10 +275,8 @@
     <ClCompile Include="Graphics\Window.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
-    <ClCompile Include="UI\UIButton.cpp" />
     <ClCompile Include="UI\UILayout.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
-    <ClCompile Include="UI\UIRect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.vcxproj">

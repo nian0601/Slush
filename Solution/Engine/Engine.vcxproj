@@ -198,7 +198,6 @@
     <ClInclude Include="Graphics\Window.h" />
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\Texture.h" />
-    <ClInclude Include="UI\UILayout.h" />
     <ClInclude Include="UI\UIManager.h" />
   </ItemGroup>
   <ItemGroup>
@@ -275,7 +274,6 @@
     <ClCompile Include="Graphics\Window.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
-    <ClCompile Include="UI\UILayout.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>

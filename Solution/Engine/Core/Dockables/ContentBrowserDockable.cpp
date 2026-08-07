@@ -6,7 +6,6 @@
 #include "Core/Dockables/DependencyTrackerDockable.h"
 #include "Core/Dockables/IAppLayout.h"
 #include "Graphics/Window.h"
-#include <UI/UILayout.h>
 
 namespace Slush
 {

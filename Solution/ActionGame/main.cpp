@@ -15,8 +15,6 @@
 
 #include "Level/LevelData.h"
 
-#include "UI/UILayout.h"
-
 #include "ActionGameGlobals.h"
 #include "CharacterAnimationSet.h"
 #include "Core/Dockables/AssetEditorLayout.h"
@@ -33,7 +31,6 @@ public:
 		Slush::EntityManager::RegisterComponents();
 
 		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-		assets.RegisterAssetType<Slush::UILayout>();
 		assets.RegisterAssetType<Slush::Texture>();
 		assets.RegisterAssetType<LevelData>();
 		assets.RegisterAssetType<Slush::Animation>();

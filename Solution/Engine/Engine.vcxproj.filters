@@ -56,7 +56,6 @@
     <ClInclude Include="Physics\PhysicsShapes.h" />
     <ClInclude Include="Physics\PhysicsWorld.h" />
     <ClInclude Include="UI\UIManager.h" />
-    <ClInclude Include="UI\UILayout.h" />
     <ClInclude Include="Core\Assets\AssetParser.h" />
     <ClInclude Include="Core\Assets\AssetReference.h" />
     <ClInclude Include="Core\Assets\AssetStorage.h" />
@@ -140,7 +139,6 @@
     <ClCompile Include="EntitySystem\Components\SpriteComponent.cpp" />
     <ClCompile Include="StateStack\StateStack.cpp" />
     <ClCompile Include="UI\UIManager.cpp" />
-    <ClCompile Include="UI\UILayout.cpp" />
     <ClCompile Include="Core\Assets\AssetParser.cpp" />
     <ClCompile Include="Core\Assets\Asset.cpp" />
     <ClCompile Include="Core\Assets\DataAsset.cpp" />

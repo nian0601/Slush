@@ -52,7 +52,7 @@ Slush::IGameState::GameStateResult CharacterSelectionState::Update()
 		return Slush::IGameState::KEEP;
 	}
 
-	Slush::DynamicUIBuilder uiBuilder;
+	Slush::UIBuilder uiBuilder;
 
 	uiBuilder.Start();
 	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
@@ -97,7 +97,7 @@ void CharacterSelectionState::Render()
 	myUIRenderCommands.RemoveAll();
 }
 
-void CharacterSelectionState::BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBUilder)
+void CharacterSelectionState::BuildCharacterDisplay(Slush::UIBuilder& aUIBUilder)
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& charAssets = assets.GetAllAssets<CharacterInfo>();

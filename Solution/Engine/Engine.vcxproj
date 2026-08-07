@@ -198,7 +198,7 @@
     <ClInclude Include="Graphics\Window.h" />
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\Texture.h" />
-    <ClInclude Include="UI\UIManager.h" />
+    <ClInclude Include="UI\UIBuilder.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Assets\Asset.cpp" />
@@ -274,7 +274,7 @@
     <ClCompile Include="Graphics\Window.cpp" />
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
-    <ClCompile Include="UI\UIManager.cpp" />
+    <ClCompile Include="UI\UIBuilder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.vcxproj">

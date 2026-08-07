@@ -16,7 +16,7 @@
 #include <Graphics\Texture.h>
 
 #include <Physics\PhysicsWorld.h>
-#include "UI/UIManager.h"
+#include "UI/UIBuilder.h"
 #include <imgui\ImGuiWidgets.h>
 
 void WeaponData::RankData::OnParse(Slush::AssetParser::Handle aRootHandle)
@@ -384,7 +384,7 @@ void WeaponComponent::UpgradeWeapon(const WeaponData& someData)
 	}
 }
 
-void WeaponComponent::HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder)
+void WeaponComponent::HandleUpgrading(Slush::UIBuilder& aUIBuilder)
 {
 	if (myUpgradeSelection.IsEmpty())
 	{

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Core/Dockables/IAppLayout.h"
-#include "UI/UIManager.h"
+#include "UI/UIBuilder.h"
 
 class Level;
 

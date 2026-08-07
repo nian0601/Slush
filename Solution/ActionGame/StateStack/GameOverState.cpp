@@ -29,7 +29,7 @@ GameOverState::GameOverState(Level& aLevel)
 
 Slush::IGameState::GameStateResult GameOverState::Update()
 {
-	Slush::DynamicUIBuilder uiBuilder;
+	Slush::UIBuilder uiBuilder;
 	uiBuilder.Start();
 	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
 	uiBuilder.Finish(myUIRenderCommands);

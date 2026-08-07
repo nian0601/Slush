@@ -37,7 +37,7 @@ Slush::IGameState::GameStateResult UpgradeWeaponState::Update()
 	if (!weaponComponent->HasPendingUpgrade())
 		return Slush::IGameState::POP_SUBSTATE;
 
-	Slush::DynamicUIBuilder uiBuilder;
+	Slush::UIBuilder uiBuilder;
 
 	uiBuilder.Start();
 	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);

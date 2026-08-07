@@ -12,7 +12,7 @@
 namespace Slush
 {
 	class Animation;
-	class DynamicUIBuilder;
+	class UIBuilder;
 	class Texture;
 }
 
@@ -103,7 +103,7 @@ public:
 
 	const FW_GrowingArray<Weapon*>& GetWeapons() { return myWeapons; }
 
-	void HandleUpgrading(Slush::DynamicUIBuilder& aUIBuilder);
+	void HandleUpgrading(Slush::UIBuilder& aUIBuilder);
 
 private:
 	Weapon* GetWeapon(const WeaponData* aWeaponData);

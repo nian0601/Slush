@@ -1,7 +1,7 @@
 #pragma once
 
 #include "StateStack/IGameState.h"
-#include "UI\UIManager.h"
+#include "UI\UIBuilder.h"
 #include "EntitySystem\EntityHandle.h"
 
 namespace Slush
@@ -20,17 +20,17 @@ public:
 	bool AllowPassThroughRender() override { return true; };
 
 private:
-	void BuildStatsDisplay(Slush::DynamicUIBuilder& aUIBUilder);
-	void BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder);
-	void BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBuilder);
-	void BuildNavigationButtons(Slush::DynamicUIBuilder& aUIBUilder);
+	void BuildStatsDisplay(Slush::UIBuilder& aUIBUilder);
+	void BuildWeaponsDisplay(Slush::UIBuilder& aUIBUilder);
+	void BuildCharacterDisplay(Slush::UIBuilder& aUIBuilder);
+	void BuildNavigationButtons(Slush::UIBuilder& aUIBUilder);
 
 	Slush::EntityHandle myPlayerHandle;
 	const CharacterInfo& myCharacterInfo;
 
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;
-	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
-	Slush::DynamicUIRenderer myUIRenderer;
+	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
+	Slush::UIRenderer myUIRenderer;
 	Slush::Font& myFont;
 };

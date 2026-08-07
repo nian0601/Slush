@@ -67,7 +67,7 @@ namespace Slush
 		int myHoverColor;
 	};
 
-	class DynamicUIBuilder
+	class UIBuilder
 	{
 	public:
 		struct RenderCommand
@@ -94,11 +94,9 @@ namespace Slush
 
 		void CloseElement();
 
-		void SetStyle(const UIElementStyle& aStyle);
 		UIElementStyle& GetStyle();
 
 		void Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor);
-		void Button(const char* someText, Font& aFont, int aTextSize, int aWidth, int aHeight, int aColor, int aTextColor);
 		void HorizontalSpacing(int aSize);
 		void VerticalSpacing(int aSize);
 		void ScreenFade(int aColor);
@@ -154,13 +152,13 @@ namespace Slush
 	class RectSprite;
 	class Text;
 
-	class DynamicUIRenderer
+	class UIRenderer
 	{
 	public:
-		DynamicUIRenderer(Slush::Font& aFont);
-		~DynamicUIRenderer();
+		UIRenderer(Slush::Font& aFont);
+		~UIRenderer();
 
-		void Render(const FW_GrowingArray<DynamicUIBuilder::RenderCommand>& someRenderCommands);
+		void Render(const FW_GrowingArray<UIBuilder::RenderCommand>& someRenderCommands);
 
 	private:
 		Slush::RectSprite* myUISprite;

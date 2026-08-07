@@ -39,7 +39,7 @@ PauseState::PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& a
 
 Slush::IGameState::GameStateResult PauseState::Update()
 {
-	Slush::DynamicUIBuilder uiBuilder;
+	Slush::UIBuilder uiBuilder;
 
 	uiBuilder.Start();
 	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
@@ -96,7 +96,7 @@ void PauseState::Render()
 	myUIRenderCommands.RemoveAll();
 }
 
-void PauseState::BuildStatsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
+void PauseState::BuildStatsDisplay(Slush::UIBuilder& aUIBUilder)
 {
 	Slush::Entity* player = myPlayerHandle.Get();
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
@@ -134,7 +134,7 @@ void PauseState::BuildStatsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 	aUIBUilder.CloseElement();
 }
 
-void PauseState::BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
+void PauseState::BuildWeaponsDisplay(Slush::UIBuilder& aUIBUilder)
 {
 	Slush::Entity* player = myPlayerHandle.Get();
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
@@ -169,7 +169,7 @@ void PauseState::BuildWeaponsDisplay(Slush::DynamicUIBuilder& aUIBUilder)
 	aUIBUilder.CloseElement();
 }
 
-void PauseState::BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBuilder)
+void PauseState::BuildCharacterDisplay(Slush::UIBuilder& aUIBuilder)
 {
 	aUIBuilder.OpenElement().SetAlingment(Slush::UIElementStyle::CENTER);
 	
@@ -190,7 +190,7 @@ void PauseState::BuildCharacterDisplay(Slush::DynamicUIBuilder& aUIBuilder)
 	aUIBuilder.CloseElement();
 }
 
-void PauseState::BuildNavigationButtons(Slush::DynamicUIBuilder& aUIBUilder)
+void PauseState::BuildNavigationButtons(Slush::UIBuilder& aUIBUilder)
 {
 	aUIBUilder.OpenElement(myUIBackgroundStyle);
 

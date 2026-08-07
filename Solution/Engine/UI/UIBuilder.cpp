@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "UIManager.h"
+#include "UIBuilder.h"
 #include <Core\Engine.h>
 #include <Graphics\Window.h>
 #include <Graphics\Renderer.h>
@@ -104,7 +104,7 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	void DynamicUIBuilder::Start()
+	void UIBuilder::Start()
 	{
 		Vector2f windowSize = Slush::Engine::GetInstance().GetWindow().GetRenderer().GetOffscreenBufferSize();
 
@@ -124,7 +124,7 @@ namespace Slush
 		myRoot.myStyle.myLayoutDirection = UIElementStyle::TOP_TO_BOTTOM;
 	}
 
-	void DynamicUIBuilder::Finish()
+	void UIBuilder::Finish()
 	{
 		FW_ASSERT(myCurrentElement == &myRoot, "Not all Elements are closed!");
 
@@ -138,19 +138,19 @@ namespace Slush
 			HandleInput(*child);
 	}
 
-	void DynamicUIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
+	void UIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
 	{
 		Finish();
 		GenerateRenderCommands(outRenderCommands);
 	}
 
-	void DynamicUIBuilder::GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands)
+	void UIBuilder::GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands)
 	{
 		for (Element* child : myRoot.myChildren)
 			GenerateRenderCommands(*child, outRenderCommands);
 	}
 
-	UIElementStyle& DynamicUIBuilder::OpenElement(const char* aIdentifier /*= nullptr*/)
+	UIElementStyle& UIBuilder::OpenElement(const char* aIdentifier /*= nullptr*/)
 	{
 		Element* newElement = new Element();
 		if (aIdentifier)
@@ -171,21 +171,21 @@ namespace Slush
 		return myCurrentElement->myStyle;
 	}
 
-	UIElementStyle& DynamicUIBuilder::OpenElement(const UIElementStyle& aStyle)
+	UIElementStyle& UIBuilder::OpenElement(const UIElementStyle& aStyle)
 	{
 		OpenElement();
 		myCurrentElement->myStyle = aStyle;
 		return myCurrentElement->myStyle;
 	}
 
-	UIElementStyle& DynamicUIBuilder::OpenElement(const char* aIdentifier, const UIElementStyle& aStyle)
+	UIElementStyle& UIBuilder::OpenElement(const char* aIdentifier, const UIElementStyle& aStyle)
 	{
 		OpenElement(aIdentifier);
 		myCurrentElement->myStyle = aStyle;
 		return myCurrentElement->myStyle;
 	}
 
-	void DynamicUIBuilder::CloseElement()
+	void UIBuilder::CloseElement()
 	{
 		int leftRightPadding = myCurrentElement->myStyle.myPadding.x * 2;
 		int topBottomPadding = myCurrentElement->myStyle.myPadding.y * 2;
@@ -223,19 +223,13 @@ namespace Slush
 		myCurrentElement = myCurrentElement->myParent;
 	}
 
-	void DynamicUIBuilder::SetStyle(const UIElementStyle& aStyle)
-	{
-		FW_ASSERT(myCurrentElement != nullptr);
-		myCurrentElement->myStyle = aStyle;
-	}
-
-	Slush::UIElementStyle& DynamicUIBuilder::GetStyle()
+	Slush::UIElementStyle& UIBuilder::GetStyle()
 	{
 		FW_ASSERT(myCurrentElement != nullptr);
 		return myCurrentElement->myStyle;
 	}
 
-	void DynamicUIBuilder::SetText(const char* someText, Font& aFont, int aTextSize /*= 15*/)
+	void UIBuilder::SetText(const char* someText, Font& aFont, int aTextSize /*= 15*/)
 	{
 		FW_ASSERT(myCurrentElement != nullptr);
 		myCurrentElement->myText = someText;
@@ -249,7 +243,7 @@ namespace Slush
 		myCurrentElement->myStyle.SetYSizing(UIElementStyle::FIXED, static_cast<int>(textSize.y));
 	}
 
-	void DynamicUIBuilder::Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor)
+	void UIBuilder::Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor)
 	{
 		OpenElement(someText, aStyle);
 		GetStyle().SetColor(aColor);
@@ -262,27 +256,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::Button(const char* someText, Font& aFont, int aTextSize, int aWidth, int aHeight, int aColor, int aTextColor)
-	{
-		OpenElement(someText);
-		UIElementStyle& style = GetStyle();
-		style.SetXSizing(Slush::UIElementStyle::FIXED, aWidth);
-		style.SetYSizing(Slush::UIElementStyle::FIXED, aHeight);
-		style.SetAlingment(Slush::UIElementStyle::CENTER);
-		style.SetColor(aColor);
-		style.SetOutlineColor(0xFF000000);
-		style.SetOutlineThickness(-1.f);
-		style.EnableButtonInteraction(0xFFDDDDDD);
-
-		OpenElement();
-		SetText(someText, aFont, aTextSize);
-		GetStyle().SetColor(aTextColor);
-		CloseElement();
-
-		CloseElement();
-	}
-
-	void DynamicUIBuilder::HorizontalSpacing(int aSize)
+	void UIBuilder::HorizontalSpacing(int aSize)
 	{
 		OpenElement();
 
@@ -294,7 +268,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::VerticalSpacing(int aSize)
+	void UIBuilder::VerticalSpacing(int aSize)
 	{
 		OpenElement();
 
@@ -306,7 +280,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::ScreenFade(int aColor)
+	void UIBuilder::ScreenFade(int aColor)
 	{
 		OpenElement();
 		Slush::UIElementStyle& style = GetStyle();
@@ -317,7 +291,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::Text(const char* someText, Font& aFont, int aTextSize, int aTextColor /*= 0xFFFFFFFF*/)
+	void UIBuilder::Text(const char* someText, Font& aFont, int aTextSize, int aTextColor /*= 0xFFFFFFFF*/)
 	{
 		OpenElement().SetAlingment(Slush::UIElementStyle::CENTER);
 		SetText(someText, aFont, aTextSize);
@@ -325,7 +299,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor)
+	void UIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor)
 	{
 		OpenElement(aStyle);
 		GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
@@ -338,7 +312,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor)
+	void UIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor)
 	{
 		OpenElement();
 
@@ -359,7 +333,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	void DynamicUIBuilder::Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect)
+	void UIBuilder::Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect)
 	{
 		OpenElement();
 
@@ -376,7 +350,7 @@ namespace Slush
 		CloseElement();
 	}
 
-	bool DynamicUIBuilder::WasClicked(const char* aIdentifier) const
+	bool UIBuilder::WasClicked(const char* aIdentifier) const
 	{
 		if (Element* const* element = myInteractiveElements.GetIfExists(aIdentifier))
 		{
@@ -386,7 +360,7 @@ namespace Slush
 		return false;
 	}
 
-	void DynamicUIBuilder::CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis)
+	void UIBuilder::CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis)
 	{
 		if (aParent.myChildren.IsEmpty())
 			return;
@@ -518,7 +492,7 @@ namespace Slush
 			CalculateSizeAlongAxis(*child, aIsXAxis);
 	}
 
-	void DynamicUIBuilder::CalculatePositions(Element& anElement)
+	void UIBuilder::CalculatePositions(Element& anElement)
 	{
 		int xOffset = anElement.myStyle.myPadding.x;
 		int yOffset = anElement.myStyle.myPadding.y;
@@ -558,7 +532,7 @@ namespace Slush
 		}
 	}
 
-	bool DynamicUIBuilder::HandleInput(Element& anElement)
+	bool UIBuilder::HandleInput(Element& anElement)
 	{
 		const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
 		for (Element* child : anElement.myChildren)
@@ -588,7 +562,7 @@ namespace Slush
 		return false;
 	}
 
-	void DynamicUIBuilder::GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands)
+	void UIBuilder::GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands)
 	{
 		RenderCommand& command = outRenderCommands.Add();
 		command.myPosition.x = static_cast<float>(anElement.myPosition.x);
@@ -607,17 +581,17 @@ namespace Slush
 			GenerateRenderCommands(*child, outRenderCommands);
 	}
 
-	DynamicUIBuilder::Element::Element()
+	UIBuilder::Element::Element()
 	{
 		Reset();
 	}
 
-	DynamicUIBuilder::Element::~Element()
+	UIBuilder::Element::~Element()
 	{
 		myChildren.DeleteAll();
 	}
 
-	void DynamicUIBuilder::Element::Reset()
+	void UIBuilder::Element::Reset()
 	{
 		myPosition = { 0, 0 };
 		mySize = { 0, 0 };
@@ -636,21 +610,21 @@ namespace Slush
 	
 	//////////////////////////////////////////////////////////////////////////
 
-	DynamicUIRenderer::DynamicUIRenderer(Slush::Font& aFont)
+	UIRenderer::UIRenderer(Slush::Font& aFont)
 	{
 		myUISprite = new Slush::RectSprite();
 		myText = new Slush::Text(aFont);
 	}
 
-	DynamicUIRenderer::~DynamicUIRenderer()
+	UIRenderer::~UIRenderer()
 	{
 		FW_SAFE_DELETE(myText);
 		FW_SAFE_DELETE(myUISprite);
 	}
 
-	void DynamicUIRenderer::Render(const FW_GrowingArray<DynamicUIBuilder::RenderCommand>& someRenderCommands)
+	void UIRenderer::Render(const FW_GrowingArray<UIBuilder::RenderCommand>& someRenderCommands)
 	{
-		for (const DynamicUIBuilder::RenderCommand& command : someRenderCommands)
+		for (const UIBuilder::RenderCommand& command : someRenderCommands)
 		{
 			if (command.myText.Empty())
 			{

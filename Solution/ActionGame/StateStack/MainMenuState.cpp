@@ -47,7 +47,7 @@ Slush::IGameState::GameStateResult MainMenuState::Update()
 		return Slush::IGameState::KEEP;
 	}
 
-	Slush::DynamicUIBuilder uiBuilder;
+	Slush::UIBuilder uiBuilder;
 	uiBuilder.Start();
 	uiBuilder.ScreenFade(0xAA121212);
 	uiBuilder.Finish(myUIRenderCommands);

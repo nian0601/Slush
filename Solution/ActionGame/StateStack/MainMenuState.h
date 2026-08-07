@@ -2,7 +2,7 @@
 
 #include "StateStack/IGameState.h"
 
-#include "UI\UIManager.h"
+#include "UI\UIBuilder.h"
 
 namespace Slush
 {
@@ -24,7 +24,7 @@ private:
 
 	Slush::UIElementStyle myUIBackgroundStyle;
 	Slush::UIElementStyle myUIButtonStyle;
-	FW_GrowingArray<Slush::DynamicUIBuilder::RenderCommand> myUIRenderCommands;
-	Slush::DynamicUIRenderer myUIRenderer;
+	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
+	Slush::UIRenderer myUIRenderer;
 	Slush::Font& myFont;
 };

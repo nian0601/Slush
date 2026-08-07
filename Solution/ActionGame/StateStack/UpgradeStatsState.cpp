@@ -72,7 +72,7 @@ Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 
 	const StatsUpgradeData* upgradeData = stats->GetUpgradeData();
 
-	Slush::DynamicUIBuilder uiBuilder;
+	Slush::UIBuilder uiBuilder;
 
 	uiBuilder.Start();
 	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);

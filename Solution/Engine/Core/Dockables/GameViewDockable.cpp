@@ -11,13 +11,6 @@ namespace Slush
 		Engine& engine = Engine::GetInstance();
 		engine.GetWindow().RenderOffscreenBufferToImGUI();
 
-		//if (ImGui::IsItemHovered())
-		//{
-		//	ImGuiIO& imguiIO = ImGui::GetIO();
-		//	imguiIO.WantCaptureKeyboard = false;
-		//	imguiIO.WantCaptureMouse = false;
-		//}
-
 		engine.myByPassImGUIInputRestriction = ImGui::IsItemHovered();
 	}
 }

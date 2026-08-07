@@ -120,11 +120,6 @@ namespace Slush
 		if (!ValidateField(aFieldName))
 			return;
 
-		/*if (myIsReading)
-			GetStringField(aFieldName, aValue);
-		else
-			WriteStringField(aFieldName, aValue);*/
-
 		if (myIsReading)
 			GetStringField(myElement->GetField(aFieldName), aValue);
 		else
@@ -382,7 +377,6 @@ namespace Slush
 			// That should let me store text with spaces, but also could do oneline vector-representations
 			else
 			{
-				//SLUSH_ERROR("AssetParser: Malformed Element, found '%i' words on one line but only 1 or 2 is expected, in %s", words.Count(), aFileParser.GetFilePath().GetBuffer());
 				Field* field = new Field();
 				field->myFieldName = words[0];
 				field->myRawData = words[1];

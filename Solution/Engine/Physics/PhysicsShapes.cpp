@@ -384,17 +384,6 @@ namespace Slush
 
 		Vector2f p2 = myObject->myPreviousPosition + space * myVertices[0];
 		renderer.RenderLine(p1, p2, myObject->myColor);
-
-		//Vector2f p1 = myObject->myPosition + myModelSpace * myVertices[0];
-		//for (int i = 1; i < myVertexCount; ++i)
-		//{
-		//	Vector2f p2 = myObject->myPosition + myModelSpace * myVertices[i];
-		//	window.RenderLine(p1, p2, myObject->myColor);
-		//	p1 = p2;
-		//}
-		//
-		//Vector2f p2 = myObject->myPosition + myModelSpace * myVertices[0];
-		//window.RenderLine(p1, p2, myObject->myColor);
 	}
 
 	void PolygonShape::SetOrientation(float aRadians)

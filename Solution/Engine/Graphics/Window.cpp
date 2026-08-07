@@ -33,13 +33,12 @@ namespace Slush
 		
 		ImGuiIO& imguiIO = ImGui::GetIO();
 		imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-		imguiIO.IniFilename = NULL;// path.GetBuffer();
+		imguiIO.IniFilename = NULL;
 
 		
 
 		// Having this enabled makes it tricky/impossible to have Keyboard-input for the gameview :/
 		// An option could be to have this be togglable somehow maybe?
-		//imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 		imguiIO.ConfigWindowsMoveFromTitleBarOnly = true;
 		SLUSH_INFO("Window Created");
@@ -74,8 +73,6 @@ namespace Slush
 			else if (const auto* resized = event->getIf<sf::Event::Resized>())
 			{
 				SetRectSize(myWindowRect, { static_cast<float>(resized->size.x), static_cast<float>(resized->size.y) });
-				//myGameViewRect = MakeRectFromTopLeft<float>({ 0.f, 0.f }, GetSizeThatRespectsAspectRatio(aWidth, aHeight));
-				//myRenderWindow->setSize({ event.size.width, event.size.height });
 				sf::FloatRect visibleArea({ 0.f, 0.f }, { static_cast<float>(resized->size.x), static_cast<float>(resized->size.y) });
 				myRenderWindow->setView(sf::View(visibleArea));
 			}
@@ -134,7 +131,6 @@ namespace Slush
 				ImGui::EndMainMenuBar();
 			}
 
-			//ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 			ImGui::DockSpaceOverViewport();
 
 			if (myDisplayImGUIDemo)

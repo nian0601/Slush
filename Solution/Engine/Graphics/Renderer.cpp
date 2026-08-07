@@ -57,6 +57,12 @@ namespace Slush
 		myActiveRenderTarget = myRenderWindow;
 	}
 
+	Vector2f Renderer::GetOffscreenBufferSize() const
+	{
+		sf::Vector2u size = myOffscreenBuffer->getSize();
+		return { static_cast<float>(size.x), static_cast<float>(size.y) };
+	}
+
 	void Renderer::RenderLine(const Vector2i& aStart, const Vector2i& aEnd, int aColor)
 	{
 		sf::VertexArray line(sf::PrimitiveType::Lines, 2);

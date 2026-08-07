@@ -23,6 +23,7 @@ namespace Slush
 
 		sf::RenderTarget* GetActiveRenderTarget() const { return myActiveRenderTarget; }
 		sf::RenderTexture* GetOffscreenBuffer() const { return myOffscreenBuffer; }
+		Vector2f GetOffscreenBufferSize() const;
 
 		void RenderLine(const Vector2i& aStart, const Vector2i& aEnd, int aColor = 0xFFFFFFFF);
 		void RenderLine(const Vector2f& aStart, const Vector2f& aEnd, int aColor = 0xFFFFFFFF);

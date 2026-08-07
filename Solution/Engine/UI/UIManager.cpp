@@ -1,7 +1,9 @@
 #include "stdafx.h"
 
 #include "UIManager.h"
+#include <Core\Engine.h>
 #include <Graphics\Window.h>
+#include <Graphics\Renderer.h>
 #include <Core\Input.h>
 #include "Graphics\Text.h"
 #include "Graphics\RectSprite.h"
@@ -104,9 +106,7 @@ namespace Slush
 
 	void DynamicUIBuilder::Start()
 	{
-		//Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		//Vector2f windowSize = window.GetGameViewRect().myExtents;
-		Vector2f windowSize = { 1920.f, 1080.f };
+		Vector2f windowSize = Slush::Engine::GetInstance().GetWindow().GetRenderer().GetOffscreenBufferSize();
 
 		myCurrentElement = nullptr;
 		myInteractiveElements.Clear();

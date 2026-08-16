@@ -16,10 +16,17 @@ namespace Slush
 
 	void IAppLayout::Update()
 	{
+		for (Dockable* dockable : myDockables)
+			dockable->Update();
+
+		OnUpdate();
+	}
+
+	void IAppLayout::BuildUI()
+	{
 		for (int i = 0; i < myDockables.Count(); ++i)
 		{
 			Dockable* dockable = myDockables[i];
-			dockable->Update();
 			dockable->BuildUI();
 
 			if (dockable->WantsToClose())
@@ -29,8 +36,6 @@ namespace Slush
 				--i;
 			}
 		}
-
-		OnUpdate();
 	}
 
 	void IAppLayout::Render()

@@ -137,7 +137,10 @@ namespace Slush
 				ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
 
 			if (myAppLayout)
+			{
 				myAppLayout->Update();
+				myAppLayout->BuildUI();
+			}
 
 			ImGui::SFML::Render(*myRenderWindow);
 		}

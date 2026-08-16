@@ -11,6 +11,7 @@ namespace Slush
 		IAppLayout(const char* aLayoutName);
 		virtual ~IAppLayout();;
 		void Update();
+		void BuildUI();
 		void Render();
 
 		const FW_String& GetName() const { return myName; }

@@ -15,6 +15,7 @@ namespace Slush
 		virtual ~Dockable() {}
 
 		void Update();
+		void BuildUI();
 
 		virtual const char* GetName() const = 0;
 

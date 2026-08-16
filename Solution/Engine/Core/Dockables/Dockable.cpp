@@ -17,7 +17,10 @@ namespace Slush
 		}
 
 		OnUpdate();
+	}
 
+	void Dockable::BuildUI()
+	{
 		// Only takes effect the very first time this window has no saved ini entry. Safe to call every
 		// frame - ImGui clears FirstUseEver eligibility on the window the first time it's applied, so this
 		// becomes a no-op (never fights the user's manual resize) for the rest of the window's lifetime.

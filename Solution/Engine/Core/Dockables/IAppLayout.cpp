@@ -20,6 +20,7 @@ namespace Slush
 		{
 			Dockable* dockable = myDockables[i];
 			dockable->Update();
+			dockable->BuildUI();
 
 			if (dockable->WantsToClose())
 			{

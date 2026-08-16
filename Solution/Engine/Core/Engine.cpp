@@ -129,6 +129,7 @@ namespace Slush
 
 			anApp.Render();
 			myWindow->RenderAppLayout();
+			myWindow->UpdateAppLayout();
 
 			if (myInput->WasKeyPressed(Slush::Input::_F10))
 				myWindow->RequestScreenshot();

@@ -137,10 +137,7 @@ namespace Slush
 				ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
 
 			if (myAppLayout)
-			{
-				myAppLayout->Update();
 				myAppLayout->BuildUI();
-			}
 
 			ImGui::SFML::Render(*myRenderWindow);
 		}
@@ -229,8 +226,10 @@ namespace Slush
 			return;
 		}
 
-		// Window::Present() only updates the app layout inside 'if (myShowEditorUI)' - force it on so a
-		// quit initiated from the game view still gets to draw and take input on the confirmation popup.
+		// PumpEvents() skips ImGui::SFML::Update() while the editor is hidden, so no ImGui frame is begun
+		// and the close-confirmation modal (built in the editor-only BuildUI() half) has nothing to draw
+		// into and no way to take input - force the editor on so a quit initiated from the game view still
+		// gets to draw and take input on the confirmation popup.
 		myShowEditorUI = true;
 
 		switch (myAppLayout->RequestClose())
@@ -256,6 +255,12 @@ namespace Slush
 		myAppLayout = aLayout;
 
 		LoadAppLayoutConfig();
+	}
+
+	void Window::UpdateAppLayout()
+	{
+		if (myAppLayout)
+			myAppLayout->Update();
 	}
 
 	void Window::RenderAppLayout()

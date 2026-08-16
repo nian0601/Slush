@@ -23,6 +23,12 @@ namespace Slush
 		bool WantsToClose() const { return myIsClosable && !myIsOpen; }
 
 	protected:
+		// Idempotent - safe to call from both Update() and BuildUI(). Normally set by Update() early in the
+		// frame, but a Dockable created mid-BuildUI() (e.g. ContentBrowserDockable's "Show Dependencies" ->
+		// OpenOrCreateDockable<T>()) gets its BuildUI() called later in that same loop with no Update() call
+		// of its own this frame - BuildUI() re-checks so ImGui::Begin() never sees an empty name.
+		void EnsureUniqueIDName();
+
 		// 0xFFFFFFFF marks "no type ID assigned" - FW_TypeID<Dockable>::GetID<T>() hands out real IDs
 		// starting at 0, so a plain 0 default here would collide with whichever DockableBase<T> subclass
 		// happens to be the first one ever queried.

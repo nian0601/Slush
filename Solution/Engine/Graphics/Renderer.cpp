@@ -3,6 +3,7 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/SFMLHelpers.h"
 #include "Graphics/Texture.h"
+#include "Graphics/Font.h"
 #include "Core/Time.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -11,6 +12,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/VertexArray.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 namespace Slush
 {
@@ -44,6 +46,7 @@ namespace Slush
 		FW_SAFE_DELETE(myOffscreenBuffer);
 		FW_SAFE_DELETE(myCircleShape);
 		FW_SAFE_DELETE(myRectShape);
+		FW_SAFE_DELETE(myTextShape);
 		FW_SAFE_DELETE(myFadeData.myFadeTexture);
 	}
 
@@ -149,6 +152,17 @@ namespace Slush
 		command.myOutlineThickness = aOutlineThickness;
 	}
 
+	void Renderer::RenderText(const Font& aFont, const FW_String& aString, const Vector2f& aPosition, int aCharacterSize, int aColor)
+	{
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Text;
+		command.myFont = &aFont;
+		command.myString = aString;
+		command.myPoint1 = aPosition;
+		command.myCharacterSize = aCharacterSize;
+		command.myColor = aColor;
+	}
+
 	void Renderer::ProcessRenderQueue()
 	{
 		for (TargetQueue& queue : myTargetQueues)
@@ -241,8 +255,24 @@ namespace Slush
 					queue.myTarget->draw(*myCircleShape);
 					break;
 				}
-				case RenderCommand::Type::Sprite:
 				case RenderCommand::Type::Text:
+				{
+					FW_ASSERT(command.myFont != nullptr);
+
+					if (myTextShape == nullptr)
+						myTextShape = new sf::Text(*command.myFont->GetSFMLFont());
+					else
+						myTextShape->setFont(*command.myFont->GetSFMLFont());
+
+					myTextShape->setString(command.myString.GetBuffer());
+					myTextShape->setCharacterSize(command.myCharacterSize);
+					myTextShape->setFillColor(GetSFMLColor(command.myColor));
+					myTextShape->setPosition({ command.myPoint1.x, command.myPoint1.y });
+
+					queue.myTarget->draw(*myTextShape);
+					break;
+				}
+				case RenderCommand::Type::Sprite:
 				default:
 					break;
 				}

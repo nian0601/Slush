@@ -13,6 +13,7 @@
 namespace Slush
 {
 	Text::Text(const Font& aFont)
+		: myFont(&aFont)
 	{
 		myText = new sf::Text(*aFont.GetSFMLFont());
 		myText->setCharacterSize(15);
@@ -80,6 +81,7 @@ namespace Slush
 
 	void Text::SetColor(int argb)
 	{
+		myColor = argb;
 		myText->setFillColor(SFMLHelpers::GetColor(argb));
 	}
 
@@ -154,11 +156,12 @@ namespace Slush
 	void Text::Render(float x, float y)
 	{
 		SetPosition(x, y);
-		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myText);
+		Render();
 	}
 
 	void Text::Render()
 	{
-		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myText);
+		Vector2f position = { myText->getPosition().x, myText->getPosition().y };
+		Engine::GetInstance().GetWindow().GetRenderer().RenderText(*myFont, myString, position, static_cast<int>(myText->getCharacterSize()), myColor);
 	}
 }

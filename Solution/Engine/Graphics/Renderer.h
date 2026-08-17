@@ -8,11 +8,13 @@ namespace sf
 	class Texture;
 	class CircleShape;
 	class RectangleShape;
+	class Text;
 }
 
 namespace Slush
 {
 	class Texture;
+	class Font;
 
 	class Renderer
 	{
@@ -34,6 +36,8 @@ namespace Slush
 		void RenderRect(const Rectf& aRect, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness, float aRotationInRadians = 0.f);
 		void RenderCircle(const Vector2f& aCenter, float aRadius, int aColor = 0xFFFFFFFF);
 		void RenderCircle(const Vector2f& aCenter, float aRadius, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness);
+
+		void RenderText(const Font& aFont, const FW_String& aString, const Vector2f& aPosition, int aCharacterSize, int aColor);
 
 		void StartFade(float aDuration);
 		void RenderFade();
@@ -71,11 +75,21 @@ namespace Slush
 			Recti myTextureRect;
 			int myOutlineColor = 0xFFFFFFFF;
 			float myOutlineThickness = 0.f;
+
+			const Font* myFont = nullptr;
+			FW_String myString;
+			int myCharacterSize = 0;
 		};
 
 		struct TargetQueue
 		{
 			sf::RenderTarget* myTarget = nullptr;
+
+			// RenderCommand::myString (used by Type::Text) relies on FW_GrowingArray's
+			// safe-mode (element-wise copy-assignment) semantics rather than memcpy --
+			// a memcpy of an FW_String would leave two commands sharing one buffer
+			// pointer, corrupting/use-after-freeing it on RemoveAll()/growth. Never flip
+			// this array to fast/memcpy mode.
 			FW_GrowingArray<RenderCommand> myCommands;
 		};
 
@@ -88,6 +102,7 @@ namespace Slush
 
 		sf::CircleShape* myCircleShape = nullptr;
 		sf::RectangleShape* myRectShape = nullptr;
+		sf::Text* myTextShape = nullptr;
 
 		FW_GrowingArray<TargetQueue> myTargetQueues;
 

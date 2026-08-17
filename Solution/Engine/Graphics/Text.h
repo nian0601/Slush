@@ -50,7 +50,9 @@ namespace Slush
 
 	private:
 		sf::Text* myText;
+		const Font* myFont = nullptr;
 		FW_String myString;
+		int myColor = 0xFFFFFFFF;
 		Vector2f myPosition;
 		float myMaxWidth = FLT_MAX;
 		HorizontalAlignment myHorizontalAlignment = HorizontalAlignment::LEFT;

@@ -115,6 +115,9 @@ namespace Slush
 		command.myRect = aRect;
 		command.myColor = aColor;
 		command.myRotationInRadians = aRotationInRadians;
+		command.myTexture = nullptr;
+		command.myOutlineColor = 0xFFFFFFFF;
+		command.myOutlineThickness = 0.f;
 	}
 
 	void Renderer::RenderRect(const Rectf& aRect, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness, float aRotationInRadians)
@@ -137,6 +140,9 @@ namespace Slush
 		command.myCenter = aCenter;
 		command.myRadius = aRadius;
 		command.myColor = aColor;
+		command.myTexture = nullptr;
+		command.myOutlineColor = 0xFFFFFFFF;
+		command.myOutlineThickness = 0.f;
 	}
 
 	void Renderer::RenderCircle(const Vector2f& aCenter, float aRadius, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness)

@@ -26,6 +26,10 @@ Building inside a git worktree (e.g. `/implement-issue`'s per-issue worktrees) d
 
 Every MSBuild invocation must add `/nodeReuse:false` alongside `/m` — without it, MSBuild's worker nodes linger after the build finishes with their cwd wherever the build ran, and Windows won't let `git worktree remove` delete a directory that's still a running process's cwd. If a build gets interrupted rather than completing, `mspdbsrv.exe` (MSBuild's shared PDB-writing server) can similarly be left running with a worktree's directory as its module path and block removal the same way. If `git worktree remove` fails with a file-in-use/access-denied error, find processes whose command line/module path references the worktree's absolute path and terminate those specifically — don't reach for `git worktree remove --force` or manually delete the directory. If it still won't clear, stop and report rather than forcing it.
 
+*(Optional, recommended if a lingering process or dirtied runtime file is a recurring problem)*
+Worktree-blocking processes: ActionGame.exe, BossMonster.exe, TopDownGame.exe, MSBuild.exe, mspdbsrv.exe
+Worktree-discardable paths: Workbed/*/ImGUILayouts/*.ini, Workbed/*/Data/DebugSettings.sdebug, Workbed/*/temp/*.output
+
 ## Code style
 
 These conventions differ from typical C++ defaults — follow them in this codebase (naming/brace/indentation conventions are global, see `~/.claude/CLAUDE.md`):

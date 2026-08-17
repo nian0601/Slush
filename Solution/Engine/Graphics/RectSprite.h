@@ -22,7 +22,10 @@ namespace Slush
 		void SetWidth(float aWidth);
 		void SetHeight(float aHeight);
 		const Vector2f& GetSize() const { return mySize; }
-		
+
+		void Render() override;
+		void Render(float x, float y) override;
+
 	private:
 		Vector2f mySize;
 		Origin myOrigin = Origin::CENTER;

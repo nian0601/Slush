@@ -1,15 +1,10 @@
 #include "stdafx.h"
 
-#include "Core/Engine.h"
-
 #include "Graphics/BaseSprite.h"
 #include "Graphics/Texture.h"
-#include "Graphics/Window.h"
-#include "Graphics/Renderer.h"
 #include "Graphics/SFMLHelpers.h"
 
 #include <SFML/Graphics/Shape.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
 
 namespace Slush
 {
@@ -120,14 +115,15 @@ namespace Slush
 		return myShape->getOutlineThickness();
 	}
 
-	void BaseSprite::Render()
+	Recti BaseSprite::GetFlippedTextureRect() const
 	{
-		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myShape);
-	}
+		Recti rect = myTextureRect;
+		if (myEnableHorizontalFlip)
+		{
+			rect.myTopLeft.x += rect.myExtents.x;
+			rect.myExtents.x = -rect.myExtents.x;
+		}
 
-	void BaseSprite::Render(float x, float y)
-	{
-		SetPosition(x, y);
-		Engine::GetInstance().GetWindow().GetRenderer().GetActiveRenderTarget()->draw(*myShape);
+		return rect;
 	}
 }

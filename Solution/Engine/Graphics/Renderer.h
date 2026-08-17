@@ -12,6 +12,8 @@ namespace sf
 
 namespace Slush
 {
+	class Texture;
+
 	class Renderer
 	{
 	public:
@@ -29,7 +31,9 @@ namespace Slush
 		void RenderLine(const Vector2f& aStart, const Vector2f& aEnd, int aColor = 0xFFFFFFFF);
 		void RenderTriangle(const Vector2f& aV1, const Vector2f& aV2, const Vector2f& aV3, int aColor = 0xFFFFFFFF);
 		void RenderRect(const Rectf& aRect, int aColor = 0xFFFFFFFF, float aRotationInRadians = 0.f);
+		void RenderRect(const Rectf& aRect, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness, float aRotationInRadians = 0.f);
 		void RenderCircle(const Vector2f& aCenter, float aRadius, int aColor = 0xFFFFFFFF);
+		void RenderCircle(const Vector2f& aCenter, float aRadius, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness);
 
 		void StartFade(float aDuration);
 		void RenderFade();
@@ -62,6 +66,11 @@ namespace Slush
 			float myRadius = 0.f;
 
 			int myColor = 0xFFFFFFFF;
+
+			const Texture* myTexture = nullptr;
+			Recti myTextureRect;
+			int myOutlineColor = 0xFFFFFFFF;
+			float myOutlineThickness = 0.f;
 		};
 
 		struct TargetQueue

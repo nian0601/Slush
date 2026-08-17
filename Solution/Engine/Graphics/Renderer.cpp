@@ -2,6 +2,7 @@
 
 #include "Graphics/Renderer.h"
 #include "Graphics/SFMLHelpers.h"
+#include "Graphics/Texture.h"
 #include "Core/Time.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
@@ -113,6 +114,19 @@ namespace Slush
 		command.myRotationInRadians = aRotationInRadians;
 	}
 
+	void Renderer::RenderRect(const Rectf& aRect, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness, float aRotationInRadians)
+	{
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Rect;
+		command.myRect = aRect;
+		command.myColor = aFillColor;
+		command.myRotationInRadians = aRotationInRadians;
+		command.myTexture = aTexture;
+		command.myTextureRect = aTextureRect;
+		command.myOutlineColor = aOutlineColor;
+		command.myOutlineThickness = aOutlineThickness;
+	}
+
 	void Renderer::RenderCircle(const Vector2f& aCenter, float aRadius, int aColor)
 	{
 		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
@@ -120,6 +134,19 @@ namespace Slush
 		command.myCenter = aCenter;
 		command.myRadius = aRadius;
 		command.myColor = aColor;
+	}
+
+	void Renderer::RenderCircle(const Vector2f& aCenter, float aRadius, const Texture* aTexture, const Recti& aTextureRect, int aFillColor, int aOutlineColor, float aOutlineThickness)
+	{
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Circle;
+		command.myCenter = aCenter;
+		command.myRadius = aRadius;
+		command.myColor = aFillColor;
+		command.myTexture = aTexture;
+		command.myTextureRect = aTextureRect;
+		command.myOutlineColor = aOutlineColor;
+		command.myOutlineThickness = aOutlineThickness;
 	}
 
 	void Renderer::ProcessRenderQueue()
@@ -170,7 +197,20 @@ namespace Slush
 					}
 
 					myRectShape->setFillColor(GetSFMLColor(command.myColor));
-					myRectShape->setTexture(nullptr);
+					myRectShape->setOutlineColor(GetSFMLColor(command.myOutlineColor));
+					myRectShape->setOutlineThickness(command.myOutlineThickness);
+
+					if (command.myTexture != nullptr)
+					{
+						myRectShape->setTexture(command.myTexture->GetSFMLTexture());
+						myRectShape->setTextureRect(sf::IntRect(
+							{ command.myTextureRect.myTopLeft.x, command.myTextureRect.myTopLeft.y },
+							{ command.myTextureRect.myExtents.x, command.myTextureRect.myExtents.y }));
+					}
+					else
+					{
+						myRectShape->setTexture(nullptr);
+					}
 
 					queue.myTarget->draw(*myRectShape);
 					break;
@@ -183,6 +223,21 @@ namespace Slush
 						myCircleShape->setRadius(command.myRadius);
 
 					myCircleShape->setFillColor(GetSFMLColor(command.myColor));
+					myCircleShape->setOutlineColor(GetSFMLColor(command.myOutlineColor));
+					myCircleShape->setOutlineThickness(command.myOutlineThickness);
+
+					if (command.myTexture != nullptr)
+					{
+						myCircleShape->setTexture(command.myTexture->GetSFMLTexture());
+						myCircleShape->setTextureRect(sf::IntRect(
+							{ command.myTextureRect.myTopLeft.x, command.myTextureRect.myTopLeft.y },
+							{ command.myTextureRect.myExtents.x, command.myTextureRect.myExtents.y }));
+					}
+					else
+					{
+						myCircleShape->setTexture(nullptr);
+					}
+
 					queue.myTarget->draw(*myCircleShape);
 					break;
 				}

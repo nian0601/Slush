@@ -13,6 +13,9 @@ namespace Slush
 		void SetRadius(float aRadius);
 		float GetRadius() const { return myRadius; }
 
+		void Render() override;
+		void Render(float x, float y) override;
+
 	private:
 		float myRadius;
 	};

@@ -5,6 +5,7 @@
 #include "Graphics/RectSprite.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Window.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/SFMLHelpers.h"
 
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -56,4 +57,24 @@ namespace Slush
 		SetSize(mySize.x, aHeight);
 	}
 
+	void RectSprite::Render()
+	{
+		// myShape's origin (set via SetOrigin()/SetSize()) may not be the rect's center - Renderer::RenderRect
+		// always rotates/positions around the rect's center, so account for the origin offset here to match
+		// the previous direct-draw-of-myShape behavior for non-CENTER origins.
+		sf::Vector2f shapeOrigin = myShape->getOrigin();
+		Vector2f originOffset = { shapeOrigin.x, shapeOrigin.y };
+		Vector2f centerOffset = Rotate(mySize * 0.5f - originOffset, GetRotation()) * GetScale();
+
+		Rectf rect = MakeRectFromCenter(GetPosition() + centerOffset, mySize * GetScale());
+
+		Engine::GetInstance().GetWindow().GetRenderer().RenderRect(
+			rect, GetTexture(), GetFlippedTextureRect(), GetFillColor(), GetOutlineColor(), GetOutlineThickness(), GetRotation());
+	}
+
+	void RectSprite::Render(float x, float y)
+	{
+		SetPosition(x, y);
+		Render();
+	}
 }

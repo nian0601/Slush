@@ -41,11 +41,13 @@ namespace Slush
 
 		bool GetHorizontalFlip() const { return myEnableHorizontalFlip; }
 
-		void Render();
-		void Render(float x, float y);
+		virtual void Render() = 0;
+		virtual void Render(float x, float y) = 0;
 
 	protected:
 		BaseSprite(sf::Shape* aShape);
+
+		Recti GetFlippedTextureRect() const;
 
 		sf::Shape* myShape;
 		const Texture* myTexture;

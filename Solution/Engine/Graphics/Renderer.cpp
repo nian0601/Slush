@@ -63,72 +63,138 @@ namespace Slush
 		return { static_cast<float>(size.x), static_cast<float>(size.y) };
 	}
 
+	Renderer::TargetQueue& Renderer::GetOrCreateTargetQueue(sf::RenderTarget* aTarget)
+	{
+		for (TargetQueue& queue : myTargetQueues)
+		{
+			if (queue.myTarget == aTarget)
+				return queue;
+		}
+
+		TargetQueue& newQueue = myTargetQueues.Add();
+		newQueue.myTarget = aTarget;
+		return newQueue;
+	}
+
 	void Renderer::RenderLine(const Vector2i& aStart, const Vector2i& aEnd, int aColor)
 	{
-		sf::VertexArray line(sf::PrimitiveType::Lines, 2);
-		line[0].position = { float(aStart.x), float(aStart.y) };
-		line[0].color = GetSFMLColor(aColor);
-
-		line[1].position = { float(aEnd.x), float(aEnd.y) };
-		line[1].color = GetSFMLColor(aColor);
-
-		GetActiveRenderTarget()->draw(line);
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Line;
+		command.myPoint1 = { float(aStart.x), float(aStart.y) };
+		command.myPoint2 = { float(aEnd.x), float(aEnd.y) };
+		command.myColor = aColor;
 	}
 
 	void Renderer::RenderLine(const Vector2f& aStart, const Vector2f& aEnd, int aColor)
 	{
-		sf::VertexArray line(sf::PrimitiveType::Lines, 2);
-		line[0].position = { aStart.x, aStart.y };
-		line[0].color = GetSFMLColor(aColor);
-
-		line[1].position = { aEnd.x, aEnd.y };
-		line[1].color = GetSFMLColor(aColor);
-
-		GetActiveRenderTarget()->draw(line);
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Line;
+		command.myPoint1 = aStart;
+		command.myPoint2 = aEnd;
+		command.myColor = aColor;
 	}
 
 	void Renderer::RenderTriangle(const Vector2f& aV1, const Vector2f& aV2, const Vector2f& aV3, int aColor /*= 0xFFFFFFFF*/)
 	{
-		sf::VertexArray triangle(sf::PrimitiveType::Triangles, 3);
-		triangle[0].position = { aV1.x, aV1.y };
-		triangle[0].color = GetSFMLColor(aColor);
-
-		triangle[1].position = { aV2.x, aV2.y };
-		triangle[1].color = GetSFMLColor(aColor);
-
-		triangle[2].position = { aV3.x, aV3.y };
-		triangle[2].color = GetSFMLColor(aColor);
-
-		GetActiveRenderTarget()->draw(triangle);
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Triangle;
+		command.myPoint1 = aV1;
+		command.myPoint2 = aV2;
+		command.myPoint3 = aV3;
+		command.myColor = aColor;
 	}
 
 	void Renderer::RenderRect(const Rectf& aRect, int aColor, float aRotationInRadians)
 	{
-		myRectShape->setOrigin({ aRect.myExtents.x * 0.5f, aRect.myExtents.y * 0.5f });
-		myRectShape->setPosition({ aRect.myCenterPos.x, aRect.myCenterPos.y });
-		myRectShape->setRotation(sf::radians(aRotationInRadians));
-
-		sf::Vector2f oldSize = myRectShape->getSize();
-		if (oldSize.x != aRect.myExtents.x || oldSize.y != aRect.myExtents.y)
-		{
-			myRectShape->setSize({ aRect.myExtents.x, aRect.myExtents.y });
-		}
-
-		myRectShape->setFillColor(GetSFMLColor(aColor));
-		myRectShape->setTexture(nullptr);
-
-		GetActiveRenderTarget()->draw(*myRectShape);
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Rect;
+		command.myRect = aRect;
+		command.myColor = aColor;
+		command.myRotationInRadians = aRotationInRadians;
 	}
 
 	void Renderer::RenderCircle(const Vector2f& aCenter, float aRadius, int aColor)
 	{
-		myCircleShape->setPosition({ aCenter.x - aRadius, aCenter.y - aRadius });
+		RenderCommand& command = GetOrCreateTargetQueue(GetActiveRenderTarget()).myCommands.Add();
+		command.myType = RenderCommand::Type::Circle;
+		command.myCenter = aCenter;
+		command.myRadius = aRadius;
+		command.myColor = aColor;
+	}
 
-		if (myCircleShape->getRadius() != aRadius)
-			myCircleShape->setRadius(aRadius);
+	void Renderer::ProcessRenderQueue()
+	{
+		for (TargetQueue& queue : myTargetQueues)
+		{
+			for (RenderCommand& command : queue.myCommands)
+			{
+				switch (command.myType)
+				{
+				case RenderCommand::Type::Line:
+				{
+					sf::VertexArray line(sf::PrimitiveType::Lines, 2);
+					line[0].position = { command.myPoint1.x, command.myPoint1.y };
+					line[0].color = GetSFMLColor(command.myColor);
 
-		myCircleShape->setFillColor(GetSFMLColor(aColor));
-		GetActiveRenderTarget()->draw(*myCircleShape);
+					line[1].position = { command.myPoint2.x, command.myPoint2.y };
+					line[1].color = GetSFMLColor(command.myColor);
+
+					queue.myTarget->draw(line);
+					break;
+				}
+				case RenderCommand::Type::Triangle:
+				{
+					sf::VertexArray triangle(sf::PrimitiveType::Triangles, 3);
+					triangle[0].position = { command.myPoint1.x, command.myPoint1.y };
+					triangle[0].color = GetSFMLColor(command.myColor);
+
+					triangle[1].position = { command.myPoint2.x, command.myPoint2.y };
+					triangle[1].color = GetSFMLColor(command.myColor);
+
+					triangle[2].position = { command.myPoint3.x, command.myPoint3.y };
+					triangle[2].color = GetSFMLColor(command.myColor);
+
+					queue.myTarget->draw(triangle);
+					break;
+				}
+				case RenderCommand::Type::Rect:
+				{
+					myRectShape->setOrigin({ command.myRect.myExtents.x * 0.5f, command.myRect.myExtents.y * 0.5f });
+					myRectShape->setPosition({ command.myRect.myCenterPos.x, command.myRect.myCenterPos.y });
+					myRectShape->setRotation(sf::radians(command.myRotationInRadians));
+
+					sf::Vector2f oldSize = myRectShape->getSize();
+					if (oldSize.x != command.myRect.myExtents.x || oldSize.y != command.myRect.myExtents.y)
+					{
+						myRectShape->setSize({ command.myRect.myExtents.x, command.myRect.myExtents.y });
+					}
+
+					myRectShape->setFillColor(GetSFMLColor(command.myColor));
+					myRectShape->setTexture(nullptr);
+
+					queue.myTarget->draw(*myRectShape);
+					break;
+				}
+				case RenderCommand::Type::Circle:
+				{
+					myCircleShape->setPosition({ command.myCenter.x - command.myRadius, command.myCenter.y - command.myRadius });
+
+					if (myCircleShape->getRadius() != command.myRadius)
+						myCircleShape->setRadius(command.myRadius);
+
+					myCircleShape->setFillColor(GetSFMLColor(command.myColor));
+					queue.myTarget->draw(*myCircleShape);
+					break;
+				}
+				case RenderCommand::Type::Sprite:
+				case RenderCommand::Type::Text:
+				default:
+					break;
+				}
+			}
+
+			queue.myCommands.RemoveAll();
+		}
 	}
 
 	void Renderer::StartFade(float aDuration)

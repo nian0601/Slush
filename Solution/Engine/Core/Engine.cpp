@@ -134,6 +134,7 @@ namespace Slush
 			if (myInput->WasKeyPressed(Slush::Input::_F10))
 				myWindow->RequestScreenshot();
 
+			myWindow->GetRenderer().ProcessRenderQueue();
 			myWindow->GetRenderer().RenderFade();
 
 			myWindow->Present();

@@ -34,7 +34,44 @@ namespace Slush
 		void StartFade(float aDuration);
 		void RenderFade();
 
+		void ProcessRenderQueue();
+
 	private:
+		struct RenderCommand
+		{
+			enum class Type
+			{
+				Line,
+				Triangle,
+				Rect,
+				Circle,
+				Sprite,
+				Text
+			};
+
+			Type myType = Type::Line;
+
+			Vector2f myPoint1;
+			Vector2f myPoint2;
+			Vector2f myPoint3;
+
+			Rectf myRect;
+			float myRotationInRadians = 0.f;
+
+			Vector2f myCenter;
+			float myRadius = 0.f;
+
+			int myColor = 0xFFFFFFFF;
+		};
+
+		struct TargetQueue
+		{
+			sf::RenderTarget* myTarget = nullptr;
+			FW_GrowingArray<RenderCommand> myCommands;
+		};
+
+		TargetQueue& GetOrCreateTargetQueue(sf::RenderTarget* aTarget);
+
 		sf::RenderWindow* myRenderWindow = nullptr;
 
 		sf::RenderTarget* myActiveRenderTarget = nullptr;
@@ -42,6 +79,8 @@ namespace Slush
 
 		sf::CircleShape* myCircleShape = nullptr;
 		sf::RectangleShape* myRectShape = nullptr;
+
+		FW_GrowingArray<TargetQueue> myTargetQueues;
 
 		struct FadeData
 		{

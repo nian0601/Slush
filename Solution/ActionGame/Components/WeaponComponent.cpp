@@ -276,8 +276,11 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 		projDamage->SetDamage(damage);
 	}
 
-	if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
-		anim->PlayAnimation(*mySpriteSheetAnimation);
+	if (mySpriteSheetAnimation)
+	{
+		if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
+			anim->PlayAnimation(*mySpriteSheetAnimation);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

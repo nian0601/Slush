@@ -119,9 +119,12 @@ void PauseState::BuildStatsDisplay(Slush::UIBuilder& aUIBUilder)
 		style.SetOutlineThickness(-1.f);
 		style.EnableButtonInteraction(0xFF888888);
 
-		const StatsUpgradeData::StatData& statdata = upgradeData->myStatDatas[statType];
-		if (const Slush::Texture* iconTexture = statdata.myIconTexture.Get())
-			aUIBUilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
+		if (upgradeData)
+		{
+			const StatsUpgradeData::StatData& statdata = upgradeData->myStatDatas[statType];
+			if (const Slush::Texture* iconTexture = statdata.myIconTexture.Get())
+				aUIBUilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
+		}
 
 		FW_String upgradeValue;
 		upgradeValue += "+";

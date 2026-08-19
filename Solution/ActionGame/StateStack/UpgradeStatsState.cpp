@@ -98,16 +98,19 @@ Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 		style.SetOutlineThickness(-1.f);
 		style.EnableButtonInteraction(0xFF888888);
 
-		const StatsUpgradeData::StatData& statdata = upgradeData->myStatDatas[myUpgradeOptions[i]];
-		if (const Slush::Texture* iconTexture = statdata.myIconTexture.Get())
-			uiBuilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
+		if (upgradeData)
+		{
+			const StatsUpgradeData::StatData& statdata = upgradeData->myStatDatas[myUpgradeOptions[i]];
+			if (const Slush::Texture* iconTexture = statdata.myIconTexture.Get())
+				uiBuilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
 
-		uiBuilder.Text(myUpgradeLabels[i].GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
-		FW_String upgradeValue;
-		upgradeValue += "+";
-		upgradeValue += static_cast<int>(statdata.myIncreasePerUpgrade * 100);
-		upgradeValue += "%";
-		uiBuilder.Text(upgradeValue.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 18, 0xFF44FF44);
+			uiBuilder.Text(myUpgradeLabels[i].GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
+			FW_String upgradeValue;
+			upgradeValue += "+";
+			upgradeValue += static_cast<int>(statdata.myIncreasePerUpgrade * 100);
+			upgradeValue += "%";
+			uiBuilder.Text(upgradeValue.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 18, 0xFF44FF44);
+		}
 
 		uiBuilder.CloseElement();
 	}

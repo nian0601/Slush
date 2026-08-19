@@ -39,6 +39,13 @@ PauseState::PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& a
 
 Slush::IGameState::GameStateResult PauseState::Update()
 {
+	Slush::Entity* player = myPlayerHandle.Get();
+	if (!player)
+	{
+		SLUSH_ERROR("PauseState lost its player entity");
+		return Slush::IGameState::POP_SUBSTATE;
+	}
+
 	Slush::UIBuilder uiBuilder;
 
 	uiBuilder.Start();
@@ -100,6 +107,11 @@ void PauseState::BuildStatsDisplay(Slush::UIBuilder& aUIBUilder)
 {
 	Slush::Entity* player = myPlayerHandle.Get();
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
+	if (!stats)
+	{
+		SLUSH_ERROR("Entity with 'PauseState' player role is missing a 'StatsComponent'");
+		return;
+	}
 
 	const StatsUpgradeData* upgradeData = stats->GetUpgradeData();
 
@@ -141,6 +153,12 @@ void PauseState::BuildWeaponsDisplay(Slush::UIBuilder& aUIBUilder)
 {
 	Slush::Entity* player = myPlayerHandle.Get();
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
+	if (!weaponComponent)
+	{
+		SLUSH_ERROR("Entity with 'PauseState' player role is missing a 'WeaponComponent'");
+		return;
+	}
+
 	const FW_GrowingArray<Weapon*>& weapons = weaponComponent->GetWeapons();
 
 	aUIBUilder.OpenElement(myUIBackgroundStyle).SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);

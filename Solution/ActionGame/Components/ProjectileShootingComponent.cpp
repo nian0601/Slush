@@ -67,8 +67,16 @@ bool ProjectileShootingComponent::TryShoot(const Vector2f& aDirection)
 
 	Vector2f projPosition = myEntity.myPosition + aDirection * shootingData.myProjectileSpawnOffset;
 	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(projPosition, *prefab);
-	projectile->GetComponent<Slush::PhysicsComponent>()->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
-	projectile->GetComponent<Slush::SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+
+	if (Slush::PhysicsComponent* physics = projectile->GetComponent<Slush::PhysicsComponent>())
+		physics->myObject->myVelocity = aDirection * shootingData.myProjectileSpeed;
+	else
+		SLUSH_ERROR("Entity spawned by 'ProjectileShootingComponent::TryShoot' is missing a 'PhysicsComponent'");
+
+	if (Slush::SpriteComponent* sprite = projectile->GetComponent<Slush::SpriteComponent>())
+		sprite->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+	else
+		SLUSH_ERROR("Entity spawned by 'ProjectileShootingComponent::TryShoot' is missing a 'SpriteComponent'");
 
 	return true;
 }

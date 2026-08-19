@@ -34,6 +34,18 @@ UpgradeStatsState::UpgradeStatsState(Slush::EntityHandle aPlayerHandle)
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
 
+	if (!expComp)
+	{
+		SLUSH_ERROR("Entity with 'UpgradeStatsState' player role is missing an 'ExperienceComponent'");
+		return;
+	}
+
+	if (!stats)
+	{
+		SLUSH_ERROR("Entity with 'UpgradeStatsState' player role is missing a 'StatsComponent'");
+		return;
+	}
+
 	FW_GrowingArray<StatType> potentialUpgrades;
 	potentialUpgrades.Add(StatType::COOLDOWN);
 	potentialUpgrades.Add(StatType::DAMAGE);
@@ -59,7 +71,18 @@ UpgradeStatsState::UpgradeStatsState(Slush::EntityHandle aPlayerHandle)
 Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 {
 	Slush::Entity* player = myPlayerHandle.Get();
+	if (!player)
+	{
+		SLUSH_ERROR("UpgradeStatsState lost its player entity");
+		return Slush::IGameState::POP_SUBSTATE;
+	}
+
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
+	if (!expComp)
+	{
+		SLUSH_ERROR("Entity with 'UpgradeStatsState' player role is missing an 'ExperienceComponent'");
+		return Slush::IGameState::POP_SUBSTATE;
+	}
 
 	if (myUpgradeOptions.IsEmpty())
 	{
@@ -69,6 +92,11 @@ Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 	}
 
 	StatsComponent* stats = player->GetComponent<StatsComponent>();
+	if (!stats)
+	{
+		SLUSH_ERROR("Entity with 'UpgradeStatsState' player role is missing a 'StatsComponent'");
+		return Slush::IGameState::POP_SUBSTATE;
+	}
 
 	const StatsUpgradeData* upgradeData = stats->GetUpgradeData();
 

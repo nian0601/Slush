@@ -265,8 +265,17 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 		return;
 
 	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, *prefab);
-	projectile->GetComponent<Slush::PhysicsComponent>()->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
-	projectile->GetComponent<Slush::SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+
+	if (Slush::PhysicsComponent* physics = projectile->GetComponent<Slush::PhysicsComponent>())
+		physics->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
+	else
+		SLUSH_ERROR("Entity spawned by 'Weapon::ShootProjectile' is missing a 'PhysicsComponent'");
+
+	if (Slush::SpriteComponent* sprite = projectile->GetComponent<Slush::SpriteComponent>())
+		sprite->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+	else
+		SLUSH_ERROR("Entity spawned by 'Weapon::ShootProjectile' is missing a 'SpriteComponent'");
+
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
 		int damage = myRankData->myBaseDamage;

@@ -50,6 +50,9 @@ CharacterAnimationComponent::~CharacterAnimationComponent()
 
 void CharacterAnimationComponent::PlayMovementAnimation()
 {
+	if (!myAnimationSet)
+		return;
+
 	if (!myAnimationSet->myWalk)
 		return;
 
@@ -65,6 +68,9 @@ void CharacterAnimationComponent::PlayMovementAnimation()
 
 void CharacterAnimationComponent::PlayAttackAnimation()
 {
+	if (!myAnimationSet)
+		return;
+
 	Slush::AnimationComponent* animComponent = myEntity.GetComponent<Slush::AnimationComponent>();
 	animComponent->PlayAnimation(*myAnimationSet->myAttack);
 }

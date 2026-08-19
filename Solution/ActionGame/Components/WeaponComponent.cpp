@@ -313,6 +313,7 @@ WeaponComponent::WeaponComponent(Slush::Entity& anEntity, const Slush::EntityPre
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	WeaponData* startingWeapon = anEntityPrefab.GetComponentData<WeaponComponent>().myWeaponData.Get();
+	FW_ASSERT(startingWeapon, "WeaponComponent has no valid starting WeaponData - check EntityPrefab's WeaponComponent data");
 
 	myWeapons.Add(new Weapon(myEntity, *startingWeapon));
 

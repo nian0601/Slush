@@ -60,7 +60,7 @@ Every Slush game launches as a `Windows`-subsystem executable (see `Directory.Bu
 
 ## Repo etiquette
 
-Solo project — commit directly to `main`, no branch/PR convention to follow. The one sanctioned exception: `/implement-issue` does its work on a transient `issue-<N>` branch inside a git worktree, fast-forwarded back into `main` and deleted once the issue is done — never a long-lived branch.
+Base/merge branch: `main`. Solo project, but `/implement-issue`/`/implement-issue-orchestrated` use a PR flow rather than direct-commit: work happens on a transient `issue-<N>` branch inside a git worktree, then gets pushed and opened as a GitHub PR (`Closes #<N>` in the body) instead of merged locally. Merging itself is never automated — it happens only when you click Merge on GitHub, which is the actual review gate — and the worktree/branch are torn down once the PR is open.
 
 ## Issue tracking
 

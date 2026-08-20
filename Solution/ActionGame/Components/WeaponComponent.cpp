@@ -265,8 +265,17 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 		return;
 
 	Slush::Entity* projectile = myEntity.myEntityManager.CreateEntity(myEntity.myPosition + aDirection * 35.f, *prefab);
-	projectile->GetComponent<Slush::PhysicsComponent>()->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
-	projectile->GetComponent<Slush::SpriteComponent>()->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+
+	if (Slush::PhysicsComponent* physics = projectile->GetComponent<Slush::PhysicsComponent>())
+		physics->myObject->myVelocity = aDirection * myRankData->myProjectileData.myBaseProjectileSpeed;
+	else
+		SLUSH_ERROR("Entity spawned by 'Weapon::ShootProjectile' is missing a 'PhysicsComponent'");
+
+	if (Slush::SpriteComponent* sprite = projectile->GetComponent<Slush::SpriteComponent>())
+		sprite->GetSprite().SetRotation(FW_SignedAngle(aDirection));
+	else
+		SLUSH_ERROR("Entity spawned by 'Weapon::ShootProjectile' is missing a 'SpriteComponent'");
+
 	if (DamageDealerComponent* projDamage = projectile->GetComponent<DamageDealerComponent>())
 	{
 		int damage = myRankData->myBaseDamage;
@@ -276,8 +285,11 @@ void Weapon::ShootProjectile(const Vector2f& aDirection)
 		projDamage->SetDamage(damage);
 	}
 
-	if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
-		anim->PlayAnimation(*mySpriteSheetAnimation);
+	if (mySpriteSheetAnimation)
+	{
+		if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
+			anim->PlayAnimation(*mySpriteSheetAnimation);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -310,6 +322,7 @@ WeaponComponent::WeaponComponent(Slush::Entity& anEntity, const Slush::EntityPre
 {
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	WeaponData* startingWeapon = anEntityPrefab.GetComponentData<WeaponComponent>().myWeaponData.Get();
+	FW_ASSERT(startingWeapon, "WeaponComponent has no valid starting WeaponData - check EntityPrefab's WeaponComponent data");
 
 	myWeapons.Add(new Weapon(myEntity, *startingWeapon));
 

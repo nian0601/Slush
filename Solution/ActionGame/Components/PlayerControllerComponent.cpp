@@ -28,7 +28,7 @@ void PlayerControllerComponent::OnEnterWorld()
 void PlayerControllerComponent::PrePhysicsUpdate()
 {
 	Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>();
-	if (!anim || !anim->IsAnimationPlaying(*myDashAnimation))
+	if (!anim || !myDashAnimation || !anim->IsAnimationPlaying(*myDashAnimation))
 	{
 		myDirection = { 0.f, 0.f };
 
@@ -56,7 +56,7 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 				sprite->GetSprite().SetHorizontalFlip(true);
 		}
 
-		if (anim && input.WasKeyPressed(Slush::Input::SPACE))
+		if (anim && myDashAnimation && input.WasKeyPressed(Slush::Input::SPACE))
 		{
 			Slush::AnimationRuntime* animData = anim->PlayAnimation(*myDashAnimation);
 			animData->myEndPosition = myEntity.myPosition + myDirection * 500.f;
@@ -70,7 +70,7 @@ void PlayerControllerComponent::PrePhysicsUpdate()
 			ActionGameGlobals::GetInstance().GetEntityManager().CreateEntity(myEntity.myPosition, "Magic_Spawn_Large");
 		}
 			
-		if (anim && input.WasKeyPressed(Slush::Input::V))
+		if (anim && mySpriteSheetAnimation && input.WasKeyPressed(Slush::Input::V))
 			anim->PlayAnimation(*mySpriteSheetAnimation);
 	}
 }

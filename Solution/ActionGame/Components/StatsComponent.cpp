@@ -136,6 +136,9 @@ bool StatsComponent::CanUpgradeAnyStat() const
 
 void StatsComponent::UpgradeStat(StatType aStat)
 {
+	if (!myUpgradeData)
+		return;
+
 	RuntimeStat& runtime = myRuntimeStats[aStat];
 	const StatsUpgradeData::StatData& upgradeData = myUpgradeData->myStatDatas[aStat];
 
@@ -144,6 +147,9 @@ void StatsComponent::UpgradeStat(StatType aStat)
 
 bool StatsComponent::CanUpgradeStat(StatType aStat) const
 {
+	if (!myUpgradeData)
+		return false;
+
 	const RuntimeStat& runtime = myRuntimeStats[aStat];
 	const StatsUpgradeData::StatData& upgradeData = myUpgradeData->myStatDatas[aStat];
 

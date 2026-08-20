@@ -30,5 +30,5 @@ public:
 	//void Update() override;
 	
 private:
-	const CharacterAnimationSet* myAnimationSet;
+	const CharacterAnimationSet* myAnimationSet = nullptr;
 };

@@ -48,20 +48,28 @@ void Level::Update(Slush::StateStack& aStateStack)
 	ExperienceComponent* expComp = player->GetComponent<ExperienceComponent>();
 	WeaponComponent* weaponComp = player->GetComponent<WeaponComponent>();
 
+	if (!expComp)
+		SLUSH_ERROR("Entity with player role is missing an 'ExperienceComponent'");
+
+	if (!weaponComp)
+		SLUSH_ERROR("Entity with player role is missing a 'WeaponComponent'");
+
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	const Slush::Input& input = engine.GetInput();
 	if (input.WasKeyReleased(Slush::Input::E))
 	{
-		expComp->AddExperience(1);
+		if (expComp)
+			expComp->AddExperience(1);
 	}
 	else if (input.WasKeyReleased(Slush::Input::Q))
 	{
-		weaponComp->AddPendingUpgrade();
+		if (weaponComp)
+			weaponComp->AddPendingUpgrade();
 	}
 
-	if (expComp->NeedsLevelUp())
+	if (expComp && expComp->NeedsLevelUp())
 		aStateStack.PushSubState(new UpgradeStatsState(myPlayerHandle));
-	else if (weaponComp->HasPendingUpgrade())
+	else if (weaponComp && weaponComp->HasPendingUpgrade())
 		aStateStack.PushSubState(new UpgradeWeaponState(myPlayerHandle));
 	else
 		HandleEnemyWaves();

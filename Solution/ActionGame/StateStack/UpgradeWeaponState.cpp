@@ -32,7 +32,18 @@ UpgradeWeaponState::UpgradeWeaponState(Slush::EntityHandle aPlayerHandle)
 Slush::IGameState::GameStateResult UpgradeWeaponState::Update()
 {
 	Slush::Entity* player = myPlayerHandle.Get();
+	if (!player)
+	{
+		SLUSH_ERROR("UpgradeWeaponState lost its player entity");
+		return Slush::IGameState::POP_SUBSTATE;
+	}
+
 	WeaponComponent* weaponComponent = player->GetComponent<WeaponComponent>();
+	if (!weaponComponent)
+	{
+		SLUSH_ERROR("Entity with 'UpgradeWeaponState' player role is missing a 'WeaponComponent'");
+		return Slush::IGameState::POP_SUBSTATE;
+	}
 
 	if (!weaponComponent->HasPendingUpgrade())
 		return Slush::IGameState::POP_SUBSTATE;

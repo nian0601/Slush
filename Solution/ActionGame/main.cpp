@@ -23,6 +23,7 @@
 #include "Components/StatsComponent.h"
 #include "CharacterInfo.h"
 
+// Disposable trial marker (nian0601/Slush#40 Phase 5) -- verifies the manual-test gate end-to-end; this branch/PR is discarded after review, never merged.
 class App : public Slush::IApp
 {
 public:

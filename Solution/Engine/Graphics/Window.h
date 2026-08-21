@@ -22,6 +22,8 @@ namespace Slush
 
 		void RequestScreenshot() { myScreenshotRequested = true; }
 
+		void BuildEditorChrome();
+		void Composite();
 		void Present();
 
 		// Single chokepoint for every way of quitting - resolves any unsaved changes (via the owning
@@ -31,6 +33,7 @@ namespace Slush
 		void Hide();
 
 		void ToggleEditorUI() { myShowEditorUI = !myShowEditorUI; }
+		bool IsEditorUIVisible() const { return myShowEditorUI; }
 
 		void SetAppLayout(IAppLayout* aLayout);
 

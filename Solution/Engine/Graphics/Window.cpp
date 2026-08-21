@@ -90,55 +90,59 @@ namespace Slush
 		ImGui::Image(textureID, { myGameViewRect.myExtents.x, myGameViewRect.myExtents.y }, { 0, 1 }, { 1, 0 });
 	}
 
-	void Window::Present()
+	void Window::BuildEditorChrome()
 	{
-		if (myShowEditorUI)
+		if (!myShowEditorUI)
+			return;
+
+		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMainMenuBar())
+			if (myAppLayout)
+				ImGui::Text("[ %s ]", myAppLayout->GetName().GetBuffer());
+
+			if (ImGui::BeginMenu("Layouts"))
 			{
-				if (myAppLayout)
-					ImGui::Text("[ %s ]", myAppLayout->GetName().GetBuffer());
-
-				if (ImGui::BeginMenu("Layouts"))
-				{
-					ImGui::Selectable("Game");
-					ImGui::Selectable("Entity");
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("ImGUI"))
-				{
-					ImGui::Checkbox("Show Demo", &myDisplayImGUIDemo);
-					ImGui::EndMenu();
-				}
-
-				ImGui::EndMainMenuBar();
+				ImGui::Selectable("Game");
+				ImGui::Selectable("Entity");
+				ImGui::EndMenu();
 			}
 
-			ImGui::DockSpaceOverViewport();
+			if (ImGui::BeginMenu("ImGUI"))
+			{
+				ImGui::Checkbox("Show Demo", &myDisplayImGUIDemo);
+				ImGui::EndMenu();
+			}
 
-			if (myDisplayImGUIDemo)
-				ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
-
-			if (myAppLayout)
-				myAppLayout->BuildUI();
-		}
-		else
-		{
-			myGameViewRect = myWindowRect;
-
-			// If we're not in 'ShowEditorUI'-mode, then we need to render the OffScreenBuffer that contains the Gamerender
-			// to the screen using a rectshape.
-			// While in 'ShowEditorUI'-mode this will instead happen through the 'GameViewDockable'.
-			Vector2f adjustedSize = GetSizeThatRespectsAspectRatio(static_cast<int>(myWindowRect.myExtents.x), static_cast<int>(myWindowRect.myExtents.y));
-
-			sf::RectangleShape rect;
-			rect.setTexture(&myRenderer->GetOffscreenBuffer()->getTexture());
-			rect.setSize({ adjustedSize.x, adjustedSize.y });
-
-			myRenderWindow->draw(rect);
+			ImGui::EndMainMenuBar();
 		}
 
+		ImGui::DockSpaceOverViewport();
+
+		if (myDisplayImGUIDemo)
+			ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
+
+		if (myAppLayout)
+			myAppLayout->BuildUI();
+	}
+
+	void Window::Composite()
+	{
+		myGameViewRect = myWindowRect;
+
+		// If we're not in 'ShowEditorUI'-mode, then we need to render the OffScreenBuffer that contains the Gamerender
+		// to the screen using a rectshape.
+		// While in 'ShowEditorUI'-mode this will instead happen through the 'GameViewDockable'.
+		Vector2f adjustedSize = GetSizeThatRespectsAspectRatio(static_cast<int>(myWindowRect.myExtents.x), static_cast<int>(myWindowRect.myExtents.y));
+
+		sf::RectangleShape rect;
+		rect.setTexture(&myRenderer->GetOffscreenBuffer()->getTexture());
+		rect.setSize({ adjustedSize.x, adjustedSize.y });
+
+		myRenderWindow->draw(rect);
+	}
+
+	void Window::Present()
+	{
 		ImGui::SFML::Render(*myRenderWindow);
 
 		myRenderWindow->display();

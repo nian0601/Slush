@@ -148,6 +148,13 @@ namespace Slush
 			myWindow->GetRenderer().RenderFade();
 			myWindow->GetRenderer().FinalizeOffscreenBuffer();
 
+			myWindow->BuildEditorChrome();
+
+			// The editor path composites via GameViewDockable -> RenderOffscreenBufferToImGUI() -> ImGui::Image
+			// instead, since the game view there is an ImGui-laid-out dockable panel.
+			if (!myWindow->IsEditorUIVisible())
+				myWindow->Composite();
+
 			myWindow->Present();
 		}
 

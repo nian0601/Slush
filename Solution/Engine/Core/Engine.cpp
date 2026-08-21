@@ -106,8 +106,17 @@ namespace Slush
 	{
 		anApp.Initialize();
 
-		while (myWindow->PumpEvents())
+		while (myWindow->IsOpen())
 		{
+			myWindow->PumpEvents();
+
+			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
+				myWindow->ToggleEditorUI();
+
+			myWindow->UpdatePendingClose();
+
+			ImGui::SFML::Update(*myWindow->GetRenderWindow(), Time::GetDelta());
+
 			Time::Update();
 			myLogger->Update();
 

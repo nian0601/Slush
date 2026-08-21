@@ -3,9 +3,6 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Log.h"
-#include "Core/Engine.h"
-#include "Core/Input.h"
-#include "Core/Time.h"
 #include "Core/Dockables/Dockable.h"
 #include "Core/Dockables/IAppLayout.h"
 
@@ -57,11 +54,8 @@ namespace Slush
 		myRenderWindow->setVisible(false);
 	}
 
-	bool Window::PumpEvents()
+	void Window::PumpEvents()
 	{
-		if (!myShouldBeOpen)
-			return false;
-
 		while (const std::optional event = myRenderWindow->pollEvent())
 		{
 			ImGui::SFML::ProcessEvent(*myRenderWindow, *event);
@@ -77,15 +71,6 @@ namespace Slush
 				myRenderWindow->setView(sf::View(visibleArea));
 			}
 		}
-
-		if (Slush::Engine::GetInstance().GetInput().WasKeyPressed(Slush::Input::HYPHEN))
-			ToggleEditorUI();
-
-		UpdatePendingClose();
-
-		ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());
-
-		return true;
 	}
 
 	void Window::RenderOffscreenBufferToImGUI()

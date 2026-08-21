@@ -141,10 +141,12 @@ namespace Slush
 
 			anApp.Render();
 			myWindow->UpdateAppLayout();
+			myWindow->GetRenderer().UpdateFade();
 			myWindow->RenderAppLayout();
 
 			myWindow->GetRenderer().ProcessRenderQueue();
 			myWindow->GetRenderer().RenderFade();
+			myWindow->GetRenderer().FinalizeOffscreenBuffer();
 
 			myWindow->Present();
 		}

@@ -295,7 +295,7 @@ namespace Slush
 		myFadeData.myTotalTime = aDuration;
 	}
 
-	void Renderer::RenderFade()
+	void Renderer::UpdateFade()
 	{
 		if (myFadeData.myIsFading)
 		{
@@ -303,7 +303,10 @@ namespace Slush
 			if (myFadeData.myRemainingTime <= 0.f)
 				myFadeData.myIsFading = false;
 		}
+	}
 
+	void Renderer::RenderFade()
+	{
 		if (myFadeData.myIsFading)
 		{
 			float alpha = FW_Max(0.f, myFadeData.myRemainingTime / myFadeData.myTotalTime);
@@ -313,7 +316,10 @@ namespace Slush
 			rect.setFillColor(SFMLHelpers::GetColor(FW_Float_To_ARGB(alpha, 1.f, 1.f, 1.f)));
 			myOffscreenBuffer->draw(rect);
 		}
+	}
 
+	void Renderer::FinalizeOffscreenBuffer()
+	{
 		myOffscreenBuffer->display();
 
 		if (!myFadeData.myIsFading)

@@ -81,14 +81,9 @@ namespace Slush
 		if (Slush::Engine::GetInstance().GetInput().WasKeyPressed(Slush::Input::HYPHEN))
 			ToggleEditorUI();
 
-		// Must run before the myShowEditorUI check below: this can force the editor back on for a pending
-		// close, and that has to take effect in time to begin this frame's ImGui frame - otherwise Present()
-		// still sees myShowEditorUI true (set here) but ImGui::SFML::Update() (ImGui::NewFrame()) never
-		// ran this frame, so its ImGui::Begin() calls assert.
 		UpdatePendingClose();
 
-		if (myShowEditorUI)
-			ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());
+		ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());
 
 		return true;
 	}
@@ -142,8 +137,6 @@ namespace Slush
 
 			if (myAppLayout)
 				myAppLayout->BuildUI();
-
-			ImGui::SFML::Render(*myRenderWindow);
 		}
 		else
 		{
@@ -160,6 +153,8 @@ namespace Slush
 
 			myRenderWindow->draw(rect);
 		}
+
+		ImGui::SFML::Render(*myRenderWindow);
 
 		myRenderWindow->display();
 
@@ -230,12 +225,8 @@ namespace Slush
 			return;
 		}
 
-		// PumpEvents() skips ImGui::SFML::Update() while the editor is hidden, so no ImGui frame is begun
-		// and the close-confirmation modal (built in the editor-only BuildUI() half) has nothing to draw
-		// into and no way to take input - force the editor on so a quit initiated from the game view still
-		// gets to draw and take input on the confirmation popup. Must happen before PumpEvents()'s own
-		// myShowEditorUI check (that's why this is called from there, not from Present()) so the forced
-		// value takes effect in time for this same frame's ImGui::SFML::Update() to actually run.
+		// The close-confirmation modal is built in the editor-only BuildUI() half, so the editor must be
+		// visible for the user to see and click it.
 		myShowEditorUI = true;
 
 		switch (myAppLayout->RequestClose())

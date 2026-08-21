@@ -140,8 +140,8 @@ namespace Slush
 			anApp.Update();
 
 			anApp.Render();
-			myWindow->RenderAppLayout();
 			myWindow->UpdateAppLayout();
+			myWindow->RenderAppLayout();
 
 			myWindow->GetRenderer().ProcessRenderQueue();
 			myWindow->GetRenderer().RenderFade();

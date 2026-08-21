@@ -64,4 +64,4 @@ Base/merge branch: `main`. Solo project, but `/implement-issue`/`/implement-issu
 
 ## Issue tracking
 
-Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Valid `project:` label values: `project:engine` (Slush Engine/Framework code), `project:actiongame` (ActionGame-specific code), `project:tooling` (Claude Code skills, CLAUDE.md, repo workflow tooling). Revisit if this needs to be more granular (e.g. per-game, as BossMonster/TopDownGame become active) or consolidated.
+Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Valid `project:` label values: `project:engine` (Slush Engine/Framework code), `project:actiongame` (ActionGame-specific code), `project:topdowngame` (TopDownGame-specific code), `project:tooling` (Claude Code skills, CLAUDE.md, repo workflow tooling). Revisit if this needs to be more granular (e.g. per-game, as BossMonster becomes active) or consolidated.

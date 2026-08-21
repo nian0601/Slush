@@ -110,13 +110,6 @@ namespace Slush
 		{
 			myWindow->PumpEvents();
 
-			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
-				myWindow->ToggleEditorUI();
-
-			myWindow->UpdatePendingClose();
-
-			ImGui::SFML::Update(*myWindow->GetRenderWindow(), Time::GetDelta());
-
 			Time::Update();
 			myLogger->Update();
 
@@ -134,14 +127,21 @@ namespace Slush
 				myInput->RemapMousePosition(myWindow->GetWindowRect(), myWindow->GetGameViewRect());
 			}
 
+			if (myInput->WasKeyPressed(Slush::Input::_F10))
+				myWindow->RequestScreenshot();
+
+			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
+				myWindow->ToggleEditorUI();
+
+			myWindow->UpdatePendingClose();
+
+			ImGui::SFML::Update(*myWindow->GetRenderWindow(), Time::GetDelta());
+
 			anApp.Update();
 
 			anApp.Render();
 			myWindow->RenderAppLayout();
 			myWindow->UpdateAppLayout();
-
-			if (myInput->WasKeyPressed(Slush::Input::_F10))
-				myWindow->RequestScreenshot();
 
 			myWindow->GetRenderer().ProcessRenderQueue();
 			myWindow->GetRenderer().RenderFade();

@@ -102,6 +102,74 @@ namespace Slush
 		FW_SAFE_DELETE(myLogger);
 	}
 
+	void Engine::BeginFrame()
+	{
+		Time::Update();
+		myLogger->Update();
+	}
+
+	void Engine::UpdateInput()
+	{
+		ImGuiIO& imguiIO = ImGui::GetIO();
+
+		if (!imguiIO.WantCaptureKeyboard)
+			myInput->UpdateKeyboard();
+
+		if (CommandLineArgs::GetInstance().HasFlag("-usedebuginput"))
+			myInput->PollDebugInputFile(imguiIO.WantCaptureKeyboard);
+
+		if (!imguiIO.WantCaptureMouse || myByPassImGUIInputRestriction)
+		{
+			myInput->UpdateMouse(*myWindow->GetRenderWindow());
+			myInput->RemapMousePosition(myWindow->GetWindowRect(), myWindow->GetGameViewRect());
+		}
+
+		if (myInput->WasKeyPressed(Slush::Input::_F10))
+			myWindow->RequestScreenshot();
+
+		if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
+			myWindow->ToggleEditorUI();
+
+		myWindow->UpdatePendingClose();
+	}
+
+	void Engine::BeginImGuiFrame()
+	{
+		ImGui::SFML::Update(*myWindow->GetRenderWindow(), Time::GetDelta());
+	}
+
+	void Engine::UpdateSimulation(IApp& anApp)
+	{
+		anApp.Update();
+		myWindow->UpdateAppLayout();
+		myWindow->GetRenderer().UpdateFade();
+	}
+
+	void Engine::RenderFrame(IApp& anApp)
+	{
+		anApp.Render();
+		myWindow->RenderAppLayout();
+
+		myWindow->GetRenderer().ProcessRenderQueue();
+		myWindow->GetRenderer().RenderFade();
+		myWindow->GetRenderer().FinalizeOffscreenBuffer();
+	}
+
+	void Engine::BuildEditorUI()
+	{
+		myWindow->BuildEditorChrome();
+	}
+
+	void Engine::CompositeAndPresent()
+	{
+		// The editor path composites via GameViewDockable -> RenderOffscreenBufferToImGUI() -> ImGui::Image
+		// instead, since the game view there is an ImGui-laid-out dockable panel.
+		if (!myWindow->IsEditorUIVisible())
+			myWindow->Composite();
+
+		myWindow->Present();
+	}
+
 	void Engine::Run(IApp& anApp)
 	{
 		anApp.Initialize();
@@ -109,53 +177,13 @@ namespace Slush
 		while (myWindow->IsOpen())
 		{
 			myWindow->PumpEvents();
-
-			Time::Update();
-			myLogger->Update();
-
-			ImGuiIO& imguiIO = ImGui::GetIO();
-
-			if(!imguiIO.WantCaptureKeyboard)
-				myInput->UpdateKeyboard();
-
-			if (CommandLineArgs::GetInstance().HasFlag("-usedebuginput"))
-				myInput->PollDebugInputFile(imguiIO.WantCaptureKeyboard);
-
-			if (!imguiIO.WantCaptureMouse || myByPassImGUIInputRestriction)
-			{
-				myInput->UpdateMouse(*myWindow->GetRenderWindow());
-				myInput->RemapMousePosition(myWindow->GetWindowRect(), myWindow->GetGameViewRect());
-			}
-
-			if (myInput->WasKeyPressed(Slush::Input::_F10))
-				myWindow->RequestScreenshot();
-
-			if (myInput->WasKeyPressed(Slush::Input::HYPHEN))
-				myWindow->ToggleEditorUI();
-
-			myWindow->UpdatePendingClose();
-
-			ImGui::SFML::Update(*myWindow->GetRenderWindow(), Time::GetDelta());
-
-			anApp.Update();
-
-			anApp.Render();
-			myWindow->UpdateAppLayout();
-			myWindow->GetRenderer().UpdateFade();
-			myWindow->RenderAppLayout();
-
-			myWindow->GetRenderer().ProcessRenderQueue();
-			myWindow->GetRenderer().RenderFade();
-			myWindow->GetRenderer().FinalizeOffscreenBuffer();
-
-			myWindow->BuildEditorChrome();
-
-			// The editor path composites via GameViewDockable -> RenderOffscreenBufferToImGUI() -> ImGui::Image
-			// instead, since the game view there is an ImGui-laid-out dockable panel.
-			if (!myWindow->IsEditorUIVisible())
-				myWindow->Composite();
-
-			myWindow->Present();
+			BeginFrame();
+			UpdateInput();
+			BeginImGuiFrame();
+			UpdateSimulation(anApp);
+			RenderFrame(anApp);
+			BuildEditorUI();
+			CompositeAndPresent();
 		}
 
 		anApp.Shutdown();

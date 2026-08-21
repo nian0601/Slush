@@ -68,10 +68,13 @@ void HealthComponent::DealDamage(int aDamageAmount)
 
 	damageTaken.myNewHealth = myCurrentHealth;
 
-	if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
+	if (myDamageAnimation)
 	{
-		Slush::AnimationRuntime* animData = anim->PlayAnimation(*myDamageAnimation);
-		animData->myEndColor = 0xFFFF0000;
+		if (Slush::AnimationComponent* anim = myEntity.GetComponent<Slush::AnimationComponent>())
+		{
+			Slush::AnimationRuntime* animData = anim->PlayAnimation(*myDamageAnimation);
+			animData->myEndColor = 0xFFFF0000;
+		}
 	}
 
 	if (HealthBarComponent* healthBar = myEntity.GetComponent<HealthBarComponent>())

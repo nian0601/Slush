@@ -16,11 +16,14 @@ namespace Slush
 		Window(unsigned int aWidth, unsigned int aHeight);
 		~Window();
 
-		bool PumpEvents();
+		bool IsOpen() const { return myShouldBeOpen; }
+		void PumpEvents();
 		void RenderOffscreenBufferToImGUI();
 
 		void RequestScreenshot() { myScreenshotRequested = true; }
 
+		void BuildEditorChrome();
+		void Composite();
 		void Present();
 
 		// Single chokepoint for every way of quitting - resolves any unsaved changes (via the owning
@@ -30,11 +33,15 @@ namespace Slush
 		void Hide();
 
 		void ToggleEditorUI() { myShowEditorUI = !myShowEditorUI; }
+		bool IsEditorUIVisible() const { return myShowEditorUI; }
 
 		void SetAppLayout(IAppLayout* aLayout);
 
 		void UpdateAppLayout();
 		void RenderAppLayout();
+
+		// Called every frame (from Engine::Run()) while a close is pending, until it's resolved or cancelled.
+		void UpdatePendingClose();
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
 		Renderer& GetRenderer() const { return *myRenderer; }
@@ -47,9 +54,6 @@ namespace Slush
 		void LoadAppLayoutConfig();
 
 		void SaveScreenshot();
-
-		// Called every frame (from Present()) while a close is pending, until it's resolved or cancelled.
-		void UpdatePendingClose();
 
 		// Single point where myShouldBeOpen actually flips false, so there's always a log line marking
 		// a graceful shutdown - useful for telling it apart from a crash or a forcibly-killed process.

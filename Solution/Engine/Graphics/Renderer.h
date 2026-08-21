@@ -40,7 +40,9 @@ namespace Slush
 		void RenderText(const Font& aFont, const FW_String& aString, const Vector2f& aPosition, int aCharacterSize, int aColor);
 
 		void StartFade(float aDuration);
+		void UpdateFade();
 		void RenderFade();
+		void FinalizeOffscreenBuffer();
 
 		void ProcessRenderQueue();
 

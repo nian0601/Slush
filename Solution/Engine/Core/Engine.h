@@ -32,6 +32,14 @@ namespace Slush
 		~Engine() {};
 		static Engine* ourInstance;
 
+		void BeginFrame();
+		void UpdateInput();
+		void BeginImGuiFrame();
+		void UpdateSimulation(IApp& anApp);
+		void RenderFrame(IApp& anApp);
+		void BuildEditorUI();
+		void CompositeAndPresent();
+
 		Window* myWindow = nullptr;
 		Input* myInput = nullptr;
 		Logger* myLogger = nullptr;

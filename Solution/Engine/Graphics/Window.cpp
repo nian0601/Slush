@@ -3,9 +3,6 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Log.h"
-#include "Core/Engine.h"
-#include "Core/Input.h"
-#include "Core/Time.h"
 #include "Core/Dockables/Dockable.h"
 #include "Core/Dockables/IAppLayout.h"
 
@@ -57,11 +54,8 @@ namespace Slush
 		myRenderWindow->setVisible(false);
 	}
 
-	bool Window::PumpEvents()
+	void Window::PumpEvents()
 	{
-		if (!myShouldBeOpen)
-			return false;
-
 		while (const std::optional event = myRenderWindow->pollEvent())
 		{
 			ImGui::SFML::ProcessEvent(*myRenderWindow, *event);
@@ -77,20 +71,6 @@ namespace Slush
 				myRenderWindow->setView(sf::View(visibleArea));
 			}
 		}
-
-		if (Slush::Engine::GetInstance().GetInput().WasKeyPressed(Slush::Input::HYPHEN))
-			ToggleEditorUI();
-
-		// Must run before the myShowEditorUI check below: this can force the editor back on for a pending
-		// close, and that has to take effect in time to begin this frame's ImGui frame - otherwise Present()
-		// still sees myShowEditorUI true (set here) but ImGui::SFML::Update() (ImGui::NewFrame()) never
-		// ran this frame, so its ImGui::Begin() calls assert.
-		UpdatePendingClose();
-
-		if (myShowEditorUI)
-			ImGui::SFML::Update(*myRenderWindow, Time::GetDelta());
-
-		return true;
 	}
 
 	void Window::RenderOffscreenBufferToImGUI()
@@ -110,56 +90,60 @@ namespace Slush
 		ImGui::Image(textureID, { myGameViewRect.myExtents.x, myGameViewRect.myExtents.y }, { 0, 1 }, { 1, 0 });
 	}
 
-	void Window::Present()
+	void Window::BuildEditorChrome()
 	{
-		if (myShowEditorUI)
+		if (!myShowEditorUI)
+			return;
+
+		if (ImGui::BeginMainMenuBar())
 		{
-			if (ImGui::BeginMainMenuBar())
+			if (myAppLayout)
+				ImGui::Text("[ %s ]", myAppLayout->GetName().GetBuffer());
+
+			if (ImGui::BeginMenu("Layouts"))
 			{
-				if (myAppLayout)
-					ImGui::Text("[ %s ]", myAppLayout->GetName().GetBuffer());
-
-				if (ImGui::BeginMenu("Layouts"))
-				{
-					ImGui::Selectable("Game");
-					ImGui::Selectable("Entity");
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("ImGUI"))
-				{
-					ImGui::Checkbox("Show Demo", &myDisplayImGUIDemo);
-					ImGui::EndMenu();
-				}
-
-				ImGui::EndMainMenuBar();
+				ImGui::Selectable("Game");
+				ImGui::Selectable("Entity");
+				ImGui::EndMenu();
 			}
 
-			ImGui::DockSpaceOverViewport();
+			if (ImGui::BeginMenu("ImGUI"))
+			{
+				ImGui::Checkbox("Show Demo", &myDisplayImGUIDemo);
+				ImGui::EndMenu();
+			}
 
-			if (myDisplayImGUIDemo)
-				ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
-
-			if (myAppLayout)
-				myAppLayout->BuildUI();
-
-			ImGui::SFML::Render(*myRenderWindow);
+			ImGui::EndMainMenuBar();
 		}
-		else
-		{
-			myGameViewRect = myWindowRect;
 
-			// If we're not in 'ShowEditorUI'-mode, then we need to render the OffScreenBuffer that contains the Gamerender
-			// to the screen using a rectshape.
-			// While in 'ShowEditorUI'-mode this will instead happen through the 'GameViewDockable'.
-			Vector2f adjustedSize = GetSizeThatRespectsAspectRatio(static_cast<int>(myWindowRect.myExtents.x), static_cast<int>(myWindowRect.myExtents.y));
+		ImGui::DockSpaceOverViewport();
 
-			sf::RectangleShape rect;
-			rect.setTexture(&myRenderer->GetOffscreenBuffer()->getTexture());
-			rect.setSize({ adjustedSize.x, adjustedSize.y });
+		if (myDisplayImGUIDemo)
+			ImGui::ShowDemoWindow(&myDisplayImGUIDemo);
 
-			myRenderWindow->draw(rect);
-		}
+		if (myAppLayout)
+			myAppLayout->BuildUI();
+	}
+
+	void Window::Composite()
+	{
+		myGameViewRect = myWindowRect;
+
+		// If we're not in 'ShowEditorUI'-mode, then we need to render the OffScreenBuffer that contains the Gamerender
+		// to the screen using a rectshape.
+		// While in 'ShowEditorUI'-mode this will instead happen through the 'GameViewDockable'.
+		Vector2f adjustedSize = GetSizeThatRespectsAspectRatio(static_cast<int>(myWindowRect.myExtents.x), static_cast<int>(myWindowRect.myExtents.y));
+
+		sf::RectangleShape rect;
+		rect.setTexture(&myRenderer->GetOffscreenBuffer()->getTexture());
+		rect.setSize({ adjustedSize.x, adjustedSize.y });
+
+		myRenderWindow->draw(rect);
+	}
+
+	void Window::Present()
+	{
+		ImGui::SFML::Render(*myRenderWindow);
 
 		myRenderWindow->display();
 
@@ -230,12 +214,8 @@ namespace Slush
 			return;
 		}
 
-		// PumpEvents() skips ImGui::SFML::Update() while the editor is hidden, so no ImGui frame is begun
-		// and the close-confirmation modal (built in the editor-only BuildUI() half) has nothing to draw
-		// into and no way to take input - force the editor on so a quit initiated from the game view still
-		// gets to draw and take input on the confirmation popup. Must happen before PumpEvents()'s own
-		// myShowEditorUI check (that's why this is called from there, not from Present()) so the forced
-		// value takes effect in time for this same frame's ImGui::SFML::Update() to actually run.
+		// The close-confirmation modal is built in the editor-only BuildUI() half, so the editor must be
+		// visible for the user to see and click it.
 		myShowEditorUI = true;
 
 		switch (myAppLayout->RequestClose())

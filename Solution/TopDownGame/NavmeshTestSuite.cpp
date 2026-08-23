@@ -148,8 +148,98 @@ namespace NavmeshTestSuite
 		FW_ASSERT(reFunneledWaypoints.GetLast() == goal, "Expected last waypoint to be the goal position");
 	}
 
+	void TestCutAcrossOneQuadProducesExpectedCounts()
+	{
+		Navmesh mesh;
+
+		const int initialTriangleCount = mesh.GetTriangleCount();
+		const int initialVertexCount = mesh.GetVertexCount();
+		FW_ASSERT(initialTriangleCount == 210, "Expected the default sector grid to produce 210 triangles");
+		FW_ASSERT(initialVertexCount == 128, "Expected the default sector grid to produce 128 vertices");
+
+		// A thin band entirely inside one interior quad, crossing its diagonal edge twice (once on
+		// each of the band's long sides). All 4 corners sit deep inside triangle interiors - away
+		// from any existing vertex or edge - so besides the 2 diagonal crossings, each of the 4
+		// corners now also gets its own precise vertex inserted (the Phase 2 fix - see
+		// EnsureCutterVerticesExist). Before that fix landed this produced only +2/+2; the higher
+		// counts here are the new, correct behavior, not a regression.
+		FW_GrowingArray<Vector2f> cutterCorners;
+		cutterCorners.Add(Vector2f{ 700.f, 440.f });
+		cutterCorners.Add(Vector2f{ 748.f, 440.f });
+		cutterCorners.Add(Vector2f{ 748.f, 496.f });
+		cutterCorners.Add(Vector2f{ 700.f, 496.f });
+		mesh.CutHole(cutterCorners);
+
+		FW_ASSERT(mesh.GetTriangleCount() == initialTriangleCount + 10, "Expected the 2 diagonal crossings plus 4 precise corner insertions to add exactly 10 triangles");
+		FW_ASSERT(mesh.GetVertexCount() == initialVertexCount + 8, "Expected the 2 diagonal crossings plus 4 precise corner insertions to add exactly 8 vertices");
+		FW_ASSERT(mesh.HasVertexNear(Vector2f{ 700.f, 440.f }, 0.01f), "Expected a precise vertex at the cutter's own corner position");
+	}
+
+	void TestCutterCornerInsideTriangleInteriorProducesVertexThere()
+	{
+		Navmesh mesh;
+
+		Vector2f cornerDeepInsideATriangle{ 45.f, 45.f };
+		FW_ASSERT(!mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Test setup: expected no existing vertex at this position");
+
+		FW_GrowingArray<Vector2f> cutterCorners;
+		cutterCorners.Add(cornerDeepInsideATriangle);
+		cutterCorners.Add(Vector2f{ 60.f, 45.f });
+		cutterCorners.Add(Vector2f{ 45.f, 60.f });
+		mesh.CutHole(cutterCorners);
+
+		FW_ASSERT(mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Expected a precise vertex at the cutter corner that landed inside a triangle's interior");
+	}
+
+	void TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating()
+	{
+		Navmesh mesh;
+
+		// The exact 3 vertices of one interior quad's own upper-left triangle - already real navmesh
+		// vertices, so EnsureCutterVerticesExist should snap to each rather than inserting a
+		// near-duplicate for any of them.
+		Vector2f topLeft{ 660.f, 404.f };
+		Vector2f topRight{ 788.f, 404.f };
+		Vector2f bottomLeft{ 660.f, 532.f };
+		FW_ASSERT(mesh.HasVertexNear(topLeft, 0.01f) && mesh.HasVertexNear(topRight, 0.01f) && mesh.HasVertexNear(bottomLeft, 0.01f),
+			"Test setup: expected these to already be real navmesh vertices");
+
+		const int initialVertexCount = mesh.GetVertexCount();
+
+		FW_GrowingArray<Vector2f> cutterCorners;
+		cutterCorners.Add(topLeft);
+		cutterCorners.Add(topRight);
+		cutterCorners.Add(bottomLeft);
+		mesh.CutHole(cutterCorners);
+
+		FW_ASSERT(mesh.GetVertexCount() == initialVertexCount, "Expected snapping to already-existing vertices to add no new vertices");
+	}
+
+	void TestCutterCornerNearExistingEdgeSnapsOntoThatEdge()
+	{
+		Navmesh mesh;
+
+		// A point close to (but not exactly on, and well clear of either endpoint of) one interior
+		// quad's own top edge - should snap onto that edge via SplitEdgeAtPosition rather than
+		// falling into the triangle-interior insertion path.
+		Vector2f cornerNearEdge{ 724.f, 404.3f };
+		FW_ASSERT(!mesh.HasVertexNear(cornerNearEdge, 0.01f), "Test setup: expected no existing vertex at this position");
+
+		FW_GrowingArray<Vector2f> cutterCorners;
+		cutterCorners.Add(cornerNearEdge);
+		cutterCorners.Add(Vector2f{ 700.f, 460.f });
+		cutterCorners.Add(Vector2f{ 748.f, 460.f });
+		mesh.CutHole(cutterCorners);
+
+		FW_ASSERT(mesh.HasVertexNear(cornerNearEdge, 0.01f), "Expected a vertex snapped onto the nearby edge at the cutter's own corner position");
+	}
+
 	void RunTests()
 	{
+		TestCutAcrossOneQuadProducesExpectedCounts();
+		TestCutterCornerInsideTriangleInteriorProducesVertexThere();
+		TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating();
+		TestCutterCornerNearExistingEdgeSnapsOntoThatEdge();
 		TestFindPathSucceedsBetweenReachablePoints();
 		TestFindPathFailsOutsideMesh();
 		TestFindPathFailsWhenCutDisconnectsStartFromGoal();

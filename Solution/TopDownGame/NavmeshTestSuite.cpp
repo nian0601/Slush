@@ -148,8 +148,32 @@ namespace NavmeshTestSuite
 		FW_ASSERT(reFunneledWaypoints.GetLast() == goal, "Expected last waypoint to be the goal position");
 	}
 
+	void TestCutAcrossOneQuadProducesExpectedCounts()
+	{
+		Navmesh mesh;
+
+		const int initialTriangleCount = mesh.GetTriangleCount();
+		const int initialVertexCount = mesh.GetVertexCount();
+		FW_ASSERT(initialTriangleCount == 210, "Expected the default sector grid to produce 210 triangles");
+		FW_ASSERT(initialVertexCount == 128, "Expected the default sector grid to produce 128 vertices");
+
+		// A thin band entirely inside one interior quad, crossing its diagonal edge twice (once on
+		// each of the band's long sides). All 4 corners sit deep inside triangle interiors - away
+		// from any existing vertex or edge - so this exercises the plain edge-crossing cut path only.
+		FW_GrowingArray<Vector2f> cutterCorners;
+		cutterCorners.Add(Vector2f{ 700.f, 440.f });
+		cutterCorners.Add(Vector2f{ 748.f, 440.f });
+		cutterCorners.Add(Vector2f{ 748.f, 496.f });
+		cutterCorners.Add(Vector2f{ 700.f, 496.f });
+		mesh.CutHole(cutterCorners);
+
+		FW_ASSERT(mesh.GetTriangleCount() == initialTriangleCount + 2, "Expected the two diagonal crossings to add exactly 2 triangles");
+		FW_ASSERT(mesh.GetVertexCount() == initialVertexCount + 2, "Expected the two diagonal crossings to add exactly 2 vertices");
+	}
+
 	void RunTests()
 	{
+		TestCutAcrossOneQuadProducesExpectedCounts();
 		TestFindPathSucceedsBetweenReachablePoints();
 		TestFindPathFailsOutsideMesh();
 		TestFindPathFailsWhenCutDisconnectsStartFromGoal();

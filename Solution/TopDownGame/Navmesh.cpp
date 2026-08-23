@@ -609,6 +609,27 @@ void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)
 	CutPolygon(aPolygon);
 }
 
+int Navmesh::GetTriangleCount() const
+{
+	return myTriangles.Count();
+}
+
+int Navmesh::GetVertexCount() const
+{
+	return myVertices.Count();
+}
+
+bool Navmesh::HasVertexNear(const Vector2f& aPosition, float anEpsilon) const
+{
+	for (Vertex* vertex : myVertices)
+	{
+		if (Length2(vertex->myPos - aPosition) <= anEpsilon * anEpsilon)
+			return true;
+	}
+
+	return false;
+}
+
 void Navmesh::CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints)
 {
 	FW_GrowingArray<Vector2f> closedPolygon = aPolygonPoints;

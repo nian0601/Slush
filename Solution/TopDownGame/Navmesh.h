@@ -27,6 +27,10 @@ public:
 
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 
+	int GetTriangleCount() const;
+	int GetVertexCount() const;
+	bool HasVertexNear(const Vector2f& aPosition, float anEpsilon) const;
+
 private:
 	struct Vertex;
 	struct Edge;

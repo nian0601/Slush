@@ -3,7 +3,6 @@
 #include "NavmeshTestSuite.h"
 #include "Navmesh.h"
 #include "Level/NavmeshData.h"
-#include <FW_FileSystem.h>
 
 namespace NavmeshTestSuite
 {
@@ -248,8 +247,6 @@ namespace NavmeshTestSuite
 
 	void TestNavmeshSaveLoadRoundTrip()
 	{
-		FW_FileSystem::CreateFolderIfNecessary(NavmeshData::GetAssetTypeFolder());
-
 		NavmeshData original("navmesh_roundtrip_test", 0);
 		original.myNavmesh.GenerateDefaultGrid();
 
@@ -267,18 +264,25 @@ namespace NavmeshTestSuite
 		cutBlockB.Add(Vector2f{ 900.f, 400.f });
 		original.myNavmesh.CutHole(cutBlockB);
 
-		original.Save();
+		// Drive NavmeshData::OnParse() directly (bypassing DataAsset::Save()/Load()'s
+		// folder-derived paths) so this test writes to its own scratch file under temp/ instead
+		// of the real data/navmeshes/ folder - that folder is scanned by AssetStorage<NavmeshData>
+		// on every launch, so writing there would leave this fixture behind as a permanent, visible
+		// asset in the editor UI, not just a test artifact.
+		// "temp/" already exists (FW_UnitTestSuite's own file-processor test lives there) -
+		// CreateFolderIfNecessary() can't be used here anyway, since it assumes every path
+		// contains a "data" segment.
+		const char* testFilePath = "temp/navmesh_roundtrip_test.navmesh";
 
-		// DataAsset::Save() doesn't populate myFilePath (only Load() does) - build the same
-		// path Save() just wrote to, so Load() below can read it back.
-		FW_String filePath = NavmeshData::GetAssetTypeFolder();
-		filePath += "/";
-		filePath += original.GetAssetName();
-		filePath += ".";
-		filePath += NavmeshData::GetAssetTypeExtention();
+		Slush::AssetParser writer;
+		Slush::AssetParser::Handle writeHandle = writer.StartWriting("NavmeshData");
+		original.OnParse(writeHandle, 1);
+		writer.FinishWriting(testFilePath);
 
+		Slush::AssetParser reader;
+		Slush::AssetParser::Handle readHandle = reader.Load(testFilePath);
 		NavmeshData loaded("navmesh_roundtrip_test", 0);
-		loaded.Load(filePath.GetBuffer());
+		loaded.OnParse(readHandle, 1);
 
 		FW_ASSERT(loaded.myNavmesh.GetVertexCount() == original.myNavmesh.GetVertexCount(), "Expected matching vertex counts after a save/load round-trip");
 		FW_ASSERT(loaded.myNavmesh.GetTriangleCount() == original.myNavmesh.GetTriangleCount(), "Expected matching triangle counts after a save/load round-trip");
@@ -296,8 +300,13 @@ namespace NavmeshTestSuite
 
 		FW_ASSERT(originalFound && loadedFound, "Expected FindPath to succeed on both the original and the round-tripped navmesh");
 		FW_ASSERT(loadedWaypoints.Count() == originalWaypoints.Count(), "Expected matching waypoint counts after a save/load round-trip");
+
+		// Epsilon compare, not ==: field values round-trip through AssetParser's "%.3f" float
+		// formatting, so a waypoint landing on a non-exact-decimal position would otherwise make
+		// this fail on a correct round-trip purely from serialization precision loss.
+		const float PositionEpsilon = 0.01f;
 		for (int i = 0; i < originalWaypoints.Count(); ++i)
-			FW_ASSERT(loadedWaypoints[i] == originalWaypoints[i], "Expected matching waypoints after a save/load round-trip");
+			FW_ASSERT(Length2(loadedWaypoints[i] - originalWaypoints[i]) <= PositionEpsilon * PositionEpsilon, "Expected matching waypoints after a save/load round-trip");
 	}
 
 	void RunTests()

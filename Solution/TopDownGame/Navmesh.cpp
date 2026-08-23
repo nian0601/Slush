@@ -309,6 +309,7 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 
 bool Navmesh::BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const
 {
+	outWaypoints.RemoveAll();
 	outWaypoints.Add(aStart);
 
 	for (const Portal& portal : aCorridor.myPortals)
@@ -328,6 +329,8 @@ namespace
 
 bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const
 {
+	outWaypoints.RemoveAll();
+
 	if (aCorridor.myPortals.IsEmpty())
 	{
 		outWaypoints.Add(aStart);
@@ -421,12 +424,17 @@ bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_Growing
 	if (startTriangle == nullptr || goalTriangle == nullptr)
 		return false;
 
+	PathCorridor foundCorridor;
 	if (startTriangle != goalTriangle)
 	{
-		if (!FindTrianglePath(aStart, startTriangle, goalTriangle, outCorridor))
+		if (!FindTrianglePath(aStart, startTriangle, goalTriangle, foundCorridor))
 			return false;
 	}
 
+	// Build into a local corridor and only hand it to the caller once the search has
+	// actually succeeded, so a reused outCorridor is replaced rather than appended to
+	// (guaranteeing the zero-portal same-triangle case) and stays untouched on failure.
+	outCorridor = foundCorridor;
 	return StringPull(aStart, aGoal, outCorridor, outWaypoints);
 }
 

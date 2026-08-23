@@ -1,12 +1,15 @@
 #include "stdafx.h"
 
 #include "Core/IApp.h"
+#include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
+#include "Core/Dockables/AssetEditorLayout.h"
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Input.h"
 
+#include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
 
@@ -15,8 +18,13 @@ class App : public Slush::IApp
 public:
 	void Initialize() override
 	{
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		assets.RegisterAssetType<NavmeshData>();
+		assets.LoadAllAssets();
+
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.ToggleEditorUI();
+		window.SetAppLayout(new Slush::AssetEditorLayout());
 
 		myNavmesh.GenerateDefaultGrid();
 	}

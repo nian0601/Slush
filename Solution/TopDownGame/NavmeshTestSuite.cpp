@@ -2,6 +2,8 @@
 
 #include "NavmeshTestSuite.h"
 #include "Navmesh.h"
+#include "Level/NavmeshData.h"
+#include <FW_FileSystem.h>
 
 namespace NavmeshTestSuite
 {
@@ -244,8 +246,63 @@ namespace NavmeshTestSuite
 		FW_ASSERT(mesh.HasVertexNear(cornerNearEdge, 0.01f), "Expected a vertex snapped onto the nearby edge at the cutter's own corner position");
 	}
 
+	void TestNavmeshSaveLoadRoundTrip()
+	{
+		FW_FileSystem::CreateFolderIfNecessary(NavmeshData::GetAssetTypeFolder());
+
+		NavmeshData original("navmesh_roundtrip_test", 0);
+		original.myNavmesh.GenerateDefaultGrid();
+
+		FW_GrowingArray<Vector2f> cutBlockA;
+		cutBlockA.Add(Vector2f{ 100.f, 100.f });
+		cutBlockA.Add(Vector2f{ 200.f, 100.f });
+		cutBlockA.Add(Vector2f{ 200.f, 200.f });
+		cutBlockA.Add(Vector2f{ 100.f, 200.f });
+		original.myNavmesh.CutHole(cutBlockA);
+
+		FW_GrowingArray<Vector2f> cutBlockB;
+		cutBlockB.Add(Vector2f{ 900.f, 300.f });
+		cutBlockB.Add(Vector2f{ 1000.f, 300.f });
+		cutBlockB.Add(Vector2f{ 1000.f, 400.f });
+		cutBlockB.Add(Vector2f{ 900.f, 400.f });
+		original.myNavmesh.CutHole(cutBlockB);
+
+		original.Save();
+
+		// DataAsset::Save() doesn't populate myFilePath (only Load() does) - build the same
+		// path Save() just wrote to, so Load() below can read it back.
+		FW_String filePath = NavmeshData::GetAssetTypeFolder();
+		filePath += "/";
+		filePath += original.GetAssetName();
+		filePath += ".";
+		filePath += NavmeshData::GetAssetTypeExtention();
+
+		NavmeshData loaded("navmesh_roundtrip_test", 0);
+		loaded.Load(filePath.GetBuffer());
+
+		FW_ASSERT(loaded.myNavmesh.GetVertexCount() == original.myNavmesh.GetVertexCount(), "Expected matching vertex counts after a save/load round-trip");
+		FW_ASSERT(loaded.myNavmesh.GetTriangleCount() == original.myNavmesh.GetTriangleCount(), "Expected matching triangle counts after a save/load round-trip");
+
+		Vector2f start{ 50.f, 50.f };
+		Vector2f goal{ 1900.f, 850.f };
+
+		FW_GrowingArray<Vector2f> originalWaypoints;
+		Navmesh::PathCorridor originalCorridor;
+		bool originalFound = original.myNavmesh.FindPath(start, goal, originalWaypoints, originalCorridor);
+
+		FW_GrowingArray<Vector2f> loadedWaypoints;
+		Navmesh::PathCorridor loadedCorridor;
+		bool loadedFound = loaded.myNavmesh.FindPath(start, goal, loadedWaypoints, loadedCorridor);
+
+		FW_ASSERT(originalFound && loadedFound, "Expected FindPath to succeed on both the original and the round-tripped navmesh");
+		FW_ASSERT(loadedWaypoints.Count() == originalWaypoints.Count(), "Expected matching waypoint counts after a save/load round-trip");
+		for (int i = 0; i < originalWaypoints.Count(); ++i)
+			FW_ASSERT(loadedWaypoints[i] == originalWaypoints[i], "Expected matching waypoints after a save/load round-trip");
+	}
+
 	void RunTests()
 	{
+		TestNavmeshSaveLoadRoundTrip();
 		TestCutAcrossOneQuadProducesExpectedCounts();
 		TestCutterCornerInsideTriangleInteriorProducesVertexThere();
 		TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating();

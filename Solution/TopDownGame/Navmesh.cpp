@@ -39,6 +39,72 @@ void Navmesh::GenerateDefaultGrid()
 	}
 }
 
+void Navmesh::Save(Slush::AssetParser::Handle aRootHandle) const
+{
+	// Edges are never stored directly - an edge is always exactly "the edge shared by two
+	// triangles" (or unshared, on the mesh boundary) and gets reconstructed from the triangle
+	// list on Load(), via FindOrCreateEdge().
+	Slush::AssetParser::Handle verticesHandle = aRootHandle.ParseChildElement("vertices");
+	for (Vertex* vertex : myVertices)
+	{
+		Slush::AssetParser::Handle vertexHandle = verticesHandle.ParseChildElement("vertex");
+		vertexHandle.ParseVec2fField("pos", vertex->myPos);
+	}
+
+	Slush::AssetParser::Handle trianglesHandle = aRootHandle.ParseChildElement("triangles");
+	for (Triangle* triangle : myTriangles)
+	{
+		Slush::AssetParser::Handle triangleHandle = trianglesHandle.ParseChildElement("triangle");
+		int indices[3];
+		for (int i = 0; i < 3; ++i)
+			indices[i] = myVertices.Find(triangle->myVertices[i]);
+
+		triangleHandle.ParseIntField("v0", indices[0]);
+		triangleHandle.ParseIntField("v1", indices[1]);
+		triangleHandle.ParseIntField("v2", indices[2]);
+	}
+}
+
+void Navmesh::Load(Slush::AssetParser::Handle aRootHandle)
+{
+	myTriangles.DeleteAll();
+	myEdges.DeleteAll();
+	myVertices.DeleteAll();
+
+	Slush::AssetParser::Handle verticesHandle = aRootHandle.ParseChildElement("vertices");
+	int numVertices = verticesHandle.GetNumChildElements();
+	FW_GrowingArray<Vertex*> loadedVertices;
+	loadedVertices.Reserve(numVertices);
+	for (int i = 0; i < numVertices; ++i)
+	{
+		Slush::AssetParser::Handle vertexHandle = verticesHandle.GetChildElementAtIndex(i);
+		Vector2f pos;
+		vertexHandle.ParseVec2fField("pos", pos);
+		loadedVertices[i] = CreateVertex(pos);
+	}
+
+	Slush::AssetParser::Handle trianglesHandle = aRootHandle.ParseChildElement("triangles");
+	int numTriangles = trianglesHandle.GetNumChildElements();
+	for (int i = 0; i < numTriangles; ++i)
+	{
+		Slush::AssetParser::Handle triangleHandle = trianglesHandle.GetChildElementAtIndex(i);
+		int indices[3] = {};
+		triangleHandle.ParseIntField("v0", indices[0]);
+		triangleHandle.ParseIntField("v1", indices[1]);
+		triangleHandle.ParseIntField("v2", indices[2]);
+
+		Vertex* v0 = loadedVertices[indices[0]];
+		Vertex* v1 = loadedVertices[indices[1]];
+		Vertex* v2 = loadedVertices[indices[2]];
+
+		Edge* e0 = FindOrCreateEdge(v0, v1);
+		Edge* e1 = FindOrCreateEdge(v1, v2);
+		Edge* e2 = FindOrCreateEdge(v2, v0);
+
+		CreateTriangle(e0, e1, e2);
+	}
+}
+
 void Navmesh::Update()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -549,6 +615,18 @@ Navmesh::Edge* Navmesh::CreateEdge(Vertex* aV1, Vertex* aV2)
 	aV2->myEdges.Add(edge);
 	myEdges.Add(edge);
 	return edge;
+}
+
+Navmesh::Edge* Navmesh::FindOrCreateEdge(Vertex* aV1, Vertex* aV2)
+{
+	for (Edge* edge : aV1->myEdges)
+	{
+		if ((edge->myVertices[0] == aV1 && edge->myVertices[1] == aV2) ||
+			(edge->myVertices[0] == aV2 && edge->myVertices[1] == aV1))
+			return edge;
+	}
+
+	return CreateEdge(aV1, aV2);
 }
 
 void Navmesh::DeleteEdgeIfNeeded(Edge* aEdge)

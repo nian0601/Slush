@@ -140,6 +140,189 @@ void Navmesh::Render()
 		renderer.RenderLine(myCutPositions.GetLast(), mousePos, 0xFF000000);
 }
 
+Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) const
+{
+	for (Triangle* triangle : myTriangles)
+	{
+		if (triangle->PointInside(aPosition))
+			return triangle;
+	}
+
+	return nullptr;
+}
+
+bool Navmesh::FindTrianglePath(Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const
+{
+	FW_GrowingArray<AStarNode> nodes;
+
+	AStarNode& startNode = nodes.Add();
+	startNode.myTriangle = aStartTriangle;
+	startNode.myGCost = 0.f;
+	startNode.myFCost = Length(aStartTriangle->GetCenterPosition() - aGoalTriangle->GetCenterPosition());
+
+	while (true)
+	{
+		int bestIndex = -1;
+		float bestFCost = 0.f;
+		for (int i = 0; i < nodes.Count(); ++i)
+		{
+			if (nodes[i].myIsClosed)
+				continue;
+
+			if (bestIndex == -1 || nodes[i].myFCost < bestFCost)
+			{
+				bestIndex = i;
+				bestFCost = nodes[i].myFCost;
+			}
+		}
+
+		if (bestIndex == -1)
+			return false;
+
+		nodes[bestIndex].myIsClosed = true;
+
+		if (nodes[bestIndex].myTriangle == aGoalTriangle)
+		{
+			FW_GrowingArray<Edge*> reversedEdges;
+			int index = bestIndex;
+			while (nodes[index].myParentIndex != -1)
+			{
+				reversedEdges.Add(nodes[index].myEdgeFromParent);
+				index = nodes[index].myParentIndex;
+			}
+
+			Vertex* prevLeft = nullptr;
+			Vertex* prevRight = nullptr;
+			for (int i = reversedEdges.Count() - 1; i >= 0; --i)
+			{
+				Edge* edge = reversedEdges[i];
+				Vertex* v0 = edge->myVertices[0];
+				Vertex* v1 = edge->myVertices[1];
+
+				Vertex* left = nullptr;
+				Vertex* right = nullptr;
+
+				if (prevLeft == nullptr && prevRight == nullptr)
+				{
+					left = v0;
+					right = v1;
+				}
+				else if (v0 == prevLeft)
+				{
+					left = v0;
+					right = v1;
+				}
+				else if (v0 == prevRight)
+				{
+					right = v0;
+					left = v1;
+				}
+				else if (v1 == prevLeft)
+				{
+					left = v1;
+					right = v0;
+				}
+				else if (v1 == prevRight)
+				{
+					right = v1;
+					left = v0;
+				}
+				else
+				{
+					FW_ASSERT_ALWAYS("Expected consecutive portal edges to share a vertex");
+					left = v0;
+					right = v1;
+				}
+
+				Portal& portal = outCorridor.myPortals.Add();
+				portal.myLeft = left->myPos;
+				portal.myRight = right->myPos;
+
+				prevLeft = left;
+				prevRight = right;
+			}
+
+			return true;
+		}
+
+		Triangle* currentTriangle = nodes[bestIndex].myTriangle;
+		Vector2f currentCenter = currentTriangle->GetCenterPosition();
+		float currentGCost = nodes[bestIndex].myGCost;
+
+		for (int e = 0; e < 3; ++e)
+		{
+			Edge* edge = currentTriangle->myEdges[e];
+
+			for (int t = 0; t < 2; ++t)
+			{
+				Triangle* neighbor = edge->myTriangles[t];
+				if (neighbor == nullptr || neighbor == currentTriangle)
+					continue;
+
+				float tentativeGCost = currentGCost + Length(neighbor->GetCenterPosition() - currentCenter);
+
+				int existingIndex = -1;
+				for (int i = 0; i < nodes.Count(); ++i)
+				{
+					if (nodes[i].myTriangle == neighbor)
+					{
+						existingIndex = i;
+						break;
+					}
+				}
+
+				if (existingIndex != -1)
+				{
+					if (tentativeGCost >= nodes[existingIndex].myGCost)
+						continue;
+
+					nodes[existingIndex].myGCost = tentativeGCost;
+					nodes[existingIndex].myFCost = tentativeGCost + Length(neighbor->GetCenterPosition() - aGoalTriangle->GetCenterPosition());
+					nodes[existingIndex].myParentIndex = bestIndex;
+					nodes[existingIndex].myEdgeFromParent = edge;
+					nodes[existingIndex].myIsClosed = false;
+				}
+				else
+				{
+					AStarNode& newNode = nodes.Add();
+					newNode.myTriangle = neighbor;
+					newNode.myGCost = tentativeGCost;
+					newNode.myFCost = tentativeGCost + Length(neighbor->GetCenterPosition() - aGoalTriangle->GetCenterPosition());
+					newNode.myParentIndex = bestIndex;
+					newNode.myEdgeFromParent = edge;
+				}
+			}
+		}
+	}
+}
+
+bool Navmesh::BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const
+{
+	outWaypoints.Add(aStart);
+
+	for (const Portal& portal : aCorridor.myPortals)
+		outWaypoints.Add((portal.myLeft + portal.myRight) / 2.f);
+
+	outWaypoints.Add(aGoal);
+	return true;
+}
+
+bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor& outCorridor) const
+{
+	Triangle* startTriangle = FindTriangleContaining(aStart);
+	Triangle* goalTriangle = FindTriangleContaining(aGoal);
+	if (startTriangle == nullptr || goalTriangle == nullptr)
+		return false;
+
+	if (startTriangle != goalTriangle)
+	{
+		if (!FindTrianglePath(startTriangle, goalTriangle, outCorridor))
+			return false;
+	}
+
+	return BuildEdgeCenterPath(aStart, aGoal, outCorridor, outWaypoints);
+}
+
 Navmesh::Vertex* Navmesh::GetVertex(int x, int y) const
 {
 	int index = mySectorGrid.x * y + x;
@@ -300,15 +483,30 @@ void Navmesh::PerformCut()
 	if (myCutPositions.Count() < 3)
 		return;
 
-	myCutPositions.Add(myCutPositions[0]);
-	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
+	CutPolygon(myCutPositions);
+}
+
+void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)
+{
+	if (aPolygon.Count() < 3)
+		return;
+
+	CutPolygon(aPolygon);
+}
+
+void Navmesh::CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints)
+{
+	FW_GrowingArray<Vector2f> closedPolygon = aPolygonPoints;
+	closedPolygon.Add(closedPolygon[0]);
+
+	for (int i = 0; i < closedPolygon.Count() - 1; ++i)
 	{
-		Cut(myCutPositions[i], myCutPositions[i + 1]);
+		Cut(closedPolygon[i], closedPolygon[i + 1]);
 	}
 
 	for (int i = 0; i < myTriangles.Count(); ++i)
 	{
-		if (IsInsideCutArea(myTriangles[i]))
+		if (IsInsideCutArea(closedPolygon, myTriangles[i]))
 		{
 			DeleteTriangle(myTriangles[i]);
 			--i;
@@ -387,15 +585,15 @@ void Navmesh::CutTriangle(Triangle* aTriangle, Edge* aCutEdge, Vertex* aCutVerte
 	CreateTriangle(centerEdge, oldEdge2, aNewEdge2);
 }
 
-bool Navmesh::IsInsideCutArea(Triangle* aTriangle)
+bool Navmesh::IsInsideCutArea(const FW_GrowingArray<Vector2f>& aCutPositions, Triangle* aTriangle)
 {
 	Vector2f center = aTriangle->GetCenterPosition();
 
-	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
+	for (int i = 0; i < aCutPositions.Count() - 1; ++i)
 	{
 		FW_Intersection::LineSegment cutSegment;
-		cutSegment.myStart = myCutPositions[i];
-		cutSegment.myEnd = myCutPositions[i + 1];
+		cutSegment.myStart = aCutPositions[i];
+		cutSegment.myEnd = aCutPositions[i + 1];
 
 		FW_Intersection::Line cutLine;
 		cutLine.FromSegment(cutSegment);

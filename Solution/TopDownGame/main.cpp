@@ -8,6 +8,7 @@
 #include "Core/Input.h"
 
 #include "Navmesh.h"
+#include "NavmeshTestSuite.h"
 
 class App : public Slush::IApp
 {
@@ -51,6 +52,7 @@ private:
 int main(int argc, char** argv)
 {
 	FW_UnitTestSuite::RunTests();
+	NavmeshTestSuite::RunTests();
 
 	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
 

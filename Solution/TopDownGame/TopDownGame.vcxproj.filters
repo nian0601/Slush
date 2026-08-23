@@ -5,10 +5,16 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Navmesh.cpp" />
     <ClCompile Include="NavmeshTestSuite.cpp" />
+    <ClCompile Include="Level\NavmeshData.cpp" />
+    <ClCompile Include="Level\LevelData.cpp" />
+    <ClCompile Include="Level\Level.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Navmesh.h" />
     <ClInclude Include="NavmeshTestSuite.h" />
+    <ClInclude Include="Level\NavmeshData.h" />
+    <ClInclude Include="Level\LevelData.h" />
+    <ClInclude Include="Level\Level.h" />
   </ItemGroup>
 </Project>

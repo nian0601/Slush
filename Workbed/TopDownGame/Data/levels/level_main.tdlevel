@@ -1,0 +1,15 @@
+LevelData 
+{ 
+	version 1 
+	navmeshData navmesh_main 
+	startPosition 
+	{ 
+		x 50.000 
+		y 50.000 
+	} 
+	goalPosition 
+	{ 
+		x 1900.000 
+		y 850.000 
+	} 
+} 

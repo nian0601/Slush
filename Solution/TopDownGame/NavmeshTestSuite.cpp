@@ -2,6 +2,7 @@
 
 #include "NavmeshTestSuite.h"
 #include "Navmesh.h"
+#include "Level/NavmeshData.h"
 
 namespace NavmeshTestSuite
 {
@@ -17,6 +18,7 @@ namespace NavmeshTestSuite
 	void TestFindPathSucceedsBetweenReachablePoints()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f start{ 50.f, 50.f };
 		Vector2f goal{ 1900.f, 850.f };
@@ -34,6 +36,7 @@ namespace NavmeshTestSuite
 	void TestFindPathFailsOutsideMesh()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f start{ -100.f, -100.f };
 		Vector2f goal{ 50.f, 50.f };
@@ -49,6 +52,7 @@ namespace NavmeshTestSuite
 	void TestFindPathFailsWhenCutDisconnectsStartFromGoal()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// A horizontal band spanning wider than the mesh, cutting it into a top half and a bottom half.
 		FW_GrowingArray<Vector2f> cutBand;
@@ -71,6 +75,7 @@ namespace NavmeshTestSuite
 	void TestFindPathSameTriangleYieldsStraightPath()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f start{ 30.f, 30.f };
 		Vector2f goal{ 40.f, 35.f };
@@ -89,6 +94,7 @@ namespace NavmeshTestSuite
 	void TestStringPullIsNoLongerThanEdgeCenterPath()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// A block that leaves room above and below, so the corridor between start and goal
 		// has to bend around it rather than running straight through.
@@ -119,6 +125,7 @@ namespace NavmeshTestSuite
 	void TestStringPullCanReFunnelAnExistingCorridorFromANewStart()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		FW_GrowingArray<Vector2f> cutBlock;
 		cutBlock.Add(Vector2f{ 860.f, 300.f });
@@ -151,6 +158,7 @@ namespace NavmeshTestSuite
 	void TestCutAcrossOneQuadProducesExpectedCounts()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		const int initialTriangleCount = mesh.GetTriangleCount();
 		const int initialVertexCount = mesh.GetVertexCount();
@@ -178,6 +186,7 @@ namespace NavmeshTestSuite
 	void TestCutterCornerInsideTriangleInteriorProducesVertexThere()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f cornerDeepInsideATriangle{ 45.f, 45.f };
 		FW_ASSERT(!mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Test setup: expected no existing vertex at this position");
@@ -194,6 +203,7 @@ namespace NavmeshTestSuite
 	void TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// The exact 3 vertices of one interior quad's own upper-left triangle - already real navmesh
 		// vertices, so EnsureCutterVerticesExist should snap to each rather than inserting a
@@ -218,6 +228,7 @@ namespace NavmeshTestSuite
 	void TestCutterCornerNearExistingEdgeSnapsOntoThatEdge()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// A point close to (but not exactly on, and well clear of either endpoint of) one interior
 		// quad's own top edge - should snap onto that edge via SplitEdgeAtPosition rather than
@@ -234,8 +245,73 @@ namespace NavmeshTestSuite
 		FW_ASSERT(mesh.HasVertexNear(cornerNearEdge, 0.01f), "Expected a vertex snapped onto the nearby edge at the cutter's own corner position");
 	}
 
+	void TestNavmeshSaveLoadRoundTrip()
+	{
+		NavmeshData original("navmesh_roundtrip_test", 0);
+		original.myNavmesh.GenerateDefaultGrid();
+
+		FW_GrowingArray<Vector2f> cutBlockA;
+		cutBlockA.Add(Vector2f{ 100.f, 100.f });
+		cutBlockA.Add(Vector2f{ 200.f, 100.f });
+		cutBlockA.Add(Vector2f{ 200.f, 200.f });
+		cutBlockA.Add(Vector2f{ 100.f, 200.f });
+		original.myNavmesh.CutHole(cutBlockA);
+
+		FW_GrowingArray<Vector2f> cutBlockB;
+		cutBlockB.Add(Vector2f{ 900.f, 300.f });
+		cutBlockB.Add(Vector2f{ 1000.f, 300.f });
+		cutBlockB.Add(Vector2f{ 1000.f, 400.f });
+		cutBlockB.Add(Vector2f{ 900.f, 400.f });
+		original.myNavmesh.CutHole(cutBlockB);
+
+		// Drive NavmeshData::OnParse() directly (bypassing DataAsset::Save()/Load()'s
+		// folder-derived paths) so this test writes to its own scratch file under temp/ instead
+		// of the real data/navmeshes/ folder - that folder is scanned by AssetStorage<NavmeshData>
+		// on every launch, so writing there would leave this fixture behind as a permanent, visible
+		// asset in the editor UI, not just a test artifact.
+		// "temp/" already exists (FW_UnitTestSuite's own file-processor test lives there) -
+		// CreateFolderIfNecessary() can't be used here anyway, since it assumes every path
+		// contains a "data" segment.
+		const char* testFilePath = "temp/navmesh_roundtrip_test.navmesh";
+
+		Slush::AssetParser writer;
+		Slush::AssetParser::Handle writeHandle = writer.StartWriting("NavmeshData");
+		original.OnParse(writeHandle, 1);
+		writer.FinishWriting(testFilePath);
+
+		Slush::AssetParser reader;
+		Slush::AssetParser::Handle readHandle = reader.Load(testFilePath);
+		NavmeshData loaded("navmesh_roundtrip_test", 0);
+		loaded.OnParse(readHandle, 1);
+
+		FW_ASSERT(loaded.myNavmesh.GetVertexCount() == original.myNavmesh.GetVertexCount(), "Expected matching vertex counts after a save/load round-trip");
+		FW_ASSERT(loaded.myNavmesh.GetTriangleCount() == original.myNavmesh.GetTriangleCount(), "Expected matching triangle counts after a save/load round-trip");
+
+		Vector2f start{ 50.f, 50.f };
+		Vector2f goal{ 1900.f, 850.f };
+
+		FW_GrowingArray<Vector2f> originalWaypoints;
+		Navmesh::PathCorridor originalCorridor;
+		bool originalFound = original.myNavmesh.FindPath(start, goal, originalWaypoints, originalCorridor);
+
+		FW_GrowingArray<Vector2f> loadedWaypoints;
+		Navmesh::PathCorridor loadedCorridor;
+		bool loadedFound = loaded.myNavmesh.FindPath(start, goal, loadedWaypoints, loadedCorridor);
+
+		FW_ASSERT(originalFound && loadedFound, "Expected FindPath to succeed on both the original and the round-tripped navmesh");
+		FW_ASSERT(loadedWaypoints.Count() == originalWaypoints.Count(), "Expected matching waypoint counts after a save/load round-trip");
+
+		// Epsilon compare, not ==: field values round-trip through AssetParser's "%.3f" float
+		// formatting, so a waypoint landing on a non-exact-decimal position would otherwise make
+		// this fail on a correct round-trip purely from serialization precision loss.
+		const float PositionEpsilon = 0.01f;
+		for (int i = 0; i < originalWaypoints.Count(); ++i)
+			FW_ASSERT(Length2(loadedWaypoints[i] - originalWaypoints[i]) <= PositionEpsilon * PositionEpsilon, "Expected matching waypoints after a save/load round-trip");
+	}
+
 	void RunTests()
 	{
+		TestNavmeshSaveLoadRoundTrip();
 		TestCutAcrossOneQuadProducesExpectedCounts();
 		TestCutterCornerInsideTriangleInteriorProducesVertexThere();
 		TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating();

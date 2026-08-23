@@ -1,11 +1,17 @@
 #pragma once
 #include "FW_Intersection.h"
+#include <Core\Assets\AssetParser.h>
 
 class Navmesh
 {
 public:
 	Navmesh();
 	~Navmesh();
+
+	void GenerateDefaultGrid();
+
+	void Save(Slush::AssetParser::Handle aRootHandle) const;
+	void Load(Slush::AssetParser::Handle aRootHandle);
 
 	void Update();
 	void Render();
@@ -99,6 +105,7 @@ private:
 	void DeleteVertexIfNeeded(Vertex* aVertex);
 
 	Edge* CreateEdge(Vertex* aV1, Vertex* aV2);
+	Edge* FindOrCreateEdge(Vertex* aV1, Vertex* aV2);
 	void DeleteEdgeIfNeeded(Edge* aEdge);
 
 	Triangle* CreateTriangle(Edge* aE1, Edge* aE2, Edge* aE3);

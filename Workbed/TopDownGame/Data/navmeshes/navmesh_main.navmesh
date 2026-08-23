@@ -1,0 +1,2562 @@
+NavmeshData 
+{ 
+	version 1 
+	vertices 
+	{ 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 20.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 148.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 276.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 332.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 588.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 345.500 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 460.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 660.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 788.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 20.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 148.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 276.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 404.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 532.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 660.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 788.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1172.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1300.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1428.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1556.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1684.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1812.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1940.000 
+				y 916.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 300.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1100.000 
+				y 300.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1100.000 
+				y 636.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 636.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 300.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 892.000 
+				y 300.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 300.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1020.000 
+				y 300.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1100.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1100.000 
+				y 348.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1100.000 
+				y 532.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1100.000 
+				y 476.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1100.000 
+				y 604.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1068.000 
+				y 636.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 916.000 
+				y 636.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1044.000 
+				y 636.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 940.000 
+				y 636.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 1054.500 
+				y 636.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 404.000 
+			} 
+		} 
+		vertex 
+		{ 
+			pos 
+			{ 
+				x 860.000 
+				y 532.000 
+			} 
+		} 
+	} 
+	triangles 
+	{ 
+		triangle 
+		{ 
+			v0 0 
+			v1 1 
+			v2 2 
+		} 
+		triangle 
+		{ 
+			v0 2 
+			v1 3 
+			v2 1 
+		} 
+		triangle 
+		{ 
+			v0 2 
+			v1 3 
+			v2 4 
+		} 
+		triangle 
+		{ 
+			v0 4 
+			v1 5 
+			v2 3 
+		} 
+		triangle 
+		{ 
+			v0 4 
+			v1 5 
+			v2 6 
+		} 
+		triangle 
+		{ 
+			v0 6 
+			v1 7 
+			v2 5 
+		} 
+		triangle 
+		{ 
+			v0 6 
+			v1 7 
+			v2 8 
+		} 
+		triangle 
+		{ 
+			v0 8 
+			v1 9 
+			v2 7 
+		} 
+		triangle 
+		{ 
+			v0 8 
+			v1 9 
+			v2 10 
+		} 
+		triangle 
+		{ 
+			v0 10 
+			v1 11 
+			v2 9 
+		} 
+		triangle 
+		{ 
+			v0 10 
+			v1 11 
+			v2 12 
+		} 
+		triangle 
+		{ 
+			v0 12 
+			v1 13 
+			v2 11 
+		} 
+		triangle 
+		{ 
+			v0 12 
+			v1 13 
+			v2 14 
+		} 
+		triangle 
+		{ 
+			v0 14 
+			v1 15 
+			v2 13 
+		} 
+		triangle 
+		{ 
+			v0 14 
+			v1 15 
+			v2 16 
+		} 
+		triangle 
+		{ 
+			v0 16 
+			v1 17 
+			v2 15 
+		} 
+		triangle 
+		{ 
+			v0 16 
+			v1 17 
+			v2 18 
+		} 
+		triangle 
+		{ 
+			v0 18 
+			v1 19 
+			v2 17 
+		} 
+		triangle 
+		{ 
+			v0 18 
+			v1 19 
+			v2 20 
+		} 
+		triangle 
+		{ 
+			v0 20 
+			v1 21 
+			v2 19 
+		} 
+		triangle 
+		{ 
+			v0 20 
+			v1 21 
+			v2 22 
+		} 
+		triangle 
+		{ 
+			v0 22 
+			v1 23 
+			v2 21 
+		} 
+		triangle 
+		{ 
+			v0 22 
+			v1 23 
+			v2 24 
+		} 
+		triangle 
+		{ 
+			v0 24 
+			v1 25 
+			v2 23 
+		} 
+		triangle 
+		{ 
+			v0 24 
+			v1 25 
+			v2 26 
+		} 
+		triangle 
+		{ 
+			v0 26 
+			v1 27 
+			v2 25 
+		} 
+		triangle 
+		{ 
+			v0 26 
+			v1 27 
+			v2 28 
+		} 
+		triangle 
+		{ 
+			v0 28 
+			v1 29 
+			v2 27 
+		} 
+		triangle 
+		{ 
+			v0 28 
+			v1 29 
+			v2 30 
+		} 
+		triangle 
+		{ 
+			v0 30 
+			v1 31 
+			v2 29 
+		} 
+		triangle 
+		{ 
+			v0 1 
+			v1 32 
+			v2 3 
+		} 
+		triangle 
+		{ 
+			v0 3 
+			v1 33 
+			v2 32 
+		} 
+		triangle 
+		{ 
+			v0 3 
+			v1 33 
+			v2 5 
+		} 
+		triangle 
+		{ 
+			v0 5 
+			v1 34 
+			v2 33 
+		} 
+		triangle 
+		{ 
+			v0 5 
+			v1 34 
+			v2 7 
+		} 
+		triangle 
+		{ 
+			v0 7 
+			v1 35 
+			v2 34 
+		} 
+		triangle 
+		{ 
+			v0 7 
+			v1 35 
+			v2 9 
+		} 
+		triangle 
+		{ 
+			v0 9 
+			v1 36 
+			v2 35 
+		} 
+		triangle 
+		{ 
+			v0 9 
+			v1 36 
+			v2 11 
+		} 
+		triangle 
+		{ 
+			v0 11 
+			v1 37 
+			v2 36 
+		} 
+		triangle 
+		{ 
+			v0 11 
+			v1 37 
+			v2 13 
+		} 
+		triangle 
+		{ 
+			v0 13 
+			v1 38 
+			v2 37 
+		} 
+		triangle 
+		{ 
+			v0 13 
+			v1 38 
+			v2 15 
+		} 
+		triangle 
+		{ 
+			v0 15 
+			v1 39 
+			v2 38 
+		} 
+		triangle 
+		{ 
+			v0 15 
+			v1 39 
+			v2 17 
+		} 
+		triangle 
+		{ 
+			v0 17 
+			v1 40 
+			v2 39 
+		} 
+		triangle 
+		{ 
+			v0 17 
+			v1 40 
+			v2 19 
+		} 
+		triangle 
+		{ 
+			v0 19 
+			v1 41 
+			v2 40 
+		} 
+		triangle 
+		{ 
+			v0 19 
+			v1 41 
+			v2 21 
+		} 
+		triangle 
+		{ 
+			v0 21 
+			v1 42 
+			v2 41 
+		} 
+		triangle 
+		{ 
+			v0 21 
+			v1 42 
+			v2 23 
+		} 
+		triangle 
+		{ 
+			v0 23 
+			v1 43 
+			v2 42 
+		} 
+		triangle 
+		{ 
+			v0 23 
+			v1 43 
+			v2 25 
+		} 
+		triangle 
+		{ 
+			v0 25 
+			v1 44 
+			v2 43 
+		} 
+		triangle 
+		{ 
+			v0 25 
+			v1 44 
+			v2 27 
+		} 
+		triangle 
+		{ 
+			v0 27 
+			v1 45 
+			v2 44 
+		} 
+		triangle 
+		{ 
+			v0 27 
+			v1 45 
+			v2 29 
+		} 
+		triangle 
+		{ 
+			v0 29 
+			v1 46 
+			v2 45 
+		} 
+		triangle 
+		{ 
+			v0 29 
+			v1 46 
+			v2 31 
+		} 
+		triangle 
+		{ 
+			v0 31 
+			v1 47 
+			v2 46 
+		} 
+		triangle 
+		{ 
+			v0 32 
+			v1 48 
+			v2 33 
+		} 
+		triangle 
+		{ 
+			v0 33 
+			v1 49 
+			v2 48 
+		} 
+		triangle 
+		{ 
+			v0 33 
+			v1 49 
+			v2 34 
+		} 
+		triangle 
+		{ 
+			v0 34 
+			v1 50 
+			v2 49 
+		} 
+		triangle 
+		{ 
+			v0 34 
+			v1 50 
+			v2 35 
+		} 
+		triangle 
+		{ 
+			v0 35 
+			v1 51 
+			v2 50 
+		} 
+		triangle 
+		{ 
+			v0 35 
+			v1 51 
+			v2 36 
+		} 
+		triangle 
+		{ 
+			v0 36 
+			v1 52 
+			v2 51 
+		} 
+		triangle 
+		{ 
+			v0 36 
+			v1 52 
+			v2 37 
+		} 
+		triangle 
+		{ 
+			v0 37 
+			v1 53 
+			v2 52 
+		} 
+		triangle 
+		{ 
+			v0 37 
+			v1 53 
+			v2 38 
+		} 
+		triangle 
+		{ 
+			v0 38 
+			v1 54 
+			v2 53 
+		} 
+		triangle 
+		{ 
+			v0 111 
+			v1 127 
+			v2 126 
+		} 
+		triangle 
+		{ 
+			v0 135 
+			v1 134 
+			v2 40 
+		} 
+		triangle 
+		{ 
+			v0 70 
+			v1 72 
+			v2 147 
+		} 
+		triangle 
+		{ 
+			v0 70 
+			v1 72 
+			v2 146 
+		} 
+		triangle 
+		{ 
+			v0 38 
+			v1 39 
+			v2 128 
+		} 
+		triangle 
+		{ 
+			v0 140 
+			v1 130 
+			v2 73 
+		} 
+		triangle 
+		{ 
+			v0 41 
+			v1 57 
+			v2 42 
+		} 
+		triangle 
+		{ 
+			v0 42 
+			v1 58 
+			v2 57 
+		} 
+		triangle 
+		{ 
+			v0 42 
+			v1 58 
+			v2 43 
+		} 
+		triangle 
+		{ 
+			v0 43 
+			v1 59 
+			v2 58 
+		} 
+		triangle 
+		{ 
+			v0 43 
+			v1 59 
+			v2 44 
+		} 
+		triangle 
+		{ 
+			v0 44 
+			v1 60 
+			v2 59 
+		} 
+		triangle 
+		{ 
+			v0 44 
+			v1 60 
+			v2 45 
+		} 
+		triangle 
+		{ 
+			v0 45 
+			v1 61 
+			v2 60 
+		} 
+		triangle 
+		{ 
+			v0 45 
+			v1 61 
+			v2 46 
+		} 
+		triangle 
+		{ 
+			v0 46 
+			v1 62 
+			v2 61 
+		} 
+		triangle 
+		{ 
+			v0 46 
+			v1 62 
+			v2 47 
+		} 
+		triangle 
+		{ 
+			v0 47 
+			v1 63 
+			v2 62 
+		} 
+		triangle 
+		{ 
+			v0 48 
+			v1 64 
+			v2 49 
+		} 
+		triangle 
+		{ 
+			v0 49 
+			v1 65 
+			v2 64 
+		} 
+		triangle 
+		{ 
+			v0 49 
+			v1 65 
+			v2 50 
+		} 
+		triangle 
+		{ 
+			v0 50 
+			v1 66 
+			v2 65 
+		} 
+		triangle 
+		{ 
+			v0 50 
+			v1 66 
+			v2 51 
+		} 
+		triangle 
+		{ 
+			v0 51 
+			v1 67 
+			v2 66 
+		} 
+		triangle 
+		{ 
+			v0 51 
+			v1 67 
+			v2 52 
+		} 
+		triangle 
+		{ 
+			v0 52 
+			v1 68 
+			v2 67 
+		} 
+		triangle 
+		{ 
+			v0 52 
+			v1 68 
+			v2 53 
+		} 
+		triangle 
+		{ 
+			v0 53 
+			v1 69 
+			v2 68 
+		} 
+		triangle 
+		{ 
+			v0 53 
+			v1 69 
+			v2 54 
+		} 
+		triangle 
+		{ 
+			v0 54 
+			v1 70 
+			v2 69 
+		} 
+		triangle 
+		{ 
+			v0 54 
+			v1 55 
+			v2 71 
+		} 
+		triangle 
+		{ 
+			v0 86 
+			v1 56 
+			v2 147 
+		} 
+		triangle 
+		{ 
+			v0 70 
+			v1 147 
+			v2 86 
+		} 
+		triangle 
+		{ 
+			v0 71 
+			v1 146 
+			v2 54 
+		} 
+		triangle 
+		{ 
+			v0 54 
+			v1 146 
+			v2 70 
+		} 
+		triangle 
+		{ 
+			v0 139 
+			v1 138 
+			v2 57 
+		} 
+		triangle 
+		{ 
+			v0 57 
+			v1 73 
+			v2 58 
+		} 
+		triangle 
+		{ 
+			v0 58 
+			v1 74 
+			v2 73 
+		} 
+		triangle 
+		{ 
+			v0 58 
+			v1 74 
+			v2 59 
+		} 
+		triangle 
+		{ 
+			v0 59 
+			v1 75 
+			v2 74 
+		} 
+		triangle 
+		{ 
+			v0 59 
+			v1 75 
+			v2 60 
+		} 
+		triangle 
+		{ 
+			v0 60 
+			v1 76 
+			v2 75 
+		} 
+		triangle 
+		{ 
+			v0 60 
+			v1 76 
+			v2 61 
+		} 
+		triangle 
+		{ 
+			v0 61 
+			v1 77 
+			v2 76 
+		} 
+		triangle 
+		{ 
+			v0 61 
+			v1 77 
+			v2 62 
+		} 
+		triangle 
+		{ 
+			v0 62 
+			v1 78 
+			v2 77 
+		} 
+		triangle 
+		{ 
+			v0 62 
+			v1 78 
+			v2 63 
+		} 
+		triangle 
+		{ 
+			v0 63 
+			v1 79 
+			v2 78 
+		} 
+		triangle 
+		{ 
+			v0 64 
+			v1 80 
+			v2 65 
+		} 
+		triangle 
+		{ 
+			v0 65 
+			v1 81 
+			v2 80 
+		} 
+		triangle 
+		{ 
+			v0 65 
+			v1 81 
+			v2 66 
+		} 
+		triangle 
+		{ 
+			v0 66 
+			v1 82 
+			v2 81 
+		} 
+		triangle 
+		{ 
+			v0 66 
+			v1 82 
+			v2 67 
+		} 
+		triangle 
+		{ 
+			v0 67 
+			v1 83 
+			v2 82 
+		} 
+		triangle 
+		{ 
+			v0 67 
+			v1 83 
+			v2 68 
+		} 
+		triangle 
+		{ 
+			v0 68 
+			v1 84 
+			v2 83 
+		} 
+		triangle 
+		{ 
+			v0 68 
+			v1 84 
+			v2 69 
+		} 
+		triangle 
+		{ 
+			v0 69 
+			v1 85 
+			v2 84 
+		} 
+		triangle 
+		{ 
+			v0 69 
+			v1 85 
+			v2 70 
+		} 
+		triangle 
+		{ 
+			v0 70 
+			v1 86 
+			v2 85 
+		} 
+		triangle 
+		{ 
+			v0 54 
+			v1 55 
+			v2 128 
+		} 
+		triangle 
+		{ 
+			v0 87 
+			v1 144 
+			v2 143 
+		} 
+		triangle 
+		{ 
+			v0 86 
+			v1 56 
+			v2 131 
+		} 
+		triangle 
+		{ 
+			v0 143 
+			v1 87 
+			v2 88 
+		} 
+		triangle 
+		{ 
+			v0 87 
+			v1 144 
+			v2 142 
+		} 
+		triangle 
+		{ 
+			v0 40 
+			v1 41 
+			v2 129 
+		} 
+		triangle 
+		{ 
+			v0 73 
+			v1 89 
+			v2 74 
+		} 
+		triangle 
+		{ 
+			v0 74 
+			v1 90 
+			v2 89 
+		} 
+		triangle 
+		{ 
+			v0 74 
+			v1 90 
+			v2 75 
+		} 
+		triangle 
+		{ 
+			v0 75 
+			v1 91 
+			v2 90 
+		} 
+		triangle 
+		{ 
+			v0 75 
+			v1 91 
+			v2 76 
+		} 
+		triangle 
+		{ 
+			v0 76 
+			v1 92 
+			v2 91 
+		} 
+		triangle 
+		{ 
+			v0 76 
+			v1 92 
+			v2 77 
+		} 
+		triangle 
+		{ 
+			v0 77 
+			v1 93 
+			v2 92 
+		} 
+		triangle 
+		{ 
+			v0 77 
+			v1 93 
+			v2 78 
+		} 
+		triangle 
+		{ 
+			v0 78 
+			v1 94 
+			v2 93 
+		} 
+		triangle 
+		{ 
+			v0 78 
+			v1 94 
+			v2 79 
+		} 
+		triangle 
+		{ 
+			v0 79 
+			v1 95 
+			v2 94 
+		} 
+		triangle 
+		{ 
+			v0 80 
+			v1 96 
+			v2 81 
+		} 
+		triangle 
+		{ 
+			v0 81 
+			v1 97 
+			v2 96 
+		} 
+		triangle 
+		{ 
+			v0 81 
+			v1 97 
+			v2 82 
+		} 
+		triangle 
+		{ 
+			v0 82 
+			v1 98 
+			v2 97 
+		} 
+		triangle 
+		{ 
+			v0 82 
+			v1 98 
+			v2 83 
+		} 
+		triangle 
+		{ 
+			v0 83 
+			v1 99 
+			v2 98 
+		} 
+		triangle 
+		{ 
+			v0 83 
+			v1 99 
+			v2 84 
+		} 
+		triangle 
+		{ 
+			v0 84 
+			v1 100 
+			v2 99 
+		} 
+		triangle 
+		{ 
+			v0 84 
+			v1 100 
+			v2 85 
+		} 
+		triangle 
+		{ 
+			v0 85 
+			v1 101 
+			v2 100 
+		} 
+		triangle 
+		{ 
+			v0 85 
+			v1 101 
+			v2 86 
+		} 
+		triangle 
+		{ 
+			v0 86 
+			v1 102 
+			v2 101 
+		} 
+		triangle 
+		{ 
+			v0 86 
+			v1 102 
+			v2 87 
+		} 
+		triangle 
+		{ 
+			v0 87 
+			v1 103 
+			v2 102 
+		} 
+		triangle 
+		{ 
+			v0 87 
+			v1 103 
+			v2 88 
+		} 
+		triangle 
+		{ 
+			v0 88 
+			v1 104 
+			v2 103 
+		} 
+		triangle 
+		{ 
+			v0 88 
+			v1 104 
+			v2 89 
+		} 
+		triangle 
+		{ 
+			v0 89 
+			v1 105 
+			v2 104 
+		} 
+		triangle 
+		{ 
+			v0 89 
+			v1 105 
+			v2 90 
+		} 
+		triangle 
+		{ 
+			v0 90 
+			v1 106 
+			v2 105 
+		} 
+		triangle 
+		{ 
+			v0 90 
+			v1 106 
+			v2 91 
+		} 
+		triangle 
+		{ 
+			v0 91 
+			v1 107 
+			v2 106 
+		} 
+		triangle 
+		{ 
+			v0 91 
+			v1 107 
+			v2 92 
+		} 
+		triangle 
+		{ 
+			v0 92 
+			v1 108 
+			v2 107 
+		} 
+		triangle 
+		{ 
+			v0 92 
+			v1 108 
+			v2 93 
+		} 
+		triangle 
+		{ 
+			v0 93 
+			v1 109 
+			v2 108 
+		} 
+		triangle 
+		{ 
+			v0 93 
+			v1 109 
+			v2 94 
+		} 
+		triangle 
+		{ 
+			v0 94 
+			v1 110 
+			v2 109 
+		} 
+		triangle 
+		{ 
+			v0 94 
+			v1 110 
+			v2 95 
+		} 
+		triangle 
+		{ 
+			v0 95 
+			v1 111 
+			v2 110 
+		} 
+		triangle 
+		{ 
+			v0 96 
+			v1 112 
+			v2 97 
+		} 
+		triangle 
+		{ 
+			v0 97 
+			v1 113 
+			v2 112 
+		} 
+		triangle 
+		{ 
+			v0 97 
+			v1 113 
+			v2 98 
+		} 
+		triangle 
+		{ 
+			v0 98 
+			v1 114 
+			v2 113 
+		} 
+		triangle 
+		{ 
+			v0 98 
+			v1 114 
+			v2 99 
+		} 
+		triangle 
+		{ 
+			v0 99 
+			v1 115 
+			v2 114 
+		} 
+		triangle 
+		{ 
+			v0 99 
+			v1 115 
+			v2 100 
+		} 
+		triangle 
+		{ 
+			v0 100 
+			v1 116 
+			v2 115 
+		} 
+		triangle 
+		{ 
+			v0 100 
+			v1 116 
+			v2 101 
+		} 
+		triangle 
+		{ 
+			v0 101 
+			v1 117 
+			v2 116 
+		} 
+		triangle 
+		{ 
+			v0 101 
+			v1 117 
+			v2 102 
+		} 
+		triangle 
+		{ 
+			v0 102 
+			v1 118 
+			v2 117 
+		} 
+		triangle 
+		{ 
+			v0 102 
+			v1 118 
+			v2 103 
+		} 
+		triangle 
+		{ 
+			v0 103 
+			v1 119 
+			v2 118 
+		} 
+		triangle 
+		{ 
+			v0 103 
+			v1 119 
+			v2 104 
+		} 
+		triangle 
+		{ 
+			v0 104 
+			v1 120 
+			v2 119 
+		} 
+		triangle 
+		{ 
+			v0 104 
+			v1 120 
+			v2 105 
+		} 
+		triangle 
+		{ 
+			v0 105 
+			v1 121 
+			v2 120 
+		} 
+		triangle 
+		{ 
+			v0 105 
+			v1 121 
+			v2 106 
+		} 
+		triangle 
+		{ 
+			v0 106 
+			v1 122 
+			v2 121 
+		} 
+		triangle 
+		{ 
+			v0 106 
+			v1 122 
+			v2 107 
+		} 
+		triangle 
+		{ 
+			v0 107 
+			v1 123 
+			v2 122 
+		} 
+		triangle 
+		{ 
+			v0 107 
+			v1 123 
+			v2 108 
+		} 
+		triangle 
+		{ 
+			v0 108 
+			v1 124 
+			v2 123 
+		} 
+		triangle 
+		{ 
+			v0 108 
+			v1 124 
+			v2 109 
+		} 
+		triangle 
+		{ 
+			v0 109 
+			v1 125 
+			v2 124 
+		} 
+		triangle 
+		{ 
+			v0 109 
+			v1 125 
+			v2 110 
+		} 
+		triangle 
+		{ 
+			v0 110 
+			v1 126 
+			v2 125 
+		} 
+		triangle 
+		{ 
+			v0 110 
+			v1 126 
+			v2 111 
+		} 
+		triangle 
+		{ 
+			v0 38 
+			v1 54 
+			v2 128 
+		} 
+		triangle 
+		{ 
+			v0 135 
+			v1 132 
+			v2 40 
+		} 
+		triangle 
+		{ 
+			v0 40 
+			v1 134 
+			v2 129 
+		} 
+		triangle 
+		{ 
+			v0 140 
+			v1 138 
+			v2 73 
+		} 
+		triangle 
+		{ 
+			v0 73 
+			v1 89 
+			v2 130 
+		} 
+		triangle 
+		{ 
+			v0 88 
+			v1 89 
+			v2 130 
+		} 
+		triangle 
+		{ 
+			v0 145 
+			v1 143 
+			v2 88 
+		} 
+		triangle 
+		{ 
+			v0 86 
+			v1 87 
+			v2 131 
+		} 
+		triangle 
+		{ 
+			v0 142 
+			v1 131 
+			v2 87 
+		} 
+		triangle 
+		{ 
+			v0 88 
+			v1 141 
+			v2 130 
+		} 
+		triangle 
+		{ 
+			v0 138 
+			v1 57 
+			v2 73 
+		} 
+		triangle 
+		{ 
+			v0 39 
+			v1 132 
+			v2 40 
+		} 
+		triangle 
+		{ 
+			v0 137 
+			v1 136 
+			v2 41 
+		} 
+		triangle 
+		{ 
+			v0 137 
+			v1 129 
+			v2 41 
+		} 
+		triangle 
+		{ 
+			v0 133 
+			v1 128 
+			v2 39 
+		} 
+		triangle 
+		{ 
+			v0 139 
+			v1 136 
+			v2 57 
+		} 
+		triangle 
+		{ 
+			v0 133 
+			v1 132 
+			v2 39 
+		} 
+		triangle 
+		{ 
+			v0 145 
+			v1 141 
+			v2 88 
+		} 
+		triangle 
+		{ 
+			v0 136 
+			v1 41 
+			v2 57 
+		} 
+	} 
+} 

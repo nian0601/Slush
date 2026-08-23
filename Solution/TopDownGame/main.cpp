@@ -1,12 +1,17 @@
 #include "stdafx.h"
 
 #include "Core/IApp.h"
+#include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
+#include "Core/Dockables/AssetEditorLayout.h"
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Input.h"
 
+#include "Level/Level.h"
+#include "Level/LevelData.h"
+#include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
 
@@ -15,13 +20,21 @@ class App : public Slush::IApp
 public:
 	void Initialize() override
 	{
+		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
+		assets.RegisterAssetType<NavmeshData>();
+		assets.RegisterAssetType<LevelData>();
+		assets.LoadAllAssets();
+
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.ToggleEditorUI();
-		
+		window.SetAppLayout(new Slush::AssetEditorLayout());
+
+		myLevel = new Level();
 	}
 
 	void Shutdown() override
 	{
+		FW_SAFE_DELETE(myLevel);
 	}
 
 	void Update() override
@@ -31,7 +44,7 @@ public:
 		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
 			engine.GetWindow().Close();
 
-		myNavmesh.Update();
+		myLevel->Update();
 	}
 
 	void Render() override
@@ -39,13 +52,13 @@ public:
 		Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
 		renderer.StartOffscreenBuffer();
 
-		myNavmesh.Render();
+		myLevel->Render();
 
 		renderer.EndOffscreenBuffer();
 	}
 
 private:
-	Navmesh myNavmesh;
+	Level* myLevel = nullptr;
 };
 
 #include <FW_UnitTestSuite.h>

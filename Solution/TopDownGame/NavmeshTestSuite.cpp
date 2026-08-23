@@ -215,11 +215,31 @@ namespace NavmeshTestSuite
 		FW_ASSERT(mesh.GetVertexCount() == initialVertexCount, "Expected snapping to already-existing vertices to add no new vertices");
 	}
 
+	void TestCutterCornerNearExistingEdgeSnapsOntoThatEdge()
+	{
+		Navmesh mesh;
+
+		// A point close to (but not exactly on, and well clear of either endpoint of) one interior
+		// quad's own top edge - should snap onto that edge via SplitEdgeAtPosition rather than
+		// falling into the triangle-interior insertion path.
+		Vector2f cornerNearEdge{ 724.f, 404.3f };
+		FW_ASSERT(!mesh.HasVertexNear(cornerNearEdge, 0.01f), "Test setup: expected no existing vertex at this position");
+
+		FW_GrowingArray<Vector2f> cutterCorners;
+		cutterCorners.Add(cornerNearEdge);
+		cutterCorners.Add(Vector2f{ 700.f, 460.f });
+		cutterCorners.Add(Vector2f{ 748.f, 460.f });
+		mesh.CutHole(cutterCorners);
+
+		FW_ASSERT(mesh.HasVertexNear(cornerNearEdge, 0.01f), "Expected a vertex snapped onto the nearby edge at the cutter's own corner position");
+	}
+
 	void RunTests()
 	{
 		TestCutAcrossOneQuadProducesExpectedCounts();
 		TestCutterCornerInsideTriangleInteriorProducesVertexThere();
 		TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating();
+		TestCutterCornerNearExistingEdgeSnapsOntoThatEdge();
 		TestFindPathSucceedsBetweenReachablePoints();
 		TestFindPathFailsOutsideMesh();
 		TestFindPathFailsWhenCutDisconnectsStartFromGoal();

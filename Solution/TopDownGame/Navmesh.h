@@ -10,6 +10,23 @@ public:
 	void Update();
 	void Render();
 
+	struct Portal
+	{
+		Vector2f myLeft;
+		Vector2f myRight;
+	};
+
+	struct PathCorridor
+	{
+		FW_GrowingArray<Portal> myPortals;
+	};
+
+	bool BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
+	bool StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
+	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor& outCorridor) const;
+
+	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
+
 private:
 	struct Vertex;
 	struct Edge;
@@ -55,6 +72,19 @@ private:
 		Vector2f myCutPosition;
 	};
 
+	struct AStarNode
+	{
+		Triangle* myTriangle = nullptr;
+		Edge* myEdgeFromParent = nullptr;
+		int myParentIndex = -1;
+		float myGCost = 0.f;
+		float myFCost = 0.f;
+		bool myIsClosed = false;
+	};
+
+	Triangle* FindTriangleContaining(const Vector2f& aPosition) const;
+	bool FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const;
+
 	Vertex* GetVertex(int x, int y) const;
 	Edge* GetEdgeWithVertex(Vertex* aV, Edge* aE1, Edge* aE2) const;
 	Edge* GetEdgeWithoutVertex(Vertex* aV, Edge* aE1, Edge* aE2) const;
@@ -71,11 +101,12 @@ private:
 	void DeleteTriangle(Triangle* aTriangle);
 
 	void PerformCut();
+	void CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints);
 	void Cut(const Vector2f& aV1, const Vector2f& aV2);
 	void CollectCutEdges(const FW_Intersection::LineSegment& aCuttingLine, FW_GrowingArray<CutEdge>& outCutEdges) const;
 	void CutTriangle(Triangle* aTriangle, Edge* aCutEdge, Vertex* aCutVertex, Edge* aNewEdge1, Edge* aNewEdge2);
 
-	bool IsInsideCutArea(Triangle* aTriangle);
+	bool IsInsideCutArea(const FW_GrowingArray<Vector2f>& aCutPositions, Triangle* aTriangle);
 
 	FW_GrowingArray<Vertex*> myVertices;
 	FW_GrowingArray<Edge*> myEdges;

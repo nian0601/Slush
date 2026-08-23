@@ -9,6 +9,7 @@
 #include "Graphics/Renderer.h"
 #include "Core/Input.h"
 
+#include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
@@ -20,6 +21,7 @@ public:
 	{
 		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 		assets.RegisterAssetType<NavmeshData>();
+		assets.RegisterAssetType<LevelData>();
 		assets.LoadAllAssets();
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();

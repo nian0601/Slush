@@ -151,7 +151,7 @@ Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) co
 	return nullptr;
 }
 
-bool Navmesh::FindTrianglePath(Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const
+bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const
 {
 	FW_GrowingArray<AStarNode> nodes;
 
@@ -204,8 +204,19 @@ bool Navmesh::FindTrianglePath(Triangle* aStartTriangle, Triangle* aGoalTriangle
 
 				if (prevLeft == nullptr && prevRight == nullptr)
 				{
-					left = v0;
-					right = v1;
+					// Orient the first portal so it satisfies the funnel algorithm's own
+					// apex/left/right invariant with the initial apex (aStart): the sweep
+					// from left to right around aStart must be non-negative (CCW-or-degenerate).
+					if (Cross(v0->myPos - aStart, v1->myPos - aStart) >= 0.f)
+					{
+						left = v0;
+						right = v1;
+					}
+					else
+					{
+						left = v1;
+						right = v0;
+					}
 				}
 				else if (v0 == prevLeft)
 				{
@@ -307,6 +318,102 @@ bool Navmesh::BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal,
 	return true;
 }
 
+namespace
+{
+	float TriArea2(const Vector2f& aA, const Vector2f& aB, const Vector2f& aC)
+	{
+		return Cross(aB - aA, aC - aA);
+	}
+}
+
+bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const
+{
+	if (aCorridor.myPortals.IsEmpty())
+	{
+		outWaypoints.Add(aStart);
+		outWaypoints.Add(aGoal);
+		return true;
+	}
+
+	// "Simple Stupid Funnel Algorithm": portals[0] and portals[Count()-1] are degenerate
+	// (both sides equal to aStart/aGoal) so the loop below can treat every step uniformly.
+	FW_GrowingArray<Vector2f> portalLefts;
+	FW_GrowingArray<Vector2f> portalRights;
+	portalLefts.Add(aStart);
+	portalRights.Add(aStart);
+	for (const Portal& portal : aCorridor.myPortals)
+	{
+		portalLefts.Add(portal.myLeft);
+		portalRights.Add(portal.myRight);
+	}
+	portalLefts.Add(aGoal);
+	portalRights.Add(aGoal);
+
+	outWaypoints.Add(aStart);
+
+	Vector2f apex = aStart;
+	Vector2f left = portalLefts[0];
+	Vector2f right = portalRights[0];
+	int apexIndex = 0;
+	int leftIndex = 0;
+	int rightIndex = 0;
+
+	for (int i = 1; i < portalLefts.Count(); ++i)
+	{
+		const Vector2f& newLeft = portalLefts[i];
+		const Vector2f& newRight = portalRights[i];
+
+		if (TriArea2(apex, right, newRight) <= 0.f)
+		{
+			if (apex == right || TriArea2(apex, left, newRight) > 0.f)
+			{
+				right = newRight;
+				rightIndex = i;
+			}
+			else
+			{
+				outWaypoints.Add(left);
+
+				apex = left;
+				apexIndex = leftIndex;
+				left = apex;
+				right = apex;
+				leftIndex = apexIndex;
+				rightIndex = apexIndex;
+
+				i = apexIndex;
+				continue;
+			}
+		}
+
+		if (TriArea2(apex, left, newLeft) >= 0.f)
+		{
+			if (apex == left || TriArea2(apex, right, newLeft) < 0.f)
+			{
+				left = newLeft;
+				leftIndex = i;
+			}
+			else
+			{
+				outWaypoints.Add(right);
+
+				apex = right;
+				apexIndex = rightIndex;
+				left = apex;
+				right = apex;
+				leftIndex = apexIndex;
+				rightIndex = apexIndex;
+
+				i = apexIndex;
+				continue;
+			}
+		}
+	}
+
+	outWaypoints.Add(aGoal);
+	return true;
+}
+
 bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor& outCorridor) const
 {
 	Triangle* startTriangle = FindTriangleContaining(aStart);
@@ -316,11 +423,11 @@ bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_Growing
 
 	if (startTriangle != goalTriangle)
 	{
-		if (!FindTrianglePath(startTriangle, goalTriangle, outCorridor))
+		if (!FindTrianglePath(aStart, startTriangle, goalTriangle, outCorridor))
 			return false;
 	}
 
-	return BuildEdgeCenterPath(aStart, aGoal, outCorridor, outWaypoints);
+	return StringPull(aStart, aGoal, outCorridor, outWaypoints);
 }
 
 Navmesh::Vertex* Navmesh::GetVertex(int x, int y) const

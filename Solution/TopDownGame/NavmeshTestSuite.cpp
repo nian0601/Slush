@@ -5,6 +5,15 @@
 
 namespace NavmeshTestSuite
 {
+	float GetTotalPathLength(const FW_GrowingArray<Vector2f>& aWaypoints)
+	{
+		float length = 0.f;
+		for (int i = 0; i < aWaypoints.Count() - 1; ++i)
+			length += Length(aWaypoints[i + 1] - aWaypoints[i]);
+
+		return length;
+	}
+
 	void TestFindPathSucceedsBetweenReachablePoints()
 	{
 		Navmesh mesh;
@@ -77,11 +86,75 @@ namespace NavmeshTestSuite
 		FW_ASSERT(waypoints[1] == goal, "Expected second waypoint to be the goal position");
 	}
 
+	void TestStringPullIsNoLongerThanEdgeCenterPath()
+	{
+		Navmesh mesh;
+
+		// A block that leaves room above and below, so the corridor between start and goal
+		// has to bend around it rather than running straight through.
+		FW_GrowingArray<Vector2f> cutBlock;
+		cutBlock.Add(Vector2f{ 860.f, 300.f });
+		cutBlock.Add(Vector2f{ 1100.f, 300.f });
+		cutBlock.Add(Vector2f{ 1100.f, 636.f });
+		cutBlock.Add(Vector2f{ 860.f, 636.f });
+		mesh.CutHole(cutBlock);
+
+		Vector2f start{ 50.f, 468.f };
+		Vector2f goal{ 1900.f, 468.f };
+
+		FW_GrowingArray<Vector2f> stringPulledWaypoints;
+		Navmesh::PathCorridor corridor;
+		bool found = mesh.FindPath(start, goal, stringPulledWaypoints, corridor);
+
+		FW_ASSERT(found, "Expected FindPath to succeed by routing around the cut");
+		FW_ASSERT(corridor.myPortals.Count() > 1, "Expected a multi-portal corridor bending around the cut");
+
+		FW_GrowingArray<Vector2f> edgeCenterWaypoints;
+		mesh.BuildEdgeCenterPath(start, goal, corridor, edgeCenterWaypoints);
+
+		FW_ASSERT(GetTotalPathLength(stringPulledWaypoints) <= GetTotalPathLength(edgeCenterWaypoints),
+			"Expected the string-pulled path to be no longer than the edge-center path through the same corridor");
+	}
+
+	void TestStringPullCanReFunnelAnExistingCorridorFromANewStart()
+	{
+		Navmesh mesh;
+
+		FW_GrowingArray<Vector2f> cutBlock;
+		cutBlock.Add(Vector2f{ 860.f, 300.f });
+		cutBlock.Add(Vector2f{ 1100.f, 300.f });
+		cutBlock.Add(Vector2f{ 1100.f, 636.f });
+		cutBlock.Add(Vector2f{ 860.f, 636.f });
+		mesh.CutHole(cutBlock);
+
+		Vector2f start{ 50.f, 468.f };
+		Vector2f goal{ 1900.f, 468.f };
+
+		FW_GrowingArray<Vector2f> waypoints;
+		Navmesh::PathCorridor corridor;
+		bool found = mesh.FindPath(start, goal, waypoints, corridor);
+		FW_ASSERT(found, "Expected the initial FindPath to succeed");
+
+		// Simulate an entity that has moved partway along its route: re-funnel the same,
+		// already-computed corridor from a new position without running a new search.
+		Vector2f partwayPosition{ 300.f, 468.f };
+
+		FW_GrowingArray<Vector2f> reFunneledWaypoints;
+		bool reFunneled = mesh.StringPull(partwayPosition, goal, corridor, reFunneledWaypoints);
+
+		FW_ASSERT(reFunneled, "Expected StringPull to succeed when re-funneling a stored corridor");
+		FW_ASSERT(reFunneledWaypoints.Count() >= 2, "Expected at least a start and goal waypoint");
+		FW_ASSERT(reFunneledWaypoints[0] == partwayPosition, "Expected first waypoint to be the new start position");
+		FW_ASSERT(reFunneledWaypoints.GetLast() == goal, "Expected last waypoint to be the goal position");
+	}
+
 	void RunTests()
 	{
 		TestFindPathSucceedsBetweenReachablePoints();
 		TestFindPathFailsOutsideMesh();
 		TestFindPathFailsWhenCutDisconnectsStartFromGoal();
 		TestFindPathSameTriangleYieldsStraightPath();
+		TestStringPullIsNoLongerThanEdgeCenterPath();
+		TestStringPullCanReFunnelAnExistingCorridorFromANewStart();
 	}
 }

@@ -22,6 +22,7 @@ public:
 	};
 
 	bool BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
+	bool StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
 	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor& outCorridor) const;
 
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
@@ -82,7 +83,7 @@ private:
 	};
 
 	Triangle* FindTriangleContaining(const Vector2f& aPosition) const;
-	bool FindTrianglePath(Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const;
+	bool FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const;
 
 	Vertex* GetVertex(int x, int y) const;
 	Edge* GetEdgeWithVertex(Vertex* aV, Edge* aE1, Edge* aE2) const;

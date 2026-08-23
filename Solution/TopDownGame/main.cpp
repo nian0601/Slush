@@ -17,7 +17,8 @@ public:
 	{
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.ToggleEditorUI();
-		
+
+		myNavmesh.GenerateDefaultGrid();
 	}
 
 	void Shutdown() override

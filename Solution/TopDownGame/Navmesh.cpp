@@ -8,6 +8,17 @@
 
 Navmesh::Navmesh()
 {
+}
+
+Navmesh::~Navmesh()
+{
+	myTriangles.DeleteAll();
+	myEdges.DeleteAll();
+	myVertices.DeleteAll();
+}
+
+void Navmesh::GenerateDefaultGrid()
+{
 	Vector2f offset = { 20.f, 20. };
 	Vertex* topLeft = CreateVertex(offset);
 
@@ -26,13 +37,6 @@ Navmesh::Navmesh()
 		topLeft = bottomEdges[0]->myVertices[0];
 		outRight = nullptr;
 	}
-}
-
-Navmesh::~Navmesh()
-{
-	myTriangles.DeleteAll();
-	myEdges.DeleteAll();
-	myVertices.DeleteAll();
 }
 
 void Navmesh::Update()

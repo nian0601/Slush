@@ -7,6 +7,8 @@ public:
 	Navmesh();
 	~Navmesh();
 
+	void GenerateDefaultGrid();
+
 	void Update();
 	void Render();
 

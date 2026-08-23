@@ -17,6 +17,7 @@ namespace NavmeshTestSuite
 	void TestFindPathSucceedsBetweenReachablePoints()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f start{ 50.f, 50.f };
 		Vector2f goal{ 1900.f, 850.f };
@@ -34,6 +35,7 @@ namespace NavmeshTestSuite
 	void TestFindPathFailsOutsideMesh()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f start{ -100.f, -100.f };
 		Vector2f goal{ 50.f, 50.f };
@@ -49,6 +51,7 @@ namespace NavmeshTestSuite
 	void TestFindPathFailsWhenCutDisconnectsStartFromGoal()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// A horizontal band spanning wider than the mesh, cutting it into a top half and a bottom half.
 		FW_GrowingArray<Vector2f> cutBand;
@@ -71,6 +74,7 @@ namespace NavmeshTestSuite
 	void TestFindPathSameTriangleYieldsStraightPath()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f start{ 30.f, 30.f };
 		Vector2f goal{ 40.f, 35.f };
@@ -89,6 +93,7 @@ namespace NavmeshTestSuite
 	void TestStringPullIsNoLongerThanEdgeCenterPath()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// A block that leaves room above and below, so the corridor between start and goal
 		// has to bend around it rather than running straight through.
@@ -119,6 +124,7 @@ namespace NavmeshTestSuite
 	void TestStringPullCanReFunnelAnExistingCorridorFromANewStart()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		FW_GrowingArray<Vector2f> cutBlock;
 		cutBlock.Add(Vector2f{ 860.f, 300.f });
@@ -151,6 +157,7 @@ namespace NavmeshTestSuite
 	void TestCutAcrossOneQuadProducesExpectedCounts()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		const int initialTriangleCount = mesh.GetTriangleCount();
 		const int initialVertexCount = mesh.GetVertexCount();
@@ -178,6 +185,7 @@ namespace NavmeshTestSuite
 	void TestCutterCornerInsideTriangleInteriorProducesVertexThere()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		Vector2f cornerDeepInsideATriangle{ 45.f, 45.f };
 		FW_ASSERT(!mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Test setup: expected no existing vertex at this position");
@@ -194,6 +202,7 @@ namespace NavmeshTestSuite
 	void TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// The exact 3 vertices of one interior quad's own upper-left triangle - already real navmesh
 		// vertices, so EnsureCutterVerticesExist should snap to each rather than inserting a
@@ -218,6 +227,7 @@ namespace NavmeshTestSuite
 	void TestCutterCornerNearExistingEdgeSnapsOntoThatEdge()
 	{
 		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
 
 		// A point close to (but not exactly on, and well clear of either endpoint of) one interior
 		// quad's own top edge - should snap onto that edge via SplitEdgeAtPosition rather than

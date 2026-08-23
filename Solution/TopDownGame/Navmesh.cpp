@@ -621,17 +621,13 @@ int Navmesh::GetVertexCount() const
 
 bool Navmesh::HasVertexNear(const Vector2f& aPosition, float anEpsilon) const
 {
-	for (Vertex* vertex : myVertices)
-	{
-		if (Length2(vertex->myPos - aPosition) <= anEpsilon * anEpsilon)
-			return true;
-	}
-
-	return false;
+	return FindNearbyVertex(aPosition, anEpsilon) != nullptr;
 }
 
 void Navmesh::CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints)
 {
+	EnsureCutterVerticesExist(aPolygonPoints);
+
 	FW_GrowingArray<Vector2f> closedPolygon = aPolygonPoints;
 	closedPolygon.Add(closedPolygon[0]);
 
@@ -650,14 +646,39 @@ void Navmesh::CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints)
 	}
 }
 
+namespace
+{
+	const float CutterVertexEpsilon = 1.f;
+}
+
+void Navmesh::EnsureCutterVerticesExist(const FW_GrowingArray<Vector2f>& aPolygonPoints)
+{
+	// A cutter shape's own corner points are never guaranteed to land on an existing mesh edge, so
+	// without this step Cut()'s edge-crossing logic below only ever creates vertices where a cut
+	// segment crosses an *existing* edge - the shape's own corners can fall anywhere inside a
+	// triangle and drift from the clicked/authored positions. Snapping within CutterVertexEpsilon
+	// instead of always inserting exactly avoids scattering near-duplicate vertices/edges a hair's
+	// width apart from whatever's already there (e.g. re-cutting close to a previous cut's own
+	// corners, or a corner that's already effectively on a shared edge/vertex by construction).
+	// The remaining imprecision is bounded by the epsilon rather than by triangle size.
+	for (const Vector2f& point : aPolygonPoints)
+	{
+		if (FindNearbyVertex(point, CutterVertexEpsilon) != nullptr)
+			continue;
+
+		if (Edge* nearbyEdge = FindNearbyEdge(point, CutterVertexEpsilon))
+		{
+			SplitEdgeAtPosition(nearbyEdge, point);
+			continue;
+		}
+
+		if (Triangle* triangle = FindTriangleContaining(point))
+			InsertVertexInTriangle(triangle, point);
+	}
+}
+
 void Navmesh::Cut(const Vector2f& aV1, const Vector2f& aV2)
 {
-	// There is not guarantee that there will be a Vertex created exactly at aV1 and aV2, so the
-	// further away from an edge those postions are within a triangle, the less accurate the cut becomes
-	// in that triangle.
-	// Ideally a Vertex should always be created on those specific positions, but that also makes the
-	// cutting more complex.
-
 	FW_Intersection::LineSegment cuttingLine;
 	cuttingLine.myStart = aV1;
 	cuttingLine.myEnd = aV2;
@@ -688,6 +709,13 @@ void Navmesh::Cut(const Vector2f& aV1, const Vector2f& aV2)
 
 void Navmesh::CollectCutEdges(const FW_Intersection::LineSegment& aCuttingLine, FW_GrowingArray<CutEdge>& outCutEdges) const
 {
+	// LineSegmentVsLineSegment's general (non-parallel) case is endpoint-inclusive, so a cutting
+	// segment that starts/ends exactly on an existing vertex (as EnsureCutterVerticesExist now
+	// guarantees) reports a spurious "crossing" against every edge incident to that vertex, right
+	// at the segment's own endpoint. That's not an interior crossing needing a new vertex there -
+	// the vertex already exists - so skip any hit that lands on the cutting segment's own start/end.
+	const float DegenerateEpsilonSq = 0.0001f;
+
 	FW_Intersection::LineSegment edgeSegment;
 	Vector2f intersectionPoint;
 	for (Edge* edge : myEdges)
@@ -696,11 +724,99 @@ void Navmesh::CollectCutEdges(const FW_Intersection::LineSegment& aCuttingLine, 
 		edgeSegment.myEnd = edge->myVertices[1]->myPos;
 		if (FW_Intersection::LineSegmentVsLineSegment(aCuttingLine, edgeSegment, &intersectionPoint))
 		{
+			if (Length2(intersectionPoint - aCuttingLine.myStart) <= DegenerateEpsilonSq)
+				continue;
+			if (Length2(intersectionPoint - aCuttingLine.myEnd) <= DegenerateEpsilonSq)
+				continue;
+
 			CutEdge& cutEdge = outCutEdges.Add();
 			cutEdge.myEdge = edge;
 			cutEdge.myCutPosition = intersectionPoint;
 		}
 	}
+}
+
+Navmesh::Vertex* Navmesh::InsertVertexInTriangle(Triangle* aTriangle, const Vector2f& aPosition)
+{
+	Vertex* newVertex = CreateVertex(aPosition);
+
+	Vertex* v0 = aTriangle->myVertices[0];
+	Vertex* v1 = aTriangle->myVertices[1];
+	Vertex* v2 = aTriangle->myVertices[2];
+
+	Edge* edge01 = aTriangle->GetEdgeWithoutVertex(v2);
+	Edge* edge12 = aTriangle->GetEdgeWithoutVertex(v0);
+	Edge* edge20 = aTriangle->GetEdgeWithoutVertex(v1);
+
+	Edge* spoke0 = CreateEdge(newVertex, v0);
+	Edge* spoke1 = CreateEdge(newVertex, v1);
+	Edge* spoke2 = CreateEdge(newVertex, v2);
+
+	myTriangles.DeleteCyclic(aTriangle);
+
+	CreateTriangle(edge01, spoke0, spoke1);
+	CreateTriangle(edge12, spoke1, spoke2);
+	CreateTriangle(edge20, spoke2, spoke0);
+
+	return newVertex;
+}
+
+Navmesh::Vertex* Navmesh::SplitEdgeAtPosition(Edge* aEdge, const Vector2f& aPosition)
+{
+	Vertex* cutVertex = CreateVertex(aPosition);
+
+	Edge* newEdge1 = CreateEdge(aEdge->myVertices[0], cutVertex);
+	Edge* newEdge2 = CreateEdge(cutVertex, aEdge->myVertices[1]);
+
+	Triangle* triangle0 = aEdge->myTriangles[0];
+	Triangle* triangle1 = aEdge->myTriangles[1];
+
+	CutTriangle(triangle0, aEdge, cutVertex, newEdge1, newEdge2);
+	CutTriangle(triangle1, aEdge, cutVertex, newEdge1, newEdge2);
+
+	if (triangle0)
+		DeleteTriangle(triangle0);
+	if (triangle1)
+		DeleteTriangle(triangle1);
+
+	return cutVertex;
+}
+
+Navmesh::Vertex* Navmesh::FindNearbyVertex(const Vector2f& aPosition, float anEpsilon) const
+{
+	for (Vertex* vertex : myVertices)
+	{
+		if (Length2(vertex->myPos - aPosition) <= anEpsilon * anEpsilon)
+			return vertex;
+	}
+
+	return nullptr;
+}
+
+namespace
+{
+	float DistancePointToSegmentSq(const Vector2f& aPoint, const Vector2f& aSegmentStart, const Vector2f& aSegmentEnd)
+	{
+		Vector2f segmentDir = aSegmentEnd - aSegmentStart;
+		float segmentLength2 = Length2(segmentDir);
+		if (segmentLength2 == 0.f)
+			return Length2(aPoint - aSegmentStart);
+
+		float t = FW_Clamp(Dot(aPoint - aSegmentStart, segmentDir) / segmentLength2, 0.f, 1.f);
+		Vector2f closestPoint = aSegmentStart + segmentDir * t;
+		return Length2(aPoint - closestPoint);
+	}
+}
+
+Navmesh::Edge* Navmesh::FindNearbyEdge(const Vector2f& aPosition, float anEpsilon) const
+{
+	for (Edge* edge : myEdges)
+	{
+		if (DistancePointToSegmentSq(aPosition, edge->myVertices[0]->myPos, edge->myVertices[1]->myPos) <= anEpsilon * anEpsilon)
+			return edge;
+	}
+
+	return nullptr;
 }
 
 void Navmesh::CutTriangle(Triangle* aTriangle, Edge* aCutEdge, Vertex* aCutVertex, Edge* aNewEdge1, Edge* aNewEdge2)

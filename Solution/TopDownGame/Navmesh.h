@@ -106,9 +106,15 @@ private:
 
 	void PerformCut();
 	void CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints);
+	void EnsureCutterVerticesExist(const FW_GrowingArray<Vector2f>& aPolygonPoints);
 	void Cut(const Vector2f& aV1, const Vector2f& aV2);
 	void CollectCutEdges(const FW_Intersection::LineSegment& aCuttingLine, FW_GrowingArray<CutEdge>& outCutEdges) const;
 	void CutTriangle(Triangle* aTriangle, Edge* aCutEdge, Vertex* aCutVertex, Edge* aNewEdge1, Edge* aNewEdge2);
+
+	Vertex* InsertVertexInTriangle(Triangle* aTriangle, const Vector2f& aPosition);
+	Vertex* SplitEdgeAtPosition(Edge* aEdge, const Vector2f& aPosition);
+	Vertex* FindNearbyVertex(const Vector2f& aPosition, float anEpsilon) const;
+	Edge* FindNearbyEdge(const Vector2f& aPosition, float anEpsilon) const;
 
 	bool IsInsideCutArea(const FW_GrowingArray<Vector2f>& aCutPositions, Triangle* aTriangle);
 

@@ -146,6 +146,7 @@
     <ClCompile Include="NavmeshTestSuite.cpp" />
     <ClCompile Include="Level\NavmeshData.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
+    <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -157,6 +158,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Level\NavmeshData.h" />
     <ClInclude Include="Level\LevelData.h" />
+    <ClInclude Include="Level\Level.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

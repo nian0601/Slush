@@ -92,6 +92,7 @@ void NavmeshDebuggerDockable::OnBuildUI()
 			{
 				myIsPathfindTestModeActive = false;
 				myPathfindTestHasStart = false;
+				myNavmesh.SetPathfindTestModeActive(false);
 			}
 		}
 	}
@@ -102,6 +103,7 @@ void NavmeshDebuggerDockable::OnBuildUI()
 		{
 			myIsPathfindTestModeActive = false;
 			myPathfindTestHasStart = false;
+			myNavmesh.SetPathfindTestModeActive(false);
 		}
 	}
 	else
@@ -110,6 +112,7 @@ void NavmeshDebuggerDockable::OnBuildUI()
 		{
 			myIsPathfindTestModeActive = true;
 			myPathfindTestHasStart = false;
+			myNavmesh.SetPathfindTestModeActive(true);
 
 			if (myIsBoxCutModeActive)
 			{

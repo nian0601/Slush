@@ -125,6 +125,11 @@ void Navmesh::Update()
 			}
 		}
 	}
+	else if (myPathfindTestModeActive)
+	{
+		// Pathfind-test click handling lives in NavmeshDebuggerDockable::OnUpdate() - this branch
+		// only needs to exist so the freeform-paint fallback below doesn't also consume the same click.
+	}
 	else if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 	{
 		myCutPositions.Add(engine.GetInput().GetMousePositionf());
@@ -726,6 +731,11 @@ void Navmesh::SetBoxCutModeActive(bool anIsActive)
 {
 	myBoxCutModeActive = anIsActive;
 	myBoxCutHasStartCorner = false;
+}
+
+void Navmesh::SetPathfindTestModeActive(bool anIsActive)
+{
+	myPathfindTestModeActive = anIsActive;
 }
 
 int Navmesh::GetTriangleCount() const

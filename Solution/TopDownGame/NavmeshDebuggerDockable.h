@@ -31,9 +31,14 @@ private:
 	void BuildPathfindResultsList();
 	void UpdatePathfindTestMode();
 
+	void DisableBoxCutMode();
+	void DisablePathfindTestMode();
+	void DisableManualCutMode();
+
 	Navmesh& myNavmesh;
 
 	bool myIsBoxCutModeActive = false;
+	bool myIsManualCutModeActive = false;
 
 	bool myIsPathfindTestModeActive = false;
 	bool myPathfindTestHasStart = false;

@@ -34,7 +34,7 @@ public:
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 
 	void SetBoxCutModeActive(bool anIsActive);
-	void SetPathfindTestModeActive(bool anIsActive);
+	void SetManualCutModeActive(bool anIsActive);
 
 	int GetTriangleCount() const;
 	int GetVertexCount() const;
@@ -146,5 +146,5 @@ private:
 	bool myBoxCutHasStartCorner = false;
 	Vector2f myBoxCutStartCorner;
 
-	bool myPathfindTestModeActive = false;
+	bool myManualCutModeActive = false;
 };

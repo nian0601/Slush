@@ -69,6 +69,33 @@ void NavmeshDebuggerDockable::UpdatePathfindTestMode()
 	result.myWaypoints = waypoints;
 }
 
+void NavmeshDebuggerDockable::DisableBoxCutMode()
+{
+	if (!myIsBoxCutModeActive)
+		return;
+
+	myIsBoxCutModeActive = false;
+	myNavmesh.SetBoxCutModeActive(false);
+}
+
+void NavmeshDebuggerDockable::DisablePathfindTestMode()
+{
+	if (!myIsPathfindTestModeActive)
+		return;
+
+	myIsPathfindTestModeActive = false;
+	myPathfindTestHasStart = false;
+}
+
+void NavmeshDebuggerDockable::DisableManualCutMode()
+{
+	if (!myIsManualCutModeActive)
+		return;
+
+	myIsManualCutModeActive = false;
+	myNavmesh.SetManualCutModeActive(false);
+}
+
 void NavmeshDebuggerDockable::OnBuildUI()
 {
 	ImGui::Text("Navmesh Debugger");
@@ -76,10 +103,7 @@ void NavmeshDebuggerDockable::OnBuildUI()
 	if (myIsBoxCutModeActive)
 	{
 		if (ImGui::Button("Disable Box Cut"))
-		{
-			myIsBoxCutModeActive = false;
-			myNavmesh.SetBoxCutModeActive(false);
-		}
+			DisableBoxCutMode();
 	}
 	else
 	{
@@ -88,23 +112,15 @@ void NavmeshDebuggerDockable::OnBuildUI()
 			myIsBoxCutModeActive = true;
 			myNavmesh.SetBoxCutModeActive(true);
 
-			if (myIsPathfindTestModeActive)
-			{
-				myIsPathfindTestModeActive = false;
-				myPathfindTestHasStart = false;
-				myNavmesh.SetPathfindTestModeActive(false);
-			}
+			DisablePathfindTestMode();
+			DisableManualCutMode();
 		}
 	}
 
 	if (myIsPathfindTestModeActive)
 	{
 		if (ImGui::Button("Disable Pathfind Test"))
-		{
-			myIsPathfindTestModeActive = false;
-			myPathfindTestHasStart = false;
-			myNavmesh.SetPathfindTestModeActive(false);
-		}
+			DisablePathfindTestMode();
 	}
 	else
 	{
@@ -112,13 +128,26 @@ void NavmeshDebuggerDockable::OnBuildUI()
 		{
 			myIsPathfindTestModeActive = true;
 			myPathfindTestHasStart = false;
-			myNavmesh.SetPathfindTestModeActive(true);
 
-			if (myIsBoxCutModeActive)
-			{
-				myIsBoxCutModeActive = false;
-				myNavmesh.SetBoxCutModeActive(false);
-			}
+			DisableBoxCutMode();
+			DisableManualCutMode();
+		}
+	}
+
+	if (myIsManualCutModeActive)
+	{
+		if (ImGui::Button("Disable Manual Cut"))
+			DisableManualCutMode();
+	}
+	else
+	{
+		if (ImGui::Button("Enable Manual Cut"))
+		{
+			myIsManualCutModeActive = true;
+			myNavmesh.SetManualCutModeActive(true);
+
+			DisableBoxCutMode();
+			DisablePathfindTestMode();
 		}
 	}
 
@@ -139,8 +168,14 @@ void NavmeshDebuggerDockable::BuildPathfindResultsList()
 
 		ImGui::PushID(result.myID);
 
+		// Selectable() defaults to stretching across the whole remaining row width, which would
+		// otherwise sit underneath (and eat clicks meant for) the Remove button placed via SameLine()
+		// below - give it an explicit width that stops short of the button instead.
+		const float removeButtonWidth = ImGui::CalcTextSize("Remove").x + ImGui::GetStyle().FramePadding.x * 2.0f;
+		const float selectableWidth = ImGui::GetContentRegionAvail().x - removeButtonWidth - ImGui::GetStyle().ItemSpacing.x;
+
 		const bool isSelected = (mySelectedPathfindResultID == result.myID);
-		if (ImGui::Selectable(result.myLabel.GetBuffer(), isSelected))
+		if (ImGui::Selectable(result.myLabel.GetBuffer(), isSelected, 0, ImVec2(selectableWidth, 0)))
 			mySelectedPathfindResultID = isSelected ? -1 : result.myID;
 
 		ImGui::SameLine();

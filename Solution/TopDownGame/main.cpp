@@ -28,7 +28,6 @@ public:
 		myLevel = new Level();
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.ToggleEditorUI();
 		window.SetAppLayout(new TopDownGameLayout(myLevel->GetNavmesh()));
 	}
 

@@ -155,6 +155,15 @@ namespace FW_FileSystem
 		}
 	}
 
+	// Unlike CreateFolderIfNecessary(), this doesn't assume the path lives under a "data" folder -
+	// creates exactly the single, already-absolute directory passed in (its parent must already exist).
+	void CreateFolder(const FW_String& anAbsoluteFolderPath)
+	{
+		bool success = CreateDirectoryA(anAbsoluteFolderPath.GetBuffer(), NULL);
+		if (!success && GetLastError() != ERROR_ALREADY_EXISTS)
+			FW_ASSERT_ALWAYS;
+	}
+
 	void GetFileName(const FW_String& aFilePath, FW_String& aNameOut)
 	{
 		int findIndex = aFilePath.RFind("/");

@@ -260,6 +260,10 @@ namespace Slush
 		if (!myAppLayout)
 			return;
 
+		FW_String folderPath;
+		FW_FileSystem::GetAbsoluteFilePath("ImGUILayouts", folderPath);
+		FW_FileSystem::CreateFolder(folderPath);
+
 		FW_String path;
 		FW_String settingName = "ImGUILayouts/";
 		settingName += myAppLayout->GetName();

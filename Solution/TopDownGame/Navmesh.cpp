@@ -108,7 +108,24 @@ void Navmesh::Load(Slush::AssetParser::Handle aRootHandle)
 void Navmesh::Update()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
+
+	if (myBoxCutModeActive)
+	{
+		if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
+		{
+			if (!myBoxCutHasStartCorner)
+			{
+				myBoxCutStartCorner = engine.GetInput().GetMousePositionf();
+				myBoxCutHasStartCorner = true;
+			}
+			else
+			{
+				CommitBoxCut(myBoxCutStartCorner, engine.GetInput().GetMousePositionf());
+				myBoxCutHasStartCorner = false;
+			}
+		}
+	}
+	else if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 	{
 		myCutPositions.Add(engine.GetInput().GetMousePositionf());
 	}
@@ -208,6 +225,20 @@ void Navmesh::Render()
 
 	if (!myCutPositions.IsEmpty())
 		renderer.RenderLine(myCutPositions.GetLast(), mousePos, 0xFF000000);
+
+	if (myBoxCutModeActive && myBoxCutHasStartCorner)
+	{
+		const Vector2f topLeft{ FW_Min(myBoxCutStartCorner.x, mousePos.x), FW_Min(myBoxCutStartCorner.y, mousePos.y) };
+		const Vector2f bottomRight{ FW_Max(myBoxCutStartCorner.x, mousePos.x), FW_Max(myBoxCutStartCorner.y, mousePos.y) };
+		const Vector2f topRight{ bottomRight.x, topLeft.y };
+		const Vector2f bottomLeft{ topLeft.x, bottomRight.y };
+
+		const int boxPreviewColor = 0xFF00FF00;
+		renderer.RenderLine(topLeft, topRight, boxPreviewColor);
+		renderer.RenderLine(topRight, bottomRight, boxPreviewColor);
+		renderer.RenderLine(bottomRight, bottomLeft, boxPreviewColor);
+		renderer.RenderLine(bottomLeft, topLeft, boxPreviewColor);
+	}
 }
 
 Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) const
@@ -691,6 +722,12 @@ void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)
 	CutPolygon(aPolygon);
 }
 
+void Navmesh::SetBoxCutModeActive(bool anIsActive)
+{
+	myBoxCutModeActive = anIsActive;
+	myBoxCutHasStartCorner = false;
+}
+
 int Navmesh::GetTriangleCount() const
 {
 	return myTriangles.Count();
@@ -704,6 +741,20 @@ int Navmesh::GetVertexCount() const
 bool Navmesh::HasVertexNear(const Vector2f& aPosition, float anEpsilon) const
 {
 	return FindNearbyVertex(aPosition, anEpsilon) != nullptr;
+}
+
+void Navmesh::CommitBoxCut(const Vector2f& aStartCorner, const Vector2f& anEndCorner)
+{
+	const Vector2f topLeft{ FW_Min(aStartCorner.x, anEndCorner.x), FW_Min(aStartCorner.y, anEndCorner.y) };
+	const Vector2f bottomRight{ FW_Max(aStartCorner.x, anEndCorner.x), FW_Max(aStartCorner.y, anEndCorner.y) };
+
+	FW_GrowingArray<Vector2f> boxCorners;
+	boxCorners.Add(topLeft);
+	boxCorners.Add(Vector2f{ bottomRight.x, topLeft.y });
+	boxCorners.Add(bottomRight);
+	boxCorners.Add(Vector2f{ topLeft.x, bottomRight.y });
+
+	CutHole(boxCorners);
 }
 
 void Navmesh::CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints)

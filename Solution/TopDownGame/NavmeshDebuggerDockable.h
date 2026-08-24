@@ -16,4 +16,6 @@ protected:
 
 private:
 	Navmesh& myNavmesh;
+
+	bool myIsBoxCutModeActive = false;
 };

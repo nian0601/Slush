@@ -144,6 +144,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Navmesh.cpp" />
     <ClCompile Include="NavmeshTestSuite.cpp" />
+    <ClCompile Include="NavmeshDebuggerDockable.cpp" />
+    <ClCompile Include="TopDownGameLayout.cpp" />
     <ClCompile Include="Level\NavmeshData.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="Level\Level.cpp" />
@@ -155,6 +157,8 @@
   <ItemGroup>
     <ClInclude Include="Navmesh.h" />
     <ClInclude Include="NavmeshTestSuite.h" />
+    <ClInclude Include="NavmeshDebuggerDockable.h" />
+    <ClInclude Include="TopDownGameLayout.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Level\NavmeshData.h" />
     <ClInclude Include="Level\LevelData.h" />

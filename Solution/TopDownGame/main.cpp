@@ -3,7 +3,6 @@
 #include "Core/IApp.h"
 #include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
-#include "Core/Dockables/AssetEditorLayout.h"
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
@@ -14,6 +13,7 @@
 #include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
+#include "TopDownGameLayout.h"
 
 class App : public Slush::IApp
 {
@@ -25,11 +25,11 @@ public:
 		assets.RegisterAssetType<LevelData>();
 		assets.LoadAllAssets();
 
+		myLevel = new Level();
+
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.ToggleEditorUI();
-		window.SetAppLayout(new Slush::AssetEditorLayout());
-
-		myLevel = new Level();
+		window.SetAppLayout(new TopDownGameLayout(myLevel->GetNavmesh()));
 	}
 
 	void Shutdown() override

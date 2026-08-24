@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "TopDownGameLayout.h"
+#include "NavmeshDebuggingLayout.h"
 
 #include "NavmeshDebuggerDockable.h"
 
@@ -9,7 +9,7 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 
-TopDownGameLayout::TopDownGameLayout(Navmesh& aNavmesh)
+NavmeshDebuggingLayout::NavmeshDebuggingLayout(Navmesh& aNavmesh)
 	: Slush::IAppLayout("TopDownGame")
 	, myNavmesh(aNavmesh)
 {
@@ -19,12 +19,12 @@ TopDownGameLayout::TopDownGameLayout(Navmesh& aNavmesh)
 	AddDockable(myNavmeshDebuggerDockable);
 }
 
-void TopDownGameLayout::OnRender()
+void NavmeshDebuggingLayout::OnRender()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
-	myNavmeshDebuggerDockable->RenderPathfindResults();
+	myNavmeshDebuggerDockable->RenderDebugOverlay();
 
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();
 }

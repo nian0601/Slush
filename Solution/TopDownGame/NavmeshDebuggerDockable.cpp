@@ -15,6 +15,13 @@ NavmeshDebuggerDockable::NavmeshDebuggerDockable(Navmesh& aNavmesh)
 {
 }
 
+void NavmeshDebuggerDockable::RenderDebugOverlay() const
+{
+	RenderPathfindResults();
+	RenderBoxCutPreview();
+	RenderManualCutPreview();
+}
+
 void NavmeshDebuggerDockable::RenderPathfindResults() const
 {
 	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
@@ -31,9 +38,96 @@ void NavmeshDebuggerDockable::RenderPathfindResults() const
 	}
 }
 
+void NavmeshDebuggerDockable::RenderBoxCutPreview() const
+{
+	if (!myIsBoxCutModeActive || !myBoxCutHasStartCorner)
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
+	const Vector2f& mousePos = engine.GetInput().GetMousePositionf();
+
+	const Vector2f topLeft{ FW_Min(myBoxCutStartCorner.x, mousePos.x), FW_Min(myBoxCutStartCorner.y, mousePos.y) };
+	const Vector2f bottomRight{ FW_Max(myBoxCutStartCorner.x, mousePos.x), FW_Max(myBoxCutStartCorner.y, mousePos.y) };
+	const Vector2f topRight{ bottomRight.x, topLeft.y };
+	const Vector2f bottomLeft{ topLeft.x, bottomRight.y };
+
+	const int boxPreviewColor = 0xFF00FF00;
+	renderer.RenderLine(topLeft, topRight, boxPreviewColor);
+	renderer.RenderLine(topRight, bottomRight, boxPreviewColor);
+	renderer.RenderLine(bottomRight, bottomLeft, boxPreviewColor);
+	renderer.RenderLine(bottomLeft, topLeft, boxPreviewColor);
+}
+
+void NavmeshDebuggerDockable::RenderManualCutPreview() const
+{
+	if (!myIsManualCutModeActive || myCutPositions.IsEmpty())
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
+	const Vector2f& mousePos = engine.GetInput().GetMousePositionf();
+
+	const int cutPreviewColor = 0xFF000000;
+	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
+		renderer.RenderLine(myCutPositions[i], myCutPositions[i + 1], cutPreviewColor);
+
+	renderer.RenderLine(myCutPositions.GetLast(), mousePos, cutPreviewColor);
+}
+
 void NavmeshDebuggerDockable::OnUpdate()
 {
+	UpdateBoxCutMode();
+	UpdateManualCutMode();
 	UpdatePathfindTestMode();
+}
+
+void NavmeshDebuggerDockable::UpdateBoxCutMode()
+{
+	if (!myIsBoxCutModeActive)
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
+		return;
+
+	if (!myBoxCutHasStartCorner)
+	{
+		myBoxCutStartCorner = engine.GetInput().GetMousePositionf();
+		myBoxCutHasStartCorner = true;
+		return;
+	}
+
+	const Vector2f endCorner = engine.GetInput().GetMousePositionf();
+	myBoxCutHasStartCorner = false;
+
+	const Vector2f topLeft{ FW_Min(myBoxCutStartCorner.x, endCorner.x), FW_Min(myBoxCutStartCorner.y, endCorner.y) };
+	const Vector2f bottomRight{ FW_Max(myBoxCutStartCorner.x, endCorner.x), FW_Max(myBoxCutStartCorner.y, endCorner.y) };
+
+	FW_GrowingArray<Vector2f> boxCorners;
+	boxCorners.Add(topLeft);
+	boxCorners.Add(Vector2f{ bottomRight.x, topLeft.y });
+	boxCorners.Add(bottomRight);
+	boxCorners.Add(Vector2f{ topLeft.x, bottomRight.y });
+
+	myNavmesh.CutHole(boxCorners);
+}
+
+void NavmeshDebuggerDockable::UpdateManualCutMode()
+{
+	if (!myIsManualCutModeActive)
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
+	{
+		myCutPositions.Add(engine.GetInput().GetMousePositionf());
+	}
+	else if (engine.GetInput().WasMouseReleased(Slush::Input::RIGHTMB))
+	{
+		myNavmesh.CutHole(myCutPositions);
+		myCutPositions.RemoveAll();
+	}
 }
 
 void NavmeshDebuggerDockable::UpdatePathfindTestMode()
@@ -75,7 +169,7 @@ void NavmeshDebuggerDockable::DisableBoxCutMode()
 		return;
 
 	myIsBoxCutModeActive = false;
-	myNavmesh.SetBoxCutModeActive(false);
+	myBoxCutHasStartCorner = false;
 }
 
 void NavmeshDebuggerDockable::DisablePathfindTestMode()
@@ -93,7 +187,7 @@ void NavmeshDebuggerDockable::DisableManualCutMode()
 		return;
 
 	myIsManualCutModeActive = false;
-	myNavmesh.SetManualCutModeActive(false);
+	myCutPositions.RemoveAll();
 }
 
 void NavmeshDebuggerDockable::OnBuildUI()
@@ -110,7 +204,7 @@ void NavmeshDebuggerDockable::OnBuildUI()
 		if (ImGui::Button("Enable Box Cut"))
 		{
 			myIsBoxCutModeActive = true;
-			myNavmesh.SetBoxCutModeActive(true);
+			myBoxCutHasStartCorner = false;
 
 			DisablePathfindTestMode();
 			DisableManualCutMode();
@@ -144,7 +238,7 @@ void NavmeshDebuggerDockable::OnBuildUI()
 		if (ImGui::Button("Enable Manual Cut"))
 		{
 			myIsManualCutModeActive = true;
-			myNavmesh.SetManualCutModeActive(true);
+			myCutPositions.RemoveAll();
 
 			DisableBoxCutMode();
 			DisablePathfindTestMode();

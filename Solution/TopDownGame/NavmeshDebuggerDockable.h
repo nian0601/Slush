@@ -12,7 +12,7 @@ public:
 
 	const char* GetName() const override { return "Navmesh Debugger"; }
 
-	void RenderPathfindResults() const;
+	void RenderDebugOverlay() const;
 
 protected:
 	void OnUpdate() override;
@@ -29,7 +29,14 @@ private:
 	};
 
 	void BuildPathfindResultsList();
+
+	void UpdateBoxCutMode();
+	void UpdateManualCutMode();
 	void UpdatePathfindTestMode();
+
+	void RenderPathfindResults() const;
+	void RenderBoxCutPreview() const;
+	void RenderManualCutPreview() const;
 
 	void DisableBoxCutMode();
 	void DisablePathfindTestMode();
@@ -38,7 +45,11 @@ private:
 	Navmesh& myNavmesh;
 
 	bool myIsBoxCutModeActive = false;
+	bool myBoxCutHasStartCorner = false;
+	Vector2f myBoxCutStartCorner;
+
 	bool myIsManualCutModeActive = false;
+	FW_GrowingArray<Vector2f> myCutPositions;
 
 	bool myIsPathfindTestModeActive = false;
 	bool myPathfindTestHasStart = false;

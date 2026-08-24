@@ -33,9 +33,6 @@ public:
 
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 
-	void SetBoxCutModeActive(bool anIsActive);
-	void SetManualCutModeActive(bool anIsActive);
-
 	int GetTriangleCount() const;
 	int GetVertexCount() const;
 	bool HasVertexNear(const Vector2f& aPosition, float anEpsilon) const;
@@ -114,14 +111,11 @@ private:
 	Triangle* CreateTriangle(Edge* aE1, Edge* aE2, Edge* aE3);
 	void DeleteTriangle(Triangle* aTriangle);
 
-	void PerformCut();
 	void CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints);
 	void EnsureCutterVerticesExist(const FW_GrowingArray<Vector2f>& aPolygonPoints);
 	void Cut(const Vector2f& aV1, const Vector2f& aV2);
 	void CollectCutEdges(const FW_Intersection::LineSegment& aCuttingLine, FW_GrowingArray<CutEdge>& outCutEdges) const;
 	void CutTriangle(Triangle* aTriangle, Edge* aCutEdge, Vertex* aCutVertex, Edge* aNewEdge1, Edge* aNewEdge2);
-
-	void CommitBoxCut(const Vector2f& aStartCorner, const Vector2f& anEndCorner);
 
 	Vertex* InsertVertexInTriangle(Triangle* aTriangle, const Vector2f& aPosition);
 	Vertex* SplitEdgeAtPosition(Edge* aEdge, const Vector2f& aPosition);
@@ -139,12 +133,4 @@ private:
 	
 	//Vector2i mySectorGrid{ 2, 2 };
 	//Vector2i mySectorGridSize{ 512, 512 };
-
-	FW_GrowingArray<Vector2f> myCutPositions;
-
-	bool myBoxCutModeActive = false;
-	bool myBoxCutHasStartCorner = false;
-	Vector2f myBoxCutStartCorner;
-
-	bool myManualCutModeActive = false;
 };

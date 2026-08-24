@@ -5,10 +5,10 @@
 class Navmesh;
 class NavmeshDebuggerDockable;
 
-class TopDownGameLayout : public Slush::IAppLayout
+class NavmeshDebuggingLayout : public Slush::IAppLayout
 {
 public:
-	TopDownGameLayout(Navmesh& aNavmesh);
+	NavmeshDebuggingLayout(Navmesh& aNavmesh);
 
 protected:
 	void OnRender() override;

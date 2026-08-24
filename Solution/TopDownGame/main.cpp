@@ -13,7 +13,7 @@
 #include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
-#include "TopDownGameLayout.h"
+#include "NavmeshDebuggingLayout.h"
 
 class App : public Slush::IApp
 {
@@ -28,7 +28,7 @@ public:
 		myLevel = new Level();
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.SetAppLayout(new TopDownGameLayout(myLevel->GetNavmesh()));
+		window.SetAppLayout(new NavmeshDebuggingLayout(myLevel->GetNavmesh()));
 	}
 
 	void Shutdown() override

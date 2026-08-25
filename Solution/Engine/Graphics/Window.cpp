@@ -45,6 +45,8 @@ namespace Slush
 	{
 		SaveAppLayoutConfig();
 
+		myLayouts.DeleteAll();
+
 		FW_SAFE_DELETE(myRenderer);
 		FW_SAFE_DELETE(myRenderWindow);
 	}
@@ -102,8 +104,11 @@ namespace Slush
 
 			if (ImGui::BeginMenu("Layouts"))
 			{
-				ImGui::Selectable("Game");
-				ImGui::Selectable("Entity");
+				for (IAppLayout* layout : myLayouts)
+				{
+					if (ImGui::Selectable(layout->GetMenuLabel().GetBuffer()))
+						RequestLayoutSwitch(*layout);
+				}
 				ImGui::EndMenu();
 			}
 
@@ -193,7 +198,7 @@ namespace Slush
 			return;
 		}
 
-		myCloseRequested = true;
+		myPendingTransition = PendingTransition::Close;
 	}
 
 	void Window::ConfirmClose(const char* aReason)
@@ -202,15 +207,35 @@ namespace Slush
 		myShouldBeOpen = false;
 	}
 
+	void Window::AddLayout(IAppLayout* aLayout, bool aSetAsActive)
+	{
+		FW_ASSERT(aLayout, "AddLayout: aLayout is null");
+		myLayouts.Add(aLayout);
+
+		if (aSetAsActive)
+			RequestLayoutSwitch(*aLayout);
+	}
+
+	void Window::RequestLayoutSwitch(IAppLayout& aTarget)
+	{
+		if (!myAppLayout || !myAppLayout->HasUnsavedChanges())
+		{
+			SetActiveLayout(&aTarget);
+			return;
+		}
+
+		myPendingTransition = PendingTransition::SwitchLayout;
+		myPendingLayoutTarget = &aTarget;
+	}
+
 	void Window::UpdatePendingClose()
 	{
-		if (!myCloseRequested)
+		if (myPendingTransition == PendingTransition::None)
 			return;
 
 		if (!myAppLayout)
 		{
-			ConfirmClose("no app layout");
-			myCloseRequested = false;
+			ResolvePendingTransition("no app layout");
 			return;
 		}
 
@@ -221,13 +246,35 @@ namespace Slush
 		switch (myAppLayout->RequestClose())
 		{
 		case IAppLayout::CloseRequestResult::Resolved:
-			ConfirmClose("unsaved changes resolved");
-			myCloseRequested = false;
+			ResolvePendingTransition("unsaved changes resolved");
 			break;
 		case IAppLayout::CloseRequestResult::Cancelled:
-			myCloseRequested = false;
+			myPendingTransition = PendingTransition::None;
+			myPendingLayoutTarget = nullptr;
 			break;
 		case IAppLayout::CloseRequestResult::StillPending:
+			break;
+		}
+	}
+
+	void Window::ResolvePendingTransition(const char* aCloseReason)
+	{
+		const PendingTransition transition = myPendingTransition;
+		IAppLayout* target = myPendingLayoutTarget;
+
+		myPendingTransition = PendingTransition::None;
+		myPendingLayoutTarget = nullptr;
+
+		switch (transition)
+		{
+		case PendingTransition::Close:
+			ConfirmClose(aCloseReason);
+			break;
+		case PendingTransition::SwitchLayout:
+			FW_ASSERT(target, "Pending layout switch resolved with no target layout");
+			SetActiveLayout(target);
+			break;
+		case PendingTransition::None:
 			break;
 		}
 	}
@@ -237,6 +284,15 @@ namespace Slush
 		SaveAppLayoutConfig();
 
 		FW_SAFE_DELETE(myAppLayout);
+
+		myAppLayout = aLayout;
+
+		LoadAppLayoutConfig();
+	}
+
+	void Window::SetActiveLayout(IAppLayout* aLayout)
+	{
+		SaveAppLayoutConfig();
 
 		myAppLayout = aLayout;
 

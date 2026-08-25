@@ -15,6 +15,11 @@ Navmesh& Level::GetNavmesh()
 	return myLevelData->myNavmeshData.Get()->myNavmesh;
 }
 
+NavmeshData& Level::GetNavmeshDataAsset()
+{
+	return *myLevelData->myNavmeshData.Get();
+}
+
 void Level::Update()
 {
 	GetNavmesh().Update();

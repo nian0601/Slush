@@ -9,10 +9,11 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 
-NavmeshDebuggingLayout::NavmeshDebuggingLayout(Navmesh& aNavmesh)
-	: Slush::IAppLayout("TopDownGame")
-	, myNavmesh(aNavmesh)
+NavmeshDebuggingLayout::NavmeshDebuggingLayout()
+	: Slush::IAppLayout("TopDownGame", "Navmesh Debugger")
 {
+	myNavmesh.GenerateDefaultGrid();
+
 	AddDockable(new Slush::GameViewDockable());
 
 	myNavmeshDebuggerDockable = new NavmeshDebuggerDockable(myNavmesh);
@@ -24,6 +25,7 @@ void NavmeshDebuggingLayout::OnRender()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
+	myNavmesh.Render();
 	myNavmeshDebuggerDockable->RenderDebugOverlay();
 
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();

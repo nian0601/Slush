@@ -2,18 +2,22 @@
 
 #include <Core/Dockables/IAppLayout.h>
 
-class Navmesh;
+#include "Navmesh.h"
+
 class NavmeshDebuggerDockable;
 
 class NavmeshDebuggingLayout : public Slush::IAppLayout
 {
 public:
-	NavmeshDebuggingLayout(Navmesh& aNavmesh);
+	NavmeshDebuggingLayout();
 
 protected:
 	void OnRender() override;
 
 private:
-	Navmesh& myNavmesh;
+	// Owned outright rather than referencing the real Level's NavmeshData - this layout is a pure
+	// diagnostic sandbox for quick pathfinding experiments, kept fully separate from the real,
+	// persisted navmesh the Level Editor saves.
+	Navmesh myNavmesh;
 	NavmeshDebuggerDockable* myNavmeshDebuggerDockable = nullptr;
 };

@@ -8,13 +8,16 @@ namespace Slush
 	class IAppLayout
 	{
 	public:
-		IAppLayout(const char* aLayoutName);
+		// aMenuLabel is what Window's "Layouts" menu displays for this layout; defaults to aLayoutName
+		// when a layout has no need for a separate human-readable label.
+		IAppLayout(const char* aLayoutName, const char* aMenuLabel = nullptr);
 		virtual ~IAppLayout();;
 		void Update();
 		void BuildUI();
 		void Render();
 
 		const FW_String& GetName() const { return myName; }
+		const FW_String& GetMenuLabel() const { return myMenuLabel; }
 
 		bool HasUnsavedChanges() const;
 
@@ -68,6 +71,7 @@ namespace Slush
 
 	private:
 		FW_String myName;
+		FW_String myMenuLabel;
 		FW_GrowingArray<Dockable*> myDockables;
 		int myNextDockableID = 0;
 

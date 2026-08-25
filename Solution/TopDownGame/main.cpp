@@ -5,7 +5,6 @@
 #include "Core/CommandLineArgs.h"
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
-#include "Graphics/Renderer.h"
 #include "Core/Input.h"
 
 #include "Level/Level.h"
@@ -14,6 +13,7 @@
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
 #include "NavmeshDebuggingLayout.h"
+#include "LevelEditorLayout.h"
 
 class App : public Slush::IApp
 {
@@ -28,7 +28,8 @@ public:
 		myLevel = new Level();
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.SetAppLayout(new NavmeshDebuggingLayout(myLevel->GetNavmesh()));
+		window.AddLayout(new NavmeshDebuggingLayout());
+		window.AddLayout(new LevelEditorLayout(*myLevel), true);
 	}
 
 	void Shutdown() override
@@ -44,16 +45,6 @@ public:
 			engine.GetWindow().Close();
 
 		myLevel->Update();
-	}
-
-	void Render() override
-	{
-		Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
-		renderer.StartOffscreenBuffer();
-
-		myLevel->Render();
-
-		renderer.EndOffscreenBuffer();
 	}
 
 private:

@@ -3,6 +3,7 @@
 #include "LevelEditorDockable.h"
 
 #include "Level/Level.h"
+#include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
 
 #include "Core/CommandLineArgs.h"
@@ -23,6 +24,7 @@ void LevelEditorDockable::RenderOverlay() const
 {
 	RenderBoxCutPreview();
 	RenderManualCutPreview();
+	RenderStartAndGoalMarkers();
 }
 
 void LevelEditorDockable::RenderBoxCutPreview() const
@@ -62,10 +64,26 @@ void LevelEditorDockable::RenderManualCutPreview() const
 	renderer.RenderLine(myCutPositions.GetLast(), mousePos, cutPreviewColor);
 }
 
+void LevelEditorDockable::RenderStartAndGoalMarkers() const
+{
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
+	const LevelData& levelData = myLevel.GetLevelDataAsset();
+
+	const float markerRadius = 10.f;
+	const int startColor = 0xFF00FF00;
+	const int goalColor = 0xFF0000FF;
+
+	renderer.RenderCircle(levelData.myStartPosition, markerRadius, startColor);
+	renderer.RenderCircle(levelData.myGoalPosition, markerRadius, goalColor);
+}
+
 void LevelEditorDockable::OnUpdate()
 {
 	UpdateBoxCutMode();
 	UpdateManualCutMode();
+	UpdateSetStartMode();
+	UpdateSetGoalMode();
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
@@ -116,6 +134,30 @@ void LevelEditorDockable::UpdateManualCutMode()
 	}
 }
 
+void LevelEditorDockable::UpdateSetStartMode()
+{
+	if (!myIsSetStartModeActive)
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
+		return;
+
+	SetStartPosition(engine.GetInput().GetMousePositionf());
+}
+
+void LevelEditorDockable::UpdateSetGoalMode()
+{
+	if (!myIsSetGoalModeActive)
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
+		return;
+
+	SetGoalPosition(engine.GetInput().GetMousePositionf());
+}
+
 void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions)
 {
 	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
@@ -123,6 +165,24 @@ void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCu
 	Slush::AssetEditScope editScope(navmeshData);
 	navmeshData.myNavmesh.CutHole(someCutPositions);
 	navmeshData.MarkAsUnsaved();
+}
+
+void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
+{
+	LevelData& levelData = myLevel.GetLevelDataAsset();
+
+	Slush::AssetEditScope editScope(levelData);
+	levelData.myStartPosition = aPosition;
+	levelData.MarkAsUnsaved();
+}
+
+void LevelEditorDockable::SetGoalPosition(const Vector2f& aPosition)
+{
+	LevelData& levelData = myLevel.GetLevelDataAsset();
+
+	Slush::AssetEditScope editScope(levelData);
+	levelData.myGoalPosition = aPosition;
+	levelData.MarkAsUnsaved();
 }
 
 void LevelEditorDockable::DisableBoxCutMode()
@@ -141,6 +201,16 @@ void LevelEditorDockable::DisableManualCutMode()
 
 	myIsManualCutModeActive = false;
 	myCutPositions.RemoveAll();
+}
+
+void LevelEditorDockable::DisableSetStartMode()
+{
+	myIsSetStartModeActive = false;
+}
+
+void LevelEditorDockable::DisableSetGoalMode()
+{
+	myIsSetGoalModeActive = false;
 }
 
 void LevelEditorDockable::OnBuildUI()
@@ -168,6 +238,8 @@ void LevelEditorDockable::OnBuildUI()
 			myBoxCutHasStartCorner = false;
 
 			DisableManualCutMode();
+			DisableSetStartMode();
+			DisableSetGoalMode();
 		}
 	}
 
@@ -184,22 +256,63 @@ void LevelEditorDockable::OnBuildUI()
 			myCutPositions.RemoveAll();
 
 			DisableBoxCutMode();
+			DisableSetStartMode();
+			DisableSetGoalMode();
+		}
+	}
+
+	if (myIsSetStartModeActive)
+	{
+		if (ImGui::Button("Disable Set Start"))
+			DisableSetStartMode();
+	}
+	else
+	{
+		if (ImGui::Button("Enable Set Start"))
+		{
+			myIsSetStartModeActive = true;
+
+			DisableBoxCutMode();
+			DisableManualCutMode();
+			DisableSetGoalMode();
+		}
+	}
+
+	if (myIsSetGoalModeActive)
+	{
+		if (ImGui::Button("Disable Set Goal"))
+			DisableSetGoalMode();
+	}
+	else
+	{
+		if (ImGui::Button("Enable Set Goal"))
+		{
+			myIsSetGoalModeActive = true;
+
+			DisableBoxCutMode();
+			DisableManualCutMode();
+			DisableSetStartMode();
 		}
 	}
 }
 
 bool LevelEditorDockable::HasUnsavedChanges() const
 {
-	return myLevel.GetNavmeshDataAsset().HasUnsavedChanges();
+	return myLevel.GetNavmeshDataAsset().HasUnsavedChanges() || myLevel.GetLevelDataAsset().HasUnsavedChanges();
 }
 
 void LevelEditorDockable::OnCloseRequested()
 {
-	// Under -hidewindow, no user is around to click a popup - log which asset is being discarded, by
+	// Under -hidewindow, no user is around to click a popup - log which asset(s) are being discarded, by
 	// name, and resolve immediately instead of opening one that would otherwise hang the close forever.
 	if (Slush::CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
 	{
-		SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
+		if (myLevel.GetNavmeshDataAsset().HasUnsavedChanges())
+			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
+
+		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
+			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
+
 		DiscardUnsavedChanges();
 		return;
 	}
@@ -217,7 +330,11 @@ void LevelEditorDockable::OnBuildModals()
 
 	if (ImGui::BeginPopupModal("Unsaved Changes", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
-		ImGui::Text("The Level Editor has unsaved changes.");
+		ImGui::Text("The following assets have unsaved changes:");
+		if (myLevel.GetNavmeshDataAsset().HasUnsavedChanges())
+			ImGui::BulletText("%s", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
+		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
+			ImGui::BulletText("%s", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
 
 		if (ImGui::Button("Save"))
 		{
@@ -250,9 +367,11 @@ void LevelEditorDockable::OnBuildModals()
 void LevelEditorDockable::SaveAssets()
 {
 	myLevel.GetNavmeshDataAsset().Save();
+	myLevel.GetLevelDataAsset().Save();
 }
 
 void LevelEditorDockable::DiscardUnsavedChanges()
 {
 	myLevel.GetNavmeshDataAsset().MarkAsSaved();
+	myLevel.GetLevelDataAsset().MarkAsSaved();
 }

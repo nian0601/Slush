@@ -16,18 +16,14 @@
 #include "NavmeshDebuggingLayout.h"
 #include "LevelEditorLayout.h"
 
-// Lets Window's "Layouts" menu (re)create a NavmeshDebuggingLayout on demand, without Window needing to
-// know it takes a Navmesh& - myNavmesh is a reference into the App-owned Level, which outlives Window.
+// Lets Window's "Layouts" menu (re)create a NavmeshDebuggingLayout on demand. NavmeshDebuggingLayout
+// owns its own throwaway Navmesh (a default grid, not the real Level's), so this factory needs no
+// state of its own.
 class NavmeshDebuggingLayoutFactory : public Slush::IAppLayoutFactory
 {
 public:
-	explicit NavmeshDebuggingLayoutFactory(Navmesh& aNavmesh) : myNavmesh(aNavmesh) {}
-
 	const char* GetMenuLabel() const override { return "Navmesh Debugger"; }
-	Slush::IAppLayout* CreateLayout() const override { return new NavmeshDebuggingLayout(myNavmesh); }
-
-private:
-	Navmesh& myNavmesh;
+	Slush::IAppLayout* CreateLayout() const override { return new NavmeshDebuggingLayout(); }
 };
 
 // Same idea for LevelEditorLayout - myLevel is the same App-owned Level referenced above.
@@ -56,7 +52,7 @@ public:
 		myLevel = new Level();
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
-		window.RegisterLayout(new NavmeshDebuggingLayoutFactory(myLevel->GetNavmesh()));
+		window.RegisterLayout(new NavmeshDebuggingLayoutFactory());
 		window.RegisterLayout(new LevelEditorLayoutFactory(*myLevel));
 		window.SetAppLayout(new LevelEditorLayout(*myLevel));
 	}

@@ -11,7 +11,7 @@
 #include "Graphics/Renderer.h"
 
 LevelEditorLayout::LevelEditorLayout(Level& aLevel)
-	: Slush::IAppLayout("LevelEditor")
+	: Slush::IAppLayout("LevelEditor", "Level Editor")
 	, myLevel(aLevel)
 {
 	AddDockable(new Slush::GameViewDockable());

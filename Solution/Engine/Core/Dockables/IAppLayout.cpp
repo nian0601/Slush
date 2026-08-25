@@ -4,8 +4,9 @@
 
 namespace Slush
 {
-	IAppLayout::IAppLayout(const char* aLayoutName)
+	IAppLayout::IAppLayout(const char* aLayoutName, const char* aMenuLabel)
 		: myName(aLayoutName)
+		, myMenuLabel(aMenuLabel ? aMenuLabel : aLayoutName)
 	{
 	}
 

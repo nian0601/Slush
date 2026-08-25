@@ -8,7 +8,6 @@ namespace sf
 namespace Slush
 {
 	class IAppLayout;
-	class IAppLayoutFactory;
 	class Dockable;
 	class Renderer;
 	class Window
@@ -38,10 +37,11 @@ namespace Slush
 
 		void SetAppLayout(IAppLayout* aLayout);
 
-		// Registers aFactory with the "Layouts" menu so its layout becomes switchable at runtime. Window
-		// takes ownership - aFactory stays alive (and registered) for the Window's whole lifetime, unlike
-		// the IAppLayout instances it creates on each switch.
-		void RegisterLayout(IAppLayoutFactory* aFactory);
+		// Adds aLayout to the "Layouts" menu so it becomes switchable at runtime. Window takes ownership -
+		// aLayout stays alive for the Window's whole lifetime and switching the active layout never
+		// deletes or recreates it, unlike SetAppLayout(). Pass aSetAsActive to make it the active layout
+		// immediately (subject to the same unsaved-changes gating as a menu-driven switch).
+		void AddLayout(IAppLayout* aLayout, bool aSetAsActive = false);
 
 		void UpdateAppLayout();
 		void RenderAppLayout();
@@ -66,7 +66,11 @@ namespace Slush
 		// a graceful shutdown - useful for telling it apart from a crash or a forcibly-killed process.
 		void ConfirmClose(const char* aReason);
 
-		void RequestLayoutSwitch(IAppLayoutFactory& aFactory);
+		// Switches the active layout among Window-owned myLayouts entries - never deletes anything, unlike
+		// SetAppLayout().
+		void SetActiveLayout(IAppLayout* aLayout);
+
+		void RequestLayoutSwitch(IAppLayout& aTarget);
 
 		// Common resolution for both a pending close and a pending layout switch, once the current
 		// layout's RequestClose() reports Resolved (or there was never a layout to check). aCloseReason
@@ -92,8 +96,10 @@ namespace Slush
 		// discarding silently - see UpdatePendingClose()/ResolvePendingTransition().
 		enum class PendingTransition { None, Close, SwitchLayout };
 		PendingTransition myPendingTransition = PendingTransition::None;
-		IAppLayoutFactory* myPendingLayoutFactory = nullptr;
+		IAppLayout* myPendingLayoutTarget = nullptr;
 
-		FW_GrowingArray<IAppLayoutFactory*> myRegisteredLayouts;
+		// Layouts added via AddLayout() - owned by Window for its whole lifetime, distinct from a layout
+		// set directly via SetAppLayout() (which Window deletes on the next switch/destruction instead).
+		FW_GrowingArray<IAppLayout*> myLayouts;
 	};
 }

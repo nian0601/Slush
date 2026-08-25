@@ -10,7 +10,7 @@
 #include "Graphics/Renderer.h"
 
 NavmeshDebuggingLayout::NavmeshDebuggingLayout()
-	: Slush::IAppLayout("TopDownGame")
+	: Slush::IAppLayout("TopDownGame", "Navmesh Debugger")
 {
 	myNavmesh.GenerateDefaultGrid();
 

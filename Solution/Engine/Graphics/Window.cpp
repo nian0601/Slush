@@ -45,7 +45,7 @@ namespace Slush
 	{
 		SaveAppLayoutConfig();
 
-		myRegisteredLayouts.DeleteAll();
+		myLayouts.DeleteAll();
 
 		FW_SAFE_DELETE(myRenderer);
 		FW_SAFE_DELETE(myRenderWindow);
@@ -104,10 +104,10 @@ namespace Slush
 
 			if (ImGui::BeginMenu("Layouts"))
 			{
-				for (IAppLayoutFactory* factory : myRegisteredLayouts)
+				for (IAppLayout* layout : myLayouts)
 				{
-					if (ImGui::Selectable(factory->GetMenuLabel()))
-						RequestLayoutSwitch(*factory);
+					if (ImGui::Selectable(layout->GetMenuLabel().GetBuffer()))
+						RequestLayoutSwitch(*layout);
 				}
 				ImGui::EndMenu();
 			}
@@ -207,22 +207,25 @@ namespace Slush
 		myShouldBeOpen = false;
 	}
 
-	void Window::RegisterLayout(IAppLayoutFactory* aFactory)
+	void Window::AddLayout(IAppLayout* aLayout, bool aSetAsActive)
 	{
-		FW_ASSERT(aFactory, "RegisterLayout: aFactory is null");
-		myRegisteredLayouts.Add(aFactory);
+		FW_ASSERT(aLayout, "AddLayout: aLayout is null");
+		myLayouts.Add(aLayout);
+
+		if (aSetAsActive)
+			RequestLayoutSwitch(*aLayout);
 	}
 
-	void Window::RequestLayoutSwitch(IAppLayoutFactory& aFactory)
+	void Window::RequestLayoutSwitch(IAppLayout& aTarget)
 	{
 		if (!myAppLayout || !myAppLayout->HasUnsavedChanges())
 		{
-			SetAppLayout(aFactory.CreateLayout());
+			SetActiveLayout(&aTarget);
 			return;
 		}
 
 		myPendingTransition = PendingTransition::SwitchLayout;
-		myPendingLayoutFactory = &aFactory;
+		myPendingLayoutTarget = &aTarget;
 	}
 
 	void Window::UpdatePendingClose()
@@ -247,7 +250,7 @@ namespace Slush
 			break;
 		case IAppLayout::CloseRequestResult::Cancelled:
 			myPendingTransition = PendingTransition::None;
-			myPendingLayoutFactory = nullptr;
+			myPendingLayoutTarget = nullptr;
 			break;
 		case IAppLayout::CloseRequestResult::StillPending:
 			break;
@@ -257,10 +260,10 @@ namespace Slush
 	void Window::ResolvePendingTransition(const char* aCloseReason)
 	{
 		const PendingTransition transition = myPendingTransition;
-		IAppLayoutFactory* factory = myPendingLayoutFactory;
+		IAppLayout* target = myPendingLayoutTarget;
 
 		myPendingTransition = PendingTransition::None;
-		myPendingLayoutFactory = nullptr;
+		myPendingLayoutTarget = nullptr;
 
 		switch (transition)
 		{
@@ -268,8 +271,8 @@ namespace Slush
 			ConfirmClose(aCloseReason);
 			break;
 		case PendingTransition::SwitchLayout:
-			FW_ASSERT(factory, "Pending layout switch resolved with no target factory");
-			SetAppLayout(factory->CreateLayout());
+			FW_ASSERT(target, "Pending layout switch resolved with no target layout");
+			SetActiveLayout(target);
 			break;
 		case PendingTransition::None:
 			break;
@@ -281,6 +284,15 @@ namespace Slush
 		SaveAppLayoutConfig();
 
 		FW_SAFE_DELETE(myAppLayout);
+
+		myAppLayout = aLayout;
+
+		LoadAppLayoutConfig();
+	}
+
+	void Window::SetActiveLayout(IAppLayout* aLayout)
+	{
+		SaveAppLayoutConfig();
 
 		myAppLayout = aLayout;
 

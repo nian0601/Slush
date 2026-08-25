@@ -74,4 +74,16 @@ namespace Slush
 		Dockable* myCloseRequestBlocker = nullptr;
 		bool myCloseWasCancelled = false;
 	};
+
+	// Creates a fresh IAppLayout instance on demand - used by Window's "Layouts" menu registry so a
+	// menu-driven switch can construct a brand new layout each time without Window needing to know each
+	// layout's own constructor arguments.
+	class IAppLayoutFactory
+	{
+	public:
+		virtual ~IAppLayoutFactory() {}
+
+		virtual const char* GetMenuLabel() const = 0;
+		virtual IAppLayout* CreateLayout() const = 0;
+	};
 }

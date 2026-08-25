@@ -15,6 +15,20 @@
 #include "NavmeshTestSuite.h"
 #include "NavmeshDebuggingLayout.h"
 
+// Lets Window's "Layouts" menu (re)create a NavmeshDebuggingLayout on demand, without Window needing to
+// know it takes a Navmesh& - myNavmesh is a reference into the App-owned Level, which outlives Window.
+class NavmeshDebuggingLayoutFactory : public Slush::IAppLayoutFactory
+{
+public:
+	explicit NavmeshDebuggingLayoutFactory(Navmesh& aNavmesh) : myNavmesh(aNavmesh) {}
+
+	const char* GetMenuLabel() const override { return "Navmesh Debugger"; }
+	Slush::IAppLayout* CreateLayout() const override { return new NavmeshDebuggingLayout(myNavmesh); }
+
+private:
+	Navmesh& myNavmesh;
+};
+
 class App : public Slush::IApp
 {
 public:
@@ -28,6 +42,7 @@ public:
 		myLevel = new Level();
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+		window.RegisterLayout(new NavmeshDebuggingLayoutFactory(myLevel->GetNavmesh()));
 		window.SetAppLayout(new NavmeshDebuggingLayout(myLevel->GetNavmesh()));
 	}
 

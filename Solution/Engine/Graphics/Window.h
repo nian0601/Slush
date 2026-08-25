@@ -8,6 +8,7 @@ namespace sf
 namespace Slush
 {
 	class IAppLayout;
+	class IAppLayoutFactory;
 	class Dockable;
 	class Renderer;
 	class Window
@@ -37,10 +38,16 @@ namespace Slush
 
 		void SetAppLayout(IAppLayout* aLayout);
 
+		// Registers aFactory with the "Layouts" menu so its layout becomes switchable at runtime. Window
+		// takes ownership - aFactory stays alive (and registered) for the Window's whole lifetime, unlike
+		// the IAppLayout instances it creates on each switch.
+		void RegisterLayout(IAppLayoutFactory* aFactory);
+
 		void UpdateAppLayout();
 		void RenderAppLayout();
 
-		// Called every frame (from Engine::Run()) while a close is pending, until it's resolved or cancelled.
+		// Called every frame (from Engine::Run()) while a close or a menu-driven layout switch is pending,
+		// until it's resolved or cancelled.
 		void UpdatePendingClose();
 
 		sf::RenderWindow* GetRenderWindow() const { return myRenderWindow; }
@@ -59,6 +66,13 @@ namespace Slush
 		// a graceful shutdown - useful for telling it apart from a crash or a forcibly-killed process.
 		void ConfirmClose(const char* aReason);
 
+		void RequestLayoutSwitch(IAppLayoutFactory& aFactory);
+
+		// Common resolution for both a pending close and a pending layout switch, once the current
+		// layout's RequestClose() reports Resolved (or there was never a layout to check). aCloseReason
+		// is only used for the Close case - passed straight through to ConfirmClose().
+		void ResolvePendingTransition(const char* aCloseReason);
+
 		Vector2f GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const;
 
 		Rectf myWindowRect;
@@ -69,9 +83,17 @@ namespace Slush
 		sf::RenderWindow* myRenderWindow = nullptr;
 		Renderer* myRenderer = nullptr;
 		bool myShouldBeOpen = true;
-		bool myCloseRequested = false;
 		bool myDisplayImGUIDemo = false;
 		bool myScreenshotRequested = false;
 		IAppLayout* myAppLayout = nullptr;
+
+		// A close and a menu-driven layout switch both go through this same pending-transition flow, so
+		// either one gets gated by the current layout's own unsaved-changes confirmation instead of
+		// discarding silently - see UpdatePendingClose()/ResolvePendingTransition().
+		enum class PendingTransition { None, Close, SwitchLayout };
+		PendingTransition myPendingTransition = PendingTransition::None;
+		IAppLayoutFactory* myPendingLayoutFactory = nullptr;
+
+		FW_GrowingArray<IAppLayoutFactory*> myRegisteredLayouts;
 	};
 }

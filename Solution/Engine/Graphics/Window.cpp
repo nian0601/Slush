@@ -45,6 +45,8 @@ namespace Slush
 	{
 		SaveAppLayoutConfig();
 
+		myRegisteredLayouts.DeleteAll();
+
 		FW_SAFE_DELETE(myRenderer);
 		FW_SAFE_DELETE(myRenderWindow);
 	}
@@ -102,8 +104,11 @@ namespace Slush
 
 			if (ImGui::BeginMenu("Layouts"))
 			{
-				ImGui::Selectable("Game");
-				ImGui::Selectable("Entity");
+				for (IAppLayoutFactory* factory : myRegisteredLayouts)
+				{
+					if (ImGui::Selectable(factory->GetMenuLabel()))
+						RequestLayoutSwitch(*factory);
+				}
 				ImGui::EndMenu();
 			}
 
@@ -193,7 +198,7 @@ namespace Slush
 			return;
 		}
 
-		myCloseRequested = true;
+		myPendingTransition = PendingTransition::Close;
 	}
 
 	void Window::ConfirmClose(const char* aReason)
@@ -202,15 +207,32 @@ namespace Slush
 		myShouldBeOpen = false;
 	}
 
+	void Window::RegisterLayout(IAppLayoutFactory* aFactory)
+	{
+		FW_ASSERT(aFactory, "RegisterLayout: aFactory is null");
+		myRegisteredLayouts.Add(aFactory);
+	}
+
+	void Window::RequestLayoutSwitch(IAppLayoutFactory& aFactory)
+	{
+		if (!myAppLayout || !myAppLayout->HasUnsavedChanges())
+		{
+			SetAppLayout(aFactory.CreateLayout());
+			return;
+		}
+
+		myPendingTransition = PendingTransition::SwitchLayout;
+		myPendingLayoutFactory = &aFactory;
+	}
+
 	void Window::UpdatePendingClose()
 	{
-		if (!myCloseRequested)
+		if (myPendingTransition == PendingTransition::None)
 			return;
 
 		if (!myAppLayout)
 		{
-			ConfirmClose("no app layout");
-			myCloseRequested = false;
+			ResolvePendingTransition("no app layout");
 			return;
 		}
 
@@ -221,13 +243,35 @@ namespace Slush
 		switch (myAppLayout->RequestClose())
 		{
 		case IAppLayout::CloseRequestResult::Resolved:
-			ConfirmClose("unsaved changes resolved");
-			myCloseRequested = false;
+			ResolvePendingTransition("unsaved changes resolved");
 			break;
 		case IAppLayout::CloseRequestResult::Cancelled:
-			myCloseRequested = false;
+			myPendingTransition = PendingTransition::None;
+			myPendingLayoutFactory = nullptr;
 			break;
 		case IAppLayout::CloseRequestResult::StillPending:
+			break;
+		}
+	}
+
+	void Window::ResolvePendingTransition(const char* aCloseReason)
+	{
+		const PendingTransition transition = myPendingTransition;
+		IAppLayoutFactory* factory = myPendingLayoutFactory;
+
+		myPendingTransition = PendingTransition::None;
+		myPendingLayoutFactory = nullptr;
+
+		switch (transition)
+		{
+		case PendingTransition::Close:
+			ConfirmClose(aCloseReason);
+			break;
+		case PendingTransition::SwitchLayout:
+			FW_ASSERT(factory, "Pending layout switch resolved with no target factory");
+			SetAppLayout(factory->CreateLayout());
+			break;
+		case PendingTransition::None:
 			break;
 		}
 	}

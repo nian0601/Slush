@@ -146,6 +146,8 @@
     <ClCompile Include="NavmeshTestSuite.cpp" />
     <ClCompile Include="NavmeshDebuggerDockable.cpp" />
     <ClCompile Include="NavmeshDebuggingLayout.cpp" />
+    <ClCompile Include="LevelEditorDockable.cpp" />
+    <ClCompile Include="LevelEditorLayout.cpp" />
     <ClCompile Include="Level\NavmeshData.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="Level\Level.cpp" />
@@ -159,6 +161,8 @@
     <ClInclude Include="NavmeshTestSuite.h" />
     <ClInclude Include="NavmeshDebuggerDockable.h" />
     <ClInclude Include="NavmeshDebuggingLayout.h" />
+    <ClInclude Include="LevelEditorDockable.h" />
+    <ClInclude Include="LevelEditorLayout.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Level\NavmeshData.h" />
     <ClInclude Include="Level\LevelData.h" />

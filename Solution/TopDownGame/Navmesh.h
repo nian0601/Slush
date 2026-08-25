@@ -111,7 +111,6 @@ private:
 	Triangle* CreateTriangle(Edge* aE1, Edge* aE2, Edge* aE3);
 	void DeleteTriangle(Triangle* aTriangle);
 
-	void PerformCut();
 	void CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints);
 	void EnsureCutterVerticesExist(const FW_GrowingArray<Vector2f>& aPolygonPoints);
 	void Cut(const Vector2f& aV1, const Vector2f& aV2);
@@ -134,6 +133,4 @@ private:
 	
 	//Vector2i mySectorGrid{ 2, 2 };
 	//Vector2i mySectorGridSize{ 512, 512 };
-
-	FW_GrowingArray<Vector2f> myCutPositions;
 };

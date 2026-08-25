@@ -108,15 +108,6 @@ void Navmesh::Load(Slush::AssetParser::Handle aRootHandle)
 void Navmesh::Update()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
-	{
-		myCutPositions.Add(engine.GetInput().GetMousePositionf());
-	}
-	else if (engine.GetInput().WasMouseReleased(Slush::Input::RIGHTMB))
-	{
-		PerformCut();
-		myCutPositions.RemoveAll();
-	}
 
 	if (engine.GetInput().WasKeyReleased(Slush::Input::E))
 	{
@@ -131,56 +122,13 @@ void Navmesh::Render()
 	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
 
 	const Vector2f& mousePos = engine.GetInput().GetMousePositionf();
-	
+
 	int lineColor = 0xFF00FFFF;
 	int faceColor = 0xAA00AAFF;
 
-	FW_GrowingArray<Vector2f> intersections;
-
 	for (Triangle* triangle : myTriangles)
 	{
-		bool collision = false;
-		Vector2f intersection;
-		if (!myCutPositions.IsEmpty())
-		{
-			FW_Intersection::LineSegment edge1{ triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos };
-			FW_Intersection::LineSegment edge2{ triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos };
-			FW_Intersection::LineSegment edge3{ triangle->myVertices[2]->myPos, triangle->myVertices[0]->myPos };
-
-			for (int i = 0; i < myCutPositions.Count(); ++i)
-			{
-				FW_Intersection::LineSegment cutSegment;
-				cutSegment.myStart = myCutPositions[i];
-				
-				if (i == myCutPositions.Count() - 1)
-					cutSegment.myEnd = mousePos;
-				else
-					cutSegment.myEnd = myCutPositions[i+1];
-
-				if (FW_Intersection::LineSegmentVsLineSegment(cutSegment, edge1, &intersection))
-				{
-					intersections.Add(intersection);
-					collision = true;
-				}
-
-				if (FW_Intersection::LineSegmentVsLineSegment(cutSegment, edge2, &intersection))
-				{
-					intersections.Add(intersection);
-					collision = true;
-				}
-
-				if (FW_Intersection::LineSegmentVsLineSegment(cutSegment, edge3, &intersection))
-				{
-					intersections.Add(intersection);
-					collision = true;
-				}
-			}
-			
-		}
-		else
-		{
-			collision = triangle->PointInside(mousePos);
-		}
+		bool collision = triangle->PointInside(mousePos);
 
 		if (collision)
 		{
@@ -197,17 +145,6 @@ void Navmesh::Render()
 	{
 		renderer.RenderLine(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, lineColor);
 	}
-
-	for (const Vector2f& intersect : intersections)
-		renderer.RenderCircle(intersect, 3.f, 0xFFFF0000);
-
-	for (int i = 0; i < myCutPositions.Count() - 1; ++i)
-	{
-		renderer.RenderLine(myCutPositions[i], myCutPositions[i+1], 0xFF000000);
-	}
-
-	if (!myCutPositions.IsEmpty())
-		renderer.RenderLine(myCutPositions.GetLast(), mousePos, 0xFF000000);
 }
 
 Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) const
@@ -673,14 +610,6 @@ void Navmesh::DeleteTriangle(Triangle* aTriangle)
 	DeleteEdgeIfNeeded(aTriangle->myEdges[2]);
 
 	myTriangles.DeleteCyclic(aTriangle);
-}
-
-void Navmesh::PerformCut()
-{
-	if (myCutPositions.Count() < 3)
-		return;
-
-	CutPolygon(myCutPositions);
 }
 
 void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)

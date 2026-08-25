@@ -5,7 +5,6 @@
 #include "Core/CommandLineArgs.h"
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
-#include "Graphics/Renderer.h"
 #include "Core/Input.h"
 
 #include "Level/Level.h"
@@ -70,16 +69,6 @@ public:
 			engine.GetWindow().Close();
 
 		myLevel->Update();
-	}
-
-	void Render() override
-	{
-		Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
-		renderer.StartOffscreenBuffer();
-
-		myLevel->Render();
-
-		renderer.EndOffscreenBuffer();
 	}
 
 private:

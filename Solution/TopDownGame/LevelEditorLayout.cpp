@@ -25,6 +25,7 @@ void LevelEditorLayout::OnRender()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
+	myLevel.Render();
 	myLevelEditorDockable->RenderOverlay();
 
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();

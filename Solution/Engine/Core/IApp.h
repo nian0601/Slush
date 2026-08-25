@@ -10,9 +10,9 @@ namespace Slush
 
 		virtual void Update() {};
 
-		// Not dead despite ActionGame's override being empty - BossMonster (main.cpp) and TopDownGame
-		// (main.cpp) have no game-rendering IAppLayout and use this as their only render entry point,
-		// wrapping StartOffscreenBuffer()/EndOffscreenBuffer() around their draws.
+		// Not dead despite ActionGame's override being empty - BossMonster (main.cpp) has no
+		// game-rendering IAppLayout and uses this as its only render entry point, wrapping
+		// StartOffscreenBuffer()/EndOffscreenBuffer() around its draws.
 		virtual void Render() {};
 	};
 }

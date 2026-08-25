@@ -25,6 +25,7 @@ void NavmeshDebuggingLayout::OnRender()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
+	myNavmesh.Render();
 	myNavmeshDebuggerDockable->RenderDebugOverlay();
 
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();

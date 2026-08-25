@@ -25,7 +25,7 @@ void LevelEditorLayout::OnRender()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
-	// Terrain-shape (Phase 3) and spawn/goal (Phase 4) overlay rendering land here.
+	myLevelEditorDockable->RenderOverlay();
 
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();
 }

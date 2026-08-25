@@ -10,6 +10,7 @@ public:
 	Level();
 
 	Navmesh& GetNavmesh();
+	NavmeshData& GetNavmeshDataAsset();
 
 	void Update();
 	void Render();

@@ -151,6 +151,9 @@
     <ClCompile Include="Level\NavmeshData.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="Level\Level.cpp" />
+	<ClCompile Include="TopDownGameGlobals.cpp" />
+	<ClCompile Include="EntitySystem\EntityManager.cpp" />
+	<ClCompile Include="Components\MovementComponent.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -167,6 +170,8 @@
     <ClInclude Include="Level\NavmeshData.h" />
     <ClInclude Include="Level\LevelData.h" />
     <ClInclude Include="Level\Level.h" />
+	<ClInclude Include="TopDownGameGlobals.h" />
+	<ClInclude Include="Components\MovementComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

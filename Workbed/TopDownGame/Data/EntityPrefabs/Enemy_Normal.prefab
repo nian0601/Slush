@@ -1,0 +1,19 @@
+Entity Prefab
+{
+	version 1
+	sprite
+	{
+		version 1
+		color -16711936
+		size
+		{
+			width 32.000
+			height 32.000
+		}
+	}
+	movement
+	{
+		version 1
+		movespeed 100.000
+	}
+}

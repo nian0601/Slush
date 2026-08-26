@@ -19,9 +19,13 @@ public:
 	void Render();
 
 	void SpawnEnemyNormal();
+	void SpawnEnemyFast();
+	void SpawnEnemySlow();
 	void DamageAllEnemies();
 
 private:
+	void SpawnEnemy(const char* aPrefabName);
+
 	LevelData* myLevelData = nullptr;
 	Slush::EntityManager myEntityManager;
 

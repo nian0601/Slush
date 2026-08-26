@@ -43,6 +43,14 @@ void Level::Update()
 	{
 		DamageAllEnemies();
 	}
+	if (engine.GetInput().WasKeyReleased(Slush::Input::_9))
+	{
+		SpawnEnemyFast();
+	}
+	if (engine.GetInput().WasKeyReleased(Slush::Input::_0))
+	{
+		SpawnEnemySlow();
+	}
 
 	GetNavmesh().Update();
 	myEntityManager.Update();
@@ -57,7 +65,22 @@ void Level::Render()
 
 void Level::SpawnEnemyNormal()
 {
-	myEntityManager.CreateEntity(myLevelData->myStartPosition, "Enemy_Normal");
+	SpawnEnemy("Enemy_Normal");
+}
+
+void Level::SpawnEnemyFast()
+{
+	SpawnEnemy("Enemy_Fast");
+}
+
+void Level::SpawnEnemySlow()
+{
+	SpawnEnemy("Enemy_Slow");
+}
+
+void Level::SpawnEnemy(const char* aPrefabName)
+{
+	myEntityManager.CreateEntity(myLevelData->myStartPosition, aPrefabName);
 }
 
 void Level::DamageAllEnemies()

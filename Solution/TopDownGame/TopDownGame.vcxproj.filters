@@ -15,6 +15,7 @@
 	<ClCompile Include="TopDownGameGlobals.cpp" />
 	<ClCompile Include="EntitySystem\EntityManager.cpp" />
 	<ClCompile Include="Components\MovementComponent.cpp" />
+	<ClCompile Include="Components\HealthComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -29,5 +30,6 @@
     <ClInclude Include="Level\Level.h" />
 	<ClInclude Include="TopDownGameGlobals.h" />
 	<ClInclude Include="Components\MovementComponent.h" />
+	<ClInclude Include="Components\HealthComponent.h" />
   </ItemGroup>
 </Project>

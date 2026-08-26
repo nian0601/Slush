@@ -154,6 +154,7 @@
 	<ClCompile Include="TopDownGameGlobals.cpp" />
 	<ClCompile Include="EntitySystem\EntityManager.cpp" />
 	<ClCompile Include="Components\MovementComponent.cpp" />
+	<ClCompile Include="Components\HealthComponent.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -172,6 +173,7 @@
     <ClInclude Include="Level\Level.h" />
 	<ClInclude Include="TopDownGameGlobals.h" />
 	<ClInclude Include="Components\MovementComponent.h" />
+	<ClInclude Include="Components\HealthComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

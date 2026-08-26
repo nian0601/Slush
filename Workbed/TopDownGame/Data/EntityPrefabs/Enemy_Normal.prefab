@@ -16,4 +16,9 @@ Entity Prefab
 		version 1
 		movespeed 100.000
 	}
+	health
+	{
+		version 1
+		maxhealth 30
+	}
 }

@@ -19,6 +19,7 @@ public:
 	void Render();
 
 	void SpawnEnemyNormal();
+	void DamageAllEnemies();
 
 private:
 	LevelData* myLevelData = nullptr;

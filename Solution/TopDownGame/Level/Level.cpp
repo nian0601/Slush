@@ -6,6 +6,7 @@
 #include <Core\Input.h>
 
 #include "TopDownGameGlobals.h"
+#include "Components/HealthComponent.h"
 
 Level::Level()
 {
@@ -38,6 +39,10 @@ void Level::Update()
 	{
 		SpawnEnemyNormal();
 	}
+	if (engine.GetInput().WasKeyReleased(Slush::Input::_8))
+	{
+		DamageAllEnemies();
+	}
 
 	GetNavmesh().Update();
 	myEntityManager.Update();
@@ -53,4 +58,20 @@ void Level::Render()
 void Level::SpawnEnemyNormal()
 {
 	myEntityManager.CreateEntity(myLevelData->myStartPosition, "Enemy_Normal");
+}
+
+void Level::DamageAllEnemies()
+{
+	FW_GrowingArray<Slush::EntityHandle> entities;
+	myEntityManager.GetAllEntities(entities);
+
+	for (const Slush::EntityHandle& handle : entities)
+	{
+		Slush::Entity* entity = handle.Get();
+		if (!entity || entity->myIsMarkedForRemoval)
+			continue;
+
+		if (HealthComponent* health = entity->GetComponent<HealthComponent>())
+			health->DealDamage(10);
+	}
 }

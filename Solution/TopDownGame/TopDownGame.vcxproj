@@ -73,12 +73,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(RepoRoot)Workbed\$(ProjectName)\</OutDir>
     <IntDir>$(RepoRoot)Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\ActionGame;$(SolutionDir)\TopDownGame;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\TopDownGame;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(RepoRoot)Workbed\$(ProjectName)\</OutDir>
     <IntDir>$(RepoRoot)Build_Output\$(ProjectName)\$(Configuration)\</IntDir>
-    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\ActionGame;$(SolutionDir)\TopDownGame;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\Engine;$(SolutionDir)..\SFML\include;$(SolutionDir)\Framework;$(SolutionDir)\TopDownGame;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

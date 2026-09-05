@@ -29,7 +29,7 @@ public:
 
 	bool BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
 	bool StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
-	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor& outCorridor) const;
+	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 

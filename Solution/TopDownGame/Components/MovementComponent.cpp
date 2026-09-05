@@ -6,7 +6,7 @@
 #include <EntitySystem/Entity.h>
 #include <imgui/ImGuiWidgets.h>
 
-#include "../Level/Level.h"
+#include "Level/Level.h"
 #include "TopDownGameGlobals.h"
 
 void MovementComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
@@ -28,8 +28,7 @@ MovementComponent::MovementComponent(Slush::Entity& anEntity, const Slush::Entit
 void MovementComponent::OnEnterWorld()
 {
 	Level& level = TopDownGameGlobals::GetInstance().GetLevel();
-	Navmesh::PathCorridor corridor;
-	const bool foundPath = level.GetNavmesh().FindPath(myEntity.myPosition, level.GetLevelDataAsset().myGoalPosition, myWaypoints, corridor);
+	const bool foundPath = level.GetNavmesh().FindPath(myEntity.myPosition, level.GetLevelDataAsset().myGoalPosition, myWaypoints);
 	if (!foundPath)
 	{
 		SLUSH_ERROR("Enemy '%s' could not find a path from the level start to its goal", myEntityPrefab.GetAssetName().GetBuffer());

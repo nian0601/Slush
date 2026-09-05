@@ -25,7 +25,7 @@ namespace NavmeshTestSuite
 
 		FW_GrowingArray<Vector2f> waypoints;
 		Navmesh::PathCorridor corridor;
-		bool found = mesh.FindPath(start, goal, waypoints, corridor);
+		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
 		FW_ASSERT(found, "Expected FindPath to succeed between two reachable points");
 		FW_ASSERT(waypoints.Count() >= 2, "Expected at least a start and goal waypoint");
@@ -43,7 +43,7 @@ namespace NavmeshTestSuite
 
 		FW_GrowingArray<Vector2f> waypoints;
 		Navmesh::PathCorridor corridor;
-		bool found = mesh.FindPath(start, goal, waypoints, corridor);
+		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
 		FW_ASSERT(!found, "Expected FindPath to fail when the start position is outside the mesh");
 		FW_ASSERT(waypoints.IsEmpty(), "Expected no waypoints for a failed path");
@@ -67,7 +67,7 @@ namespace NavmeshTestSuite
 
 		FW_GrowingArray<Vector2f> waypoints;
 		Navmesh::PathCorridor corridor;
-		bool found = mesh.FindPath(start, goal, waypoints, corridor);
+		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
 		FW_ASSERT(!found, "Expected FindPath to fail once a full-width cut disconnects start from goal");
 	}
@@ -82,7 +82,7 @@ namespace NavmeshTestSuite
 
 		FW_GrowingArray<Vector2f> waypoints;
 		Navmesh::PathCorridor corridor;
-		bool found = mesh.FindPath(start, goal, waypoints, corridor);
+		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
 		FW_ASSERT(found, "Expected FindPath to succeed for a same-triangle start/goal");
 		FW_ASSERT(corridor.myPortals.IsEmpty(), "Expected a zero-portal corridor for a same-triangle path");
@@ -110,7 +110,7 @@ namespace NavmeshTestSuite
 
 		FW_GrowingArray<Vector2f> stringPulledWaypoints;
 		Navmesh::PathCorridor corridor;
-		bool found = mesh.FindPath(start, goal, stringPulledWaypoints, corridor);
+		bool found = mesh.FindPath(start, goal, stringPulledWaypoints, &corridor);
 
 		FW_ASSERT(found, "Expected FindPath to succeed by routing around the cut");
 		FW_ASSERT(corridor.myPortals.Count() > 1, "Expected a multi-portal corridor bending around the cut");
@@ -139,7 +139,7 @@ namespace NavmeshTestSuite
 
 		FW_GrowingArray<Vector2f> waypoints;
 		Navmesh::PathCorridor corridor;
-		bool found = mesh.FindPath(start, goal, waypoints, corridor);
+		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 		FW_ASSERT(found, "Expected the initial FindPath to succeed");
 
 		// Simulate an entity that has moved partway along its route: re-funnel the same,
@@ -292,11 +292,11 @@ namespace NavmeshTestSuite
 
 		FW_GrowingArray<Vector2f> originalWaypoints;
 		Navmesh::PathCorridor originalCorridor;
-		bool originalFound = original.myNavmesh.FindPath(start, goal, originalWaypoints, originalCorridor);
+		bool originalFound = original.myNavmesh.FindPath(start, goal, originalWaypoints, &originalCorridor);
 
 		FW_GrowingArray<Vector2f> loadedWaypoints;
 		Navmesh::PathCorridor loadedCorridor;
-		bool loadedFound = loaded.myNavmesh.FindPath(start, goal, loadedWaypoints, loadedCorridor);
+		bool loadedFound = loaded.myNavmesh.FindPath(start, goal, loadedWaypoints, &loadedCorridor);
 
 		FW_ASSERT(originalFound && loadedFound, "Expected FindPath to succeed on both the original and the round-tripped navmesh");
 		FW_ASSERT(loadedWaypoints.Count() == originalWaypoints.Count(), "Expected matching waypoint counts after a save/load round-trip");

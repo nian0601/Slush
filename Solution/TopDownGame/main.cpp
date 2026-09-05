@@ -7,6 +7,9 @@
 #include "Graphics/Window.h"
 #include "Core/Input.h"
 
+#include "EntitySystem/EntityManager.h"
+#include "EntitySystem/EntityPrefab.h"
+
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
@@ -14,15 +17,19 @@
 #include "NavmeshTestSuite.h"
 #include "NavmeshDebuggingLayout.h"
 #include "LevelEditorLayout.h"
+#include "TopDownGameGlobals.h"
 
 class App : public Slush::IApp
 {
 public:
 	void Initialize() override
 	{
+		Slush::EntityManager::RegisterComponents();
+
 		Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 		assets.RegisterAssetType<NavmeshData>();
 		assets.RegisterAssetType<LevelData>();
+		assets.RegisterAssetType<Slush::EntityPrefab>();
 		assets.LoadAllAssets();
 
 		myLevel = new Level();
@@ -35,6 +42,7 @@ public:
 	void Shutdown() override
 	{
 		FW_SAFE_DELETE(myLevel);
+		TopDownGameGlobals::Destroy();
 	}
 
 	void Update() override

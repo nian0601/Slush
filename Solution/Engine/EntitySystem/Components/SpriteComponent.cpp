@@ -204,7 +204,7 @@ namespace Slush
 				SLUSH_ERROR("%s uses a Animated SpriteComponent without a SpriteSheet-clip, expect weird first-frame texturing", myEntityPrefab.GetAssetName().GetBuffer());
 			}
 		}
-		else
+		else if (spriteData.mySpriteType != Data::None)
 		{
 			FW_ASSERT_ALWAYS("Invalid SpriteType when creating SpriteComponent");
 		}

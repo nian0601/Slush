@@ -224,6 +224,21 @@ void LevelEditorDockable::OnBuildUI()
 	}
 
 	ImGui::Text("Level Editor");
+	ImGui::Separator();
+
+	if (ImGui::Button("Spawn Normal"))
+		myLevel.SpawnEnemyNormal();
+
+	if (ImGui::Button("Spawn Fast"))
+		myLevel.SpawnEnemyFast();
+
+	if (ImGui::Button("Spawn Slow"))
+		myLevel.SpawnEnemySlow();
+
+	if (ImGui::Button("Damage All Enemies"))
+		myLevel.DamageAllEnemies();
+
+	ImGui::Separator();
 
 	if (myIsBoxCutModeActive)
 	{

@@ -424,7 +424,7 @@ bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const Pa
 	return true;
 }
 
-bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor& outCorridor) const
+bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor) const
 {
 	Triangle* startTriangle = FindTriangleContaining(aStart);
 	Triangle* goalTriangle = FindTriangleContaining(aGoal);
@@ -439,10 +439,11 @@ bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_Growing
 	}
 
 	// Build into a local corridor and only hand it to the caller once the search has
-	// actually succeeded, so a reused outCorridor is replaced rather than appended to
+	// actually succeeded, so a reused *outCorridor is replaced rather than appended to
 	// (guaranteeing the zero-portal same-triangle case) and stays untouched on failure.
-	outCorridor = foundCorridor;
-	return StringPull(aStart, aGoal, outCorridor, outWaypoints);
+	if (outCorridor != nullptr)
+		*outCorridor = foundCorridor;
+	return StringPull(aStart, aGoal, foundCorridor, outWaypoints);
 }
 
 Navmesh::Vertex* Navmesh::GetVertex(int x, int y) const

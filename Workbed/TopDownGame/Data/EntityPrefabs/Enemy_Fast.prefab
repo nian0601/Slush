@@ -21,4 +21,8 @@ Entity Prefab
 		version 1
 		maxhealth 20
 	}
+	targetable
+	{
+		version 1
+	}
 }

@@ -63,3 +63,17 @@ void MovementComponent::Update()
 		myEntity.myIsMarkedForRemoval = true;
 	}
 }
+
+float MovementComponent::GetRemainingPathDistance() const
+{
+	if (myNextWaypointIndex >= myWaypoints.Count())
+		return 0.f;
+
+	float remainingDistance = Length(myWaypoints[myNextWaypointIndex] - myEntity.myPosition);
+	for (int waypointIndex = myNextWaypointIndex + 1; waypointIndex < myWaypoints.Count(); ++waypointIndex)
+	{
+		remainingDistance += Length(myWaypoints[waypointIndex] - myWaypoints[waypointIndex - 1]);
+	}
+
+	return remainingDistance;
+}

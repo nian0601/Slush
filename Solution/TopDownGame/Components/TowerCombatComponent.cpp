@@ -73,9 +73,7 @@ void TowerCombatComponent::AcquireTarget()
 			continue;
 
 		MovementComponent* movement = entity->GetComponent<MovementComponent>();
-		FW_ASSERT(movement, "Tower target is missing a MovementComponent");
-
-		const float remainingPathDistance = movement->GetRemainingPathDistance();
+		const float remainingPathDistance = movement ? movement->GetRemainingPathDistance() : 0.f;
 		if (remainingPathDistance < bestRemainingPathDistance)
 		{
 			myTarget = handle;

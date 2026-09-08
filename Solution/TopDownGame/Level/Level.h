@@ -21,6 +21,8 @@ public:
 	void SpawnEnemyNormal();
 	void SpawnEnemyFast();
 	void SpawnEnemySlow();
+	void SpawnTowerBasic();
+	void SpawnTowerZeroDamage();
 	void DamageAllEnemies();
 
 private:

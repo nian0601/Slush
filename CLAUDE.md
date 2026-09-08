@@ -63,6 +63,7 @@ Manual-test gate: launch `Workbed/<Game>/<Game>.exe` directly, no flags — real
 ## Repo etiquette
 
 Base/merge branch: `main`. Solo project, but `/implement-issue`/`/implement-issue-orchestrated` use a PR flow rather than direct-commit: work happens on a transient `issue-<N>` branch inside a git worktree, then gets pushed and opened as a GitHub PR (`Closes #<N>` in the body) instead of merged locally. Merging itself is never automated — it happens only when you click Merge on GitHub, which is the actual review gate — and the worktree/branch are torn down once the PR is open.
+PR-flow token: <AGENT_GH_TOKEN>
 
 ## Issue tracking
 

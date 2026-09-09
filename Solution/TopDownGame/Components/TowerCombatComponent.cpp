@@ -2,7 +2,6 @@
 
 #include "TowerCombatComponent.h"
 
-#include <float.h>
 #include <EntitySystem/Entity.h>
 #include <EntitySystem/EntityManager.h>
 #include <imgui/ImGuiWidgets.h>
@@ -65,7 +64,8 @@ void TowerCombatComponent::AcquireTarget()
 	FW_GrowingArray<Slush::EntityHandle> entities;
 	myEntity.myEntityManager.GetAllEntities(entities);
 
-	float bestRemainingPathDistance = FLT_MAX;
+	float bestRemainingPathDistance = 0.f;
+	bool hasTarget = false;
 	for (const Slush::EntityHandle& handle : entities)
 	{
 		Slush::Entity* entity = handle.Get();
@@ -74,10 +74,11 @@ void TowerCombatComponent::AcquireTarget()
 
 		MovementComponent* movement = entity->GetComponent<MovementComponent>();
 		const float remainingPathDistance = movement ? movement->GetRemainingPathDistance() : 0.f;
-		if (remainingPathDistance < bestRemainingPathDistance)
+		if (!hasTarget || remainingPathDistance < bestRemainingPathDistance)
 		{
 			myTarget = handle;
 			bestRemainingPathDistance = remainingPathDistance;
+			hasTarget = true;
 		}
 	}
 }

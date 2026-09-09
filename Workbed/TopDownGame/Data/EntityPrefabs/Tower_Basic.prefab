@@ -1,0 +1,21 @@
+Entity Prefab
+{
+	version 1
+	sprite
+	{
+		version 1
+		color -16776961
+		size
+		{
+			width 48.000
+			height 48.000
+		}
+	}
+	towercombat
+	{
+		version 1
+		range 300.000
+		cooldown 1.000
+		damage 10
+	}
+}

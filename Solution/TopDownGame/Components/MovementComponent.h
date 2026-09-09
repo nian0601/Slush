@@ -20,6 +20,7 @@ public:
 
 	void OnEnterWorld() override;
 	void Update() override;
+	float GetRemainingPathDistance() const;
 
 private:
 	float myMoveSpeed = 0.f;

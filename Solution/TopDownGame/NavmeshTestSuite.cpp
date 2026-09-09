@@ -4,6 +4,8 @@
 #include "Navmesh.h"
 #include "Level/NavmeshData.h"
 
+#include <windows.h>
+
 namespace NavmeshTestSuite
 {
 	float GetTotalPathLength(const FW_GrowingArray<Vector2f>& aWaypoints)
@@ -269,18 +271,24 @@ namespace NavmeshTestSuite
 		// of the real data/navmeshes/ folder - that folder is scanned by AssetStorage<NavmeshData>
 		// on every launch, so writing there would leave this fixture behind as a permanent, visible
 		// asset in the editor UI, not just a test artifact.
-		// "temp/" already exists (FW_UnitTestSuite's own file-processor test lives there) -
-		// CreateFolderIfNecessary() can't be used here anyway, since it assumes every path
-		// contains a "data" segment.
-		const char* testFilePath = "temp/navmesh_roundtrip_test.navmesh";
+		// Resolve from the executable rather than the current working directory. These tests run
+		// before Engine::Initialize() sets FW_FileSystem's data folder, so a relative path would
+		// otherwise write into whichever folder launched the game.
+		char modulePath[MAX_PATH];
+		GetModuleFileNameA(nullptr, modulePath, MAX_PATH);
+		FW_String testFilePath = modulePath;
+		const int lastFolderSeparator = testFilePath.RFind("\\");
+		FW_ASSERT(lastFolderSeparator != -1, "Expected executable path to include a folder");
+		testFilePath = testFilePath.SubStr(0, lastFolderSeparator);
+		testFilePath += "/temp/navmesh_roundtrip_test.navmesh";
 
 		Slush::AssetParser writer;
 		Slush::AssetParser::Handle writeHandle = writer.StartWriting("NavmeshData");
 		original.OnParse(writeHandle, 1);
-		writer.FinishWriting(testFilePath);
+		writer.FinishWriting(testFilePath.GetBuffer());
 
 		Slush::AssetParser reader;
-		Slush::AssetParser::Handle readHandle = reader.Load(testFilePath);
+		Slush::AssetParser::Handle readHandle = reader.Load(testFilePath.GetBuffer());
 		NavmeshData loaded("navmesh_roundtrip_test", 0);
 		loaded.OnParse(readHandle, 1);
 

@@ -16,6 +16,6 @@ Entity Prefab
 		version 1
 		range 300.000
 		cooldown 1.000
-		damage 10
+		projectiletype Projectile_Basic
 	}
 }

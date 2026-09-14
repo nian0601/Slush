@@ -1,0 +1,20 @@
+Entity Prefab
+{
+	version 1
+	sprite
+	{
+		version 1
+		color -16711681
+		size
+		{
+			width 16.000
+			height 16.000
+		}
+	}
+	projectile
+	{
+		version 1
+		speed 500.000
+		damage 0
+	}
+}

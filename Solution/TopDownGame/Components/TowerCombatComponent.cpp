@@ -6,22 +6,27 @@
 #include <EntitySystem/EntityManager.h>
 #include <imgui/ImGuiWidgets.h>
 
-#include "HealthComponent.h"
 #include "MovementComponent.h"
+#include "ProjectileComponent.h"
 #include "TargetableComponent.h"
 
 void TowerCombatComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseFloatField("range", myRange);
 	aComponentHandle.ParseFloatField("cooldown", myCooldown);
-	aComponentHandle.ParseIntField("damage", myDamage);
+	myProjectilePrefab.Parse(aComponentHandle, "projectiletype");
+}
+
+void TowerCombatComponent::Data::ResolveDependencies()
+{
+	myProjectilePrefab.ResolveDependency();
 }
 
 void TowerCombatComponent::Data::OnBuildUI()
 {
 	Slush::ImGuiWidgets::InputFloat("Range", &myRange);
 	Slush::ImGuiWidgets::InputFloat("Cooldown", &myCooldown);
-	Slush::ImGuiWidgets::InputInt("Damage", &myDamage);
+	ImGui::Text("ProjectileType: %s", myProjectilePrefab.GetName().GetBuffer());
 }
 
 TowerCombatComponent::TowerCombatComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
@@ -30,9 +35,8 @@ TowerCombatComponent::TowerCombatComponent(Slush::Entity& anEntity, const Slush:
 	const Data& data = anEntityPrefab.GetComponentData<TowerCombatComponent>();
 	myRange = data.myRange;
 	myCooldown = data.myCooldown;
-	myDamage = data.myDamage;
 
-	SLUSH_DEBUG("Tower '%s' created at (%.1f, %.1f) with damage %d", myEntityPrefab.GetAssetName().GetBuffer(), myEntity.myPosition.x, myEntity.myPosition.y, myDamage);
+	SLUSH_DEBUG("Tower '%s' created at (%.1f, %.1f)", myEntityPrefab.GetAssetName().GetBuffer(), myEntity.myPosition.x, myEntity.myPosition.y);
 }
 
 void TowerCombatComponent::Update()
@@ -89,12 +93,12 @@ void TowerCombatComponent::AttackTarget()
 	if (!target)
 		return;
 
-	HealthComponent* health = target->GetComponent<HealthComponent>();
-	FW_ASSERT(health, "Tower target is missing a HealthComponent");
-
-	health->DealDamage(myDamage);
-	if (health->IsDead())
+	const Data& data = myEntityPrefab.GetComponentData<TowerCombatComponent>();
+	if (Slush::EntityPrefab* projectilePrefab = data.myProjectilePrefab.Get())
 	{
-		SLUSH_DEBUG("Tower '%s' at (%.1f, %.1f) killed a target at (%.1f, %.1f) with damage %d", myEntityPrefab.GetAssetName().GetBuffer(), myEntity.myPosition.x, myEntity.myPosition.y, target->myPosition.x, target->myPosition.y, myDamage);
+		Slush::Entity* projectileEntity = myEntity.myEntityManager.CreateEntity(myEntity.myPosition, *projectilePrefab);
+		ProjectileComponent* projectile = projectileEntity->GetComponent<ProjectileComponent>();
+		FW_ASSERT(projectile, "Tower projectile is missing a ProjectileComponent");
+		projectile->SetTarget(myTarget);
 	}
 }

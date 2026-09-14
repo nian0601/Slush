@@ -15,6 +15,7 @@
 #include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
+#include "WaveScalingTestSuite.h"
 #include "NavmeshDebuggingLayout.h"
 #include "LevelEditorLayout.h"
 #include "TopDownGameGlobals.h"
@@ -64,6 +65,7 @@ int main(int argc, char** argv)
 {
 	FW_UnitTestSuite::RunTests();
 	NavmeshTestSuite::RunTests();
+	WaveScalingTestSuite::RunTests();
 
 	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
 

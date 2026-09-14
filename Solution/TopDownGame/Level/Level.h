@@ -14,6 +14,7 @@ public:
 	Navmesh& GetNavmesh();
 	NavmeshData& GetNavmeshDataAsset();
 	LevelData& GetLevelDataAsset() { return *myLevelData; }
+	Slush::EntityManager& GetEntityManager() { return myEntityManager; }
 
 	void Update();
 	void Render();
@@ -21,8 +22,6 @@ public:
 	void SpawnEnemyNormal();
 	void SpawnEnemyFast();
 	void SpawnEnemySlow();
-	void SpawnTowerBasic();
-	void SpawnTowerZeroDamage();
 	void DamageAllEnemies();
 
 private:

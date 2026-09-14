@@ -5,13 +5,17 @@
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
+#include "Components/TowerCombatComponent.h"
 
+#include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/Dockables/IAppLayout.h"
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Window.h"
+#include <EntitySystem/Components/SpriteComponent.h>
+#include <EntitySystem/EntityPrefab.h>
 #include <imgui/ImGuiWidgets.h>
 
 LevelEditorDockable::LevelEditorDockable(Level& aLevel)
@@ -84,6 +88,7 @@ void LevelEditorDockable::OnUpdate()
 	UpdateManualCutMode();
 	UpdateSetStartMode();
 	UpdateSetGoalMode();
+	UpdatePlaceTowerMode();
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
@@ -158,6 +163,36 @@ void LevelEditorDockable::UpdateSetGoalMode()
 	SetGoalPosition(engine.GetInput().GetMousePositionf());
 }
 
+void LevelEditorDockable::UpdatePlaceTowerMode()
+{
+	if (!myIsPlaceTowerModeActive)
+		return;
+
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB) || myTowerPrefabToPlace == nullptr)
+		return;
+
+	const Vector2f& position = engine.GetInput().GetMousePositionf();
+	const Slush::SpriteComponent::Data& spriteData = myTowerPrefabToPlace->GetComponentData<Slush::SpriteComponent>();
+	const Vector2f halfSize = spriteData.mySize * 0.5f;
+
+	FW_GrowingArray<Vector2f> footprint;
+	footprint.Add(position - halfSize);
+	footprint.Add(Vector2f{ position.x + halfSize.x, position.y - halfSize.y });
+	footprint.Add(position + halfSize);
+	footprint.Add(Vector2f{ position.x - halfSize.x, position.y + halfSize.y });
+
+	Navmesh& navmesh = myLevel.GetNavmesh();
+	if (!navmesh.IsAreaFullyOnMesh(footprint))
+	{
+		SLUSH_WARNING("[Level Editor] Tower placement rejected: footprint is not fully on open navmesh");
+		return;
+	}
+
+	myLevel.GetEntityManager().CreateEntity(position, *myTowerPrefabToPlace);
+	navmesh.CutHole(footprint);
+}
+
 void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions)
 {
 	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
@@ -211,6 +246,11 @@ void LevelEditorDockable::DisableSetStartMode()
 void LevelEditorDockable::DisableSetGoalMode()
 {
 	myIsSetGoalModeActive = false;
+}
+
+void LevelEditorDockable::DisablePlaceTowerMode()
+{
+	myIsPlaceTowerModeActive = false;
 }
 
 void LevelEditorDockable::OnBuildUI()
@@ -307,6 +347,49 @@ void LevelEditorDockable::OnBuildUI()
 			DisableBoxCutMode();
 			DisableManualCutMode();
 			DisableSetStartMode();
+		}
+	}
+
+	ImGui::Separator();
+
+	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
+	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
+	const char* selectedPrefabName = myTowerPrefabToPlace ? myTowerPrefabToPlace->GetAssetName().GetBuffer() : "Select a tower";
+	if (ImGui::BeginCombo("Tower Prefab", selectedPrefabName))
+	{
+		for (Slush::Asset* asset : prefabs)
+		{
+			Slush::EntityPrefab* prefab = static_cast<Slush::EntityPrefab*>(asset);
+			if (!prefab->Has<TowerCombatComponent>() || !prefab->Has<Slush::SpriteComponent>())
+				continue;
+
+			const bool isSelected = prefab == myTowerPrefabToPlace;
+			if (ImGui::Selectable(prefab->GetAssetName().GetBuffer(), isSelected))
+				myTowerPrefabToPlace = prefab;
+			if (isSelected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	if (myIsPlaceTowerModeActive)
+	{
+		if (ImGui::Button("Disable Place Tower"))
+			DisablePlaceTowerMode();
+	}
+	else if (ImGui::Button("Enable Place Tower"))
+	{
+		if (myTowerPrefabToPlace == nullptr)
+		{
+			SLUSH_WARNING("[Level Editor] Select a tower prefab before enabling tower placement");
+		}
+		else
+		{
+			myIsPlaceTowerModeActive = true;
+			DisableBoxCutMode();
+			DisableManualCutMode();
+			DisableSetStartMode();
+			DisableSetGoalMode();
 		}
 	}
 }

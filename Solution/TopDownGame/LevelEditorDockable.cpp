@@ -264,6 +264,8 @@ void LevelEditorDockable::OnBuildUI()
 	}
 
 	ImGui::Text("Level Editor");
+	if (mySaveBlockedTowerCount > 0)
+		ImGui::Text("Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
 	ImGui::Separator();
 
 	if (ImGui::Button("Spawn Normal"))
@@ -436,8 +438,8 @@ void LevelEditorDockable::OnBuildModals()
 
 		if (ImGui::Button("Save"))
 		{
-			SaveAssets();
-			ImGui::CloseCurrentPopup();
+			if (SaveAssets())
+				ImGui::CloseCurrentPopup();
 		}
 
 		ImGui::SameLine();
@@ -462,10 +464,34 @@ void LevelEditorDockable::OnBuildModals()
 	}
 }
 
-void LevelEditorDockable::SaveAssets()
+bool LevelEditorDockable::SaveAssets()
 {
+	mySaveBlockedTowerCount = GetPlacedTowerCount();
+	if (mySaveBlockedTowerCount > 0)
+	{
+		SLUSH_WARNING("[Level Editor] Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
+		return false;
+	}
+
 	myLevel.GetNavmeshDataAsset().Save();
 	myLevel.GetLevelDataAsset().Save();
+	return true;
+}
+
+int LevelEditorDockable::GetPlacedTowerCount() const
+{
+	FW_GrowingArray<Slush::EntityHandle> entities;
+	myLevel.GetEntityManager().GetAllEntities(entities);
+
+	int towerCount = 0;
+	for (const Slush::EntityHandle& handle : entities)
+	{
+		Slush::Entity* entity = handle.Get();
+		if (entity && !entity->myIsMarkedForRemoval && entity->GetComponent<TowerCombatComponent>())
+			++towerCount;
+	}
+
+	return towerCount;
 }
 
 void LevelEditorDockable::DiscardUnsavedChanges()

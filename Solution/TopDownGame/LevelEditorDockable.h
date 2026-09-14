@@ -52,7 +52,8 @@ private:
 	void SetStartPosition(const Vector2f& aPosition);
 	void SetGoalPosition(const Vector2f& aPosition);
 
-	void SaveAssets();
+	bool SaveAssets();
+	int GetPlacedTowerCount() const;
 	void DiscardUnsavedChanges();
 
 	Level& myLevel;
@@ -70,4 +71,5 @@ private:
 	Slush::EntityPrefab* myTowerPrefabToPlace = nullptr;
 
 	bool myWantToOpenUnsavedChangesPopup = false;
+	int mySaveBlockedTowerCount = 0;
 };

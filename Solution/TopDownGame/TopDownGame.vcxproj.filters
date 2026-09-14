@@ -18,6 +18,7 @@
 	<ClCompile Include="Components\HealthComponent.cpp" />
 	<ClCompile Include="Components\TargetableComponent.cpp" />
 	<ClCompile Include="Components\TowerCombatComponent.cpp" />
+	<ClCompile Include="Components\ProjectileComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -35,5 +36,6 @@
 	<ClInclude Include="Components\HealthComponent.h" />
 	<ClInclude Include="Components\TargetableComponent.h" />
 	<ClInclude Include="Components\TowerCombatComponent.h" />
+	<ClInclude Include="Components\ProjectileComponent.h" />
   </ItemGroup>
 </Project>

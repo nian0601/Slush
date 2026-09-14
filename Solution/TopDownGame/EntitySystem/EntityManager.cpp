@@ -8,6 +8,7 @@
 #include "Components/HealthComponent.h"
 #include "Components/TargetableComponent.h"
 #include "Components/TowerCombatComponent.h"
+#include "Components/ProjectileComponent.h"
 
 void Slush::EntityManager::RegisterComponents()
 {
@@ -17,4 +18,5 @@ void Slush::EntityManager::RegisterComponents()
 	registry.RegisterComponent<HealthComponent, HealthComponent::Data>();
 	registry.RegisterComponent<TargetableComponent>();
 	registry.RegisterComponent<TowerCombatComponent, TowerCombatComponent::Data>();
+	registry.RegisterComponent<ProjectileComponent, ProjectileComponent::Data>();
 }

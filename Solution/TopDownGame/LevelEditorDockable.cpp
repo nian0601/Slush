@@ -435,6 +435,8 @@ void LevelEditorDockable::OnBuildModals()
 			ImGui::BulletText("%s", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
 		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
 			ImGui::BulletText("%s", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
+		if (mySaveBlockedTowerCount > 0)
+			ImGui::Text("Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
 
 		if (ImGui::Button("Save"))
 		{

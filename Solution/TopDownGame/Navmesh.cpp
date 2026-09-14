@@ -613,6 +613,24 @@ void Navmesh::DeleteTriangle(Triangle* aTriangle)
 	myTriangles.DeleteCyclic(aTriangle);
 }
 
+namespace
+{
+	bool IsPointInsidePolygon(const Vector2f& aPoint, const FW_GrowingArray<Vector2f>& aPolygon)
+	{
+		bool isInside = false;
+		for (int i = 0, previousIndex = aPolygon.Count() - 1; i < aPolygon.Count(); previousIndex = i++)
+		{
+			const Vector2f& vertex = aPolygon[i];
+			const Vector2f& previousVertex = aPolygon[previousIndex];
+			const bool crossesHorizontalRay = (vertex.y > aPoint.y) != (previousVertex.y > aPoint.y);
+			if (crossesHorizontalRay && aPoint.x < (previousVertex.x - vertex.x) * (aPoint.y - vertex.y) / (previousVertex.y - vertex.y) + vertex.x)
+				isInside = !isInside;
+		}
+
+		return isInside;
+	}
+}
+
 void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)
 {
 	if (aPolygon.Count() < 3)
@@ -650,6 +668,8 @@ bool Navmesh::IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const
 		FW_Intersection::LineSegment boundaryEdge;
 		boundaryEdge.myStart = edge->myVertices[0]->myPos;
 		boundaryEdge.myEnd = edge->myVertices[1]->myPos;
+		if (IsPointInsidePolygon(boundaryEdge.myStart, aPolygon) || IsPointInsidePolygon(boundaryEdge.myEnd, aPolygon))
+			return false;
 
 		for (int i = 0; i < aPolygon.Count(); ++i)
 		{

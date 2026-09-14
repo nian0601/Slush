@@ -43,6 +43,10 @@ void Level::Update()
 	{
 		SpawnTower("Tower_ZeroDamage");
 	}
+	if (engine.GetInput().WasKeyReleased(Slush::Input::_3))
+	{
+		SpawnTower("Tower_Splash");
+	}
 	if (engine.GetInput().WasKeyReleased(Slush::Input::_7))
 	{
 		SpawnEnemyNormal();

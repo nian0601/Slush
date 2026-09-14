@@ -4,20 +4,24 @@
 
 #include <Core/Time.h>
 #include <EntitySystem/Entity.h>
+#include <EntitySystem/EntityManager.h>
 #include <imgui/ImGuiWidgets.h>
 
 #include "HealthComponent.h"
+#include "TargetableComponent.h"
 
 void ProjectileComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
 {
 	aComponentHandle.ParseFloatField("speed", mySpeed);
 	aComponentHandle.ParseIntField("damage", myDamage);
+	aComponentHandle.ParseFloatField("splashradius", mySplashRadius);
 }
 
 void ProjectileComponent::Data::OnBuildUI()
 {
 	Slush::ImGuiWidgets::InputFloat("Speed", &mySpeed);
 	Slush::ImGuiWidgets::InputInt("Damage", &myDamage);
+	Slush::ImGuiWidgets::InputFloat("Splash Radius", &mySplashRadius);
 }
 
 ProjectileComponent::ProjectileComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
@@ -26,6 +30,7 @@ ProjectileComponent::ProjectileComponent(Slush::Entity& anEntity, const Slush::E
 	const Data& data = anEntityPrefab.GetComponentData<ProjectileComponent>();
 	mySpeed = data.mySpeed;
 	myDamage = data.myDamage;
+	mySplashRadius = data.mySplashRadius;
 }
 
 void ProjectileComponent::Update()
@@ -42,13 +47,24 @@ void ProjectileComponent::Update()
 	const float stepDistance = mySpeed * Slush::Time::GetDelta();
 	if (distanceToTarget <= stepDistance)
 	{
-		HealthComponent* health = target->GetComponent<HealthComponent>();
-		FW_ASSERT(health, "Projectile target is missing a HealthComponent");
+		FW_GrowingArray<Slush::EntityHandle> entities;
+		myEntity.myEntityManager.GetAllEntities(entities);
 
-		health->DealDamage(myDamage);
-		if (health->IsDead())
+		for (const Slush::EntityHandle& handle : entities)
 		{
-			SLUSH_DEBUG("Projectile '%s' at (%.1f, %.1f) killed a target at (%.1f, %.1f) with damage %d", myEntityPrefab.GetAssetName().GetBuffer(), myEntity.myPosition.x, myEntity.myPosition.y, target->myPosition.x, target->myPosition.y, myDamage);
+			Slush::Entity* entity = handle.Get();
+			if (!entity || entity->myIsMarkedForRemoval || !entity->GetComponent<TargetableComponent>() || Length2(entity->myPosition - target->myPosition) > FW_Square(mySplashRadius))
+				continue;
+
+			HealthComponent* health = entity->GetComponent<HealthComponent>();
+			if (!health || health->IsDead())
+				continue;
+
+			health->DealDamage(myDamage);
+			if (health->IsDead())
+			{
+				SLUSH_DEBUG("Projectile '%s' at (%.1f, %.1f) killed a target at (%.1f, %.1f) with damage %d", myEntityPrefab.GetAssetName().GetBuffer(), myEntity.myPosition.x, myEntity.myPosition.y, entity->myPosition.x, entity->myPosition.y, myDamage);
+			}
 		}
 
 		myEntity.myIsMarkedForRemoval = true;

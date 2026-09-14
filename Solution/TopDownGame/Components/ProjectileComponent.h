@@ -15,6 +15,7 @@ public:
 
 		float mySpeed = 500.f;
 		int myDamage = 10;
+		float mySplashRadius = 0.f;
 	};
 
 	ProjectileComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
@@ -25,5 +26,6 @@ public:
 private:
 	float mySpeed = 0.f;
 	int myDamage = 0;
+	float mySplashRadius = 0.f;
 	Slush::EntityHandle myTarget;
 };

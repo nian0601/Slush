@@ -141,18 +141,25 @@ void Level::UpdateWaveSpawning()
 	if (myCurrentWaveIndex >= myLevelData->myTotalWaveCount)
 		return;
 
-	if (!myNextWaveTimer.IsStarted())
+	// The final wave clearing has no next wave to rest before, so it skips the timer
+	// entirely rather than spending a full rest duration before myCurrentWaveIndex
+	// reaches myTotalWaveCount and callers (e.g. the win/loss system) see "exhausted".
+	bool isLastWave = (myCurrentWaveIndex == myLevelData->myTotalWaveCount - 1);
+	if (!isLastWave)
 	{
-		myNextWaveTimer.Start(myLevelData->myInterWaveRestDuration);
-		return;
+		if (!myNextWaveTimer.IsStarted())
+		{
+			myNextWaveTimer.Start(myLevelData->myInterWaveRestDuration);
+			return;
+		}
+
+		if (!myNextWaveTimer.HasExpired())
+			return;
+
+		// Timer has no explicit reset - reassigning a fresh instance is how it's un-started, so the
+		// next wave-cleared cycle waits out a full rest duration again instead of seeing a stale expiry.
+		myNextWaveTimer = Slush::Timer();
 	}
-
-	if (!myNextWaveTimer.HasExpired())
-		return;
-
-	// Timer has no explicit reset - reassigning a fresh instance is how it's un-started, so the
-	// next wave-cleared cycle waits out a full rest duration again instead of seeing a stale expiry.
-	myNextWaveTimer = Slush::Timer();
 
 	++myCurrentWaveIndex;
 	if (myCurrentWaveIndex < myLevelData->myTotalWaveCount)

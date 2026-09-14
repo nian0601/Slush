@@ -74,6 +74,58 @@ namespace NavmeshTestSuite
 		FW_ASSERT(!found, "Expected FindPath to fail once a full-width cut disconnects start from goal");
 	}
 
+	void TestIsAreaFullyOnMesh()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+
+		FW_GrowingArray<Vector2f> openArea;
+		openArea.Add(Vector2f{ 100.f, 100.f });
+		openArea.Add(Vector2f{ 200.f, 100.f });
+		openArea.Add(Vector2f{ 200.f, 200.f });
+		openArea.Add(Vector2f{ 100.f, 200.f });
+		FW_ASSERT(mesh.IsAreaFullyOnMesh(openArea), "Expected an area entirely on open mesh to be accepted");
+
+		FW_GrowingArray<Vector2f> cutArea;
+		cutArea.Add(Vector2f{ 500.f, 300.f });
+		cutArea.Add(Vector2f{ 700.f, 300.f });
+		cutArea.Add(Vector2f{ 700.f, 500.f });
+		cutArea.Add(Vector2f{ 500.f, 500.f });
+		mesh.CutHole(cutArea);
+
+		FW_ASSERT(!mesh.IsAreaFullyOnMesh(cutArea), "Expected an area entirely overlapping a cut hole to be rejected");
+
+		FW_GrowingArray<Vector2f> straddlingArea;
+		straddlingArea.Add(Vector2f{ 450.f, 350.f });
+		straddlingArea.Add(Vector2f{ 550.f, 350.f });
+		straddlingArea.Add(Vector2f{ 550.f, 450.f });
+		straddlingArea.Add(Vector2f{ 450.f, 450.f });
+		FW_ASSERT(!mesh.IsAreaFullyOnMesh(straddlingArea), "Expected an area straddling a cut-hole boundary to be rejected");
+
+		FW_GrowingArray<Vector2f> secondCutArea;
+		secondCutArea.Add(Vector2f{ 650.f, 400.f });
+		secondCutArea.Add(Vector2f{ 800.f, 400.f });
+		secondCutArea.Add(Vector2f{ 800.f, 550.f });
+		secondCutArea.Add(Vector2f{ 650.f, 550.f });
+		FW_ASSERT(!mesh.IsAreaFullyOnMesh(secondCutArea), "Expected an area overlapping a previously cut area to be rejected");
+
+		Navmesh nestedHoleMesh;
+		nestedHoleMesh.GenerateDefaultGrid();
+		FW_GrowingArray<Vector2f> nestedHole;
+		nestedHole.Add(Vector2f{ 600.f, 400.f });
+		nestedHole.Add(Vector2f{ 650.f, 400.f });
+		nestedHole.Add(Vector2f{ 650.f, 450.f });
+		nestedHole.Add(Vector2f{ 600.f, 450.f });
+		nestedHoleMesh.CutHole(nestedHole);
+
+		FW_GrowingArray<Vector2f> enclosingArea;
+		enclosingArea.Add(Vector2f{ 550.f, 350.f });
+		enclosingArea.Add(Vector2f{ 700.f, 350.f });
+		enclosingArea.Add(Vector2f{ 700.f, 500.f });
+		enclosingArea.Add(Vector2f{ 550.f, 500.f });
+		FW_ASSERT(!nestedHoleMesh.IsAreaFullyOnMesh(enclosingArea), "Expected an area enclosing a cut hole to be rejected");
+	}
+
 	void TestFindPathSameTriangleYieldsStraightPath()
 	{
 		Navmesh mesh;
@@ -327,6 +379,7 @@ namespace NavmeshTestSuite
 		TestFindPathSucceedsBetweenReachablePoints();
 		TestFindPathFailsOutsideMesh();
 		TestFindPathFailsWhenCutDisconnectsStartFromGoal();
+		TestIsAreaFullyOnMesh();
 		TestFindPathSameTriangleYieldsStraightPath();
 		TestStringPullIsNoLongerThanEdgeCenterPath();
 		TestStringPullCanReFunnelAnExistingCorridorFromANewStart();

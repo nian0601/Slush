@@ -51,15 +51,6 @@ void Level::Update()
 	{
 		SpawnEnemySlow();
 	}
-	if (engine.GetInput().WasKeyReleased(Slush::Input::_5))
-	{
-		SpawnTowerBasic();
-	}
-	if (engine.GetInput().WasKeyReleased(Slush::Input::_6))
-	{
-		SpawnTowerZeroDamage();
-	}
-
 	GetNavmesh().Update();
 	myEntityManager.Update();
 	myEntityManager.EndFrame();
@@ -84,16 +75,6 @@ void Level::SpawnEnemyFast()
 void Level::SpawnEnemySlow()
 {
 	SpawnEnemy("Enemy_Slow");
-}
-
-void Level::SpawnTowerBasic()
-{
-	SpawnEnemy("Tower_Basic");
-}
-
-void Level::SpawnTowerZeroDamage()
-{
-	SpawnEnemy("Tower_ZeroDamage");
 }
 
 void Level::SpawnEnemy(const char* aPrefabName)

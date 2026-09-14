@@ -31,6 +31,7 @@ public:
 	bool StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
 	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
+	bool IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const;
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 
 	int GetTriangleCount() const;

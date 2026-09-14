@@ -621,6 +621,49 @@ void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)
 	CutPolygon(aPolygon);
 }
 
+bool Navmesh::IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const
+{
+	if (aPolygon.Count() < 3)
+		return false;
+
+	for (const Vector2f& point : aPolygon)
+	{
+		bool isOnMesh = false;
+		for (const Triangle* triangle : myTriangles)
+		{
+			if (triangle->PointInside(point))
+			{
+				isOnMesh = true;
+				break;
+			}
+		}
+
+		if (!isOnMesh)
+			return false;
+	}
+
+	for (const Edge* edge : myEdges)
+	{
+		if (edge->myTriangles[0] != nullptr && edge->myTriangles[1] != nullptr)
+			continue;
+
+		FW_Intersection::LineSegment boundaryEdge;
+		boundaryEdge.myStart = edge->myVertices[0]->myPos;
+		boundaryEdge.myEnd = edge->myVertices[1]->myPos;
+
+		for (int i = 0; i < aPolygon.Count(); ++i)
+		{
+			FW_Intersection::LineSegment polygonEdge;
+			polygonEdge.myStart = aPolygon[i];
+			polygonEdge.myEnd = aPolygon[(i + 1) % aPolygon.Count()];
+			if (FW_Intersection::LineSegmentVsLineSegment(boundaryEdge, polygonEdge))
+				return false;
+		}
+	}
+
+	return true;
+}
+
 int Navmesh::GetTriangleCount() const
 {
 	return myTriangles.Count();

@@ -28,7 +28,7 @@ Every MSBuild invocation must add `/nodeReuse:false` alongside `/m` — without 
 
 *(Optional, recommended if a lingering process or dirtied runtime file is a recurring problem)*
 Worktree-blocking processes: ActionGame.exe, BossMonster.exe, TopDownGame.exe, MSBuild.exe, mspdbsrv.exe
-Worktree-discardable paths: Workbed/*/ImGUILayouts/*.ini, Workbed/*/Data/DebugSettings.sdebug, Workbed/*/temp/*.output, Workbed/*/temp/*.navmesh
+Worktree-discardable paths: Workbed/*/ImGUILayouts/*.ini, Workbed/*/Data/DebugSettings.sdebug, Workbed/*/Data/debug/debug_input.txt, Workbed/*/Data/debug/screenshot.png, Workbed/*/temp/*.output, Workbed/*/temp/*.navmesh
 
 ## Code style
 

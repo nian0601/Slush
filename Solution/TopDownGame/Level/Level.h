@@ -26,6 +26,7 @@ public:
 
 private:
 	void SpawnEnemy(const char* aPrefabName);
+	void SpawnTower(const char* aPrefabName);
 
 	LevelData* myLevelData = nullptr;
 	Slush::EntityManager myEntityManager;

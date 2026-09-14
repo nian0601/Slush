@@ -35,6 +35,14 @@ NavmeshData& Level::GetNavmeshDataAsset()
 void Level::Update()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (engine.GetInput().WasKeyReleased(Slush::Input::_1))
+	{
+		SpawnTower("Tower_Basic");
+	}
+	if (engine.GetInput().WasKeyReleased(Slush::Input::_2))
+	{
+		SpawnTower("Tower_ZeroDamage");
+	}
 	if (engine.GetInput().WasKeyReleased(Slush::Input::_7))
 	{
 		SpawnEnemyNormal();
@@ -80,6 +88,11 @@ void Level::SpawnEnemySlow()
 void Level::SpawnEnemy(const char* aPrefabName)
 {
 	myEntityManager.CreateEntity(myLevelData->myStartPosition, aPrefabName);
+}
+
+void Level::SpawnTower(const char* aPrefabName)
+{
+	myEntityManager.CreateEntity(myLevelData->myStartPosition + Vector2f(200.f, 0.f), aPrefabName);
 }
 
 void Level::DamageAllEnemies()

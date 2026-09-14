@@ -2,6 +2,7 @@
 
 #include <EntitySystem/Component.h>
 #include <EntitySystem/EntityHandle.h>
+#include <Core/Assets/AssetReference.h>
 #include <Core/Time.h>
 
 class TowerCombatComponent : public Slush::Component
@@ -13,10 +14,11 @@ public:
 	{
 		void OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion) override;
 		void OnBuildUI() override;
+		void ResolveDependencies() override;
 
 		float myRange = 300.f;
 		float myCooldown = 1.f;
-		int myDamage = 10;
+		Slush::AssetReference<Slush::EntityPrefab> myProjectilePrefab;
 	};
 
 	TowerCombatComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
@@ -30,7 +32,6 @@ private:
 
 	float myRange = 0.f;
 	float myCooldown = 0.f;
-	int myDamage = 0;
 	Slush::EntityHandle myTarget;
 	Slush::Timer myAttackTimer;
 };

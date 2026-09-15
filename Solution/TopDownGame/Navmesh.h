@@ -5,6 +5,23 @@
 class Navmesh
 {
 public:
+	struct TriangleMesh
+	{
+		// [n, n+1, n+2] builds a triangle, vertices are not shared
+		FW_GrowingArray<Vector2f> myVertices;
+	};
+
+	enum RenderFlags
+	{
+		FACES = 1 << 0,
+		EDGES = 1 << 1,
+		MOUSE_TEST = 1 << 2,
+		OUTLINE = 1 << 3,
+
+		ALL = FACES | EDGES | MOUSE_TEST,
+	};
+
+public:
 	Navmesh();
 	~Navmesh();
 
@@ -13,8 +30,9 @@ public:
 	void Save(Slush::AssetParser::Handle aRootHandle) const;
 	void Load(Slush::AssetParser::Handle aRootHandle);
 
-	void Update();
-	void Render();
+	void GetAsTriangleMesh(TriangleMesh& aMesh) const;
+
+	void Render(unsigned int aFlags = RenderFlags::OUTLINE);
 
 	struct Portal
 	{
@@ -92,6 +110,8 @@ private:
 		float myFCost = 0.f;
 		bool myIsClosed = false;
 	};
+
+	void Clear();
 
 	Triangle* FindTriangleContaining(const Vector2f& aPosition) const;
 	bool FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const;

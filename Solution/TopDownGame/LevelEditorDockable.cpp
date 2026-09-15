@@ -22,10 +22,18 @@ LevelEditorDockable::LevelEditorDockable(Level& aLevel)
 	: Slush::DockableBase<LevelEditorDockable>(true)
 	, myLevel(aLevel)
 {
+	myLevel.GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
 }
 
 void LevelEditorDockable::RenderOverlay() const
 {
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
+	for (int i = 0; i < myTriangleMesh.myVertices.Count(); i += 3)
+	{
+		renderer.RenderTriangle(myTriangleMesh.myVertices[i], myTriangleMesh.myVertices[i + 1], myTriangleMesh.myVertices[i + 2], 0xFF004400);
+	}
+
 	RenderBoxCutPreview();
 	RenderManualCutPreview();
 	RenderStartAndGoalMarkers();
@@ -200,6 +208,8 @@ void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCu
 	Slush::AssetEditScope editScope(navmeshData);
 	navmeshData.myNavmesh.CutHole(someCutPositions);
 	navmeshData.MarkAsUnsaved();
+
+	navmeshData.myNavmesh.GetAsTriangleMesh(myTriangleMesh);
 }
 
 void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
@@ -263,10 +273,13 @@ void LevelEditorDockable::OnBuildUI()
 		ImGui::EndMenuBar();
 	}
 
-	ImGui::Text("Level Editor");
 	if (mySaveBlockedTowerCount > 0)
+	{
 		ImGui::Text("Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
-	ImGui::Separator();
+		ImGui::Separator();
+	}
+
+	ImGui::Text("Enemies");
 
 	if (ImGui::Button("Spawn Normal"))
 		myLevel.SpawnEnemyNormal();
@@ -282,6 +295,7 @@ void LevelEditorDockable::OnBuildUI()
 
 	ImGui::Separator();
 
+	ImGui::Text("Navmesh");
 	if (myIsBoxCutModeActive)
 	{
 		if (ImGui::Button("Disable Box Cut"))
@@ -318,6 +332,14 @@ void LevelEditorDockable::OnBuildUI()
 		}
 	}
 
+	if (ImGui::Button("Clear Navmesh"))
+	{
+		myLevel.GetNavmesh().GenerateDefaultGrid();
+		myLevel.GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
+	}
+
+	ImGui::Separator();
+	ImGui::Text("Start/Goal");
 	if (myIsSetStartModeActive)
 	{
 		if (ImGui::Button("Disable Set Start"))
@@ -354,6 +376,7 @@ void LevelEditorDockable::OnBuildUI()
 
 	ImGui::Separator();
 
+	ImGui::Text("Towers");
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
 	const char* selectedPrefabName = myTowerPrefabToPlace ? myTowerPrefabToPlace->GetAssetName().GetBuffer() : "Select a tower";

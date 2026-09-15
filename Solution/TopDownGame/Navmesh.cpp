@@ -12,13 +12,13 @@ Navmesh::Navmesh()
 
 Navmesh::~Navmesh()
 {
-	myTriangles.DeleteAll();
-	myEdges.DeleteAll();
-	myVertices.DeleteAll();
+	Clear();
 }
 
 void Navmesh::GenerateDefaultGrid()
 {
+	Clear();
+
 	Vector2f offset = { 20.f, 20. };
 	Vertex* topLeft = CreateVertex(offset);
 
@@ -105,18 +105,19 @@ void Navmesh::Load(Slush::AssetParser::Handle aRootHandle)
 	}
 }
 
-void Navmesh::Update()
+void Navmesh::GetAsTriangleMesh(TriangleMesh& aMesh) const
 {
-	Slush::Engine& engine = Slush::Engine::GetInstance();
+	aMesh.myVertices.RemoveAll();
 
-	if (engine.GetInput().WasKeyReleased(Slush::Input::E))
+	for (Triangle* triangle : myTriangles)
 	{
-		int apa = 5;
-		++apa;
+		aMesh.myVertices.Add(triangle->myVertices[0]->myPos);
+		aMesh.myVertices.Add(triangle->myVertices[1]->myPos);
+		aMesh.myVertices.Add(triangle->myVertices[2]->myPos);
 	}
 }
 
-void Navmesh::Render()
+void Navmesh::Render(unsigned int aFlags)
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
@@ -126,25 +127,48 @@ void Navmesh::Render()
 	int lineColor = 0xFF00FFFF;
 	int faceColor = 0xAA00AAFF;
 
-	for (Triangle* triangle : myTriangles)
+	if ((aFlags & RenderFlags::FACES) > 0)
 	{
-		bool collision = triangle->PointInside(mousePos);
-
-		if (collision)
+		const bool showMouseTest = (aFlags & RenderFlags::MOUSE_TEST) > 0;
+		for (Triangle* triangle : myTriangles)
 		{
-			renderer.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, 0xFFFFFFFF);
-		}
-		else
-		{
-			renderer.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, faceColor);
-		}
+			bool collision = showMouseTest && triangle->PointInside(mousePos);
 
+			if (collision)
+			{
+				renderer.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, 0xFFFFFFFF);
+			}
+			else
+			{
+				renderer.RenderTriangle(triangle->myVertices[0]->myPos, triangle->myVertices[1]->myPos, triangle->myVertices[2]->myPos, faceColor);
+			}
+
+		}
 	}
 
-	for (Edge* edge : myEdges)
+	if ((aFlags & RenderFlags::EDGES) > 0)
 	{
-		renderer.RenderLine(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, lineColor);
+		for (Edge* edge : myEdges)
+		{
+			renderer.RenderLine(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, lineColor);
+		}
 	}
+
+	if ((aFlags & RenderFlags::OUTLINE) > 0)
+	{
+		for (Edge* edge : myEdges)
+		{
+			if (!edge->myTriangles[0] || !edge->myTriangles[1])
+				renderer.RenderLine(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, lineColor);
+		}
+	}
+}
+
+void Navmesh::Clear()
+{
+	myTriangles.DeleteAll();
+	myEdges.DeleteAll();
+	myVertices.DeleteAll();
 }
 
 Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) const

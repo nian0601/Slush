@@ -7,6 +7,7 @@
 
 #include "Core/Engine.h"
 #include "Core/Dockables/GameViewDockable.h"
+#include "Core/Dockables/LogDockable.h"
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 
@@ -18,6 +19,7 @@ LevelEditorLayout::LevelEditorLayout(Level& aLevel)
 
 	myLevelEditorDockable = new LevelEditorDockable(aLevel);
 	AddDockable(myLevelEditorDockable);
+	AddDockable(new Slush::LogDockable());
 }
 
 void LevelEditorLayout::OnRender()
@@ -25,8 +27,8 @@ void LevelEditorLayout::OnRender()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
-	myLevel.Render();
 	myLevelEditorDockable->RenderOverlay();
+	myLevel.Render();
 
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();
 }

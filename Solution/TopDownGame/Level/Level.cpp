@@ -73,8 +73,6 @@ void Level::Update()
 		SpawnEnemySlow();
 	}
 	UpdateWaveSpawning();
-
-	GetNavmesh().Update();
 	myEntityManager.Update();
 	myEntityManager.EndFrame();
 }

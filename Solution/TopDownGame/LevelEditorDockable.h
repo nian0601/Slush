@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Core/Dockables/Dockable.h>
+#include "Navmesh.h"
 
 class Level;
 
@@ -72,4 +73,6 @@ private:
 
 	bool myWantToOpenUnsavedChangesPopup = false;
 	int mySaveBlockedTowerCount = 0;
+
+	Navmesh::TriangleMesh myTriangleMesh;
 };

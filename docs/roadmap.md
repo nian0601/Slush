@@ -3,6 +3,7 @@
 ## Near-term goals
 
 - First playable for the top-down game: one or two playable levels, different enemies, different turrets, and basic editor functionality for creating those levels.
+- Concrete next step for the first playable: properly plan what "first playable" means, and structure the remaining work under new Feature issues.
 
 ## Long-term ideas
 

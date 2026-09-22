@@ -8,12 +8,14 @@ class LevelEditorDockable;
 class LevelEditorLayout : public Slush::IAppLayout
 {
 public:
-	LevelEditorLayout(Level& aLevel);
+	LevelEditorLayout();
+	~LevelEditorLayout();
 
 protected:
+	void OnUpdate() override;
 	void OnRender() override;
 
 private:
-	Level& myLevel;
+	Level* myLevel = nullptr;
 	LevelEditorDockable* myLevelEditorDockable = nullptr;
 };

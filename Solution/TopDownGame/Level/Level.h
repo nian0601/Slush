@@ -8,8 +8,7 @@
 class Level
 {
 public:
-	Level();
-	~Level();
+	Level(LevelData& aLevelData);
 
 	Navmesh& GetNavmesh();
 	NavmeshData& GetNavmeshDataAsset();

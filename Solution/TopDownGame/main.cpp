@@ -15,6 +15,7 @@
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
 #include "WaveScalingTestSuite.h"
+#include "GameLayout.h"
 #include "NavmeshDebuggingLayout.h"
 #include "LevelEditorLayout.h"
 #include "TopDownGameGlobals.h"
@@ -33,8 +34,9 @@ public:
 		assets.LoadAllAssets();
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+		window.AddLayout(new GameLayout(), true);
 		window.AddLayout(new NavmeshDebuggingLayout());
-		window.AddLayout(new LevelEditorLayout(), true);
+		window.AddLayout(new LevelEditorLayout());
 	}
 
 	void Shutdown() override

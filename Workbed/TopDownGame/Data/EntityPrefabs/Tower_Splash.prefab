@@ -18,4 +18,9 @@ Entity Prefab
 		cooldown 1.000
 		projectiletype Projectile_Splash
 	}
+	buildcost
+	{
+		version 1
+		cost 75
+	}
 }

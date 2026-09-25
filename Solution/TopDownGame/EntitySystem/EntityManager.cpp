@@ -7,6 +7,7 @@
 #include "Components/MovementComponent.h"
 #include "Components/HealthComponent.h"
 #include "Components/KillRewardComponent.h"
+#include "Components/BuildCostComponent.h"
 #include "Components/TargetableComponent.h"
 #include "Components/TowerCombatComponent.h"
 #include "Components/ProjectileComponent.h"
@@ -18,6 +19,7 @@ void Slush::EntityManager::RegisterComponents()
 	registry.RegisterComponent<MovementComponent, MovementComponent::Data>();
 	registry.RegisterComponent<HealthComponent, HealthComponent::Data>();
 	registry.RegisterComponent<KillRewardComponent, KillRewardComponent::Data>();
+	registry.RegisterComponent<BuildCostComponent, BuildCostComponent::Data>();
 	registry.RegisterComponent<TargetableComponent>();
 	registry.RegisterComponent<TowerCombatComponent, TowerCombatComponent::Data>();
 	registry.RegisterComponent<ProjectileComponent, ProjectileComponent::Data>();

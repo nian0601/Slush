@@ -14,6 +14,8 @@ Level::Level(LevelData& aLevelData)
 {
 	myLevelData = &aLevelData;
 	FW_ASSERT(myLevelData->myNavmeshData.Get() != nullptr, "Level's LevelData has an unresolved NavmeshData reference");
+	myResources = myLevelData->myStartingResources;
+	SLUSH_INFO("[Resources] Starting balance: %d", myResources);
 
 	if (myCurrentWaveIndex < myLevelData->myTotalWaveCount)
 	{
@@ -21,6 +23,23 @@ Level::Level(LevelData& aLevelData)
 			myLevelData->myBaseEnemyCount, myLevelData->myEnemyCountPerWaveIncrement, myLevelData->myMaxEnemyCountPerWave);
 	}
 
+}
+
+void Level::AddResources(int anAmount)
+{
+	FW_ASSERT(anAmount >= 0, "Resources cannot be added with a negative amount");
+	myResources += anAmount;
+}
+
+bool Level::TrySpendResources(int anAmount)
+{
+	FW_ASSERT(anAmount >= 0, "Resources cannot be spent with a negative amount");
+
+	if (myResources < anAmount)
+		return false;
+
+	myResources -= anAmount;
+	return true;
 }
 
 Navmesh& Level::GetNavmesh()

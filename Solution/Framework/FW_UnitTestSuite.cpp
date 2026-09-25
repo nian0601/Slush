@@ -1,5 +1,6 @@
 #include "FW_UnitTestSuite.h"
 #include "FW_FileProcessor.h"
+#include "FW_FileSystem.h"
 #include "FW_Assert.h"
 
 #include <windows.h>
@@ -33,6 +34,10 @@ namespace FW_UnitTestSuite
 		assetPath.erase(assetPath.rfind("\\"), std::string::npos);
 		ReplaceAllOccurancesInString(assetPath, "\\", "/");
 		assetPath.append("/temp/fileProcessorTests.output");
+
+		std::string tempFolderPath = assetPath;
+		tempFolderPath.erase(tempFolderPath.rfind("/"), std::string::npos);
+		FW_FileSystem::CreateFolder(tempFolderPath.c_str());
 
 
 		float floatWrite = 123.f;

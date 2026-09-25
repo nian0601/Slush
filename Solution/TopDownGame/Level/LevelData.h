@@ -19,7 +19,7 @@ struct EnemyUnlockEntry
 class LevelData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("LevelData", "tdlevel", "data/levels/", ICON_FA_MAP, 2);
+	DEFINE_ASSET("LevelData", "tdlevel", "data/levels/", ICON_FA_MAP, 3);
 
 	LevelData(const char* aName, unsigned int aAssetID);
 
@@ -30,6 +30,7 @@ public:
 	Vector2f myStartPosition;
 	Vector2f myGoalPosition;
 	Slush::AssetReference<NavmeshData> myNavmeshData;
+	int myStartingResources = 100;
 
 	FW_GrowingArray<EnemyUnlockEntry> myEnemyUnlocks;
 

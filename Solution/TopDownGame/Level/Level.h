@@ -25,6 +25,9 @@ public:
 
 	int GetCurrentWaveIndex() const { return myCurrentWaveIndex; }
 	int GetTotalWaveCount() const { return myLevelData->myTotalWaveCount; }
+	int GetResources() const { return myResources; }
+	void AddResources(int anAmount);
+	bool TrySpendResources(int anAmount);
 
 private:
 	void SpawnEnemy(const char* aPrefabName);
@@ -35,6 +38,7 @@ private:
 
 	LevelData* myLevelData = nullptr;
 	Slush::EntityManager myEntityManager;
+	int myResources = 0;
 
 	int myCurrentWaveIndex = 0;
 	int myEnemiesRemainingToSpawnThisWave = 0;

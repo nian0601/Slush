@@ -377,6 +377,7 @@ void LevelEditorDockable::OnBuildUI()
 	ImGui::Separator();
 
 	ImGui::Text("Towers");
+	ImGui::Text("Resources: %d", myLevel.GetResources());
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
 	const char* selectedPrefabName = myTowerPrefabToPlace ? myTowerPrefabToPlace->GetAssetName().GetBuffer() : "Select a tower";

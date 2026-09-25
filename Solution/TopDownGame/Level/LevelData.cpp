@@ -29,6 +29,7 @@ void LevelData::BuildUI()
 {
 	Slush::ImGuiWidgets::InputFloat2("Start Position", &myStartPosition.x);
 	Slush::ImGuiWidgets::InputFloat2("Goal Position", &myGoalPosition.x);
+	Slush::ImGuiWidgets::InputInt("Starting Resources", &myStartingResources);
 
 	ImGui::Text("Navmesh: %s", myNavmeshData.GetName().GetBuffer());
 	if (ImGui::BeginDragDropTarget())
@@ -45,6 +46,7 @@ void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
 	aRootHandle.ParseVec2fField("startPosition", myStartPosition);
 	aRootHandle.ParseVec2fField("goalPosition", myGoalPosition);
 	myNavmeshData.Parse(aRootHandle, "navmeshData");
+	aRootHandle.ParseIntField("startingResources", myStartingResources);
 
 	aRootHandle.ParseIntField("totalWaveCount", myTotalWaveCount);
 	aRootHandle.ParseIntField("baseEnemyCount", myBaseEnemyCount);
@@ -76,6 +78,7 @@ void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 	aRootHandle.ParseVec2fField("startPosition", myStartPosition);
 	aRootHandle.ParseVec2fField("goalPosition", myGoalPosition);
 	myNavmeshData.Parse(aRootHandle, "navmeshData");
+	aRootHandle.ParseIntField("startingResources", myStartingResources);
 
 	aRootHandle.ParseIntField("totalWaveCount", myTotalWaveCount);
 	aRootHandle.ParseIntField("baseEnemyCount", myBaseEnemyCount);

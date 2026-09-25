@@ -10,12 +10,12 @@
 #include "EntitySystem/EntityManager.h"
 #include "EntitySystem/EntityPrefab.h"
 
-#include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
 #include "WaveScalingTestSuite.h"
+#include "GameLayout.h"
 #include "NavmeshDebuggingLayout.h"
 #include "LevelEditorLayout.h"
 #include "TopDownGameGlobals.h"
@@ -33,16 +33,14 @@ public:
 		assets.RegisterAssetType<Slush::EntityPrefab>();
 		assets.LoadAllAssets();
 
-		myLevel = new Level();
-
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
+		window.AddLayout(new GameLayout(), true);
 		window.AddLayout(new NavmeshDebuggingLayout());
-		window.AddLayout(new LevelEditorLayout(*myLevel), true);
+		window.AddLayout(new LevelEditorLayout());
 	}
 
 	void Shutdown() override
 	{
-		FW_SAFE_DELETE(myLevel);
 		TopDownGameGlobals::Destroy();
 	}
 
@@ -53,11 +51,7 @@ public:
 		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
 			engine.GetWindow().Close();
 
-		myLevel->Update();
 	}
-
-private:
-	Level* myLevel = nullptr;
 };
 
 #include <FW_UnitTestSuite.h>

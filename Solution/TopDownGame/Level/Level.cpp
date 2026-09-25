@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "Level.h"
-#include <Core\Assets\AssetStorage.h>
 #include <Core\Engine.h>
 #include <Core\Input.h>
 
@@ -11,10 +10,9 @@
 
 #include <EntitySystem\EntityPrefab.h>
 
-Level::Level()
+Level::Level(LevelData& aLevelData)
 {
-	myLevelData = Slush::AssetRegistry::GetInstance().GetAsset<LevelData>("level_main");
-	FW_ASSERT(myLevelData, "Level has no valid LevelData - expected a 'level_main' LevelData asset");
+	myLevelData = &aLevelData;
 	FW_ASSERT(myLevelData->myNavmeshData.Get() != nullptr, "Level's LevelData has an unresolved NavmeshData reference");
 
 	if (myCurrentWaveIndex < myLevelData->myTotalWaveCount)
@@ -23,12 +21,6 @@ Level::Level()
 			myLevelData->myBaseEnemyCount, myLevelData->myEnemyCountPerWaveIncrement, myLevelData->myMaxEnemyCountPerWave);
 	}
 
-	TopDownGameGlobals::GetInstance().SetLevel(this);
-}
-
-Level::~Level()
-{
-	TopDownGameGlobals::GetInstance().SetLevel(nullptr);
 }
 
 Navmesh& Level::GetNavmesh()
@@ -43,6 +35,8 @@ NavmeshData& Level::GetNavmeshDataAsset()
 
 void Level::Update()
 {
+	TopDownGameGlobals::GetInstance().SetLevel(this);
+
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (engine.GetInput().WasKeyReleased(Slush::Input::_1))
 	{

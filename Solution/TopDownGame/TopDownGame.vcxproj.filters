@@ -12,6 +12,7 @@
     <ClCompile Include="LevelEditorLayout.cpp" />
 	<ClCompile Include="GameLayout.cpp" />
 	<ClCompile Include="StateStack\LevelState.cpp" />
+	<ClCompile Include="StateStack\TowerTestState.cpp" />
     <ClCompile Include="Level\NavmeshData.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="Level\WaveScaling.cpp" />
@@ -37,6 +38,7 @@
     <ClInclude Include="LevelEditorLayout.h" />
 	<ClInclude Include="GameLayout.h" />
 	<ClInclude Include="StateStack\LevelState.h" />
+	<ClInclude Include="StateStack\TowerTestState.h" />
     <ClInclude Include="Level\NavmeshData.h" />
     <ClInclude Include="Level\LevelData.h" />
     <ClInclude Include="Level\WaveScaling.h" />

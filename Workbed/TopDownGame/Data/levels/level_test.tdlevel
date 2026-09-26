@@ -1,0 +1,26 @@
+LevelData 
+{ 
+	version 3 
+	navmeshData navmesh_main 
+	startingResources 125 
+	totalWaveCount 0 
+	baseEnemyCount 0 
+	enemyCountPerWaveIncrement 0 
+	maxEnemyCountPerWave 0 
+	difficultyRampWaveCount 0 
+	enemySpawnInterval 0.300 
+	interWaveRestDuration 3.000 
+	startPosition 
+	{ 
+		x 136.140 
+		y 85.670 
+	} 
+	goalPosition 
+	{ 
+		x 1811.930 
+		y 101.118 
+	} 
+	enemyUnlocks 
+	{ 
+	} 
+} 

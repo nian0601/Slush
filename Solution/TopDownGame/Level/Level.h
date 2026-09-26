@@ -5,6 +5,18 @@
 
 #include "LevelData.h"
 
+namespace Slush
+{
+	class EntityPrefab;
+}
+
+enum class PlaceTowerResult
+{
+	Placed,
+	FootprintBlocked,
+	NotAffordable,
+};
+
 class Level
 {
 public:
@@ -28,6 +40,8 @@ public:
 	int GetResources() const { return myResources; }
 	void AddResources(int anAmount);
 	bool TrySpendResources(int anAmount);
+
+	PlaceTowerResult TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition);
 
 private:
 	void SpawnEnemy(const char* aPrefabName);

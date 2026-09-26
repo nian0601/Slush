@@ -7,8 +7,10 @@
 #include "TopDownGameGlobals.h"
 #include "WaveScaling.h"
 #include "Components/HealthComponent.h"
+#include "Components/BuildCostComponent.h"
 
 #include <EntitySystem\EntityPrefab.h>
+#include <EntitySystem\Components\SpriteComponent.h>
 
 Level::Level(LevelData& aLevelData)
 {
@@ -40,6 +42,38 @@ bool Level::TrySpendResources(int anAmount)
 
 	myResources -= anAmount;
 	return true;
+}
+
+PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition)
+{
+	const Slush::SpriteComponent::Data& spriteData = aTowerPrefab.GetComponentData<Slush::SpriteComponent>();
+	const Vector2f halfSize = spriteData.mySize * 0.5f;
+
+	FW_GrowingArray<Vector2f> footprint;
+	footprint.Add(aPosition - halfSize);
+	footprint.Add(Vector2f{ aPosition.x + halfSize.x, aPosition.y - halfSize.y });
+	footprint.Add(aPosition + halfSize);
+	footprint.Add(Vector2f{ aPosition.x - halfSize.x, aPosition.y + halfSize.y });
+
+	Navmesh& navmesh = GetNavmesh();
+	if (!navmesh.IsAreaFullyOnMesh(footprint))
+	{
+		SLUSH_WARNING("[Level] Tower placement rejected: footprint is not fully on open navmesh");
+		return PlaceTowerResult::FootprintBlocked;
+	}
+
+	const int cost = BuildCostComponent::GetCost(aTowerPrefab);
+	if (!TrySpendResources(cost))
+	{
+		SLUSH_WARNING("[Level] Tower placement rejected: not enough resources (need %d, have %d)", cost, myResources);
+		return PlaceTowerResult::NotAffordable;
+	}
+
+	SLUSH_INFO("[Resources] -%d for %s, now %d", cost, aTowerPrefab.GetAssetName().GetBuffer(), myResources);
+
+	myEntityManager.CreateEntity(aPosition, aTowerPrefab);
+	navmesh.CutHole(footprint);
+	return PlaceTowerResult::Placed;
 }
 
 Navmesh& Level::GetNavmesh()

@@ -21,6 +21,11 @@ Entity Prefab
 		version 1
 		maxhealth 50
 	}
+	killreward
+	{
+		version 1
+		reward 15
+	}
 	targetable
 	{
 		version 1

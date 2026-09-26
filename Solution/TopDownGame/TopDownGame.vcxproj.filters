@@ -20,6 +20,8 @@
 	<ClCompile Include="EntitySystem\EntityManager.cpp" />
 	<ClCompile Include="Components\MovementComponent.cpp" />
 	<ClCompile Include="Components\HealthComponent.cpp" />
+	<ClCompile Include="Components\BuildCostComponent.cpp" />
+	<ClCompile Include="Components\KillRewardComponent.cpp" />
 	<ClCompile Include="Components\TargetableComponent.cpp" />
 	<ClCompile Include="Components\TowerCombatComponent.cpp" />
 	<ClCompile Include="Components\ProjectileComponent.cpp" />
@@ -42,6 +44,8 @@
 	<ClInclude Include="TopDownGameGlobals.h" />
 	<ClInclude Include="Components\MovementComponent.h" />
 	<ClInclude Include="Components\HealthComponent.h" />
+	<ClInclude Include="Components\BuildCostComponent.h" />
+	<ClInclude Include="Components\KillRewardComponent.h" />
 	<ClInclude Include="Components\TargetableComponent.h" />
 	<ClInclude Include="Components\TowerCombatComponent.h" />
 	<ClInclude Include="Components\ProjectileComponent.h" />

@@ -6,6 +6,7 @@
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
 #include "Components/TowerCombatComponent.h"
+#include "Components/BuildCostComponent.h"
 
 #include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
@@ -197,6 +198,15 @@ void LevelEditorDockable::UpdatePlaceTowerMode()
 		return;
 	}
 
+	const int cost = BuildCostComponent::GetCost(*myTowerPrefabToPlace);
+	if (!myLevel.TrySpendResources(cost))
+	{
+		SLUSH_WARNING("[Level Editor] Tower placement rejected: not enough resources (need %d, have %d)", cost, myLevel.GetResources());
+		return;
+	}
+
+	SLUSH_INFO("[Resources] -%d for %s, now %d", cost, myTowerPrefabToPlace->GetAssetName().GetBuffer(), myLevel.GetResources());
+
 	myLevel.GetEntityManager().CreateEntity(position, *myTowerPrefabToPlace);
 	navmesh.CutHole(footprint);
 }
@@ -377,6 +387,7 @@ void LevelEditorDockable::OnBuildUI()
 	ImGui::Separator();
 
 	ImGui::Text("Towers");
+	ImGui::Text("Resources: %d", myLevel.GetResources());
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
 	const char* selectedPrefabName = myTowerPrefabToPlace ? myTowerPrefabToPlace->GetAssetName().GetBuffer() : "Select a tower";

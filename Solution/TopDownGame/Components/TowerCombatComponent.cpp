@@ -4,6 +4,7 @@
 
 #include <EntitySystem/Entity.h>
 #include <EntitySystem/EntityManager.h>
+#include <EntitySystem/Components/SpriteComponent.h>
 #include <imgui/ImGuiWidgets.h>
 
 #include "MovementComponent.h"
@@ -37,6 +38,11 @@ TowerCombatComponent::TowerCombatComponent(Slush::Entity& anEntity, const Slush:
 	myCooldown = data.myCooldown;
 
 	SLUSH_DEBUG("Tower '%s' created at (%.1f, %.1f)", myEntityPrefab.GetAssetName().GetBuffer(), myEntity.myPosition.x, myEntity.myPosition.y);
+}
+
+bool TowerCombatComponent::IsBuildableTowerPrefab(const Slush::EntityPrefab& aPrefab)
+{
+	return aPrefab.Has<TowerCombatComponent>() && aPrefab.Has<Slush::SpriteComponent>();
 }
 
 void TowerCombatComponent::Update()

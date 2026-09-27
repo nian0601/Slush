@@ -46,7 +46,6 @@ public:
 
 private:
 	void SpawnEnemy(const char* aPrefabName);
-	void SpawnTower(const char* aPrefabName);
 
 	void UpdateWaveSpawning();
 	void SpawnWaveEnemy();

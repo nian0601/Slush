@@ -6,6 +6,7 @@
 #include "Core/Engine.h"
 #include "Graphics/Window.h"
 #include "Core/Input.h"
+#include "Graphics/Font.h"
 
 #include "EntitySystem/EntityManager.h"
 #include "EntitySystem/EntityPrefab.h"
@@ -32,6 +33,8 @@ public:
 		assets.RegisterAssetType<LevelData>();
 		assets.RegisterAssetType<Slush::EntityPrefab>();
 		assets.LoadAllAssets();
+		myFont.Load("Data/NotoSans.ttf");
+		TopDownGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddLayout(new GameLayout(), true);
@@ -52,6 +55,9 @@ public:
 			engine.GetWindow().Close();
 
 	}
+
+private:
+	Slush::Font myFont;
 };
 
 #include <FW_UnitTestSuite.h>

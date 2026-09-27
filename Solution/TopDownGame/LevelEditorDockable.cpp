@@ -368,7 +368,7 @@ void LevelEditorDockable::OnBuildUI()
 		for (Slush::Asset* asset : prefabs)
 		{
 			Slush::EntityPrefab* prefab = static_cast<Slush::EntityPrefab*>(asset);
-			if (!prefab->Has<TowerCombatComponent>() || !prefab->Has<Slush::SpriteComponent>())
+			if (!TowerCombatComponent::IsBuildableTowerPrefab(*prefab))
 				continue;
 
 			const bool isSelected = prefab == myTowerPrefabToPlace;

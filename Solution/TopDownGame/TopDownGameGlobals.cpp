@@ -26,3 +26,9 @@ Level& TopDownGameGlobals::GetLevel()
 	FW_ASSERT(myLevel != nullptr, "Need to set a Level");
 	return *myLevel;
 }
+
+Slush::Font& TopDownGameGlobals::GetFont()
+{
+	FW_ASSERT(myFont != nullptr, "Need to set a Font");
+	return *myFont;
+}

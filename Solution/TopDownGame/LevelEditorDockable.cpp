@@ -6,7 +6,6 @@
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
 #include "Components/TowerCombatComponent.h"
-#include "Components/BuildCostComponent.h"
 
 #include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
@@ -181,34 +180,7 @@ void LevelEditorDockable::UpdatePlaceTowerMode()
 	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB) || myTowerPrefabToPlace == nullptr)
 		return;
 
-	const Vector2f& position = engine.GetInput().GetMousePositionf();
-	const Slush::SpriteComponent::Data& spriteData = myTowerPrefabToPlace->GetComponentData<Slush::SpriteComponent>();
-	const Vector2f halfSize = spriteData.mySize * 0.5f;
-
-	FW_GrowingArray<Vector2f> footprint;
-	footprint.Add(position - halfSize);
-	footprint.Add(Vector2f{ position.x + halfSize.x, position.y - halfSize.y });
-	footprint.Add(position + halfSize);
-	footprint.Add(Vector2f{ position.x - halfSize.x, position.y + halfSize.y });
-
-	Navmesh& navmesh = myLevel.GetNavmesh();
-	if (!navmesh.IsAreaFullyOnMesh(footprint))
-	{
-		SLUSH_WARNING("[Level Editor] Tower placement rejected: footprint is not fully on open navmesh");
-		return;
-	}
-
-	const int cost = BuildCostComponent::GetCost(*myTowerPrefabToPlace);
-	if (!myLevel.TrySpendResources(cost))
-	{
-		SLUSH_WARNING("[Level Editor] Tower placement rejected: not enough resources (need %d, have %d)", cost, myLevel.GetResources());
-		return;
-	}
-
-	SLUSH_INFO("[Resources] -%d for %s, now %d", cost, myTowerPrefabToPlace->GetAssetName().GetBuffer(), myLevel.GetResources());
-
-	myLevel.GetEntityManager().CreateEntity(position, *myTowerPrefabToPlace);
-	navmesh.CutHole(footprint);
+	myLevel.TryPlaceTower(*myTowerPrefabToPlace, engine.GetInput().GetMousePositionf());
 }
 
 void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions)

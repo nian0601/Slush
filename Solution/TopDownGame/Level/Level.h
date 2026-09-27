@@ -20,7 +20,8 @@ enum class PlaceTowerResult
 class Level
 {
 public:
-	Level(LevelData& aLevelData);
+	Level(LevelData& aLevelData, bool aShouldCopyNavmesh);
+	~Level();
 
 	Navmesh& GetNavmesh();
 	NavmeshData& GetNavmeshDataAsset();
@@ -51,6 +52,7 @@ private:
 	void SpawnWaveEnemy();
 
 	LevelData* myLevelData = nullptr;
+	Navmesh* myNavmeshCopy = nullptr;
 	Slush::EntityManager myEntityManager;
 	int myResources = 0;
 

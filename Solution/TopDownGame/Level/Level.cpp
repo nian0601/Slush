@@ -12,10 +12,15 @@
 #include <EntitySystem\EntityPrefab.h>
 #include <EntitySystem\Components\SpriteComponent.h>
 
-Level::Level(LevelData& aLevelData)
+Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
 {
 	myLevelData = &aLevelData;
 	FW_ASSERT(myLevelData->myNavmeshData.Get() != nullptr, "Level's LevelData has an unresolved NavmeshData reference");
+	if (aShouldCopyNavmesh)
+	{
+		myNavmeshCopy = new Navmesh();
+		myNavmeshCopy->CopyFrom(myLevelData->myNavmeshData.Get()->myNavmesh);
+	}
 	myResources = myLevelData->myStartingResources;
 	SLUSH_INFO("[Resources] Starting balance: %d", myResources);
 
@@ -25,6 +30,11 @@ Level::Level(LevelData& aLevelData)
 			myLevelData->myBaseEnemyCount, myLevelData->myEnemyCountPerWaveIncrement, myLevelData->myMaxEnemyCountPerWave);
 	}
 
+}
+
+Level::~Level()
+{
+	delete myNavmeshCopy;
 }
 
 void Level::AddResources(int anAmount)
@@ -78,7 +88,7 @@ PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, c
 
 Navmesh& Level::GetNavmesh()
 {
-	return myLevelData->myNavmeshData.Get()->myNavmesh;
+	return myNavmeshCopy ? *myNavmeshCopy : myLevelData->myNavmeshData.Get()->myNavmesh;
 }
 
 NavmeshData& Level::GetNavmeshDataAsset()

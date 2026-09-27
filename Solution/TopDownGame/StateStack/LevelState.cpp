@@ -7,7 +7,7 @@
 
 LevelState::LevelState(LevelData& aLevelData)
 {
-	myLevel = new Level(aLevelData);
+	myLevel = new Level(aLevelData, true);
 }
 
 LevelState::~LevelState()

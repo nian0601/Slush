@@ -23,7 +23,10 @@ public:
 
 public:
 	Navmesh();
+	Navmesh(const Navmesh&) = delete;
+	Navmesh& operator=(const Navmesh&) = delete;
 	~Navmesh();
+	void CopyFrom(const Navmesh& aOther);
 
 	void GenerateDefaultGrid();
 

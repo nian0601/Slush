@@ -369,9 +369,49 @@ namespace NavmeshTestSuite
 			FW_ASSERT(Length2(loadedWaypoints[i] - originalWaypoints[i]) <= PositionEpsilon * PositionEpsilon, "Expected matching waypoints after a save/load round-trip");
 	}
 
+	void TestNavmeshCopyIsIndependent()
+	{
+		Navmesh original;
+		original.GenerateDefaultGrid();
+
+		FW_GrowingArray<Vector2f> firstHole;
+		firstHole.Add(Vector2f{ 700.f, 300.f });
+		firstHole.Add(Vector2f{ 800.f, 300.f });
+		firstHole.Add(Vector2f{ 800.f, 400.f });
+		firstHole.Add(Vector2f{ 700.f, 400.f });
+		original.CutHole(firstHole);
+
+		Navmesh copy;
+		copy.CopyFrom(original);
+		FW_ASSERT(copy.GetVertexCount() == original.GetVertexCount(), "Expected copied navmesh vertex count to match");
+		FW_ASSERT(copy.GetTriangleCount() == original.GetTriangleCount(), "Expected copied navmesh triangle count to match");
+
+		FW_GrowingArray<Vector2f> originalWaypoints;
+		FW_GrowingArray<Vector2f> copyWaypoints;
+		const Vector2f start{ 50.f, 50.f };
+		const Vector2f goal{ 1900.f, 850.f };
+		FW_ASSERT(original.FindPath(start, goal, originalWaypoints) == copy.FindPath(start, goal, copyWaypoints),
+			"Expected copied navmesh path query to agree with the original");
+		FW_ASSERT(copyWaypoints.Count() == originalWaypoints.Count(), "Expected matching paths on copied navmesh");
+		for (int i = 0; i < originalWaypoints.Count(); ++i)
+			FW_ASSERT(copyWaypoints[i] == originalWaypoints[i], "Expected exact waypoint positions on copied navmesh");
+
+		const int originalVertexCount = original.GetVertexCount();
+		const int originalTriangleCount = original.GetTriangleCount();
+		FW_GrowingArray<Vector2f> secondHole;
+		secondHole.Add(Vector2f{ 900.f, 300.f });
+		secondHole.Add(Vector2f{ 1000.f, 300.f });
+		secondHole.Add(Vector2f{ 1000.f, 400.f });
+		secondHole.Add(Vector2f{ 900.f, 400.f });
+		copy.CutHole(secondHole);
+		FW_ASSERT(original.GetVertexCount() == originalVertexCount, "Expected copied navmesh cut to leave original vertices unchanged");
+		FW_ASSERT(original.GetTriangleCount() == originalTriangleCount, "Expected copied navmesh cut to leave original triangles unchanged");
+	}
+
 	void RunTests()
 	{
 		TestNavmeshSaveLoadRoundTrip();
+		TestNavmeshCopyIsIndependent();
 		TestCutAcrossOneQuadProducesExpectedCounts();
 		TestCutterCornerInsideTriangleInteriorProducesVertexThere();
 		TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating();

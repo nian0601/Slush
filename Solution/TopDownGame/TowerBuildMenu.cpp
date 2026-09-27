@@ -61,9 +61,15 @@ void TowerBuildMenu::Update()
 		label += " (";
 		label += BuildCostComponent::GetCost(*prefab);
 		label += ")";
-		const int buttonColor = prefab == mySelectedTowerPrefab ? 0xFF4379A6 : 0xFF334453;
+		const bool isSelected = prefab == mySelectedTowerPrefab;
+		const bool isAffordable = BuildCostComponent::GetCost(*prefab) <= myLevel.GetResources();
+		const int buttonColor = !isAffordable ? 0xFF242D36 : (isSelected ? 0xFF4379A6 : 0xFF334453);
+		buttonStyle.SetOutlineColor(isSelected ? 0xFF81C9FF : 0x00000000);
+		buttonStyle.SetOutlineThickness(isSelected ? 2.f : 0.f);
 		uiBuilder.Button(label.GetBuffer(), font, 20, buttonStyle, buttonColor, 0xFFFFFFFF);
 	}
+	if (myFeedbackTimer.IsStarted() && !myFeedbackTimer.HasExpired())
+		uiBuilder.Text(myFeedbackText.GetBuffer(), font, 18, 0xFFFFD17A);
 
 	uiBuilder.CloseElement();
 	uiBuilder.CloseElement();
@@ -91,7 +97,21 @@ void TowerBuildMenu::Update()
 	if (mySelectedTowerPrefab && engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB)
 		&& mousePosition.y < barTop)
 	{
-		myLevel.TryPlaceTower(*mySelectedTowerPrefab, mousePosition);
+		const PlaceTowerResult result = myLevel.TryPlaceTower(*mySelectedTowerPrefab, mousePosition);
+		if (result == PlaceTowerResult::NotAffordable)
+		{
+			myFeedbackText = "Not enough resources (need ";
+			myFeedbackText += BuildCostComponent::GetCost(*mySelectedTowerPrefab);
+			myFeedbackText += ", have ";
+			myFeedbackText += myLevel.GetResources();
+			myFeedbackText += ")";
+			myFeedbackTimer.Start(2.f);
+		}
+		else if (result == PlaceTowerResult::FootprintBlocked)
+		{
+			myFeedbackText = "Can't build there";
+			myFeedbackTimer.Start(2.f);
+		}
 	}
 }
 

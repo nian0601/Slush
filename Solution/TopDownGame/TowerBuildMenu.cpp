@@ -48,8 +48,7 @@ void TowerBuildMenu::Update()
 	buttonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 230)
 		.SetYSizing(Slush::UIElementStyle::FIXED, 64)
 		.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM)
-		.SetAlingment(Slush::UIElementStyle::CENTER)
-		.EnableButtonInteraction(0xFF60758A);
+		.SetAlingment(Slush::UIElementStyle::CENTER);
 
 	for (Slush::Asset* asset : prefabs)
 	{
@@ -64,6 +63,7 @@ void TowerBuildMenu::Update()
 		const bool isSelected = prefab == mySelectedTowerPrefab;
 		const bool isAffordable = BuildCostComponent::GetCost(*prefab) <= myLevel.GetResources();
 		const int buttonColor = !isAffordable ? 0xFF242D36 : (isSelected ? 0xFF4379A6 : 0xFF334453);
+		buttonStyle.EnableButtonInteraction(isAffordable ? 0xFF60758A : 0xFF34414C);
 		buttonStyle.SetOutlineColor(isSelected ? 0xFF81C9FF : 0x00000000);
 		buttonStyle.SetOutlineThickness(isSelected ? 2.f : 0.f);
 		uiBuilder.Button(label.GetBuffer(), font, 20, buttonStyle, buttonColor, 0xFFFFFFFF);

@@ -1,8 +1,9 @@
 LevelData 
 { 
-	version 3 
+	version 4 
 	navmeshData navmesh_main 
 	startingResources 100 
+	startingLives 20 
 	totalWaveCount 6 
 	baseEnemyCount 2 
 	enemyCountPerWaveIncrement 1 

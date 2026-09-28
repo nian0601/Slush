@@ -42,6 +42,9 @@ public:
 	void AddResources(int anAmount);
 	bool TrySpendResources(int anAmount);
 
+	int GetLives() const { return myLives; }
+	void OnEnemyReachedGoal(const Slush::EntityPrefab& anEnemyPrefab);
+
 	PlaceTowerResult TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition);
 
 private:
@@ -54,6 +57,7 @@ private:
 	Navmesh* myNavmeshCopy = nullptr;
 	Slush::EntityManager myEntityManager;
 	int myResources = 0;
+	int myLives = 0;
 
 	int myCurrentWaveIndex = 0;
 	int myEnemiesRemainingToSpawnThisWave = 0;

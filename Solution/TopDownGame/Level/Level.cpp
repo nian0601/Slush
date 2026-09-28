@@ -23,6 +23,8 @@ Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
 	}
 	myResources = myLevelData->myStartingResources;
 	SLUSH_INFO("[Resources] Starting balance: %d", myResources);
+	myLives = myLevelData->myStartingLives;
+	SLUSH_INFO("[Lives] Starting lives: %d", myLives);
 
 	if (myCurrentWaveIndex < myLevelData->myTotalWaveCount)
 	{
@@ -52,6 +54,16 @@ bool Level::TrySpendResources(int anAmount)
 
 	myResources -= anAmount;
 	return true;
+}
+
+void Level::OnEnemyReachedGoal(const Slush::EntityPrefab& anEnemyPrefab)
+{
+	// Extra leaks arriving once lives are already gone (e.g. several on the same frame) are dropped silently.
+	if (myLives <= 0)
+		return;
+
+	--myLives;
+	SLUSH_INFO("[Lives] -1 from %s, now %d", anEnemyPrefab.GetAssetName().GetBuffer(), myLives);
 }
 
 PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition)

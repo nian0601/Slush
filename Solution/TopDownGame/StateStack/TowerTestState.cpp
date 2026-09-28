@@ -35,7 +35,7 @@ namespace
 
 TowerTestState::TowerTestState(LevelData& aLevelData)
 {
-	myLevel = new Level(aLevelData);
+	myLevel = new Level(aLevelData, true);
 
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 	myBasicTowerPrefab = assetRegistry.GetAsset<Slush::EntityPrefab>("Tower_Basic");

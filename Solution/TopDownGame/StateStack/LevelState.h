@@ -1,9 +1,11 @@
 #pragma once
 
 #include "StateStack/IGameState.h"
+#include <UI/UIBuilder.h>
 
 class Level;
 class LevelData;
+class TowerBuildMenu;
 
 class LevelState : public Slush::IGameState
 {
@@ -16,4 +18,6 @@ public:
 
 private:
 	Level* myLevel = nullptr;
+	TowerBuildMenu* myTowerBuildMenu = nullptr;
+	Slush::UIRenderer myUIRenderer;
 };

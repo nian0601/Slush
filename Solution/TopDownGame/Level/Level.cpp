@@ -12,10 +12,15 @@
 #include <EntitySystem\EntityPrefab.h>
 #include <EntitySystem\Components\SpriteComponent.h>
 
-Level::Level(LevelData& aLevelData)
+Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
 {
 	myLevelData = &aLevelData;
 	FW_ASSERT(myLevelData->myNavmeshData.Get() != nullptr, "Level's LevelData has an unresolved NavmeshData reference");
+	if (aShouldCopyNavmesh)
+	{
+		myNavmeshCopy = new Navmesh();
+		myNavmeshCopy->CopyFrom(myLevelData->myNavmeshData.Get()->myNavmesh);
+	}
 	myResources = myLevelData->myStartingResources;
 	SLUSH_INFO("[Resources] Starting balance: %d", myResources);
 
@@ -25,6 +30,11 @@ Level::Level(LevelData& aLevelData)
 			myLevelData->myBaseEnemyCount, myLevelData->myEnemyCountPerWaveIncrement, myLevelData->myMaxEnemyCountPerWave);
 	}
 
+}
+
+Level::~Level()
+{
+	delete myNavmeshCopy;
 }
 
 void Level::AddResources(int anAmount)
@@ -78,7 +88,7 @@ PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, c
 
 Navmesh& Level::GetNavmesh()
 {
-	return myLevelData->myNavmeshData.Get()->myNavmesh;
+	return myNavmeshCopy ? *myNavmeshCopy : myLevelData->myNavmeshData.Get()->myNavmesh;
 }
 
 NavmeshData& Level::GetNavmeshDataAsset()
@@ -91,18 +101,6 @@ void Level::Update()
 	TopDownGameGlobals::GetInstance().SetLevel(this);
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (engine.GetInput().WasKeyReleased(Slush::Input::_1))
-	{
-		SpawnTower("Tower_Basic");
-	}
-	if (engine.GetInput().WasKeyReleased(Slush::Input::_2))
-	{
-		SpawnTower("Tower_ZeroDamage");
-	}
-	if (engine.GetInput().WasKeyReleased(Slush::Input::_3))
-	{
-		SpawnTower("Tower_Splash");
-	}
 	if (engine.GetInput().WasKeyReleased(Slush::Input::_7))
 	{
 		SpawnEnemyNormal();
@@ -148,11 +146,6 @@ void Level::SpawnEnemySlow()
 void Level::SpawnEnemy(const char* aPrefabName)
 {
 	myEntityManager.CreateEntity(myLevelData->myStartPosition, aPrefabName);
-}
-
-void Level::SpawnTower(const char* aPrefabName)
-{
-	myEntityManager.CreateEntity(myLevelData->myStartPosition + Vector2f(200.f, 0.f), aPrefabName);
 }
 
 void Level::UpdateWaveSpawning()

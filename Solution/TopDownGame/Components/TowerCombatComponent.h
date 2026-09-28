@@ -22,6 +22,7 @@ public:
 	};
 
 	TowerCombatComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab);
+	static bool IsBuildableTowerPrefab(const Slush::EntityPrefab& aPrefab);
 
 	void Update() override;
 

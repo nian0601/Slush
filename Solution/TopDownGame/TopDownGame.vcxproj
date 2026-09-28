@@ -143,6 +143,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Navmesh.cpp" />
+	<ClCompile Include="TowerBuildMenu.cpp" />
     <ClCompile Include="NavmeshTestSuite.cpp" />
     <ClCompile Include="WaveScalingTestSuite.cpp" />
     <ClCompile Include="NavmeshDebuggerDockable.cpp" />
@@ -172,6 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Navmesh.h" />
+	<ClInclude Include="TowerBuildMenu.h" />
     <ClInclude Include="NavmeshTestSuite.h" />
     <ClInclude Include="WaveScalingTestSuite.h" />
     <ClInclude Include="NavmeshDebuggerDockable.h" />

@@ -15,6 +15,31 @@ Navmesh::~Navmesh()
 	Clear();
 }
 
+void Navmesh::CopyFrom(const Navmesh& aOther)
+{
+	if (this == &aOther)
+		return;
+
+	Clear();
+	mySectorGrid = aOther.mySectorGrid;
+	mySectorGridSize = aOther.mySectorGridSize;
+
+	for (Vertex* vertex : aOther.myVertices)
+		CreateVertex(vertex->myPos);
+
+	for (Triangle* triangle : aOther.myTriangles)
+	{
+		Vertex* v0 = myVertices[aOther.myVertices.Find(triangle->myVertices[0])];
+		Vertex* v1 = myVertices[aOther.myVertices.Find(triangle->myVertices[1])];
+		Vertex* v2 = myVertices[aOther.myVertices.Find(triangle->myVertices[2])];
+
+		Edge* e0 = FindOrCreateEdge(v0, v1);
+		Edge* e1 = FindOrCreateEdge(v1, v2);
+		Edge* e2 = FindOrCreateEdge(v2, v0);
+		CreateTriangle(e0, e1, e2);
+	}
+}
+
 void Navmesh::GenerateDefaultGrid()
 {
 	Clear();

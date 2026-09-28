@@ -17,6 +17,13 @@ enum class PlaceTowerResult
 	NotAffordable,
 };
 
+enum class LevelResult
+{
+	InProgress,
+	Won,
+	Lost,
+};
+
 class Level
 {
 public:
@@ -45,6 +52,8 @@ public:
 	int GetLives() const { return myLives; }
 	void OnEnemyReachedGoal(const Slush::EntityPrefab& anEnemyPrefab);
 
+	LevelResult GetResult() const { return myResult; }
+
 	PlaceTowerResult TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition);
 
 private:
@@ -52,12 +61,14 @@ private:
 
 	void UpdateWaveSpawning();
 	void SpawnWaveEnemy();
+	void UpdateResult();
 
 	LevelData* myLevelData = nullptr;
 	Navmesh* myNavmeshCopy = nullptr;
 	Slush::EntityManager myEntityManager;
 	int myResources = 0;
 	int myLives = 0;
+	LevelResult myResult = LevelResult::InProgress;
 
 	int myCurrentWaveIndex = 0;
 	int myEnemiesRemainingToSpawnThisWave = 0;

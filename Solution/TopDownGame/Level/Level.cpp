@@ -132,6 +132,7 @@ void Level::Update()
 	UpdateWaveSpawning();
 	myEntityManager.Update();
 	myEntityManager.EndFrame();
+	UpdateResult();
 }
 
 void Level::Render()
@@ -232,6 +233,40 @@ void Level::SpawnWaveEnemy()
 
 	Slush::Entity* enemy = myEntityManager.CreateEntity(myLevelData->myStartPosition, *prefab);
 	myActiveWaveEnemyHandles.Add(enemy->myHandle);
+}
+
+void Level::UpdateResult()
+{
+	// Latched - once resolved, a late leak can't flip a win into a loss.
+	if (myResult != LevelResult::InProgress)
+		return;
+
+	// Loss is checked first so it wins if both trigger on the same frame.
+	if (myLives <= 0)
+	{
+		myResult = LevelResult::Lost;
+	}
+	else
+	{
+		// Only tracked wave enemies block a win - debug-spawned enemies don't.
+		const bool allWavesSpawned = myCurrentWaveIndex >= myLevelData->myTotalWaveCount && myEnemiesRemainingToSpawnThisWave == 0;
+		bool anyWaveEnemyAlive = false;
+		for (const Slush::EntityHandle& handle : myActiveWaveEnemyHandles)
+		{
+			Slush::Entity* entity = handle.Get();
+			if (entity && !entity->myIsMarkedForRemoval)
+			{
+				anyWaveEnemyAlive = true;
+				break;
+			}
+		}
+
+		if (allWavesSpawned && !anyWaveEnemyAlive)
+			myResult = LevelResult::Won;
+	}
+
+	if (myResult != LevelResult::InProgress)
+		SLUSH_INFO("[Level] Result: %s (lives %d)", myResult == LevelResult::Won ? "Won" : "Lost", myLives);
 }
 
 void Level::DamageAllEnemies()

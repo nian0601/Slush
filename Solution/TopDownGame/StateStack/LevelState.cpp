@@ -22,8 +22,12 @@ LevelState::~LevelState()
 
 Slush::IGameState::GameStateResult LevelState::Update()
 {
-	myLevel->Update();
-	myTowerBuildMenu->Update();
+	// Freeze on a resolved result while Render keeps drawing the level; #94/#95 push their end screens here.
+	if (myLevel->GetResult() == LevelResult::InProgress)
+	{
+		myLevel->Update();
+		myTowerBuildMenu->Update();
+	}
 	return Slush::IGameState::KEEP;
 }
 

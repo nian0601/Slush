@@ -58,8 +58,11 @@ void MovementComponent::Update()
 		}
 	}
 
-	if (myNextWaypointIndex == myWaypoints.Count())
+	// The removal guard skips enemies OnEnterWorld already discarded for having no path (empty
+	// waypoint list, so 0 == 0 here), and stops a reached-goal enemy from counting twice.
+	if (myNextWaypointIndex == myWaypoints.Count() && !myEntity.myIsMarkedForRemoval)
 	{
+		TopDownGameGlobals::GetInstance().GetLevel().OnEnemyReachedGoal(myEntityPrefab);
 		myEntity.myIsMarkedForRemoval = true;
 	}
 }

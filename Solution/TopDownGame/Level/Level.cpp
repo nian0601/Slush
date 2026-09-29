@@ -28,7 +28,8 @@ Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
 
 	if (myLevelData->myPreFirstWaveGraceDuration > 0.f)
 	{
-		myNextWaveTimer.Start(myLevelData->myPreFirstWaveGraceDuration);
+		// Startup loading happens before the first Time::Update(), so cached frame time is stale.
+		myNextWaveTimer.Start(myLevelData->myPreFirstWaveGraceDuration, true);
 		myIsInGracePeriod = true;
 		SLUSH_INFO("[Waves] Grace start: %.3f seconds (next %d, countdown %d)", GetSecondsUntilNextWave(), HasNextWave(), IsCountdownActive());
 	}

@@ -1,6 +1,6 @@
 LevelData 
 { 
-	version 4 
+	version 5 
 	navmeshData navmesh_main 
 	startingResources 125 
 	startingLives 20 
@@ -11,6 +11,7 @@ LevelData
 	difficultyRampWaveCount 0 
 	enemySpawnInterval 0.300 
 	interWaveRestDuration 3.000 
+	preFirstWaveGraceDuration 0.000 
 	startPosition 
 	{ 
 		x 136.140 

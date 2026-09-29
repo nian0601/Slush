@@ -76,6 +76,15 @@ namespace Slush
 		return myExpireTime != 0;
 	}
 
+	float Timer::GetTimeRemaining() const
+	{
+		const Time::TimeUnit currentTime = Time::GetTime();
+		if (!IsStarted() || myExpireTime <= currentTime)
+			return 0.f;
+
+		return Time::ConvertTimeUnitToGameTime(myExpireTime - currentTime);
+	}
+
 	bool Timer::HasExpired() const
 	{
 		if (myExpireTime == 0)

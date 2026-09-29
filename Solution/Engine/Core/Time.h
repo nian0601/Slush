@@ -32,6 +32,7 @@ namespace Slush
 
 		bool IsStarted() const;
 		bool HasExpired() const;
+		float GetTimeRemaining() const;
 
 	private:
 		Time::TimeUnit myExpireTime = 0;

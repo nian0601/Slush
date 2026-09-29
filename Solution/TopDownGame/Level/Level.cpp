@@ -26,7 +26,13 @@ Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
 	myLives = myLevelData->myStartingLives;
 	SLUSH_INFO("[Lives] Starting lives: %d", myLives);
 
-	if (myCurrentWaveIndex < myLevelData->myTotalWaveCount)
+	if (myLevelData->myPreFirstWaveGraceDuration > 0.f)
+	{
+		myNextWaveTimer.Start(myLevelData->myPreFirstWaveGraceDuration);
+		myIsInGracePeriod = true;
+		SLUSH_INFO("[Waves] Grace start: %.3f seconds (next %d, countdown %d)", GetSecondsUntilNextWave(), HasNextWave(), IsCountdownActive());
+	}
+	else if (myCurrentWaveIndex < myLevelData->myTotalWaveCount)
 	{
 		myEnemiesRemainingToSpawnThisWave = WaveScaling::GetEnemyCountForWave(myCurrentWaveIndex,
 			myLevelData->myBaseEnemyCount, myLevelData->myEnemyCountPerWaveIncrement, myLevelData->myMaxEnemyCountPerWave);
@@ -37,6 +43,21 @@ Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
 Level::~Level()
 {
 	delete myNavmeshCopy;
+}
+
+bool Level::HasNextWave() const
+{
+	return IsInGracePeriod() || myCurrentWaveIndex + 1 < myLevelData->myTotalWaveCount;
+}
+
+bool Level::IsCountdownActive() const
+{
+	return HasNextWave() && myNextWaveTimer.IsStarted() && !myNextWaveTimer.HasExpired();
+}
+
+float Level::GetSecondsUntilNextWave() const
+{
+	return IsCountdownActive() ? myNextWaveTimer.GetTimeRemaining() : 0.f;
 }
 
 void Level::AddResources(int anAmount)
@@ -163,6 +184,21 @@ void Level::SpawnEnemy(const char* aPrefabName)
 
 void Level::UpdateWaveSpawning()
 {
+	if (myIsInGracePeriod)
+	{
+		if (!myNextWaveTimer.HasExpired())
+			return;
+
+		myNextWaveTimer = Slush::Timer();
+		myIsInGracePeriod = false;
+		if (myCurrentWaveIndex < myLevelData->myTotalWaveCount)
+		{
+			myEnemiesRemainingToSpawnThisWave = WaveScaling::GetEnemyCountForWave(myCurrentWaveIndex,
+				myLevelData->myBaseEnemyCount, myLevelData->myEnemyCountPerWaveIncrement, myLevelData->myMaxEnemyCountPerWave);
+		}
+		SLUSH_INFO("[Waves] Grace end: wave 0 ready to spawn");
+	}
+
 	// Prune enemies that have died or reached the goal since last frame - both existing removal
 	// paths (HealthComponent::DealDamage on kill, MovementComponent::Update on reaching the goal)
 	// already mark the entity for removal, so there's no new removal logic needed here.
@@ -179,6 +215,10 @@ void Level::UpdateWaveSpawning()
 	{
 		if (mySpawnStaggerTimer.IsStarted() && !mySpawnStaggerTimer.HasExpired())
 			return;
+
+		if (myEnemiesRemainingToSpawnThisWave == WaveScaling::GetEnemyCountForWave(myCurrentWaveIndex,
+			myLevelData->myBaseEnemyCount, myLevelData->myEnemyCountPerWaveIncrement, myLevelData->myMaxEnemyCountPerWave))
+			SLUSH_INFO("[Waves] Wave %d %s (next %d, countdown %d, remaining %.3f)", myCurrentWaveIndex, HasNextWave() ? "fighting" : "last wave", HasNextWave(), IsCountdownActive(), GetSecondsUntilNextWave());
 
 		SpawnWaveEnemy();
 		--myEnemiesRemainingToSpawnThisWave;
@@ -201,6 +241,7 @@ void Level::UpdateWaveSpawning()
 		if (!myNextWaveTimer.IsStarted())
 		{
 			myNextWaveTimer.Start(myLevelData->myInterWaveRestDuration);
+			SLUSH_INFO("[Waves] Rest countdown start: %.3f seconds before wave %d (next %d, countdown %d)", GetSecondsUntilNextWave(), myCurrentWaveIndex + 1, HasNextWave(), IsCountdownActive());
 			return;
 		}
 

@@ -43,6 +43,11 @@ public:
 	void SpawnEnemySlow();
 	void DamageAllEnemies();
 
+	bool IsInGracePeriod() const { return myIsInGracePeriod; }
+	bool HasNextWave() const;
+	bool IsCountdownActive() const;
+	float GetSecondsUntilNextWave() const;
+
 	int GetCurrentWaveIndex() const { return myCurrentWaveIndex; }
 	int GetTotalWaveCount() const { return myLevelData->myTotalWaveCount; }
 	int GetResources() const { return myResources; }
@@ -72,6 +77,7 @@ private:
 
 	int myCurrentWaveIndex = 0;
 	int myEnemiesRemainingToSpawnThisWave = 0;
+	bool myIsInGracePeriod = false;
 	Slush::Timer myNextWaveTimer;
 	Slush::Timer mySpawnStaggerTimer;
 	FW_GrowingArray<Slush::EntityHandle> myActiveWaveEnemyHandles;

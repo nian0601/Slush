@@ -28,12 +28,15 @@ namespace Slush
 	class Timer
 	{
 	public:
-		void Start(float aDuration);
+		// Exact time is for timers started outside a frame, such as during level loading.
+		void Start(float aDuration, bool aUseExactTime = false);
 
 		bool IsStarted() const;
 		bool HasExpired() const;
+		float GetTimeRemaining() const;
 
 	private:
 		Time::TimeUnit myExpireTime = 0;
+		bool myUseExactTime = false;
 	};
 }

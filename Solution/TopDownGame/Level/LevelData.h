@@ -19,7 +19,7 @@ struct EnemyUnlockEntry
 class LevelData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("LevelData", "tdlevel", "data/levels/", ICON_FA_MAP, 4);
+	DEFINE_ASSET("LevelData", "tdlevel", "data/levels/", ICON_FA_MAP, 5);
 
 	LevelData(const char* aName, unsigned int aAssetID);
 
@@ -42,6 +42,7 @@ public:
 	int myDifficultyRampWaveCount = 10;
 	float myEnemySpawnInterval = 0.5f;
 	float myInterWaveRestDuration = 5.f;
+	float myPreFirstWaveGraceDuration = 10.f;
 
 private:
 	void OnLoad(Slush::AssetParser::Handle aRootHandle);

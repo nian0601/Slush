@@ -66,9 +66,11 @@ namespace Slush
 
 	//////////////////////////////////////////////////////////////////////////
 
-	void Timer::Start(float aDuration)
+	void Timer::Start(float aDuration, bool aUseExactTime)
 	{
-		myExpireTime = Time::GetTime() + Time::ConvertGameTimeToTimeUnit(aDuration);
+		myUseExactTime = aUseExactTime;
+		const Time::TimeUnit currentTime = myUseExactTime ? Time::GetCurrentExactTime() : Time::GetTime();
+		myExpireTime = currentTime + Time::ConvertGameTimeToTimeUnit(aDuration);
 	}
 
 	bool Timer::IsStarted() const
@@ -76,12 +78,22 @@ namespace Slush
 		return myExpireTime != 0;
 	}
 
+	float Timer::GetTimeRemaining() const
+	{
+		const Time::TimeUnit currentTime = myUseExactTime ? Time::GetCurrentExactTime() : Time::GetTime();
+		if (!IsStarted() || myExpireTime <= currentTime)
+			return 0.f;
+
+		return Time::ConvertTimeUnitToGameTime(myExpireTime - currentTime);
+	}
+
 	bool Timer::HasExpired() const
 	{
 		if (myExpireTime == 0)
 			return false;
 
-		return myExpireTime < Time::GetTime();
+		const Time::TimeUnit currentTime = myUseExactTime ? Time::GetCurrentExactTime() : Time::GetTime();
+		return myExpireTime < currentTime;
 	}
 
 }

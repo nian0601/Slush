@@ -57,6 +57,7 @@ void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
 	aRootHandle.ParseIntField("difficultyRampWaveCount", myDifficultyRampWaveCount);
 	aRootHandle.ParseFloatField("enemySpawnInterval", myEnemySpawnInterval);
 	aRootHandle.ParseFloatField("interWaveRestDuration", myInterWaveRestDuration);
+	aRootHandle.ParseFloatField("preFirstWaveGraceDuration", myPreFirstWaveGraceDuration);
 
 	Slush::AssetParser::Handle enemyUnlocksHandle = aRootHandle.ParseChildElement("enemyUnlocks");
 	if (enemyUnlocksHandle.IsValid())
@@ -90,6 +91,7 @@ void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 	aRootHandle.ParseIntField("difficultyRampWaveCount", myDifficultyRampWaveCount);
 	aRootHandle.ParseFloatField("enemySpawnInterval", myEnemySpawnInterval);
 	aRootHandle.ParseFloatField("interWaveRestDuration", myInterWaveRestDuration);
+	aRootHandle.ParseFloatField("preFirstWaveGraceDuration", myPreFirstWaveGraceDuration);
 
 	Slush::AssetParser::Handle enemyUnlocksHandle = aRootHandle.ParseChildElement("enemyUnlocks");
 	if (enemyUnlocksHandle.IsValid())

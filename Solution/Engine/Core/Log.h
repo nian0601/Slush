@@ -69,7 +69,7 @@ namespace Slush
 			FW_String myMessage;
 		};
 
-		Logger();
+		Logger(const char* aLogFileName);
 		~Logger();
 
 		void AddMessage(Severity aSeverity, const char *aFormattedString, ...);

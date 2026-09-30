@@ -8,15 +8,17 @@
 
 namespace Slush
 {
-	Logger::Logger()
+	Logger::Logger(const char* aLogFileName)
 	{
-		FW_FileSystem::CreateFolderIfNecessary("data/debug/debuglog.txt");
+		FW_String logPath = "data/debug/";
+		logPath += aLogFileName;
+		FW_FileSystem::CreateFolderIfNecessary(logPath.GetBuffer());
 
 		FW_String absoluteLogPath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/debuglog.txt", absoluteLogPath);
+		FW_FileSystem::GetAbsoluteFilePath(logPath, absoluteLogPath);
 
 		fopen_s(&myLogFile, absoluteLogPath.GetBuffer(), "w");
-		FW_ASSERT(myLogFile != nullptr, "Failed to open debuglog.txt for writing");
+		FW_ASSERT(myLogFile != nullptr, "Failed to open %s for writing", aLogFileName);
 	}
 
 	Logger::~Logger()
@@ -70,7 +72,6 @@ namespace Slush
 		va_list args;
 		va_start(args, aFormattedString);
 		vsprintf_s(buffer, aFormattedString, args);
-		perror(buffer);
 		va_end(args);
 
 

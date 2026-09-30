@@ -86,5 +86,5 @@ debuglog.txt
 # /implement-issue's transient per-issue git worktrees
 /.worktrees/
 /Workbed/TopDownGame/temp
-/Workbed/TopDownGame/Data/debug/
+/Workbed/*/Data/debug/
 .claude/plan-corrections.jsonl

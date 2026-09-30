@@ -21,6 +21,8 @@ Windows-only, no CMake. Build only through the repo-root `build.bat`:
 
 Defaults are Debug and an incremental build; keywords are case-insensitive and can appear in any order. The script finds MSBuild via `vswhere`, falling back to PATH, and always builds all three games for x86 (the vendored SFML libraries are x86-only; see #22 for x64 support).
 
+Use `rebuild` when switching between Debug and Release: the projects share library output paths under `Workbed\`, so an incremental build can otherwise link libraries from the previous configuration.
+
 The script avoids Git Bash's `/`-switch path rewriting and builds the whole solution so `$(SolutionDir)` resolves correctly.
 
 The console prints each distinct error in full, a warning count, and a final pass/fail line; full warnings and normal build output go to `Build_Output\build.log`. The exit code is zero on success and non-zero on failure.
@@ -31,7 +33,7 @@ The script disables MSBuild worker-node reuse. An interrupted build can still le
 
 *(Optional, recommended if a lingering process or dirtied runtime file is a recurring problem)*
 Worktree-blocking processes: ActionGame.exe, BossMonster.exe, TopDownGame.exe, MSBuild.exe, mspdbsrv.exe
-Worktree-discardable paths: Workbed/*/ImGUILayouts/*.ini, Workbed/*/Data/DebugSettings.sdebug, Workbed/*/Data/debug/debug_input.txt, Workbed/*/Data/debug/screenshot.png, Workbed/*/temp/*.output, Workbed/*/temp/*.navmesh
+Worktree-discardable paths: Workbed/*/ImGUILayouts/*.ini, Workbed/*/Data/DebugSettings.sdebug, Workbed/*/temp/*.output, Workbed/*/temp/*.navmesh
 
 ## Code style
 
@@ -63,10 +65,14 @@ Every Slush game launches as a `Windows`-subsystem executable (see `Directory.Bu
 
 Manual-test gate: launch `Workbed/<Game>/<Game>.exe` directly, no flags — real menu → character-select → gameplay flow, not the headless path above. `<Game>` is `ActionGame`/`BossMonster`/`TopDownGame`, inferred from the issue's `project:` label (`project:actiongame` → `ActionGame`; ask which game(s) for `project:engine` or anything ambiguous).
 
+Use `-logname <name>` with verification launches to write `Data/debug/<name>.txt` instead of `debuglog.txt`, overwriting any existing log of that name. Names must be non-empty and contain only `[A-Za-z0-9_-]`; missing or invalid values fall back to `debuglog.txt` with a warning. With no flag, logging uses `debuglog.txt` as before. Agents running multiple verification launches should name each run rather than copy `debuglog.txt` around. All `Workbed/*/Data/debug/` files, including logs, debug input and screenshots, are gitignored.
+
 ## Repo etiquette
 
 Base/merge branch: `main`. Solo project, but `/implement-issue`/`/implement-issue-orchestrated` use a PR flow rather than direct-commit: work happens on a transient `issue-<N>` branch inside a git worktree, then gets pushed and opened as a GitHub PR (`Closes #<N>` in the body) instead of merged locally. Merging itself is never automated — it happens only when you click Merge on GitHub, which is the actual review gate — and the worktree/branch are torn down once the PR is open.
 PR-flow token: <AGENT_GH_TOKEN>
+
+Agent summaries, findings, PR/issue bodies and other scratch output belong in the session scratchpad or a temp file outside every checkout and worktree. Delete temp files right after use (for example, after `gh --body-file`), and post summaries and findings to the GitHub issue or PR where they are read. Never redirect build or run output into the repo (`> something.log`); use `build.bat`'s `Build_Output/build.log` and `-logname` instead.
 
 ## Issue tracking
 

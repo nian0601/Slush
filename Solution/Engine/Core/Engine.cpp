@@ -18,23 +18,6 @@
 
 namespace Slush
 {
-	static bool IsValidLogName(const char* aLogName)
-	{
-		if (!aLogName || aLogName[0] == '\0')
-			return false;
-
-		for (const char* character = aLogName; *character != '\0'; ++character)
-		{
-			if (!((*character >= 'A' && *character <= 'Z') ||
-				(*character >= 'a' && *character <= 'z') ||
-				(*character >= '0' && *character <= '9') ||
-				*character == '_' || *character == '-'))
-				return false;
-		}
-
-		return true;
-	}
-
 	void ReplaceAllOccurancesInString(std::string& aString, const std::string& aSomethingToReplace, const std::string& aNewString)
 	{
 		// Get the first occurrence
@@ -80,33 +63,12 @@ namespace Slush
 		// TODO: Make File-handling a part of engine instead to simplify filepath-handling?
 		FW_FileSystem::SetDataFolder(myDataFolder.GetBuffer());
 
-		CommandLineArgs& commandLineArgs = CommandLineArgs::GetInstance();
-		const char* logName = commandLineArgs.GetString("-logname");
-		const bool hasValidLogName = IsValidLogName(logName);
-		FW_String logFileName = "debuglog.txt";
-		if (hasValidLogName)
-		{
-			logFileName = logName;
-			logFileName += ".txt";
-		}
-
-		myLogger = new Logger(logFileName.GetBuffer());
-		if (commandLineArgs.HasFlag("-logname") && !hasValidLogName)
-		{
-			if (logName)
-			{
-				SLUSH_WARNING("Rejected -logname value '%s'; using debuglog.txt", logName);
-			}
-			else
-			{
-				SLUSH_WARNING("Missing -logname value; using debuglog.txt");
-			}
-		}
+		myLogger = new Logger();
 		myWindow = new Window(1920, 1080);
 		myInput = new Input();
 		Time::Init();
 
-		if (commandLineArgs.HasFlag("-hidewindow"))
+		if (CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
 			myWindow->Hide();
 
 		

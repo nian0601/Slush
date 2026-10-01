@@ -69,7 +69,7 @@ namespace Slush
 			FW_String myMessage;
 		};
 
-		Logger(const char* aLogFileName);
+		Logger();
 		~Logger();
 
 		void AddMessage(Severity aSeverity, const char *aFormattedString, ...);
@@ -79,6 +79,7 @@ namespace Slush
 
 		const FW_GrowingArray<LogEntry>& GetEntries() const { return myEntries; }
 	private:
+		static bool IsValidLogName(const char* aLogName);
 		void Flush();
 
 		FW_GrowingArray<LogEntry> myEntries;

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Core/Log.h"
+#include "Core/CommandLineArgs.h"
 
 #include <time.h>
 #include <sys/timeb.h>
@@ -8,23 +9,62 @@
 
 namespace Slush
 {
-	Logger::Logger(const char* aLogFileName)
+	Logger::Logger()
 	{
+		CommandLineArgs& commandLineArgs = CommandLineArgs::GetInstance();
+		const char* logName = commandLineArgs.GetString("-logname");
+		const bool hasValidLogName = IsValidLogName(logName);
+		FW_String logFileName = "debuglog.txt";
+		if (hasValidLogName)
+		{
+			logFileName = logName;
+			logFileName += ".txt";
+		}
+
 		FW_String logPath = "data/debug/";
-		logPath += aLogFileName;
+		logPath += logFileName;
 		FW_FileSystem::CreateFolderIfNecessary(logPath.GetBuffer());
 
 		FW_String absoluteLogPath;
 		FW_FileSystem::GetAbsoluteFilePath(logPath, absoluteLogPath);
 
 		fopen_s(&myLogFile, absoluteLogPath.GetBuffer(), "w");
-		FW_ASSERT(myLogFile != nullptr, "Failed to open %s for writing", aLogFileName);
+		FW_ASSERT(myLogFile != nullptr, "Failed to open %s for writing", logFileName.GetBuffer());
+
+		if (commandLineArgs.HasFlag("-logname") && !hasValidLogName)
+		{
+			if (logName)
+			{
+				AddMessage(WARNING, "Rejected -logname value '%s'; using debuglog.txt", logName);
+			}
+			else
+			{
+				AddMessage(WARNING, "Missing -logname value; using debuglog.txt");
+			}
+		}
 	}
 
 	Logger::~Logger()
 	{
 		if (myLogFile)
 			fclose(myLogFile);
+	}
+
+	bool Logger::IsValidLogName(const char* aLogName)
+	{
+		if (!aLogName || aLogName[0] == '\0')
+			return false;
+
+		for (const char* character = aLogName; *character != '\0'; ++character)
+		{
+			if (!((*character >= 'A' && *character <= 'Z') ||
+				(*character >= 'a' && *character <= 'z') ||
+				(*character >= '0' && *character <= '9') ||
+				*character == '_' || *character == '-'))
+				return false;
+		}
+
+		return true;
 	}
 
 	void Logger::Flush()

@@ -4,7 +4,7 @@
 #include "Navmesh.h"
 #include "Level/NavmeshData.h"
 
-#include <windows.h>
+#include <FW_UnitTestSuite.h>
 
 namespace NavmeshTestSuite
 {
@@ -29,10 +29,10 @@ namespace NavmeshTestSuite
 		Navmesh::PathCorridor corridor;
 		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
-		FW_ASSERT(found, "Expected FindPath to succeed between two reachable points");
-		FW_ASSERT(waypoints.Count() >= 2, "Expected at least a start and goal waypoint");
-		FW_ASSERT(waypoints[0] == start, "Expected first waypoint to be the start position");
-		FW_ASSERT(waypoints.GetLast() == goal, "Expected last waypoint to be the goal position");
+		FW_TEST_REQUIRE(found, "Expected FindPath to succeed between two reachable points");
+		FW_TEST_REQUIRE(waypoints.Count() >= 2, "Expected at least a start and goal waypoint");
+		FW_TEST_CHECK(waypoints[0] == start, "Expected first waypoint to be the start position");
+		FW_TEST_CHECK(waypoints.GetLast() == goal, "Expected last waypoint to be the goal position");
 	}
 
 	void TestFindPathFailsOutsideMesh()
@@ -47,8 +47,8 @@ namespace NavmeshTestSuite
 		Navmesh::PathCorridor corridor;
 		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
-		FW_ASSERT(!found, "Expected FindPath to fail when the start position is outside the mesh");
-		FW_ASSERT(waypoints.IsEmpty(), "Expected no waypoints for a failed path");
+		FW_TEST_CHECK(!found, "Expected FindPath to fail when the start position is outside the mesh");
+		FW_TEST_CHECK(waypoints.IsEmpty(), "Expected no waypoints for a failed path");
 	}
 
 	void TestFindPathFailsWhenCutDisconnectsStartFromGoal()
@@ -71,7 +71,7 @@ namespace NavmeshTestSuite
 		Navmesh::PathCorridor corridor;
 		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
-		FW_ASSERT(!found, "Expected FindPath to fail once a full-width cut disconnects start from goal");
+		FW_TEST_CHECK(!found, "Expected FindPath to fail once a full-width cut disconnects start from goal");
 	}
 
 	void TestIsAreaFullyOnMesh()
@@ -84,7 +84,7 @@ namespace NavmeshTestSuite
 		openArea.Add(Vector2f{ 200.f, 100.f });
 		openArea.Add(Vector2f{ 200.f, 200.f });
 		openArea.Add(Vector2f{ 100.f, 200.f });
-		FW_ASSERT(mesh.IsAreaFullyOnMesh(openArea), "Expected an area entirely on open mesh to be accepted");
+		FW_TEST_CHECK(mesh.IsAreaFullyOnMesh(openArea), "Expected an area entirely on open mesh to be accepted");
 
 		FW_GrowingArray<Vector2f> cutArea;
 		cutArea.Add(Vector2f{ 500.f, 300.f });
@@ -93,21 +93,21 @@ namespace NavmeshTestSuite
 		cutArea.Add(Vector2f{ 500.f, 500.f });
 		mesh.CutHole(cutArea);
 
-		FW_ASSERT(!mesh.IsAreaFullyOnMesh(cutArea), "Expected an area entirely overlapping a cut hole to be rejected");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(cutArea), "Expected an area entirely overlapping a cut hole to be rejected");
 
 		FW_GrowingArray<Vector2f> straddlingArea;
 		straddlingArea.Add(Vector2f{ 450.f, 350.f });
 		straddlingArea.Add(Vector2f{ 550.f, 350.f });
 		straddlingArea.Add(Vector2f{ 550.f, 450.f });
 		straddlingArea.Add(Vector2f{ 450.f, 450.f });
-		FW_ASSERT(!mesh.IsAreaFullyOnMesh(straddlingArea), "Expected an area straddling a cut-hole boundary to be rejected");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(straddlingArea), "Expected an area straddling a cut-hole boundary to be rejected");
 
 		FW_GrowingArray<Vector2f> secondCutArea;
 		secondCutArea.Add(Vector2f{ 650.f, 400.f });
 		secondCutArea.Add(Vector2f{ 800.f, 400.f });
 		secondCutArea.Add(Vector2f{ 800.f, 550.f });
 		secondCutArea.Add(Vector2f{ 650.f, 550.f });
-		FW_ASSERT(!mesh.IsAreaFullyOnMesh(secondCutArea), "Expected an area overlapping a previously cut area to be rejected");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(secondCutArea), "Expected an area overlapping a previously cut area to be rejected");
 
 		Navmesh nestedHoleMesh;
 		nestedHoleMesh.GenerateDefaultGrid();
@@ -123,7 +123,7 @@ namespace NavmeshTestSuite
 		enclosingArea.Add(Vector2f{ 700.f, 350.f });
 		enclosingArea.Add(Vector2f{ 700.f, 500.f });
 		enclosingArea.Add(Vector2f{ 550.f, 500.f });
-		FW_ASSERT(!nestedHoleMesh.IsAreaFullyOnMesh(enclosingArea), "Expected an area enclosing a cut hole to be rejected");
+		FW_TEST_CHECK(!nestedHoleMesh.IsAreaFullyOnMesh(enclosingArea), "Expected an area enclosing a cut hole to be rejected");
 	}
 
 	void TestFindPathSameTriangleYieldsStraightPath()
@@ -138,11 +138,11 @@ namespace NavmeshTestSuite
 		Navmesh::PathCorridor corridor;
 		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
 
-		FW_ASSERT(found, "Expected FindPath to succeed for a same-triangle start/goal");
-		FW_ASSERT(corridor.myPortals.IsEmpty(), "Expected a zero-portal corridor for a same-triangle path");
-		FW_ASSERT(waypoints.Count() == 2, "Expected a 2-waypoint straight path for a same-triangle start/goal");
-		FW_ASSERT(waypoints[0] == start, "Expected first waypoint to be the start position");
-		FW_ASSERT(waypoints[1] == goal, "Expected second waypoint to be the goal position");
+		FW_TEST_REQUIRE(found, "Expected FindPath to succeed for a same-triangle start/goal");
+		FW_TEST_CHECK(corridor.myPortals.IsEmpty(), "Expected a zero-portal corridor for a same-triangle path");
+		FW_TEST_REQUIRE(waypoints.Count() == 2, "Expected a 2-waypoint straight path for a same-triangle start/goal");
+		FW_TEST_CHECK(waypoints[0] == start, "Expected first waypoint to be the start position");
+		FW_TEST_CHECK(waypoints[1] == goal, "Expected second waypoint to be the goal position");
 	}
 
 	void TestStringPullIsNoLongerThanEdgeCenterPath()
@@ -166,13 +166,13 @@ namespace NavmeshTestSuite
 		Navmesh::PathCorridor corridor;
 		bool found = mesh.FindPath(start, goal, stringPulledWaypoints, &corridor);
 
-		FW_ASSERT(found, "Expected FindPath to succeed by routing around the cut");
-		FW_ASSERT(corridor.myPortals.Count() > 1, "Expected a multi-portal corridor bending around the cut");
+		FW_TEST_REQUIRE(found, "Expected FindPath to succeed by routing around the cut");
+		FW_TEST_CHECK(corridor.myPortals.Count() > 1, "Expected a multi-portal corridor bending around the cut");
 
 		FW_GrowingArray<Vector2f> edgeCenterWaypoints;
 		mesh.BuildEdgeCenterPath(start, goal, corridor, edgeCenterWaypoints);
 
-		FW_ASSERT(GetTotalPathLength(stringPulledWaypoints) <= GetTotalPathLength(edgeCenterWaypoints),
+		FW_TEST_CHECK(GetTotalPathLength(stringPulledWaypoints) <= GetTotalPathLength(edgeCenterWaypoints),
 			"Expected the string-pulled path to be no longer than the edge-center path through the same corridor");
 	}
 
@@ -194,7 +194,7 @@ namespace NavmeshTestSuite
 		FW_GrowingArray<Vector2f> waypoints;
 		Navmesh::PathCorridor corridor;
 		bool found = mesh.FindPath(start, goal, waypoints, &corridor);
-		FW_ASSERT(found, "Expected the initial FindPath to succeed");
+		FW_TEST_REQUIRE(found, "Expected the initial FindPath to succeed");
 
 		// Simulate an entity that has moved partway along its route: re-funnel the same,
 		// already-computed corridor from a new position without running a new search.
@@ -203,10 +203,10 @@ namespace NavmeshTestSuite
 		FW_GrowingArray<Vector2f> reFunneledWaypoints;
 		bool reFunneled = mesh.StringPull(partwayPosition, goal, corridor, reFunneledWaypoints);
 
-		FW_ASSERT(reFunneled, "Expected StringPull to succeed when re-funneling a stored corridor");
-		FW_ASSERT(reFunneledWaypoints.Count() >= 2, "Expected at least a start and goal waypoint");
-		FW_ASSERT(reFunneledWaypoints[0] == partwayPosition, "Expected first waypoint to be the new start position");
-		FW_ASSERT(reFunneledWaypoints.GetLast() == goal, "Expected last waypoint to be the goal position");
+		FW_TEST_REQUIRE(reFunneled, "Expected StringPull to succeed when re-funneling a stored corridor");
+		FW_TEST_REQUIRE(reFunneledWaypoints.Count() >= 2, "Expected at least a start and goal waypoint");
+		FW_TEST_CHECK(reFunneledWaypoints[0] == partwayPosition, "Expected first waypoint to be the new start position");
+		FW_TEST_CHECK(reFunneledWaypoints.GetLast() == goal, "Expected last waypoint to be the goal position");
 	}
 
 	void TestCutAcrossOneQuadProducesExpectedCounts()
@@ -216,8 +216,8 @@ namespace NavmeshTestSuite
 
 		const int initialTriangleCount = mesh.GetTriangleCount();
 		const int initialVertexCount = mesh.GetVertexCount();
-		FW_ASSERT(initialTriangleCount == 210, "Expected the default sector grid to produce 210 triangles");
-		FW_ASSERT(initialVertexCount == 128, "Expected the default sector grid to produce 128 vertices");
+		FW_TEST_CHECK(initialTriangleCount == 210, "Expected the default sector grid to produce 210 triangles");
+		FW_TEST_CHECK(initialVertexCount == 128, "Expected the default sector grid to produce 128 vertices");
 
 		// A thin band entirely inside one interior quad, crossing its diagonal edge twice (once on
 		// each of the band's long sides). All 4 corners sit deep inside triangle interiors - away
@@ -232,9 +232,9 @@ namespace NavmeshTestSuite
 		cutterCorners.Add(Vector2f{ 700.f, 496.f });
 		mesh.CutHole(cutterCorners);
 
-		FW_ASSERT(mesh.GetTriangleCount() == initialTriangleCount + 10, "Expected the 2 diagonal crossings plus 4 precise corner insertions to add exactly 10 triangles");
-		FW_ASSERT(mesh.GetVertexCount() == initialVertexCount + 8, "Expected the 2 diagonal crossings plus 4 precise corner insertions to add exactly 8 vertices");
-		FW_ASSERT(mesh.HasVertexNear(Vector2f{ 700.f, 440.f }, 0.01f), "Expected a precise vertex at the cutter's own corner position");
+		FW_TEST_CHECK(mesh.GetTriangleCount() == initialTriangleCount + 10, "Expected the 2 diagonal crossings plus 4 precise corner insertions to add exactly 10 triangles");
+		FW_TEST_CHECK(mesh.GetVertexCount() == initialVertexCount + 8, "Expected the 2 diagonal crossings plus 4 precise corner insertions to add exactly 8 vertices");
+		FW_TEST_CHECK(mesh.HasVertexNear(Vector2f{ 700.f, 440.f }, 0.01f), "Expected a precise vertex at the cutter's own corner position");
 	}
 
 	void TestCutterCornerInsideTriangleInteriorProducesVertexThere()
@@ -243,7 +243,7 @@ namespace NavmeshTestSuite
 		mesh.GenerateDefaultGrid();
 
 		Vector2f cornerDeepInsideATriangle{ 45.f, 45.f };
-		FW_ASSERT(!mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Test setup: expected no existing vertex at this position");
+		FW_TEST_CHECK(!mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Test setup: expected no existing vertex at this position");
 
 		FW_GrowingArray<Vector2f> cutterCorners;
 		cutterCorners.Add(cornerDeepInsideATriangle);
@@ -251,7 +251,7 @@ namespace NavmeshTestSuite
 		cutterCorners.Add(Vector2f{ 45.f, 60.f });
 		mesh.CutHole(cutterCorners);
 
-		FW_ASSERT(mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Expected a precise vertex at the cutter corner that landed inside a triangle's interior");
+		FW_TEST_CHECK(mesh.HasVertexNear(cornerDeepInsideATriangle, 0.01f), "Expected a precise vertex at the cutter corner that landed inside a triangle's interior");
 	}
 
 	void TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating()
@@ -265,7 +265,7 @@ namespace NavmeshTestSuite
 		Vector2f topLeft{ 660.f, 404.f };
 		Vector2f topRight{ 788.f, 404.f };
 		Vector2f bottomLeft{ 660.f, 532.f };
-		FW_ASSERT(mesh.HasVertexNear(topLeft, 0.01f) && mesh.HasVertexNear(topRight, 0.01f) && mesh.HasVertexNear(bottomLeft, 0.01f),
+		FW_TEST_CHECK(mesh.HasVertexNear(topLeft, 0.01f) && mesh.HasVertexNear(topRight, 0.01f) && mesh.HasVertexNear(bottomLeft, 0.01f),
 			"Test setup: expected these to already be real navmesh vertices");
 
 		const int initialVertexCount = mesh.GetVertexCount();
@@ -276,7 +276,7 @@ namespace NavmeshTestSuite
 		cutterCorners.Add(bottomLeft);
 		mesh.CutHole(cutterCorners);
 
-		FW_ASSERT(mesh.GetVertexCount() == initialVertexCount, "Expected snapping to already-existing vertices to add no new vertices");
+		FW_TEST_CHECK(mesh.GetVertexCount() == initialVertexCount, "Expected snapping to already-existing vertices to add no new vertices");
 	}
 
 	void TestCutterCornerNearExistingEdgeSnapsOntoThatEdge()
@@ -288,7 +288,7 @@ namespace NavmeshTestSuite
 		// quad's own top edge - should snap onto that edge via SplitEdgeAtPosition rather than
 		// falling into the triangle-interior insertion path.
 		Vector2f cornerNearEdge{ 724.f, 404.3f };
-		FW_ASSERT(!mesh.HasVertexNear(cornerNearEdge, 0.01f), "Test setup: expected no existing vertex at this position");
+		FW_TEST_CHECK(!mesh.HasVertexNear(cornerNearEdge, 0.01f), "Test setup: expected no existing vertex at this position");
 
 		FW_GrowingArray<Vector2f> cutterCorners;
 		cutterCorners.Add(cornerNearEdge);
@@ -296,7 +296,7 @@ namespace NavmeshTestSuite
 		cutterCorners.Add(Vector2f{ 748.f, 460.f });
 		mesh.CutHole(cutterCorners);
 
-		FW_ASSERT(mesh.HasVertexNear(cornerNearEdge, 0.01f), "Expected a vertex snapped onto the nearby edge at the cutter's own corner position");
+		FW_TEST_CHECK(mesh.HasVertexNear(cornerNearEdge, 0.01f), "Expected a vertex snapped onto the nearby edge at the cutter's own corner position");
 	}
 
 	void TestNavmeshSaveLoadRoundTrip()
@@ -319,7 +319,7 @@ namespace NavmeshTestSuite
 		original.myNavmesh.CutHole(cutBlockB);
 
 		// Drive NavmeshData::OnParse() directly (bypassing DataAsset::Save()/Load()'s
-		// folder-derived paths) so this test writes to its own scratch file under temp/ instead
+		// folder-derived paths) so this test writes to its own scratch file under data/debug/ instead
 		// of the real data/navmeshes/ folder - that folder is scanned by AssetStorage<NavmeshData>
 		// on every launch, so writing there would leave this fixture behind as a permanent, visible
 		// asset in the editor UI, not just a test artifact.
@@ -337,8 +337,8 @@ namespace NavmeshTestSuite
 		NavmeshData loaded("navmesh_roundtrip_test", 0);
 		loaded.OnParse(readHandle, 1);
 
-		FW_ASSERT(loaded.myNavmesh.GetVertexCount() == original.myNavmesh.GetVertexCount(), "Expected matching vertex counts after a save/load round-trip");
-		FW_ASSERT(loaded.myNavmesh.GetTriangleCount() == original.myNavmesh.GetTriangleCount(), "Expected matching triangle counts after a save/load round-trip");
+		FW_TEST_CHECK(loaded.myNavmesh.GetVertexCount() == original.myNavmesh.GetVertexCount(), "Expected matching vertex counts after a save/load round-trip");
+		FW_TEST_CHECK(loaded.myNavmesh.GetTriangleCount() == original.myNavmesh.GetTriangleCount(), "Expected matching triangle counts after a save/load round-trip");
 
 		Vector2f start{ 50.f, 50.f };
 		Vector2f goal{ 1900.f, 850.f };
@@ -351,15 +351,15 @@ namespace NavmeshTestSuite
 		Navmesh::PathCorridor loadedCorridor;
 		bool loadedFound = loaded.myNavmesh.FindPath(start, goal, loadedWaypoints, &loadedCorridor);
 
-		FW_ASSERT(originalFound && loadedFound, "Expected FindPath to succeed on both the original and the round-tripped navmesh");
-		FW_ASSERT(loadedWaypoints.Count() == originalWaypoints.Count(), "Expected matching waypoint counts after a save/load round-trip");
+		FW_TEST_REQUIRE(originalFound && loadedFound, "Expected FindPath to succeed on both the original and the round-tripped navmesh");
+		FW_TEST_REQUIRE(loadedWaypoints.Count() == originalWaypoints.Count(), "Expected matching waypoint counts after a save/load round-trip");
 
 		// Epsilon compare, not ==: field values round-trip through AssetParser's "%.3f" float
 		// formatting, so a waypoint landing on a non-exact-decimal position would otherwise make
 		// this fail on a correct round-trip purely from serialization precision loss.
 		const float PositionEpsilon = 0.01f;
 		for (int i = 0; i < originalWaypoints.Count(); ++i)
-			FW_ASSERT(Length2(loadedWaypoints[i] - originalWaypoints[i]) <= PositionEpsilon * PositionEpsilon, "Expected matching waypoints after a save/load round-trip");
+			FW_TEST_CHECK(Length2(loadedWaypoints[i] - originalWaypoints[i]) <= PositionEpsilon * PositionEpsilon, "Expected matching waypoints after a save/load round-trip");
 	}
 
 	void TestNavmeshCopyIsIndependent()
@@ -376,18 +376,18 @@ namespace NavmeshTestSuite
 
 		Navmesh copy;
 		copy.CopyFrom(original);
-		FW_ASSERT(copy.GetVertexCount() == original.GetVertexCount(), "Expected copied navmesh vertex count to match");
-		FW_ASSERT(copy.GetTriangleCount() == original.GetTriangleCount(), "Expected copied navmesh triangle count to match");
+		FW_TEST_CHECK(copy.GetVertexCount() == original.GetVertexCount(), "Expected copied navmesh vertex count to match");
+		FW_TEST_CHECK(copy.GetTriangleCount() == original.GetTriangleCount(), "Expected copied navmesh triangle count to match");
 
 		FW_GrowingArray<Vector2f> originalWaypoints;
 		FW_GrowingArray<Vector2f> copyWaypoints;
 		const Vector2f start{ 50.f, 50.f };
 		const Vector2f goal{ 1900.f, 850.f };
-		FW_ASSERT(original.FindPath(start, goal, originalWaypoints) == copy.FindPath(start, goal, copyWaypoints),
+		FW_TEST_CHECK(original.FindPath(start, goal, originalWaypoints) == copy.FindPath(start, goal, copyWaypoints),
 			"Expected copied navmesh path query to agree with the original");
-		FW_ASSERT(copyWaypoints.Count() == originalWaypoints.Count(), "Expected matching paths on copied navmesh");
+		FW_TEST_REQUIRE(copyWaypoints.Count() == originalWaypoints.Count(), "Expected matching paths on copied navmesh");
 		for (int i = 0; i < originalWaypoints.Count(); ++i)
-			FW_ASSERT(copyWaypoints[i] == originalWaypoints[i], "Expected exact waypoint positions on copied navmesh");
+			FW_TEST_CHECK(copyWaypoints[i] == originalWaypoints[i], "Expected exact waypoint positions on copied navmesh");
 
 		const int originalVertexCount = original.GetVertexCount();
 		const int originalTriangleCount = original.GetTriangleCount();
@@ -397,24 +397,26 @@ namespace NavmeshTestSuite
 		secondHole.Add(Vector2f{ 1000.f, 400.f });
 		secondHole.Add(Vector2f{ 900.f, 400.f });
 		copy.CutHole(secondHole);
-		FW_ASSERT(original.GetVertexCount() == originalVertexCount, "Expected copied navmesh cut to leave original vertices unchanged");
-		FW_ASSERT(original.GetTriangleCount() == originalTriangleCount, "Expected copied navmesh cut to leave original triangles unchanged");
+		FW_TEST_CHECK(original.GetVertexCount() == originalVertexCount, "Expected copied navmesh cut to leave original vertices unchanged");
+		FW_TEST_CHECK(original.GetTriangleCount() == originalTriangleCount, "Expected copied navmesh cut to leave original triangles unchanged");
 	}
 
 	void RunTests()
 	{
-		TestNavmeshSaveLoadRoundTrip();
-		TestNavmeshCopyIsIndependent();
-		TestCutAcrossOneQuadProducesExpectedCounts();
-		TestCutterCornerInsideTriangleInteriorProducesVertexThere();
-		TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating();
-		TestCutterCornerNearExistingEdgeSnapsOntoThatEdge();
-		TestFindPathSucceedsBetweenReachablePoints();
-		TestFindPathFailsOutsideMesh();
-		TestFindPathFailsWhenCutDisconnectsStartFromGoal();
-		TestIsAreaFullyOnMesh();
-		TestFindPathSameTriangleYieldsStraightPath();
-		TestStringPullIsNoLongerThanEdgeCenterPath();
-		TestStringPullCanReFunnelAnExistingCorridorFromANewStart();
+		FW_UnitTestSuite::BeginSuite("Navmesh");
+
+		FW_RUN_TEST(TestNavmeshSaveLoadRoundTrip);
+		FW_RUN_TEST(TestNavmeshCopyIsIndependent);
+		FW_RUN_TEST(TestCutAcrossOneQuadProducesExpectedCounts);
+		FW_RUN_TEST(TestCutterCornerInsideTriangleInteriorProducesVertexThere);
+		FW_RUN_TEST(TestCutterCornerNearExistingVertexSnapsInsteadOfDuplicating);
+		FW_RUN_TEST(TestCutterCornerNearExistingEdgeSnapsOntoThatEdge);
+		FW_RUN_TEST(TestFindPathSucceedsBetweenReachablePoints);
+		FW_RUN_TEST(TestFindPathFailsOutsideMesh);
+		FW_RUN_TEST(TestFindPathFailsWhenCutDisconnectsStartFromGoal);
+		FW_RUN_TEST(TestIsAreaFullyOnMesh);
+		FW_RUN_TEST(TestFindPathSameTriangleYieldsStraightPath);
+		FW_RUN_TEST(TestStringPullIsNoLongerThanEdgeCenterPath);
+		FW_RUN_TEST(TestStringPullCanReFunnelAnExistingCorridorFromANewStart);
 	}
 }

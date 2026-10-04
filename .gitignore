@@ -80,11 +80,7 @@ Application/Raytracer/Data/Video
 /Solution/.vs/Solution
 *.recipe
 
-# Runtime-generated per-session log
-debuglog.txt
-
 # /implement-issue's transient per-issue git worktrees
 /.worktrees/
-/Workbed/TopDownGame/temp
 /Workbed/*/Data/debug/
 .claude/plan-corrections.jsonl

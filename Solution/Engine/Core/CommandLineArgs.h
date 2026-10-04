@@ -7,6 +7,10 @@ namespace Slush
 	class CommandLineArgs
 	{
 	public:
+		// Public so tests can build throwaway instances, normal access is GetInstance()
+		CommandLineArgs() {};
+		~CommandLineArgs() {};
+
 		static CommandLineArgs& GetInstance();
 		static void Destroy();
 
@@ -16,8 +20,6 @@ namespace Slush
 		const char* GetString(const char* aFlag) const;
 
 	private:
-		CommandLineArgs() {};
-		~CommandLineArgs() {};
 		static CommandLineArgs* ourInstance;
 
 		FW_GrowingArray<FW_String> myArgs;

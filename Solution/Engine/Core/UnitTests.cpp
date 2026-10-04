@@ -2,6 +2,7 @@
 
 #include "Core/UnitTests.h"
 #include "Core/CommandLineArgs.h"
+#include "Core/EngineTestSuite.h"
 
 #include <FW_UnitTestSuite.h>
 
@@ -14,6 +15,7 @@ namespace Slush
 			FW_UnitTestSuite::BeginRun();
 
 			FW_UnitTestSuite::RunFrameworkTests();
+			EngineTestSuite::RunTests();
 
 			if (aGameTestsCallback)
 				aGameTestsCallback();

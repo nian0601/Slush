@@ -60,14 +60,20 @@ private:
 	Slush::Font myFont;
 };
 
-#include <FW_UnitTestSuite.h>
-int main(int argc, char** argv)
+#include "Core/UnitTests.h"
+static void RunGameTests()
 {
-	FW_UnitTestSuite::RunTests();
 	NavmeshTestSuite::RunTests();
 	WaveScalingTestSuite::RunTests();
+}
 
+int main(int argc, char** argv)
+{
 	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
+
+	const Slush::UnitTests::Outcome testOutcome = Slush::UnitTests::Run(&RunGameTests);
+	if (testOutcome != Slush::UnitTests::Outcome::Continue)
+		return testOutcome == Slush::UnitTests::Outcome::ExitPassed ? 0 : 1;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.Initialize();

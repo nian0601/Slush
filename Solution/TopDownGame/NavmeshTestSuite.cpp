@@ -323,24 +323,17 @@ namespace NavmeshTestSuite
 		// of the real data/navmeshes/ folder - that folder is scanned by AssetStorage<NavmeshData>
 		// on every launch, so writing there would leave this fixture behind as a permanent, visible
 		// asset in the editor UI, not just a test artifact.
-		// Resolve from the executable rather than the current working directory. These tests run
-		// before Engine::Initialize() sets FW_FileSystem's data folder, so a relative path would
-		// otherwise write into whichever folder launched the game.
-		char modulePath[MAX_PATH];
-		GetModuleFileNameA(nullptr, modulePath, MAX_PATH);
-		FW_String testFilePath = modulePath;
-		const int lastFolderSeparator = testFilePath.RFind("\\");
-		FW_ASSERT(lastFolderSeparator != -1, "Expected executable path to include a folder");
-		testFilePath = testFilePath.SubStr(0, lastFolderSeparator);
-		testFilePath += "/temp/navmesh_roundtrip_test.navmesh";
+		// AssetParser resolves both paths against the data folder, which the runner has already set
+		// (and data/debug/ already exists).
+		const char* testFilePath = "data/debug/navmesh_roundtrip_test.navmesh";
 
 		Slush::AssetParser writer;
 		Slush::AssetParser::Handle writeHandle = writer.StartWriting("NavmeshData");
 		original.OnParse(writeHandle, 1);
-		writer.FinishWriting(testFilePath.GetBuffer());
+		writer.FinishWriting(testFilePath);
 
 		Slush::AssetParser reader;
-		Slush::AssetParser::Handle readHandle = reader.Load(testFilePath.GetBuffer());
+		Slush::AssetParser::Handle readHandle = reader.Load(testFilePath);
 		NavmeshData loaded("navmesh_roundtrip_test", 0);
 		loaded.OnParse(readHandle, 1);
 

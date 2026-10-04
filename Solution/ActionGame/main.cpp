@@ -115,12 +115,14 @@ private:
 	//AppLayout* myAppLayout = nullptr;
 };
 
-#include <FW_UnitTestSuite.h>
+#include "Core/UnitTests.h"
 int main(int argc, char** argv)
 {
-	FW_UnitTestSuite::RunTests();
-
 	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
+
+	const Slush::UnitTests::Outcome testOutcome = Slush::UnitTests::Run(nullptr);
+	if (testOutcome != Slush::UnitTests::Outcome::Continue)
+		return testOutcome == Slush::UnitTests::Outcome::ExitPassed ? 0 : 1;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.Initialize();

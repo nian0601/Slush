@@ -1,44 +1,109 @@
 #include "FW_UnitTestSuite.h"
 #include "FW_FileProcessor.h"
 #include "FW_FileSystem.h"
+#include "FW_GrowingArray.h"
 #include "FW_Assert.h"
+#include "FW_String.h"
 
 #include <windows.h>
-#include <string>
-#include "FW_String.h"
+#include <stdio.h>
 
 namespace FW_UnitTestSuite
 {
-	void ReplaceAllOccurancesInString(std::string& aString, const std::string& aSomethingToReplace, const std::string& aNewString)
-	{
-		// Get the first occurrence
-		size_t pos = aString.find(aSomethingToReplace);
+	static const int ourLineBufferSize = 1024;
 
-		// Repeat till end is reached
-		while (pos != std::string::npos)
+	static FW_String ourCurrentSuite;
+	static FW_String ourCurrentTest;
+	static int ourTestCount = 0;
+	static int ourCheckCount = 0;
+	static FW_GrowingArray<FW_String> ourFailureLines;
+
+	void BeginRun()
+	{
+		FW_FileSystem::InitDataFolderFromExecutable();
+		FW_FileSystem::CreateFolderIfNecessary("data/debug");
+
+		ourCurrentSuite = "";
+		ourCurrentTest = "";
+		ourTestCount = 0;
+		ourCheckCount = 0;
+		ourFailureLines.RemoveAll();
+	}
+
+	void BeginSuite(const char* aSuiteName)
+	{
+		ourCurrentSuite = aSuiteName;
+	}
+
+	void BeginTest(const char* aTestName)
+	{
+		ourCurrentTest = aTestName;
+		++ourTestCount;
+	}
+
+	bool RecordCheck(bool aPassed, const char* aFile, int aLine, const char* anExpression, const char* aMessage)
+	{
+		++ourCheckCount;
+		if (aPassed)
+			return true;
+
+		// Filename only, __FILE__ is a full path
+		const char* fileName = aFile;
+		for (const char* character = aFile; *character != '\0'; ++character)
 		{
-			// Replace this occurrence of Sub String
-			aString.replace(pos, aSomethingToReplace.size(), aNewString);
-			// Get the next occurrence from the current position
-			pos = aString.find(aSomethingToReplace, pos + aNewString.size());
+			if (*character == '\\' || *character == '/')
+				fileName = character + 1;
 		}
+
+		char line[ourLineBufferSize];
+		_snprintf_s(line, ourLineBufferSize, _TRUNCATE, "FAIL %s::%s  %s(%d): %s -- %s",
+			ourCurrentSuite.GetBuffer(), ourCurrentTest.GetBuffer(), fileName, aLine, anExpression, aMessage);
+
+		ourFailureLines.Add(FW_String(line));
+		return false;
+	}
+
+	bool EndRun()
+	{
+		const bool passed = ourFailureLines.Count() == 0;
+
+		char summary[ourLineBufferSize];
+		_snprintf_s(summary, ourLineBufferSize, _TRUNCATE, "UNITTEST_RESULT: %s (%d failed / %d checks, %d tests)",
+			passed ? "PASS" : "FAIL", ourFailureLines.Count(), ourCheckCount, ourTestCount);
+
+		FW_String reportPath;
+		FW_FileSystem::GetAbsoluteFilePath("data/debug/unittest_results.txt", reportPath);
+
+		FILE* file = nullptr;
+		fopen_s(&file, reportPath.GetBuffer(), "w");
+		if (file)
+			fprintf(file, "%s\n", summary);
+
+		OutputDebugStringA(summary);
+		OutputDebugStringA("\n");
+
+		for (int i = 0; i < ourFailureLines.Count(); ++i)
+		{
+			if (file)
+				fprintf(file, "%s\n", ourFailureLines[i].GetBuffer());
+
+			OutputDebugStringA(ourFailureLines[i].GetBuffer());
+			OutputDebugStringA("\n");
+		}
+
+		if (file)
+			fclose(file);
+
+		if (!passed && IsDebuggerPresent())
+			FW_DEBUG_BREAK;
+
+		return passed;
 	}
 
 	void TestFileProcessor()
 	{
-		char fileBuffer[128];
-		GetModuleFileNameA(NULL, fileBuffer, 128);
-
-		std::string assetPath;
-		assetPath.append(fileBuffer);
-		assetPath.erase(assetPath.rfind("\\"), std::string::npos);
-		ReplaceAllOccurancesInString(assetPath, "\\", "/");
-		assetPath.append("/temp/fileProcessorTests.output");
-
-		std::string tempFolderPath = assetPath;
-		tempFolderPath.erase(tempFolderPath.rfind("/"), std::string::npos);
-		FW_FileSystem::CreateFolder(tempFolderPath.c_str());
-
+		FW_String scratchPath;
+		FW_FileSystem::GetAbsoluteFilePath("data/debug/fileprocessor_test.output", scratchPath);
 
 		float floatWrite = 123.f;
 		float floatWrite2 = 567.f;
@@ -49,7 +114,7 @@ namespace FW_UnitTestSuite
 		bool boolWrite2 = true;
 
 		{
-			FW_FileProcessor processor(assetPath.c_str(), FW_FileProcessor::WRITE);
+			FW_FileProcessor processor(scratchPath.GetBuffer(), FW_FileProcessor::WRITE);
 
 			processor.Process(floatWrite);
 			processor.Process(floatWrite2);
@@ -77,7 +142,7 @@ namespace FW_UnitTestSuite
 		bool boolRead2 = false;
 
 		{
-			FW_FileProcessor processor(assetPath.c_str(), FW_FileProcessor::READ);
+			FW_FileProcessor processor(scratchPath.GetBuffer(), FW_FileProcessor::READ);
 			
 			processor.Process(floatRead);
 			processor.Process(floatRead2);
@@ -88,17 +153,18 @@ namespace FW_UnitTestSuite
 			processor.Process(boolRead2);
 		}
 
-		FW_ASSERT(floatWrite == floatRead);
-		FW_ASSERT(floatWrite2 == floatRead2);
-		FW_ASSERT(intWrite == intRead);
-		FW_ASSERT(stringWrite == stringRead);
-		FW_ASSERT(stringWrite2 == stringRead2);
-		FW_ASSERT(boolWrite == boolRead);
-		FW_ASSERT(boolWrite2 == boolRead2);
+		FW_TEST_CHECK(floatWrite == floatRead, "float round-trip");
+		FW_TEST_CHECK(floatWrite2 == floatRead2, "second float round-trip");
+		FW_TEST_CHECK(intWrite == intRead, "int round-trip");
+		FW_TEST_CHECK(stringWrite == stringRead, "string round-trip");
+		FW_TEST_CHECK(stringWrite2 == stringRead2, "rest-of-line string round-trip");
+		FW_TEST_CHECK(boolWrite == boolRead, "bool round-trip");
+		FW_TEST_CHECK(boolWrite2 == boolRead2, "second bool round-trip");
 	}
 
-	void RunTests()
+	void RunFrameworkTests()
 	{
-		TestFileProcessor();
+		BeginSuite("Framework");
+		FW_RUN_TEST(TestFileProcessor);
 	}
 }

@@ -157,6 +157,7 @@
     <ClInclude Include="Core\Dockables\TextureViewerDockable.h" />
     <ClInclude Include="Core\CommandLineArgs.h" />
     <ClInclude Include="Core\Engine.h" />
+    <ClInclude Include="Core\UnitTests.h" />
     <ClInclude Include="Core\IApp.h" />
     <ClInclude Include="Core\Log.h" />
     <ClInclude Include="Graphics\Animation\Animation.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="Core\Dockables\TextureViewerDockable.cpp" />
     <ClCompile Include="Core\CommandLineArgs.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
+    <ClCompile Include="Core\UnitTests.cpp" />
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Graphics\Animation\Animation.cpp" />
     <ClCompile Include="Graphics\Animation\AnimationRuntime.cpp" />

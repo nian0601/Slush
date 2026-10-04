@@ -13,7 +13,7 @@
 #include <windows.h>
 #include <FW_FileSystem.h>
 
-#include "imgui/Fonts/IconsFontAwesome7.h"
+#include "Core/EditorTheme.h"
 
 namespace Slush
 {
@@ -46,24 +46,9 @@ namespace Slush
 		if (CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
 			myWindow->Hide();
 
-		
-		FW_String path = "Data/NotoSans.ttf";
-		FW_FileSystem::GetAbsoluteFilePath(path, path);
-
-		ImGuiIO& imguiIO = ImGui::GetIO();
-		imguiIO.Fonts->AddFontFromFileTTF(path.GetBuffer(), 20.f);
-
-		FW_String iconFontPath = "Data/fa-solid-900.otf";
-		FW_FileSystem::GetAbsoluteFilePath(iconFontPath, iconFontPath);
-
-		static const ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-		ImFontConfig iconFontConfig;
-		iconFontConfig.MergeMode = true;
-		iconFontConfig.PixelSnapH = true;
-		imguiIO.Fonts->AddFontFromFileTTF(iconFontPath.GetBuffer(), 20.f, &iconFontConfig, iconRanges);
-
-		ImGui::SFML::UpdateFontTexture();
-
+		// Editor look: swap these to compare (IMGUI_DEFAULT / COLD / WARM, NOTO_SANS / JETBRAINS_MONO)
+		EditorTheme::ApplyPalette(EditorTheme::WARM);
+		EditorTheme::LoadFonts(EditorTheme::JETBRAINS_MONO);
 	}
 
 	void Engine::Shutdown()

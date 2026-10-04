@@ -33,4 +33,20 @@ namespace Slush
 
 		return false;
 	}
+
+	const char* CommandLineArgs::GetString(const char* aFlag) const
+	{
+		for (int i = 0; i < myArgs.Count(); ++i)
+		{
+			if (myArgs[i] == aFlag)
+			{
+				if (i + 1 >= myArgs.Count() || myArgs[i + 1][0] == '-')
+					return nullptr;
+
+				return myArgs[i + 1].GetBuffer();
+			}
+		}
+
+		return nullptr;
+	}
 }

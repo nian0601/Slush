@@ -13,6 +13,7 @@ namespace Slush
 		void Parse(int anArgCount, char** anArgValues);
 
 		bool HasFlag(const char* aFlag) const;
+		const char* GetString(const char* aFlag) const;
 
 	private:
 		CommandLineArgs() {};

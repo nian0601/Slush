@@ -3,6 +3,7 @@
     "baseRef": "head"
   },
   "permissions": {
+    "allow": ["Bash(./build.bat*)", "PowerShell(.\\build.bat*)"],
     "deny": ["AskUserQuestion"]
   }
 }

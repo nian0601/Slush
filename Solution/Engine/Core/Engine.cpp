@@ -11,28 +11,12 @@
 #include "Graphics/Renderer.h"
 
 #include <windows.h>
-#include <string>
 #include <FW_FileSystem.h>
 
 #include "imgui/Fonts/IconsFontAwesome7.h"
 
 namespace Slush
 {
-	void ReplaceAllOccurancesInString(std::string& aString, const std::string& aSomethingToReplace, const std::string& aNewString)
-	{
-		// Get the first occurrence
-		size_t pos = aString.find(aSomethingToReplace);
-
-		// Repeat till end is reached
-		while (pos != std::string::npos)
-		{
-			// Replace this occurrence of Sub String
-			aString.replace(pos, aSomethingToReplace.size(), aNewString);
-			// Get the next occurrence from the current position
-			pos = aString.find(aSomethingToReplace, pos + aNewString.size());
-		}
-	}
-
 	Engine* Engine::ourInstance = nullptr;
 	Engine& Engine::GetInstance()
 	{
@@ -50,18 +34,9 @@ namespace Slush
 
 	void Engine::Initialize()
 	{
-		char fileBuffer[128];
-		GetModuleFileNameA(NULL, fileBuffer, 128);
-
-		std::string assetPath;
-		assetPath.append(fileBuffer);
-		assetPath.erase(assetPath.rfind("\\"), std::string::npos);
-		ReplaceAllOccurancesInString(assetPath, "\\", "/");
-		assetPath.append("/");
-		myDataFolder = assetPath.c_str();
-
 		// TODO: Make File-handling a part of engine instead to simplify filepath-handling?
-		FW_FileSystem::SetDataFolder(myDataFolder.GetBuffer());
+		FW_FileSystem::InitDataFolderFromExecutable();
+		myDataFolder = FW_FileSystem::GetDataFolder();
 
 		myLogger = new Logger();
 		myWindow = new Window(1920, 1080);

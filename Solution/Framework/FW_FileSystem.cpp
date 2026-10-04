@@ -12,6 +12,34 @@ namespace FW_FileSystem
 		ourDataFolderPath = aFolderName;
 	}
 
+	const FW_String& GetDataFolder()
+	{
+		return ourDataFolderPath;
+	}
+
+	void InitDataFolderFromExecutable()
+	{
+		char buffer[MAX_PATH];
+		const DWORD length = GetModuleFileNameA(NULL, buffer, MAX_PATH);
+		FW_ASSERT(length > 0 && length < MAX_PATH, "Failed to get the executable path");
+
+		// Strip the filename and use forward slashes
+		int lastSeparator = -1;
+		for (DWORD i = 0; i < length; ++i)
+		{
+			if (buffer[i] == '\\')
+				buffer[i] = '/';
+
+			if (buffer[i] == '/')
+				lastSeparator = static_cast<int>(i);
+		}
+
+		FW_ASSERT(lastSeparator != -1, "Executable path has no directory");
+		buffer[lastSeparator + 1] = '\0';
+
+		SetDataFolder(buffer);
+	}
+
 	void GetAbsoluteFilePath(const FW_String& aFilePath, FW_String& aFilePathOut)
 	{
 		aFilePathOut = ourDataFolderPath + aFilePath;

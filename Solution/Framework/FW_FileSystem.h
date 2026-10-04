@@ -28,6 +28,10 @@ namespace FW_FileSystem
 
 
 	void SetDataFolder(const char* aFolderName);
+	const FW_String& GetDataFolder();
+
+	// Sets the data folder to the executable's directory (forward slashes, trailing '/'). Safe to call more than once.
+	void InitDataFolderFromExecutable();
 
 	void GetAbsoluteFilePath(const FW_String& aFilePath, FW_String& aFilePathOut);
 	bool GetAllFilesFromRelativeDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);

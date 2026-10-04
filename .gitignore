@@ -84,3 +84,6 @@ Application/Raytracer/Data/Video
 /.worktrees/
 /Workbed/*/Data/debug/
 .claude/plan-corrections.jsonl
+
+# Obsidian vault settings (per-user)
+.obsidian/

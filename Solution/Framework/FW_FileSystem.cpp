@@ -19,6 +19,13 @@ namespace FW_FileSystem
 
 	void InitDataFolderFromExecutable()
 	{
+		FW_String executableDirectory;
+		GetExecutableDirectory(executableDirectory);
+		SetDataFolder(executableDirectory.GetBuffer());
+	}
+
+	void GetExecutableDirectory(FW_String& anOut)
+	{
 		char buffer[MAX_PATH];
 		const DWORD length = GetModuleFileNameA(NULL, buffer, MAX_PATH);
 		FW_ASSERT(length > 0 && length < MAX_PATH, "Failed to get the executable path");
@@ -37,7 +44,19 @@ namespace FW_FileSystem
 		FW_ASSERT(lastSeparator != -1, "Executable path has no directory");
 		buffer[lastSeparator + 1] = '\0';
 
-		SetDataFolder(buffer);
+		anOut = buffer;
+	}
+
+	bool FileExists(const FW_String& anAbsoluteFilePath)
+	{
+		const DWORD attributes = GetFileAttributesA(anAbsoluteFilePath.GetBuffer());
+		return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
+	}
+
+	bool DirectoryExists(const FW_String& anAbsoluteFolderPath)
+	{
+		const DWORD attributes = GetFileAttributesA(anAbsoluteFolderPath.GetBuffer());
+		return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 	}
 
 	void GetAbsoluteFilePath(const FW_String& aFilePath, FW_String& aFilePathOut)

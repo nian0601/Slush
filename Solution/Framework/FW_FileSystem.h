@@ -33,6 +33,11 @@ namespace FW_FileSystem
 	// Sets the data folder to the executable's directory (forward slashes, trailing '/'). Safe to call more than once.
 	void InitDataFolderFromExecutable();
 
+	// The executable's directory, forward slashes and a trailing '/'. Stateless.
+	void GetExecutableDirectory(FW_String& anOut);
+	bool FileExists(const FW_String& anAbsoluteFilePath);
+	bool DirectoryExists(const FW_String& anAbsoluteFolderPath);
+
 	void GetAbsoluteFilePath(const FW_String& aFilePath, FW_String& aFilePathOut);
 	bool GetAllFilesFromRelativeDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);
 	bool GetAllFilesFromAbsoluteDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);

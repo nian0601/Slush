@@ -37,6 +37,7 @@
     <ClInclude Include="Core\CommandLineArgs.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\EditorTheme.h" />
+    <ClInclude Include="Core\AssetRepository.h" />
     <ClInclude Include="Core\EngineTestSuite.h" />
     <ClInclude Include="Core\UnitTests.h" />
     <ClInclude Include="Core\IApp.h" />
@@ -115,6 +116,7 @@
     <ClCompile Include="Core\CommandLineArgs.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\EditorTheme.cpp" />
+    <ClCompile Include="Core\AssetRepository.cpp" />
     <ClCompile Include="Core\EngineTestSuite.cpp" />
     <ClCompile Include="Core\UnitTests.cpp" />
     <ClCompile Include="Core\Log.cpp" />

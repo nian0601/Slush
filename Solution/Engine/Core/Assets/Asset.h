@@ -28,6 +28,8 @@ namespace Slush
 
 		// Where the next Save() writes. New assets and copies go to the first mount (index 0).
 		void SetRepositoryIndex(int aRepositoryIndex) { myRepositoryIndex = aRepositoryIndex; }
+		// Set while CopyAsset loads the source, so an outdated source isn't resaved under the copy's name into the source's Asset Repository
+		void SetSkipUpgradeResave(bool aSkip) { mySkipUpgradeResave = aSkip; }
 		unsigned int GetAssetTypeID() const { return myAssetTypeID; }
 
 		bool HasUnsavedChanges() const { return myHasUnsavedChanges; }
@@ -41,6 +43,7 @@ namespace Slush
 		int myRepositoryIndex = 0;
 		unsigned int myAssetTypeID = INT_MAX;
 		bool myHasUnsavedChanges = false;
+		bool mySkipUpgradeResave = false;
 	};
 
 #define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder, AssetIcon, Version)\

@@ -101,7 +101,10 @@ namespace Slush
 		}
 
 		AssetType* asset = new AssetType(aNewName, GetAssetID<AssetType>());
+		// The Save() below writes the copy (already upgraded) to index 0
+		asset->SetSkipUpgradeResave(true);
 		asset->Load(anOldAsset.GetFilePath().GetBuffer(), anOldAsset.GetRepositoryIndex());
+		asset->SetSkipUpgradeResave(false);
 		asset->SetRepositoryIndex(0);
 		asset->Save();
 

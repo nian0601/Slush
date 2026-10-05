@@ -18,7 +18,7 @@ namespace Slush
 
 		OnParse(rootHandle, static_cast<unsigned int>(loadedVersion));
 
-		if (NeedsUpgrade(static_cast<unsigned int>(loadedVersion)))
+		if (!mySkipUpgradeResave && NeedsUpgrade(static_cast<unsigned int>(loadedVersion)))
 		{
 			SLUSH_WARNING("[Asset] '%s' (%s) is version %u, current is %u, resaving to upgrade", myAssetName.GetBuffer(), GetTypeName(), loadedVersion, GetCurrentAssetVersion());
 			Save();

@@ -32,11 +32,12 @@ namespace Slush
 		ImGui::Separator();
 
 		static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable;
-		if (ImGui::BeginTable("table_scrolly", 3, flags))
+		if (ImGui::BeginTable("table_scrolly", 4, flags))
 		{
 			ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
 			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
 			ImGui::TableSetupColumn("Type", ImGuiTableColumnFlags_None);
+			ImGui::TableSetupColumn("Repository", ImGuiTableColumnFlags_None);
 			ImGui::TableSetupColumn("Filepath", ImGuiTableColumnFlags_WidthStretch);
 			ImGui::TableHeadersRow();
 
@@ -80,6 +81,9 @@ namespace Slush
 					ImGui::Text("%s", asset->GetTypeName());
 
 					ImGui::TableSetColumnIndex(2);
+					ImGui::Text("%s", asset->GetRepositoryName().GetBuffer());
+
+					ImGui::TableSetColumnIndex(3);
 					ImGui::Text("%s", asset->GetFilePath().GetBuffer());
 				}
 			}

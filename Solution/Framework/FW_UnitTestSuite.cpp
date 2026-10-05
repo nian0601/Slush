@@ -163,6 +163,19 @@ namespace FW_UnitTestSuite
 
 	void TestCreateFolderIfNecessary()
 	{
+		// Remove the tree a previous run left behind (deepest first), so the creation below is actually tested
+		const char* foldersToRemove[] = { "createfolder_test/nested/deeper", "createfolder_test/nested", "createfolder_test" };
+		for (const char* folder : foldersToRemove)
+		{
+			FW_String folderToRemove = ourScratchFolder;
+			folderToRemove += folder;
+			RemoveDirectoryA(folderToRemove.GetBuffer());
+		}
+
+		FW_String rootFolder = ourScratchFolder;
+		rootFolder += "createfolder_test";
+		FW_TEST_REQUIRE(!FW_FileSystem::DirectoryExists(rootFolder), "Expected the previous run's folders to be removed");
+
 		FW_String filePath = ourScratchFolder;
 		filePath += "createfolder_test/nested/deeper/file.txt";
 		FW_FileSystem::CreateFolderIfNecessary(filePath);

@@ -135,11 +135,8 @@ void CardEditorDockable::SaveCard()
 	FW_String filepath;
 	if (!Slush::AssetRepository::FindAssetFile(relativePath, filepath))
 	{
-		FW_String folderPath;
-		Slush::AssetRepository::GetAssetWritePath("Cards", 0, folderPath);
-		FW_FileSystem::CreateFolder(folderPath);
-
 		Slush::AssetRepository::GetAssetWritePath(relativePath, 0, filepath);
+		FW_FileSystem::CreateFolderIfNecessary(filepath);
 	}
 
 	FW_FileProcessor processor(filepath.GetBuffer(), FW_FileProcessor::WRITE);

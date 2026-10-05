@@ -323,11 +323,8 @@ namespace Slush
 		FW_String path;
 		if (!AssetRepository::FindAssetFile(settingName, path, &repositoryIndex))
 		{
-			FW_String folderPath;
-			AssetRepository::GetAssetWritePath("ImGUILayouts", repositoryIndex, folderPath);
-			FW_FileSystem::CreateFolder(folderPath);
-
 			AssetRepository::GetAssetWritePath(settingName, repositoryIndex, path);
+			FW_FileSystem::CreateFolderIfNecessary(path);
 		}
 
 		ImGui::SaveIniSettingsToDisk(path.GetBuffer());

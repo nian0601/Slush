@@ -11,7 +11,6 @@
 #include "Graphics/Renderer.h"
 
 #include <windows.h>
-#include <FW_FileSystem.h>
 
 #include "Core/EditorTheme.h"
 
@@ -34,9 +33,6 @@ namespace Slush
 
 	void Engine::Initialize()
 	{
-		// TODO: Make File-handling a part of engine instead to simplify filepath-handling?
-		FW_FileSystem::InitDataFolderFromExecutable();
-
 		myLogger = new Logger();
 		myWindow = new Window(1920, 1080);
 		myInput = new Input();

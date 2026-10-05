@@ -161,9 +161,26 @@ namespace FW_UnitTestSuite
 		FW_TEST_CHECK(boolWrite2 == boolRead2, "second bool round-trip");
 	}
 
+	void TestCreateFolderIfNecessary()
+	{
+		FW_String filePath = ourScratchFolder;
+		filePath += "createfolder_test/nested/deeper/file.txt";
+		FW_FileSystem::CreateFolderIfNecessary(filePath);
+
+		FW_String folderPath = ourScratchFolder;
+		folderPath += "createfolder_test/nested/deeper";
+		FW_TEST_CHECK(FW_FileSystem::DirectoryExists(folderPath), "Expected every folder along the path to be created");
+		FW_TEST_CHECK(!FW_FileSystem::DirectoryExists(filePath), "Expected the trailing filename not to become a folder");
+
+		// Already existing folders are fine
+		FW_FileSystem::CreateFolderIfNecessary(folderPath);
+		FW_TEST_CHECK(FW_FileSystem::DirectoryExists(folderPath), "Expected an existing folder to stay");
+	}
+
 	void RunFrameworkTests()
 	{
 		BeginSuite("Framework");
 		FW_RUN_TEST(TestFileProcessor);
+		FW_RUN_TEST(TestCreateFolderIfNecessary);
 	}
 }

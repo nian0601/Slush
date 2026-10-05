@@ -45,9 +45,7 @@ namespace Slush
 		AssetRepository::GetAssetWritePath(myFilePath, myRepositoryIndex, myAbsoluteFilePath);
 
 		// The type folder may not exist yet in this Asset Repository (e.g. the first asset of its type in a game)
-		FW_String folderPath;
-		AssetRepository::GetAssetWritePath(GetTypeFolder(), myRepositoryIndex, folderPath);
-		FW_FileSystem::CreateFolder(folderPath);
+		FW_FileSystem::CreateFolderIfNecessary(myAbsoluteFilePath);
 
 		parser.FinishWriting(myAbsoluteFilePath.GetBuffer());
 

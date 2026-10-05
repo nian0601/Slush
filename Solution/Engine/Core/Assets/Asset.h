@@ -23,7 +23,6 @@ namespace Slush
 
 		const FW_String& GetAssetName() const { return myAssetName; }
 		const FW_String& GetFilePath() const { return myFilePath; }
-		const FW_String& GetAbsoluteFilePath() const { return myAbsoluteFilePath; }
 		int GetRepositoryIndex() const { return myRepositoryIndex; }
 		const FW_String& GetRepositoryName() const;
 

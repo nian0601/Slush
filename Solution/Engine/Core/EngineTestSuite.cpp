@@ -194,14 +194,17 @@ namespace Slush
 			FW_String foundPath;
 			int repositoryIndex = -1;
 			FW_TEST_REQUIRE(AssetRepository::FindAssetFile("EngineOnly.txt", foundPath, &repositoryIndex), "Expected the Engine-only file to be found");
+			FW_TEST_CHECK(repositoryIndex == 1, "Expected the Engine-only file to come from Engine");
 
 			FW_String writePath;
 			AssetRepository::GetAssetWritePath("EngineOnly.txt", repositoryIndex, writePath);
-			FW_TEST_CHECK(writePath == foundPath, "Expected an existing asset to be written back to its source Asset Repository");
+			FW_String expected = tree.myRoot;
+			expected += "Engine/EngineOnly.txt";
+			FW_TEST_CHECK(writePath == expected, "Expected an existing asset to be written back to its source Asset Repository");
 
 			// New asset: written to the first mount
 			AssetRepository::GetAssetWritePath("New.txt", 0, writePath);
-			FW_String expected = tree.myRoot;
+			expected = tree.myRoot;
 			expected += "Game/New.txt";
 			FW_TEST_CHECK(writePath == expected, "Expected a new asset to go to the first mounted Asset Repository");
 		}

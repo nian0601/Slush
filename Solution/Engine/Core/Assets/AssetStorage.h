@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/Assets/Asset.h"
+#include "Core/AssetRepository.h"
 #include "Core/Log.h"
 
 #include "FW_FileSystem.h"
@@ -38,7 +39,7 @@ namespace Slush
 		Asset& CreateNewAsset(const char* aName) override;
 		Asset& CopyAsset(const char* aNewName, const Asset& anOldAsset) override;
 
-		void Load(const char* aName, const char* aFilePath);
+		void Load(const char* aName, const AssetRepository::AssetFileInfo& aFileInfo);
 		void LoadAllAssets();
 
 		const Asset* GetAsset(const char* aName) const;
@@ -60,8 +61,6 @@ namespace Slush
 	template<typename AssetType>
 	AssetStorage<AssetType>::AssetStorage()
 	{
-		FW_FileSystem::CreateFolderIfNecessary(AssetType::GetAssetTypeFolder());
-
 		myAssetTypeID = GetAssetID<AssetType>();
 	}
 
@@ -82,6 +81,7 @@ namespace Slush
 		}
 
 		AssetType* asset = new AssetType(aName, GetAssetID<AssetType>());
+		asset->SetRepositoryIndex(0);
 
 		myAssets.Add(asset);
 		myAssetMap[aName] = asset;
@@ -101,7 +101,8 @@ namespace Slush
 		}
 
 		AssetType* asset = new AssetType(aNewName, GetAssetID<AssetType>());
-		asset->Load(anOldAsset.GetFilePath().GetBuffer());
+		asset->Load(anOldAsset.GetFilePath().GetBuffer(), anOldAsset.GetRepositoryIndex());
+		asset->SetRepositoryIndex(0);
 		asset->Save();
 
 		myAssets.Add(asset);
@@ -113,32 +114,41 @@ namespace Slush
 	}
 
 	template<typename AssetType>
-	void AssetStorage<AssetType>::Load(const char* aName, const char* aFilePath)
+	void AssetStorage<AssetType>::Load(const char* aName, const AssetRepository::AssetFileInfo& aFileInfo)
 	{
+		const char* repositoryName = AssetRepository::GetRepositoryName(aFileInfo.myRepositoryIndex).GetBuffer();
+		const char* filePath = aFileInfo.myRelativeFilePath.GetBuffer();
 		if (myAssetMap.KeyExists(aName))
 		{
-			SLUSH_WARNING("%ss: '%s' already exists, loading of '%s' failed.", AssetType::GetAssetTypeName(), aName, aFilePath);
+			SLUSH_WARNING("%ss: '%s' already exists, loading of '%s' (%s) failed.", AssetType::GetAssetTypeName(), aName, filePath, repositoryName);
 			return;
 		}
 
 		AssetType* asset = new AssetType(aName, GetAssetID<AssetType>());
-		asset->Load(aFilePath);
+		asset->Load(filePath, aFileInfo.myRepositoryIndex);
 
 		myAssets.Add(asset);
 		myAssetMap[aName] = asset;
 
-		SLUSH_INFO("%ss: '%s' loaded as '%s'.", AssetType::GetAssetTypeName(), aFilePath, aName);
+		SLUSH_INFO("%ss: '%s' (%s) loaded as '%s'.", AssetType::GetAssetTypeName(), filePath, repositoryName, aName);
 	}
 
 	template<typename AssetType>
 	void AssetStorage<AssetType>::LoadAllAssets()
 	{
 		SLUSH_INFO("Loading all %ss:", AssetType::GetAssetTypeName())
-		FW_GrowingArray<FW_FileSystem::FileInfo> assetFiles;
-		FW_FileSystem::GetAllFilesFromRelativeDirectory(AssetType::GetAssetTypeFolder(), assetFiles);
+		FW_GrowingArray<AssetRepository::AssetFileInfo> assetFiles;
+		FW_GrowingArray<AssetRepository::AssetFileInfo> overriddenFiles;
+		AssetRepository::GetAllAssetFiles(AssetType::GetAssetTypeFolder(), assetFiles, &overriddenFiles);
 
-		for (const FW_FileSystem::FileInfo& info : assetFiles)
-			Load(info.myFileNameNoExtention.GetBuffer(), info.myRelativeFilePath.GetBuffer());
+		for (const AssetRepository::AssetFileInfo& info : overriddenFiles)
+		{
+			SLUSH_INFO("%ss: '%s' (%s) is overridden by a higher-priority Asset Repository", AssetType::GetAssetTypeName(),
+				info.myRelativeFilePath.GetBuffer(), AssetRepository::GetRepositoryName(info.myRepositoryIndex).GetBuffer());
+		}
+
+		for (const AssetRepository::AssetFileInfo& info : assetFiles)
+			Load(info.myFileNameNoExtention.GetBuffer(), info);
 	}
 
 	template<typename AssetType>

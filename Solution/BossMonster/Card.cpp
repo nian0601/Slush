@@ -6,6 +6,7 @@
 #include <FW_Includes.h>
 #include <FW_FileParser.h>
 #include <Core/Assets/AssetStorage.h>
+#include <Core/AssetRepository.h>
 #include <Graphics/Texture.h>
 
 Card::Card(const Slush::Font* aFont)
@@ -67,7 +68,12 @@ Card::~Card()
 void Card::Load(const char* aFilePath)
 {
 	FW_String absoluteFilePath;
-	FW_FileSystem::GetAbsoluteFilePath(aFilePath, absoluteFilePath);
+	if (!Slush::AssetRepository::FindAssetFile(aFilePath, absoluteFilePath))
+	{
+		SLUSH_ERROR("Card: %s not found in any Asset Repository", aFilePath);
+		return;
+	}
+
 	FW_FileParser parser(absoluteFilePath.GetBuffer());
 
 	FW_String line;

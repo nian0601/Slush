@@ -10,7 +10,7 @@ namespace Slush
 	public:
 		using Asset::Asset;
 		virtual ~DataAsset() {}
-		void Load(const char* aFilePath) final;
+		void Load(const char* aFilePath, int aRepositoryIndex) final;
 		void Save() final;
 
 	protected:

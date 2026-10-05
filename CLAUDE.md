@@ -10,6 +10,8 @@ Slush is a personal, hand-rolled C++ game engine (namespace `Slush`) built on ve
 - `Solution/Framework/` — low-level, STL-avoiding utility library (containers, math, string/hashing, file I/O, assertions, unit tests) — all types prefixed `FW_`
 - `Solution/ActionGame/`, `Solution/BossMonster/`, `Solution/TopDownGame/` — separate game executables built on Engine + Framework
 
+Authored content lives in the top-level `Assets/` folder, split into **Asset Repositories** (`Assets/Engine/`, `Assets/ActionGame/`, ...; see `terminology.md`). Each game's `main.cpp` mounts its own with `Slush::AssetRepository::Mount("<Game>")`, Engine is mounted last automatically, and lookups return the first Asset Repository that has the file. `Workbed/<Game>/` holds only the exe, build output and the `Debug/` folder. All path resolution goes through `Slush::AssetRepository` (`Solution/Engine/Core/AssetRepository.h`).
+
 ## Build
 
 Windows-only, no CMake. Build only through the repo-root `build.bat`:
@@ -33,7 +35,7 @@ The script disables MSBuild worker-node reuse. An interrupted build can still le
 
 *(Optional, recommended if a lingering process or dirtied runtime file is a recurring problem)*
 Worktree-blocking processes: ActionGame.exe, BossMonster.exe, TopDownGame.exe, MSBuild.exe, mspdbsrv.exe
-Worktree-discardable paths: Workbed/*/ImGUILayouts/*.ini, Workbed/*/Debug/DebugSettings.sdebug, Workbed/*/Debug/*
+Worktree-discardable paths: Assets/*/ImGUILayouts/*.ini, Workbed/*/Debug/DebugSettings.sdebug, Workbed/*/Debug/*
 
 ## Code style
 
@@ -61,7 +63,7 @@ A suite starts with `FW_UnitTestSuite::BeginSuite("Name")` and runs its tests vi
 
 There's no option to skip tests: the whole suite runs on every launch of every game, so tests must stay fast. `<Game>.exe -runtestsonly` runs every suite, writes the report and exits before `Engine::Initialize` (exit code 0 on pass, 1 on fail) — the cheap verification path, no window or assets needed. Tests run before the Engine is initialized, so they can't use the logger, window or asset system. A test needing scratch files uses `Slush::AssetRepository::GetDebugFilePath(...)` (creates `Workbed/<Game>/Debug/` on first use); `AssetParser`/`FW_FileParser` take absolute paths, so pass them the resolved path.
 
-`DataAsset` types carry a version number (`DEFINE_ASSET`'s last argument) and auto-resave on `Load()` if the file's `version` field is behind (see `Solution/Engine/Core/Assets/DataAsset.cpp`). When a change triggers this kind of resave across `Workbed/` files, diff more than one resaved file in full — a resave normalizes the *entire* file to match current parsing code, so it can surface unrelated latent drift (stale unused fields, newly-required fields) that's easy to miss if you only check that the version number changed.
+`DataAsset` types carry a version number (`DEFINE_ASSET`'s last argument) and auto-resave on `Load()` if the file's `version` field is behind (see `Solution/Engine/Core/Assets/DataAsset.cpp`). When a change triggers this kind of resave across `Assets/` files, diff more than one resaved file in full — a resave normalizes the *entire* file to match current parsing code, so it can surface unrelated latent drift (stale unused fields, newly-required fields) that's easy to miss if you only check that the version number changed.
 
 For changes that could affect actual gameplay (entity spawning, component construction, weapon/projectile logic) rather than just asset loading, verify by getting into real gameplay, not just a clean asset-load log. `ActionGame`'s `SkipStartScreen` debug flag (`Workbed/ActionGame/Debug/DebugSettings.sdebug`, also toggleable via the in-editor "Debug Settings" dockable) skips the main menu and character-selection screen and drops straight into a level — enemies spawn, entities update, projectiles fire, from a cold launch. Stronger evidence than log output alone; consider a mid-run screenshot to confirm visually. Toggle it back off afterward — it's an opt-in debug convenience, not default behavior. Currently `ActionGame`-specific (`MainMenuState`/`CharacterSelectionState`).
 

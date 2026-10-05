@@ -27,7 +27,6 @@ private:
 	void LoadCard(const FW_String& aFilePath);
 
 	FW_FileSystem::FileInfo myCardsDirectoryInfo;
-	FW_String myCardsFilePath;
 
 	enum CardType
 	{

@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "DataAsset.h"
+#include "Core/AssetRepository.h"
+
 #include <FW_FileSystem.h>
 
 namespace Slush
 {
-	void DataAsset::Load(const char* aFilePath)
+	void DataAsset::Load(const char* aFilePath, int aRepositoryIndex)
 	{
-		Asset::Load(aFilePath);
+		Asset::Load(aFilePath, aRepositoryIndex);
 
 		Slush::AssetParser parser;
 		Slush::AssetParser::Handle rootHandle = parser.Load(myAbsoluteFilePath.GetBuffer());
@@ -35,13 +37,19 @@ namespace Slush
 
 		OnParse(rootHandle, GetCurrentAssetVersion());
 
-		FW_String filepath = GetTypeFolder();
-		filepath += "/";
-		filepath += myAssetName;
-		filepath += ".";
-		filepath += GetTypeExtention();
-		FW_FileSystem::GetAbsoluteFilePath(filepath, filepath);
-		parser.FinishWriting(filepath.GetBuffer());
+		myFilePath = GetTypeFolder();
+		myFilePath += "/";
+		myFilePath += myAssetName;
+		myFilePath += ".";
+		myFilePath += GetTypeExtention();
+		AssetRepository::GetAssetWritePath(myFilePath, myRepositoryIndex, myAbsoluteFilePath);
+
+		// The type folder may not exist yet in this Asset Repository (e.g. the first asset of its type in a game)
+		FW_String folderPath;
+		AssetRepository::GetAssetWritePath(GetTypeFolder(), myRepositoryIndex, folderPath);
+		FW_FileSystem::CreateFolder(folderPath);
+
+		parser.FinishWriting(myAbsoluteFilePath.GetBuffer());
 
 		MarkAsSaved();
 	}

@@ -314,15 +314,22 @@ namespace Slush
 		if (!myAppLayout)
 			return;
 
-		FW_String folderPath;
-		FW_FileSystem::GetAbsoluteFilePath("ImGUILayouts", folderPath);
-		FW_FileSystem::CreateFolder(folderPath);
-
-		FW_String path;
 		FW_String settingName = "ImGUILayouts/";
 		settingName += myAppLayout->GetName();
 		settingName += ".ini";
-		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
+
+		// Save back to the Asset Repository the layout came from, or the game's own if none had it
+		int repositoryIndex = 0;
+		FW_String path;
+		if (!AssetRepository::FindAssetFile(settingName, path, &repositoryIndex))
+		{
+			FW_String folderPath;
+			AssetRepository::GetAssetWritePath("ImGUILayouts", repositoryIndex, folderPath);
+			FW_FileSystem::CreateFolder(folderPath);
+
+			AssetRepository::GetAssetWritePath(settingName, repositoryIndex, path);
+		}
+
 		ImGui::SaveIniSettingsToDisk(path.GetBuffer());
 	}
 
@@ -331,12 +338,13 @@ namespace Slush
 		if (!myAppLayout)
 			return;
 
-		FW_String path;
 		FW_String settingName = "ImGUILayouts/";
 		settingName += myAppLayout->GetName();
 		settingName += ".ini";
-		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
-		ImGui::LoadIniSettingsFromDisk(path.GetBuffer());
+
+		FW_String path;
+		if (AssetRepository::FindAssetFile(settingName, path))
+			ImGui::LoadIniSettingsFromDisk(path.GetBuffer());
 	}
 
 	Vector2f Window::GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const

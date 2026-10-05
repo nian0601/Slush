@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Asset.h"
-#include <FW_FileSystem.h>
+#include "Core/AssetRepository.h"
 
 namespace Slush
 {
@@ -9,10 +9,16 @@ namespace Slush
 		, myAssetTypeID(aAssetID)
 	{}
 
-	void Asset::Load(const char* aFilePath)
+	void Asset::Load(const char* aFilePath, int aRepositoryIndex)
 	{
 		myFilePath = aFilePath;
-		FW_FileSystem::GetAbsoluteFilePath(myFilePath, myAbsoluteFilePath);
+		myRepositoryIndex = aRepositoryIndex;
+		AssetRepository::GetAssetWritePath(myFilePath, myRepositoryIndex, myAbsoluteFilePath);
+	}
+
+	const FW_String& Asset::GetRepositoryName() const
+	{
+		return AssetRepository::GetRepositoryName(myRepositoryIndex);
 	}
 
 	void Asset::Save()

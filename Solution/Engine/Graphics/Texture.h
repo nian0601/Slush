@@ -13,12 +13,12 @@ namespace Slush
 	class Texture : public Asset
 	{
 	public:
-		DEFINE_ASSET("Texture", "png", "data/textures", ICON_FA_IMAGE, 1);
+		DEFINE_ASSET("Texture", "png", "textures", ICON_FA_IMAGE, 1);
 
 		using Asset::Asset;
 		~Texture();
 
-		void Load(const char* aFilePath) override;
+		void Load(const char* aFilePath, int aRepositoryIndex) override;
 
 		const sf::Texture* GetSFMLTexture() const { return mySFMLTexture; }
 		const Vector2i& GetSize() const { return mySize; }

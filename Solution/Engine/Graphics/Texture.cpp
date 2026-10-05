@@ -11,9 +11,9 @@ namespace Slush
 		FW_SAFE_DELETE(mySFMLTexture);
 	}
 
-	void Texture::Load(const char* aFilePath)
+	void Texture::Load(const char* aFilePath, int aRepositoryIndex)
 	{
-		Asset::Load(aFilePath);
+		Asset::Load(aFilePath, aRepositoryIndex);
 
 		mySFMLTexture = new sf::Texture();
 		if (!mySFMLTexture->loadFromFile(myAbsoluteFilePath.GetBuffer()))

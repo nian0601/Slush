@@ -36,7 +36,6 @@ namespace Slush
 	{
 		// TODO: Make File-handling a part of engine instead to simplify filepath-handling?
 		FW_FileSystem::InitDataFolderFromExecutable();
-		myDataFolder = FW_FileSystem::GetDataFolder();
 
 		myLogger = new Logger();
 		myWindow = new Window(1920, 1080);

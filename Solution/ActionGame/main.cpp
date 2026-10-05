@@ -41,7 +41,7 @@ public:
 		assets.RegisterAssetType<StatsUpgradeData>();
 		assets.LoadAllAssets();
 
-		myFont.Load("Data/NotoSans.ttf");
+		myFont.Load("Fonts/NotoSans.ttf");
 		ActionGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -115,10 +115,12 @@ private:
 	//AppLayout* myAppLayout = nullptr;
 };
 
+#include "Core/AssetRepository.h"
 #include "Core/UnitTests.h"
 int main(int argc, char** argv)
 {
 	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
+	Slush::AssetRepository::Mount("ActionGame");
 
 	const Slush::UnitTests::Outcome testOutcome = Slush::UnitTests::Run(nullptr);
 	if (testOutcome != Slush::UnitTests::Outcome::Continue)

@@ -140,16 +140,14 @@ namespace Slush
 				for (const FW_FileSystem::FileInfo& file : repositoryFiles)
 				{
 					AssetFileInfo info;
-					info.myFileName = file.myFileName;
-					info.myFileNameNoExtention = file.myFileNameNoExtention;
+					info.myFileInfo = file;
 					info.myRelativeFilePath = file.myAbsoluteFilePath.SubStr(repositoryRoot.Length() + 1, file.myAbsoluteFilePath.Length());
-					info.myAbsoluteFilePath = file.myAbsoluteFilePath;
 					info.myRepositoryIndex = i;
 
 					bool isOverridden = false;
 					for (int j = 0; j < filesFromHigherPriority; ++j)
 					{
-						if (someOutFiles[j].myFileNameNoExtention == info.myFileNameNoExtention)
+						if (someOutFiles[j].myFileInfo.myFileNameNoExtention == file.myFileNameNoExtention)
 						{
 							isOverridden = true;
 							break;

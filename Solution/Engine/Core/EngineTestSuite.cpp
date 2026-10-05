@@ -110,7 +110,7 @@ namespace Slush
 		{
 			for (int i = 0; i < someFiles.Count(); ++i)
 			{
-				if (someFiles[i].myFileNameNoExtention == aNameNoExtention)
+				if (someFiles[i].myFileInfo.myFileNameNoExtention == aNameNoExtention)
 					return i;
 			}
 
@@ -180,9 +180,10 @@ namespace Slush
 
 			FW_String expected = tree.myRoot;
 			expected += "Engine/Prefabs/E.prefab";
-			FW_TEST_CHECK(files[engineOnly].myAbsoluteFilePath == expected, "Expected the absolute path into Engine");
+			FW_TEST_CHECK(files[engineOnly].myFileInfo.myAbsoluteFilePath == expected, "Expected the absolute path into Engine");
+			FW_TEST_CHECK(files[engineOnly].myFileInfo.myLastTimeModifiedHighbit != 0, "Expected the timestamp from FW_FileSystem's FileInfo");
 
-			FW_TEST_CHECK(overridden[0].myFileNameNoExtention == "Common", "Expected Common to be the overridden asset");
+			FW_TEST_CHECK(overridden[0].myFileInfo.myFileNameNoExtention == "Common", "Expected Common to be the overridden asset");
 			FW_TEST_CHECK(overridden[0].myRepositoryIndex == 1, "Expected the overridden Common to come from Engine");
 		}
 

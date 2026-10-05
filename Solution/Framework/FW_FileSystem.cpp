@@ -6,6 +6,17 @@
 
 namespace FW_FileSystem
 {
+	// The one place a FileInfo gets built from the OS's file data, so every FileInfo carries the same fields
+	static void FillFileInfo(const FW_String& aFileName, const FW_String& anAbsoluteFilePath, const WIN32_FIND_DATA& someData, FileInfo& aFileInfoOut)
+	{
+		aFileInfoOut.myFileName = aFileName;
+		aFileInfoOut.myAbsoluteFilePath = anAbsoluteFilePath;
+		aFileInfoOut.myLastTimeModifiedLowbit = someData.ftLastWriteTime.dwLowDateTime;
+		aFileInfoOut.myLastTimeModifiedHighbit = someData.ftLastWriteTime.dwHighDateTime;
+
+		RemoveFileExtention(aFileName, aFileInfoOut.myFileNameNoExtention);
+	}
+
 	void GetExecutableDirectory(FW_String& anOut)
 	{
 		char buffer[MAX_PATH];
@@ -70,13 +81,7 @@ namespace FW_FileSystem
 			}
 			else
 			{
-				FileInfo& info = someOutFilePaths.Add();
-				info.myFileName = name;
-				info.myAbsoluteFilePath = fullPath;
-				info.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
-				info.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
-
-				RemoveFileExtention(name, info.myFileNameNoExtention);
+				FillFileInfo(name, fullPath, data, someOutFilePaths.Add());
 			}
 		} while (FindNextFile(filehandle, &data) != 0);
 
@@ -166,10 +171,7 @@ namespace FW_FileSystem
 		if (filehandle == INVALID_HANDLE_VALUE)
 			return false;
 
-		aFileInfoOut.myFileName = data.cFileName;
-		aFileInfoOut.myAbsoluteFilePath = aFilePath;
-		aFileInfoOut.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
-		aFileInfoOut.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
+		FillFileInfo(data.cFileName, aFilePath, data, aFileInfoOut);
 
 		FindClose(filehandle);
 		return true;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <FW_FileSystem.h>
 #include <FW_GrowingArray.h>
 #include <FW_String.h>
 
@@ -11,12 +12,11 @@ namespace Slush
 	// Debug half: logs, screenshots, test reports and other runtime output live in <exeDir>/Debug/.
 	namespace AssetRepository
 	{
+		// FW_FileSystem's FileInfo (names, absolute path, timestamps) plus where it sits among the Asset Repositories
 		struct AssetFileInfo
 		{
-			FW_String myFileName;
-			FW_String myFileNameNoExtention;
+			FW_FileSystem::FileInfo myFileInfo;
 			FW_String myRelativeFilePath; // Relative to the Asset Repository, e.g. "EntityPrefabs/Player.prefab"
-			FW_String myAbsoluteFilePath;
 			int myRepositoryIndex = -1;
 		};
 

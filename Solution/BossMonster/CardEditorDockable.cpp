@@ -34,9 +34,9 @@ void CardEditorDockable::OnBuildUI()
 
 		for (const Slush::AssetRepository::AssetFileInfo& cardInfo : cardFiles)
 		{
-			if (ImGui::Selectable(cardInfo.myFileNameNoExtention.GetBuffer()))
+			if (ImGui::Selectable(cardInfo.myFileInfo.myFileNameNoExtention.GetBuffer()))
 			{
-				LoadCard(cardInfo.myAbsoluteFilePath);
+				LoadCard(cardInfo.myFileInfo.myAbsoluteFilePath);
 				break;
 			}
 		}

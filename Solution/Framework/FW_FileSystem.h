@@ -10,8 +10,8 @@ namespace FW_FileSystem
 		FW_String myFileName;
 		FW_String myFileNameNoExtention;
 		FW_String myAbsoluteFilePath;
-		unsigned long myLastTimeModifiedLowbit;
-		unsigned long myLastTimeModifiedHighbit;
+		unsigned long myLastTimeModifiedLowbit = 0;
+		unsigned long myLastTimeModifiedHighbit = 0;
 	};
 
 	// The Contents of the file will be freed when the FileContent

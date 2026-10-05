@@ -151,7 +151,7 @@ namespace Slush
 		}
 
 		for (const AssetRepository::AssetFileInfo& info : assetFiles)
-			Load(info.myFileNameNoExtention.GetBuffer(), info);
+			Load(info.myFileInfo.myFileNameNoExtention.GetBuffer(), info);
 	}
 
 	template<typename AssetType>

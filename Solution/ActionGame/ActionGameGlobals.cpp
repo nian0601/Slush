@@ -2,10 +2,15 @@
 
 #include "ActionGameGlobals.h"
 
+#include <Core/AssetRepository.h>
+
 void ActionGameGlobals::DebugSettings::LoadFromDisk()
 {
+	FW_String filePath;
+	Slush::AssetRepository::GetDebugFilePath("DebugSettings.sdebug", filePath);
+
 	Slush::AssetParser parser;
-	Slush::AssetParser::Handle rootHandle = parser.Load("Data/DebugSettings.sdebug");
+	Slush::AssetParser::Handle rootHandle = parser.Load(filePath.GetBuffer());
 
 	if (rootHandle.IsValid())
 		OnParse(rootHandle);
@@ -18,7 +23,9 @@ void ActionGameGlobals::DebugSettings::SaveToDisk()
 
 	OnParse(rootHandle);
 
-	parser.FinishWriting("Data/DebugSettings.sdebug");
+	FW_String filePath;
+	Slush::AssetRepository::GetDebugFilePath("DebugSettings.sdebug", filePath);
+	parser.FinishWriting(filePath.GetBuffer());
 }
 
 void ActionGameGlobals::DebugSettings::OnParse(Slush::AssetParser::Handle aHandle)

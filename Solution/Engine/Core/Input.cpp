@@ -2,6 +2,7 @@
 #include "Input.h"
 
 #include "Core/Log.h"
+#include "Core/AssetRepository.h"
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
@@ -158,7 +159,7 @@ namespace Slush
 	void Input::PollDebugInputFile(bool aIsImGuiCapturingKeyboard)
 	{
 		FW_String absolutePath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/debug_input.txt", absolutePath);
+		AssetRepository::GetDebugFilePath("debug_input.txt", absolutePath);
 
 		FILE* file = nullptr;
 		fopen_s(&file, absolutePath.GetBuffer(), "r");

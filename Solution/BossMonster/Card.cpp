@@ -66,7 +66,9 @@ Card::~Card()
 
 void Card::Load(const char* aFilePath)
 {
-	FW_FileParser parser(aFilePath);
+	FW_String absoluteFilePath;
+	FW_FileSystem::GetAbsoluteFilePath(aFilePath, absoluteFilePath);
+	FW_FileParser parser(absoluteFilePath.GetBuffer());
 
 	FW_String line;
 	FW_String fieldName;

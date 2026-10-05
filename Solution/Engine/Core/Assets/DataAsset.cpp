@@ -9,7 +9,7 @@ namespace Slush
 		Asset::Load(aFilePath);
 
 		Slush::AssetParser parser;
-		Slush::AssetParser::Handle rootHandle = parser.Load(myFilePath.GetBuffer());
+		Slush::AssetParser::Handle rootHandle = parser.Load(myAbsoluteFilePath.GetBuffer());
 
 		int loadedVersion = 0;
 		rootHandle.ParseOptionalIntField("version", loadedVersion, true);
@@ -40,6 +40,7 @@ namespace Slush
 		filepath += myAssetName;
 		filepath += ".";
 		filepath += GetTypeExtention();
+		FW_FileSystem::GetAbsoluteFilePath(filepath, filepath);
 		parser.FinishWriting(filepath.GetBuffer());
 
 		MarkAsSaved();

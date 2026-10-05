@@ -82,7 +82,8 @@ Application/Raytracer/Data/Video
 
 # /implement-issue's transient per-issue git worktrees
 /.worktrees/
-/Workbed/*/Data/debug/
+/Workbed/*/Debug/*
+!/Workbed/*/Debug/DebugSettings.sdebug
 .claude/plan-corrections.jsonl
 
 # Obsidian vault settings (per-user)

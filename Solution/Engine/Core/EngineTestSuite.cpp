@@ -57,16 +57,10 @@ namespace Slush
 		// Scratch tree: one "Game" Asset Repository mounted in front of "Engine"
 		//   Game/Shared.txt, Game/Prefabs/A.prefab, Game/Prefabs/Common.prefab
 		//   Engine/Shared.txt, Engine/EngineOnly.txt, Engine/Prefabs/Common.prefab, Engine/Prefabs/E.prefab
-		static const char* ourAssetRepositoryTestFolder = "data/debug/assetrepository_test/";
-
-		static void WriteScratchFile(const char* aRelativePath)
+		static void WriteScratchFile(const FW_String& aRoot, const char* aRelativePath)
 		{
-			FW_String relativePath = ourAssetRepositoryTestFolder;
-			relativePath += aRelativePath;
-			FW_FileSystem::CreateFolderIfNecessary(relativePath);
-
-			FW_String absolutePath;
-			FW_FileSystem::GetAbsoluteFilePath(relativePath, absolutePath);
+			FW_String absolutePath = aRoot;
+			absolutePath += aRelativePath;
 
 			FILE* file = nullptr;
 			fopen_s(&file, absolutePath.GetBuffer(), "w");
@@ -82,15 +76,23 @@ namespace Slush
 		{
 			ScopedAssetRepositoryTree()
 			{
-				WriteScratchFile("Game/Shared.txt");
-				WriteScratchFile("Game/Prefabs/A.prefab");
-				WriteScratchFile("Game/Prefabs/Common.prefab");
-				WriteScratchFile("Engine/Shared.txt");
-				WriteScratchFile("Engine/EngineOnly.txt");
-				WriteScratchFile("Engine/Prefabs/Common.prefab");
-				WriteScratchFile("Engine/Prefabs/E.prefab");
+				AssetRepository::GetDebugFilePath("assetrepository_test/", myRoot);
 
-				FW_FileSystem::GetAbsoluteFilePath(ourAssetRepositoryTestFolder, myRoot);
+				const char* folders[] = { "", "Game", "Game/Prefabs", "Engine", "Engine/Prefabs" };
+				for (const char* folder : folders)
+				{
+					FW_String folderPath = myRoot;
+					folderPath += folder;
+					FW_FileSystem::CreateFolder(folderPath);
+				}
+
+				WriteScratchFile(myRoot, "Game/Shared.txt");
+				WriteScratchFile(myRoot, "Game/Prefabs/A.prefab");
+				WriteScratchFile(myRoot, "Game/Prefabs/Common.prefab");
+				WriteScratchFile(myRoot, "Engine/Shared.txt");
+				WriteScratchFile(myRoot, "Engine/EngineOnly.txt");
+				WriteScratchFile(myRoot, "Engine/Prefabs/Common.prefab");
+				WriteScratchFile(myRoot, "Engine/Prefabs/E.prefab");
 
 				const char* mounts[] = { "Game" };
 				AssetRepository::Testing::SetRootAndMounts(myRoot.GetBuffer(), mounts, 1);

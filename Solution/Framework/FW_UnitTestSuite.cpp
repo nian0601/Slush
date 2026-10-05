@@ -17,11 +17,13 @@ namespace FW_UnitTestSuite
 	static int ourTestCount = 0;
 	static int ourCheckCount = 0;
 	static FW_GrowingArray<FW_String> ourFailureLines;
+	static FW_String ourReportFilePath;
+	static FW_String ourScratchFolder;
 
-	void BeginRun()
+	void BeginRun(const char* aReportFilePath, const char* aScratchFolder)
 	{
-		FW_FileSystem::InitDataFolderFromExecutable();
-		FW_FileSystem::CreateFolderIfNecessary("data/debug");
+		ourReportFilePath = aReportFilePath;
+		ourScratchFolder = aScratchFolder;
 
 		ourCurrentSuite = "";
 		ourCurrentTest = "";
@@ -71,11 +73,8 @@ namespace FW_UnitTestSuite
 		_snprintf_s(summary, ourLineBufferSize, _TRUNCATE, "UNITTEST_RESULT: %s (%d failed / %d checks, %d tests)",
 			passed ? "PASS" : "FAIL", ourFailureLines.Count(), ourCheckCount, ourTestCount);
 
-		FW_String reportPath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/unittest_results.txt", reportPath);
-
 		FILE* file = nullptr;
-		fopen_s(&file, reportPath.GetBuffer(), "w");
+		fopen_s(&file, ourReportFilePath.GetBuffer(), "w");
 		if (file)
 			fprintf(file, "%s\n", summary);
 
@@ -102,8 +101,8 @@ namespace FW_UnitTestSuite
 
 	void TestFileProcessor()
 	{
-		FW_String scratchPath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/fileprocessor_test.output", scratchPath);
+		FW_String scratchPath = ourScratchFolder;
+		scratchPath += "fileprocessor_test.output";
 
 		float floatWrite = 123.f;
 		float floatWrite2 = 567.f;

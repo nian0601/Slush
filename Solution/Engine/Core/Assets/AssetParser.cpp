@@ -321,10 +321,7 @@ namespace Slush
 
 	void AssetParser::FinishWriting(const char* aFile)
 	{
-		FW_String filepath = aFile;
-		FW_FileSystem::GetAbsoluteFilePath(filepath, filepath);
-
-		FW_FileProcessor processor(filepath.GetBuffer(), FW_FileProcessor::WRITE);
+		FW_FileProcessor processor(aFile, FW_FileProcessor::WRITE);
 		myRootElement.Save(processor);
 	}
 

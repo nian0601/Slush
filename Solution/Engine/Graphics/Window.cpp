@@ -3,6 +3,7 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Log.h"
+#include "Core/AssetRepository.h"
 #include "Core/Dockables/Dockable.h"
 #include "Core/Dockables/IAppLayout.h"
 
@@ -170,14 +171,11 @@ namespace Slush
 
 		sf::Image image = texture.copyToImage();
 
-		FW_String screenshotPath = "data/debug/screenshot.png";
-		FW_FileSystem::CreateFolderIfNecessary(screenshotPath);
-
 		FW_String absoluteScreenshotPath;
-		FW_FileSystem::GetAbsoluteFilePath(screenshotPath, absoluteScreenshotPath);
+		AssetRepository::GetDebugFilePath("screenshot.png", absoluteScreenshotPath);
 
 		FW_String absolutePreviousPath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/screenshot_previous.png", absolutePreviousPath);
+		AssetRepository::GetDebugFilePath("screenshot_previous.png", absolutePreviousPath);
 
 		FW_FileSystem::FileInfo existingScreenshotInfo;
 		if (FW_FileSystem::GetFileInfo(absoluteScreenshotPath, existingScreenshotInfo))

@@ -47,8 +47,8 @@ namespace Slush
 		if (const EntityPrefab* prefab = assets.GetAsset<EntityPrefab>(aPrefabName))
 			return CreateEntity(aPosition, *prefab);
 
-		SLUSH_ERROR("Found no EntityPrefab called %s, creating a empty entity", aPrefabName);
-		return CreateEmptyEntity();
+		SLUSH_ERROR("Found no EntityPrefab called %s, no entity created", aPrefabName);
+		return nullptr;
 	}
 
 	Entity* EntityManager::CreateEntity(const Vector2f& aPosition, const FW_String& aPrefabName)

@@ -6,18 +6,18 @@
 
 namespace FW_FileSystem
 {
-	static FW_String ourDataFolderPath = "";
-	void SetDataFolder(const char* aFolderName)
+	// The one place a FileInfo gets built from the OS's file data, so every FileInfo carries the same fields
+	static void FillFileInfo(const FW_String& aFileName, const FW_String& anAbsoluteFilePath, const WIN32_FIND_DATA& someData, FileInfo& aFileInfoOut)
 	{
-		ourDataFolderPath = aFolderName;
+		aFileInfoOut.myFileName = aFileName;
+		aFileInfoOut.myAbsoluteFilePath = anAbsoluteFilePath;
+		aFileInfoOut.myLastTimeModifiedLowbit = someData.ftLastWriteTime.dwLowDateTime;
+		aFileInfoOut.myLastTimeModifiedHighbit = someData.ftLastWriteTime.dwHighDateTime;
+
+		RemoveFileExtention(aFileName, aFileInfoOut.myFileNameNoExtention);
 	}
 
-	const FW_String& GetDataFolder()
-	{
-		return ourDataFolderPath;
-	}
-
-	void InitDataFolderFromExecutable()
+	void GetExecutableDirectory(FW_String& anOut)
 	{
 		char buffer[MAX_PATH];
 		const DWORD length = GetModuleFileNameA(NULL, buffer, MAX_PATH);
@@ -37,63 +37,19 @@ namespace FW_FileSystem
 		FW_ASSERT(lastSeparator != -1, "Executable path has no directory");
 		buffer[lastSeparator + 1] = '\0';
 
-		SetDataFolder(buffer);
+		anOut = buffer;
 	}
 
-	void GetAbsoluteFilePath(const FW_String& aFilePath, FW_String& aFilePathOut)
+	bool FileExists(const FW_String& anAbsoluteFilePath)
 	{
-		aFilePathOut = ourDataFolderPath + aFilePath;
+		const DWORD attributes = GetFileAttributesA(anAbsoluteFilePath.GetBuffer());
+		return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
 	}
 
-	bool GetAllFilesFromRelativeDirectory(const char* aRelativeDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths)
+	bool DirectoryExists(const FW_String& anAbsoluteFolderPath)
 	{
-		FW_ASSERT(strlen(aRelativeDirectory) + 3 < MAX_PATH, "Path to directory is too long");
-
-		FW_String absolutDirectory = ourDataFolderPath;
-		absolutDirectory += aRelativeDirectory;
-		if (absolutDirectory[absolutDirectory.Length()] != '/')
-			absolutDirectory += "/";
-
-		absolutDirectory += "*";
-
-		WIN32_FIND_DATA data;
-		HANDLE filehandle = FindFirstFile(absolutDirectory.GetBuffer(), &data);
-
-		if (filehandle == INVALID_HANDLE_VALUE)
-			return false;
-
-		do
-		{
-			FW_String name = data.cFileName;
-			if (name == "." || name == "..")
-				continue;
-
-			FW_String relativePath = aRelativeDirectory;
-			relativePath += "/";
-			relativePath += name;
-
-			if (data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			{
-				GetAllFilesFromRelativeDirectory(relativePath.GetBuffer(), someOutFilePaths);
-			}
-			else
-			{
-				FileInfo& info = someOutFilePaths.Add();
-				info.myFileName = name;
-				info.myRelativeFilePath = relativePath;
-				GetAbsoluteFilePath(relativePath, info.myAbsoluteFilePath);
-				info.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
-				info.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
-
-				RemoveFileExtention(name, info.myFileNameNoExtention);
-			}
-		} while (FindNextFile(filehandle, &data) != 0);
-
-		if (GetLastError() != ERROR_NO_MORE_FILES)
-			FW_ASSERT_ALWAYS("Something went wrong...");
-
-		FindClose(filehandle);
-		return true;
+		const DWORD attributes = GetFileAttributesA(anAbsoluteFolderPath.GetBuffer());
+		return attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 	}
 
 	bool GetAllFilesFromAbsoluteDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths)
@@ -125,13 +81,7 @@ namespace FW_FileSystem
 			}
 			else
 			{
-				FileInfo& info = someOutFilePaths.Add();
-				info.myFileName = name;
-				info.myAbsoluteFilePath = fullPath;
-				info.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
-				info.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
-
-				RemoveFileExtention(name, info.myFileNameNoExtention);
+				FillFileInfo(name, fullPath, data, someOutFilePaths.Add());
 			}
 		} while (FindNextFile(filehandle, &data) != 0);
 
@@ -142,10 +92,10 @@ namespace FW_FileSystem
 		return true;
 	}
 
-	void CreateFolderIfNecessary(const FW_String aFilePath)
+	void CreateFolderIfNecessary(const FW_String& anAbsolutePath)
 	{
 		FW_GrowingArray<FW_String> words;
-		SplitLine(aFilePath, "/", words);
+		SplitLine(anAbsolutePath, "/", words);
 
 		// If the last word is a filename, then remove it so we dont make a folder out of it
 		FW_String extention;
@@ -153,38 +103,23 @@ namespace FW_FileSystem
 		if (!extention.Empty())
 			words.RemoveLast();
 
-		int dataFolderIndex = -1;
-		for (int i = words.Count() - 1; i >= 0; i--)
+		// words[0] is the drive ("C:"), it always exists
+		FW_String pathToCreate = words[0];
+		for (int i = 1; i < words.Count(); ++i)
 		{
-			if (words[i] == "data")
-			{
-				dataFolderIndex = i;
-				break;
-			}
-		}
+			if (words[i].Empty())
+				continue;
 
-		FW_ASSERT(dataFolderIndex != -1, "Failed to find Data-folder, where are you trying to create folders?");
-
-		FW_String pathToCreate;
-		GetAbsoluteFilePath(words[dataFolderIndex], pathToCreate);
-
-		bool success = CreateDirectoryA(pathToCreate.GetBuffer(), NULL);
-		if (!success && GetLastError() != ERROR_ALREADY_EXISTS)
-			FW_ASSERT_ALWAYS;
-
-		for (int i = dataFolderIndex + 1; i < words.Count(); ++i)
-		{
 			pathToCreate += "/";
 			pathToCreate += words[i];
-			success = CreateDirectoryA(pathToCreate.GetBuffer(), NULL);
 
+			bool success = CreateDirectoryA(pathToCreate.GetBuffer(), NULL);
 			if (!success && GetLastError() != ERROR_ALREADY_EXISTS)
 				FW_ASSERT_ALWAYS;
 		}
 	}
 
-	// Unlike CreateFolderIfNecessary(), this doesn't assume the path lives under a "data" folder -
-	// creates exactly the single, already-absolute directory passed in (its parent must already exist).
+	// Creates exactly the single directory passed in (its parent must already exist).
 	void CreateFolder(const FW_String& anAbsoluteFolderPath)
 	{
 		bool success = CreateDirectoryA(anAbsoluteFolderPath.GetBuffer(), NULL);
@@ -236,10 +171,7 @@ namespace FW_FileSystem
 		if (filehandle == INVALID_HANDLE_VALUE)
 			return false;
 
-		aFileInfoOut.myFileName = data.cFileName;
-		aFileInfoOut.myAbsoluteFilePath = aFilePath;
-		aFileInfoOut.myLastTimeModifiedLowbit = data.ftLastWriteTime.dwLowDateTime;
-		aFileInfoOut.myLastTimeModifiedHighbit = data.ftLastWriteTime.dwHighDateTime;
+		FillFileInfo(data.cFileName, aFilePath, data, aFileInfoOut);
 
 		FindClose(filehandle);
 		return true;

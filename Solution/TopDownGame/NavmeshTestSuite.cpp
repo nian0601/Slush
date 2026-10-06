@@ -4,6 +4,8 @@
 #include "Navmesh.h"
 #include "Level/NavmeshData.h"
 
+#include <Core/AssetRepository.h>
+
 #include <FW_UnitTestSuite.h>
 
 namespace NavmeshTestSuite
@@ -319,13 +321,13 @@ namespace NavmeshTestSuite
 		original.myNavmesh.CutHole(cutBlockB);
 
 		// Drive NavmeshData::OnParse() directly (bypassing DataAsset::Save()/Load()'s
-		// folder-derived paths) so this test writes to its own scratch file under data/debug/ instead
-		// of the real data/navmeshes/ folder - that folder is scanned by AssetStorage<NavmeshData>
+		// folder-derived paths) so this test writes to its own scratch file in the Debug folder instead
+		// of the real navmeshes/ folder - that folder is scanned by AssetStorage<NavmeshData>
 		// on every launch, so writing there would leave this fixture behind as a permanent, visible
 		// asset in the editor UI, not just a test artifact.
-		// AssetParser resolves both paths against the data folder, which the runner has already set
-		// (and data/debug/ already exists).
-		const char* testFilePath = "data/debug/navmesh_roundtrip_test.navmesh";
+		FW_String testFilePathString;
+		Slush::AssetRepository::GetDebugFilePath("navmesh_roundtrip_test.navmesh", testFilePathString);
+		const char* testFilePath = testFilePathString.GetBuffer();
 
 		Slush::AssetParser writer;
 		Slush::AssetParser::Handle writeHandle = writer.StartWriting("NavmeshData");

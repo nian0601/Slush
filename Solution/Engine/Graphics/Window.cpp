@@ -3,6 +3,7 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Log.h"
+#include "Core/AssetRepository.h"
 #include "Core/Dockables/Dockable.h"
 #include "Core/Dockables/IAppLayout.h"
 
@@ -170,14 +171,11 @@ namespace Slush
 
 		sf::Image image = texture.copyToImage();
 
-		FW_String screenshotPath = "data/debug/screenshot.png";
-		FW_FileSystem::CreateFolderIfNecessary(screenshotPath);
-
 		FW_String absoluteScreenshotPath;
-		FW_FileSystem::GetAbsoluteFilePath(screenshotPath, absoluteScreenshotPath);
+		AssetRepository::GetDebugFilePath("screenshot.png", absoluteScreenshotPath);
 
 		FW_String absolutePreviousPath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/screenshot_previous.png", absolutePreviousPath);
+		AssetRepository::GetDebugFilePath("screenshot_previous.png", absolutePreviousPath);
 
 		FW_FileSystem::FileInfo existingScreenshotInfo;
 		if (FW_FileSystem::GetFileInfo(absoluteScreenshotPath, existingScreenshotInfo))
@@ -316,15 +314,19 @@ namespace Slush
 		if (!myAppLayout)
 			return;
 
-		FW_String folderPath;
-		FW_FileSystem::GetAbsoluteFilePath("ImGUILayouts", folderPath);
-		FW_FileSystem::CreateFolder(folderPath);
-
-		FW_String path;
 		FW_String settingName = "ImGUILayouts/";
 		settingName += myAppLayout->GetName();
 		settingName += ".ini";
-		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
+
+		// Save back to the Asset Repository the layout came from, or the game's own if none had it
+		int repositoryIndex = 0;
+		FW_String path;
+		if (!AssetRepository::FindAssetFile(settingName, path, &repositoryIndex))
+		{
+			AssetRepository::GetAssetWritePath(settingName, repositoryIndex, path);
+			FW_FileSystem::CreateFolderIfNecessary(path);
+		}
+
 		ImGui::SaveIniSettingsToDisk(path.GetBuffer());
 	}
 
@@ -333,12 +335,13 @@ namespace Slush
 		if (!myAppLayout)
 			return;
 
-		FW_String path;
 		FW_String settingName = "ImGUILayouts/";
 		settingName += myAppLayout->GetName();
 		settingName += ".ini";
-		FW_FileSystem::GetAbsoluteFilePath(settingName, path);
-		ImGui::LoadIniSettingsFromDisk(path.GetBuffer());
+
+		FW_String path;
+		if (AssetRepository::FindAssetFile(settingName, path))
+			ImGui::LoadIniSettingsFromDisk(path.GetBuffer());
 	}
 
 	Vector2f Window::GetSizeThatRespectsAspectRatio(int aWidth, int aHeight) const

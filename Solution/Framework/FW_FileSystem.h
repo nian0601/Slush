@@ -9,10 +9,9 @@ namespace FW_FileSystem
 	{
 		FW_String myFileName;
 		FW_String myFileNameNoExtention;
-		FW_String myRelativeFilePath;
 		FW_String myAbsoluteFilePath;
-		unsigned long myLastTimeModifiedLowbit;
-		unsigned long myLastTimeModifiedHighbit;
+		unsigned long myLastTimeModifiedLowbit = 0;
+		unsigned long myLastTimeModifiedHighbit = 0;
 	};
 
 	// The Contents of the file will be freed when the FileContent
@@ -27,17 +26,15 @@ namespace FW_FileSystem
 	};
 
 
-	void SetDataFolder(const char* aFolderName);
-	const FW_String& GetDataFolder();
+	// The executable's directory, forward slashes and a trailing '/'. Stateless.
+	void GetExecutableDirectory(FW_String& anOut);
+	bool FileExists(const FW_String& anAbsoluteFilePath);
+	bool DirectoryExists(const FW_String& anAbsoluteFolderPath);
 
-	// Sets the data folder to the executable's directory (forward slashes, trailing '/'). Safe to call more than once.
-	void InitDataFolderFromExecutable();
-
-	void GetAbsoluteFilePath(const FW_String& aFilePath, FW_String& aFilePathOut);
-	bool GetAllFilesFromRelativeDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);
 	bool GetAllFilesFromAbsoluteDirectory(const char* aDirectory, FW_GrowingArray<FileInfo>& someOutFilePaths);
 
-	void CreateFolderIfNecessary(const FW_String aFilePath);
+	// Creates every missing folder along an absolute path. A trailing filename (anything with an extension) is skipped.
+	void CreateFolderIfNecessary(const FW_String& anAbsolutePath);
 	void CreateFolder(const FW_String& anAbsoluteFolderPath);
 
 	void GetFileName(const FW_String& aFilePath, FW_String& aNameOut);

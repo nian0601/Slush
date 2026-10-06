@@ -19,7 +19,7 @@ struct EnemyUnlockEntry
 class LevelData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("LevelData", "tdlevel", "data/levels/", ICON_FA_MAP, 5);
+	DEFINE_ASSET("LevelData", "tdlevel", "levels", ICON_FA_MAP, 5);
 
 	LevelData(const char* aName, unsigned int aAssetID);
 

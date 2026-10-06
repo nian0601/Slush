@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Core/UnitTests.h"
+#include "Core/AssetRepository.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/EngineTestSuite.h"
 
@@ -12,7 +13,13 @@ namespace Slush
 	{
 		Outcome Run(void (*aGameTestsCallback)())
 		{
-			FW_UnitTestSuite::BeginRun();
+			FW_String reportFilePath;
+			AssetRepository::GetDebugFilePath("unittest_results.txt", reportFilePath);
+
+			FW_String scratchFolder;
+			AssetRepository::GetDebugFilePath("", scratchFolder);
+
+			FW_UnitTestSuite::BeginRun(reportFilePath.GetBuffer(), scratchFolder.GetBuffer());
 
 			FW_UnitTestSuite::RunFrameworkTests();
 			EngineTestSuite::RunTests();

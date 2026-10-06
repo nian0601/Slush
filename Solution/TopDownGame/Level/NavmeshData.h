@@ -6,7 +6,7 @@
 class NavmeshData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("NavmeshData", "navmesh", "data/navmeshes/", ICON_FA_DRAW_POLYGON, 1);
+	DEFINE_ASSET("NavmeshData", "navmesh", "navmeshes", ICON_FA_DRAW_POLYGON, 1);
 
 	NavmeshData(const char* aName, unsigned int aAssetID);
 

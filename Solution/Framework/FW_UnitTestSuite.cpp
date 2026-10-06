@@ -17,11 +17,13 @@ namespace FW_UnitTestSuite
 	static int ourTestCount = 0;
 	static int ourCheckCount = 0;
 	static FW_GrowingArray<FW_String> ourFailureLines;
+	static FW_String ourReportFilePath;
+	static FW_String ourScratchFolder;
 
-	void BeginRun()
+	void BeginRun(const char* aReportFilePath, const char* aScratchFolder)
 	{
-		FW_FileSystem::InitDataFolderFromExecutable();
-		FW_FileSystem::CreateFolderIfNecessary("data/debug");
+		ourReportFilePath = aReportFilePath;
+		ourScratchFolder = aScratchFolder;
 
 		ourCurrentSuite = "";
 		ourCurrentTest = "";
@@ -71,11 +73,8 @@ namespace FW_UnitTestSuite
 		_snprintf_s(summary, ourLineBufferSize, _TRUNCATE, "UNITTEST_RESULT: %s (%d failed / %d checks, %d tests)",
 			passed ? "PASS" : "FAIL", ourFailureLines.Count(), ourCheckCount, ourTestCount);
 
-		FW_String reportPath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/unittest_results.txt", reportPath);
-
 		FILE* file = nullptr;
-		fopen_s(&file, reportPath.GetBuffer(), "w");
+		fopen_s(&file, ourReportFilePath.GetBuffer(), "w");
 		if (file)
 			fprintf(file, "%s\n", summary);
 
@@ -102,8 +101,8 @@ namespace FW_UnitTestSuite
 
 	void TestFileProcessor()
 	{
-		FW_String scratchPath;
-		FW_FileSystem::GetAbsoluteFilePath("data/debug/fileprocessor_test.output", scratchPath);
+		FW_String scratchPath = ourScratchFolder;
+		scratchPath += "fileprocessor_test.output";
 
 		float floatWrite = 123.f;
 		float floatWrite2 = 567.f;
@@ -162,9 +161,39 @@ namespace FW_UnitTestSuite
 		FW_TEST_CHECK(boolWrite2 == boolRead2, "second bool round-trip");
 	}
 
+	void TestCreateFolderIfNecessary()
+	{
+		// Remove the tree a previous run left behind (deepest first), so the creation below is actually tested
+		const char* foldersToRemove[] = { "createfolder_test/nested/deeper", "createfolder_test/nested", "createfolder_test" };
+		for (const char* folder : foldersToRemove)
+		{
+			FW_String folderToRemove = ourScratchFolder;
+			folderToRemove += folder;
+			RemoveDirectoryA(folderToRemove.GetBuffer());
+		}
+
+		FW_String rootFolder = ourScratchFolder;
+		rootFolder += "createfolder_test";
+		FW_TEST_REQUIRE(!FW_FileSystem::DirectoryExists(rootFolder), "Expected the previous run's folders to be removed");
+
+		FW_String filePath = ourScratchFolder;
+		filePath += "createfolder_test/nested/deeper/file.txt";
+		FW_FileSystem::CreateFolderIfNecessary(filePath);
+
+		FW_String folderPath = ourScratchFolder;
+		folderPath += "createfolder_test/nested/deeper";
+		FW_TEST_CHECK(FW_FileSystem::DirectoryExists(folderPath), "Expected every folder along the path to be created");
+		FW_TEST_CHECK(!FW_FileSystem::DirectoryExists(filePath), "Expected the trailing filename not to become a folder");
+
+		// Already existing folders are fine
+		FW_FileSystem::CreateFolderIfNecessary(folderPath);
+		FW_TEST_CHECK(FW_FileSystem::DirectoryExists(folderPath), "Expected an existing folder to stay");
+	}
+
 	void RunFrameworkTests()
 	{
 		BeginSuite("Framework");
 		FW_RUN_TEST(TestFileProcessor);
+		FW_RUN_TEST(TestCreateFolderIfNecessary);
 	}
 }

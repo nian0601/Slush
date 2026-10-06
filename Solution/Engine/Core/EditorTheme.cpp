@@ -2,7 +2,7 @@
 
 #include "Core/EditorTheme.h"
 
-#include <FW_FileSystem.h>
+#include "Core/AssetRepository.h"
 
 #include "imgui/Fonts/IconsFontAwesome7.h"
 
@@ -246,22 +246,32 @@ namespace Slush
 			switch (aFont)
 			{
 			case NOTO_SANS:
-				path = "Data/NotoSans.ttf";
+				path = "Fonts/NotoSans.ttf";
 				size = 20.f;
 				break;
 			case JETBRAINS_MONO:
 				// Monospace runs wider than NotoSans, so a slightly smaller size keeps panels comparable
-				path = "Data/JetBrainsMono-Regular.ttf";
+				path = "Fonts/JetBrainsMono-Regular.ttf";
 				size = 18.f;
 				break;
 			}
-			FW_FileSystem::GetAbsoluteFilePath(path, path);
+			FW_String absolutePath;
+			if (!AssetRepository::FindAssetFile(path, absolutePath))
+			{
+				SLUSH_ERROR("EditorTheme: %s not found in any Asset Repository, keeping the default ImGui font", path.GetBuffer());
+				return;
+			}
 
 			ImGuiIO& imguiIO = ImGui::GetIO();
-			imguiIO.Fonts->AddFontFromFileTTF(path.GetBuffer(), size);
+			imguiIO.Fonts->AddFontFromFileTTF(absolutePath.GetBuffer(), size);
 
-			FW_String iconFontPath = "Data/fa-solid-900.otf";
-			FW_FileSystem::GetAbsoluteFilePath(iconFontPath, iconFontPath);
+			FW_String iconFontPath;
+			if (!AssetRepository::FindAssetFile("Fonts/fa-solid-900.otf", iconFontPath))
+			{
+				SLUSH_ERROR("EditorTheme: Fonts/fa-solid-900.otf not found in any Asset Repository, icons won't render");
+				ImGui::SFML::UpdateFontTexture();
+				return;
+			}
 
 			static const ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 			ImFontConfig iconFontConfig;

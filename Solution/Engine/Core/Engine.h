@@ -24,8 +24,6 @@ namespace Slush
 
 		Window& GetWindow() { return *myWindow; }
 
-		const FW_String& GetDataFolder() const { return myDataFolder; }
-
 		bool myByPassImGUIInputRestriction = false;
 	private:
 		Engine() {};
@@ -43,7 +41,5 @@ namespace Slush
 		Window* myWindow = nullptr;
 		Input* myInput = nullptr;
 		Logger* myLogger = nullptr;
-
-		FW_String myDataFolder;
 	};
 }

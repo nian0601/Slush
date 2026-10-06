@@ -49,18 +49,18 @@ public:
 		assets.RegisterAssetType<Slush::Texture>();
 		assets.LoadAllAssets();
 
-		myFont.Load("Data/OpenSans-Regular.ttf");
+		myFont.Load("Fonts/OpenSans-Regular.ttf");
 
 		myHeroCard = new HeroCard(&myFont);
-		myHeroCard->Load("Data/Cards/hero_cleric.hero");
+		myHeroCard->Load("Cards/hero_cleric.hero");
 		myHeroCard->SetPosition(200, 500);
 
 		myRoomCard = new RoomCard(&myFont);
-		myRoomCard->Load("Data/Cards/room_spawnpoint.room");
+		myRoomCard->Load("Cards/room_spawnpoint.room");
 		myRoomCard->SetPosition(600, 500);
 
 		myBossCard = new BossCard(&myFont);
-		myBossCard->Load("Data/Cards/boss_eclipse.boss");
+		myBossCard->Load("Cards/boss_eclipse.boss");
 		myBossCard->SetPosition(1000, 500);		
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -102,10 +102,12 @@ private:
 	BossCard* myBossCard;
 };
 
+#include "Core/AssetRepository.h"
 #include "Core/UnitTests.h"
 int main(int argc, char** argv)
 {
 	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
+	Slush::AssetRepository::Mount("BossMonster");
 
 	const Slush::UnitTests::Outcome testOutcome = Slush::UnitTests::Run(nullptr);
 	if (testOutcome != Slush::UnitTests::Outcome::Continue)

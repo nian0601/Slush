@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Graphics/Font.h"
+#include "Core/AssetRepository.h"
 
 #include <SFML/Graphics/Font.hpp>
 
@@ -12,8 +13,11 @@ namespace Slush
 
 	void Font::Load(const char* aFilePath)
 	{
-		myFilePath = Engine::GetInstance().GetDataFolder();
-		myFilePath += aFilePath;
+		if (!AssetRepository::FindAssetFile(aFilePath, myFilePath))
+		{
+			SLUSH_ERROR("Font: %s not found in any Asset Repository", aFilePath);
+			return;
+		}
 
 		mySFMLFont = new sf::Font();
 		if (!mySFMLFont->openFromFile(myFilePath.GetBuffer()))

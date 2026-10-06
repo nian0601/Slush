@@ -9,7 +9,8 @@ namespace Slush
 	public:
 		Asset(const char* aName, unsigned int aAssetID);
 		virtual ~Asset() {}
-		virtual void Load(const char* aFilePath);
+		// aFilePath is relative to the Asset Repository at aRepositoryIndex
+		virtual void Load(const char* aFilePath, int aRepositoryIndex);
 		virtual void Save();
 		virtual void BuildUI() {};
 		virtual void ResolveDependencies() {};
@@ -22,7 +23,13 @@ namespace Slush
 
 		const FW_String& GetAssetName() const { return myAssetName; }
 		const FW_String& GetFilePath() const { return myFilePath; }
-		const FW_String& GetAbsoluteFilePath() const { return myAbsoluteFilePath; }
+		int GetRepositoryIndex() const { return myRepositoryIndex; }
+		const FW_String& GetRepositoryName() const;
+
+		// Where the next Save() writes. New assets and copies go to the first mount (index 0).
+		void SetRepositoryIndex(int aRepositoryIndex) { myRepositoryIndex = aRepositoryIndex; }
+		// Set while CopyAsset loads the source, so an outdated source isn't resaved under the copy's name into the source's Asset Repository
+		void SetSkipUpgradeResave(bool aSkip) { mySkipUpgradeResave = aSkip; }
 		unsigned int GetAssetTypeID() const { return myAssetTypeID; }
 
 		bool HasUnsavedChanges() const { return myHasUnsavedChanges; }
@@ -33,8 +40,10 @@ namespace Slush
 		FW_String myAssetName;
 		FW_String myFilePath;
 		FW_String myAbsoluteFilePath;
+		int myRepositoryIndex = 0;
 		unsigned int myAssetTypeID = INT_MAX;
 		bool myHasUnsavedChanges = false;
+		bool mySkipUpgradeResave = false;
 	};
 
 #define DEFINE_ASSET(AssetName, AssetExtention, AssetFolder, AssetIcon, Version)\

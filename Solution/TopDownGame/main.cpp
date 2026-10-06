@@ -33,7 +33,7 @@ public:
 		assets.RegisterAssetType<LevelData>();
 		assets.RegisterAssetType<Slush::EntityPrefab>();
 		assets.LoadAllAssets();
-		myFont.Load("Data/NotoSans.ttf");
+		myFont.Load("Fonts/NotoSans.ttf");
 		TopDownGameGlobals::GetInstance().SetFont(myFont);
 
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
@@ -60,6 +60,7 @@ private:
 	Slush::Font myFont;
 };
 
+#include "Core/AssetRepository.h"
 #include "Core/UnitTests.h"
 static void RunGameTests()
 {
@@ -70,6 +71,7 @@ static void RunGameTests()
 int main(int argc, char** argv)
 {
 	Slush::CommandLineArgs::GetInstance().Parse(argc, argv);
+	Slush::AssetRepository::Mount("TopDownGame");
 
 	const Slush::UnitTests::Outcome testOutcome = Slush::UnitTests::Run(&RunGameTests);
 	if (testOutcome != Slush::UnitTests::Outcome::Continue)

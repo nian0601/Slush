@@ -6,6 +6,7 @@
 #include <imgui/imgui_user.h>
 
 #include <Core/Engine.h>
+#include <Core/AssetRepository.h>
 #include "FW_FileProcessor.h"
 #include <Core/Assets/AssetStorage.h>
 #include <Graphics/Texture.h>
@@ -16,8 +17,6 @@ CardEditorDockable::CardEditorDockable()
 	, myDescription("")
 	, myTextureName("")
 {
-	myCardsFilePath = Slush::Engine::GetInstance().GetDataFolder();
-	myCardsFilePath += "Data/Cards";
 }
 
 void CardEditorDockable::OnBuildUI()
@@ -27,17 +26,17 @@ void CardEditorDockable::OnBuildUI()
 
 	if (ImGui::BeginPopup("load_card_popup"))
 	{
-		FW_GrowingArray<FW_FileSystem::FileInfo> cardFiles;
-		FW_FileSystem::GetAllFilesFromAbsoluteDirectory(myCardsFilePath.GetBuffer(), cardFiles);
+		FW_GrowingArray<Slush::AssetRepository::AssetFileInfo> cardFiles;
+		Slush::AssetRepository::GetAllAssetFiles("Cards", cardFiles);
 
 		ImGui::Text("Cards");
 		ImGui::Separator();
 
-		for (const FW_FileSystem::FileInfo& cardInfo : cardFiles)
+		for (const Slush::AssetRepository::AssetFileInfo& cardInfo : cardFiles)
 		{
-			if (ImGui::Selectable(cardInfo.myFileNameNoExtention.GetBuffer()))
+			if (ImGui::Selectable(cardInfo.myFileInfo.myFileNameNoExtention.GetBuffer()))
 			{
-				LoadCard(cardInfo.myAbsoluteFilePath);
+				LoadCard(cardInfo.myFileInfo.myAbsoluteFilePath);
 				break;
 			}
 		}
@@ -118,19 +117,26 @@ void CardEditorDockable::OnBuildUI()
 
 void CardEditorDockable::SaveCard()
 {
-	FW_String filepath = myCardsFilePath;
-	filepath += "/";
-	filepath += myFileName;
+	FW_String relativePath = "Cards/";
+	relativePath += myFileName;
 	switch (myCardType)
 	{
 	case ROOM:
-		filepath += ".room"; break;
+		relativePath += ".room"; break;
 	case BOSS:
-		filepath += ".boss"; break;
+		relativePath += ".boss"; break;
 	case HERO:
-		filepath += ".hero"; break;
+		relativePath += ".hero"; break;
 	default:
 		break;
+	}
+
+	// Overwrite the card where it already lives, otherwise create it in the game's own Asset Repository
+	FW_String filepath;
+	if (!Slush::AssetRepository::FindAssetFile(relativePath, filepath))
+	{
+		Slush::AssetRepository::GetAssetWritePath(relativePath, 0, filepath);
+		FW_FileSystem::CreateFolderIfNecessary(filepath);
 	}
 
 	FW_FileProcessor processor(filepath.GetBuffer(), FW_FileProcessor::WRITE);

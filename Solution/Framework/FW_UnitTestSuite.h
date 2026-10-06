@@ -1,11 +1,12 @@
 #pragma once
 
 // Test runner: records every failed check and keeps going, then writes
-// data/debug/unittest_results.txt (see EndRun). Line 1 of that file is always
+// the report file given to BeginRun (see EndRun). Line 1 of that file is always
 // "UNITTEST_RESULT: PASS (...)" or "UNITTEST_RESULT: FAIL (...)".
 namespace FW_UnitTestSuite
 {
-	void BeginRun();
+	// Both absolute. aScratchFolder must exist and end with '/', Framework tests write their scratch files there.
+	void BeginRun(const char* aReportFilePath, const char* aScratchFolder);
 	void BeginSuite(const char* aSuiteName);
 	void BeginTest(const char* aTestName);
 

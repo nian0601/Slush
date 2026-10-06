@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Core/Log.h"
 #include "Core/CommandLineArgs.h"
+#include "Core/AssetRepository.h"
 
 #include <time.h>
 #include <sys/timeb.h>
@@ -21,12 +22,8 @@ namespace Slush
 			logFileName += ".txt";
 		}
 
-		FW_String logPath = "data/debug/";
-		logPath += logFileName;
-		FW_FileSystem::CreateFolderIfNecessary(logPath.GetBuffer());
-
 		FW_String absoluteLogPath;
-		FW_FileSystem::GetAbsoluteFilePath(logPath, absoluteLogPath);
+		AssetRepository::GetDebugFilePath(logFileName, absoluteLogPath);
 
 		fopen_s(&myLogFile, absoluteLogPath.GetBuffer(), "w");
 		FW_ASSERT(myLogFile != nullptr, "Failed to open %s for writing", logFileName.GetBuffer());

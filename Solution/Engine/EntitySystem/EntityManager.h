@@ -19,7 +19,6 @@ namespace Slush
 		EntityManager();
 		~EntityManager();
 
-		Entity* CreateEmptyEntity();
 		Entity* CreateEntity(const Vector2f& aPosition, const EntityPrefab& aPrefab);
 		Entity* CreateEntity(const Vector2f& aPosition, const char* aPrefabName);
 		Entity* CreateEntity(const Vector2f& aPosition, const FW_String& aPrefabName);
@@ -39,6 +38,7 @@ namespace Slush
 		void EndFrame();
 
 	private:
+		Entity* CreateEmptyEntity();
 		void CleanupProxyStorage();
 
 		FW_GrowingArray<EntityHandle::ProxyObject*> myProxyStorage;

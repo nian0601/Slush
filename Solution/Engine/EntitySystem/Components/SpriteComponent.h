@@ -9,8 +9,6 @@ namespace Slush
 	class BaseSprite;
 	class Texture;
 
-	struct AnimationRuntime;
-
 	class SpriteComponent : public Component
 	{
 	public:
@@ -63,6 +61,6 @@ namespace Slush
 	private:
 		BaseSprite* mySprite = nullptr;
 		Animation* myAnimation = nullptr;
-		AnimationRuntime* myAnimationRuntime = nullptr;
+		bool myHasStartedAnimation = false;
 	};
 }

@@ -52,7 +52,7 @@ namespace Slush
 				if (isFilterEnabled && !myAssetFilters[i])
 					continue;
 
-				const FW_GrowingArray<Asset*> assets = storage->GetAllAssets();
+				const FW_GrowingArray<Asset*>& assets = storage->GetAllAssets();
 				for (int j = 0; j < assets.Count(); ++j)
 				{
 					Slush::Asset* asset = assets[j];

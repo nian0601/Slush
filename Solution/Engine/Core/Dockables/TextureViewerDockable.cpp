@@ -20,7 +20,7 @@ namespace Slush
 		ImGui::Separator();
 
 		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
-		const FW_GrowingArray<Slush::Asset*> assets = assetRegistry.GetAllAssets<Slush::Texture>();
+		const FW_GrowingArray<Slush::Asset*>& assets = assetRegistry.GetAllAssets<Slush::Texture>();
 		for (Slush::Asset* asset : assets)
 		{
 			Slush::Texture* texture = static_cast<Slush::Texture*>(asset);

@@ -68,7 +68,7 @@ void CardEditorDockable::OnBuildUI()
 			static ImGuiTextFilter textureFilter;
 			textureFilter.Draw("Search");
 
-			const FW_GrowingArray<Slush::Asset*> assets = Slush::AssetRegistry::GetInstance().GetAllAssets<Slush::Texture>();
+			const FW_GrowingArray<Slush::Asset*>& assets = Slush::AssetRegistry::GetInstance().GetAllAssets<Slush::Texture>();
 			for (Slush::Asset* asset : assets)
 			{
 				Slush::Texture* texture = static_cast<Slush::Texture*>(asset);

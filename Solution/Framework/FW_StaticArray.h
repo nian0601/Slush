@@ -1,5 +1,5 @@
 #pragma once
-#include <cassert>
+#include "FW_Assert.h"
 
 template<typename Type, int Size>
 class FW_StaticArray

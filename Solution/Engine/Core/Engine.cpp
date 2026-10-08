@@ -141,6 +141,7 @@ namespace Slush
 			CompositeAndPresent();
 		}
 
+		myWindow->DeleteAllLayouts();
 		anApp.Shutdown();
 	}
 }

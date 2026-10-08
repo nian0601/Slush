@@ -32,6 +32,9 @@ namespace Slush
 
 			if (dockable->WantsToClose())
 			{
+				if (myCloseRequestBlocker == dockable)
+					myCloseRequestBlocker = nullptr;
+
 				myDockables.RemoveNonCyclicAtIndex(i);
 				delete dockable;
 				--i;

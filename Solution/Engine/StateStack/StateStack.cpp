@@ -5,6 +5,11 @@
 
 namespace Slush
 {
+	StateStack::~StateStack()
+	{
+		Clear();
+	}
+
 	void StateStack::PushMainState(IGameState* aState)
 	{
 		myStates.Add();

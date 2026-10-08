@@ -7,6 +7,8 @@ namespace Slush
 	class StateStack
 	{
 	public:
+		~StateStack();
+
 		void PushMainState(IGameState* aState);
 		void PushSubState(IGameState* aState);
 

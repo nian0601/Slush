@@ -44,9 +44,7 @@ namespace Slush
 
 	Window::~Window()
 	{
-		SaveAppLayoutConfig();
-
-		myLayouts.DeleteAll();
+		DeleteAllLayouts();
 
 		FW_SAFE_DELETE(myRenderer);
 		FW_SAFE_DELETE(myRenderWindow);
@@ -281,11 +279,24 @@ namespace Slush
 	{
 		SaveAppLayoutConfig();
 
-		FW_SAFE_DELETE(myAppLayout);
+		if (!myLayouts.Contains(myAppLayout))
+			FW_SAFE_DELETE(myAppLayout);
 
 		myAppLayout = aLayout;
 
 		LoadAppLayoutConfig();
+	}
+
+	void Window::DeleteAllLayouts()
+	{
+		SaveAppLayoutConfig();
+
+		if (!myLayouts.Contains(myAppLayout))
+			FW_SAFE_DELETE(myAppLayout);
+
+		myLayouts.DeleteAll();
+		myAppLayout = nullptr;
+		myPendingLayoutTarget = nullptr;
 	}
 
 	void Window::SetActiveLayout(IAppLayout* aLayout)

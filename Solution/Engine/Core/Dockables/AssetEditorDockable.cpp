@@ -408,7 +408,7 @@ namespace Slush
 
 		FW_ASSERT(assetStorage);
 
-		const FW_GrowingArray<Slush::Asset*> assets = assetStorage->GetAllAssets();
+		const FW_GrowingArray<Slush::Asset*>& assets = assetStorage->GetAllAssets();
 		for (Slush::Asset* asset : assets)
 		{
 			if (asset->GetAssetName() == myNewAssetNameStorage.GetBuffer())

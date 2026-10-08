@@ -13,8 +13,9 @@ namespace Slush
 
 	EntityManager::~EntityManager()
 	{
-		myProxyStorage.DeleteAll();
 		myEntities.DeleteAll();
+		myAddQueue.DeleteAll();
+		myProxyStorage.DeleteAll();
 	}
 
 	Entity* EntityManager::CreateEmptyEntity()

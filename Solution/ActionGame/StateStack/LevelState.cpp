@@ -35,6 +35,8 @@ LevelState::~LevelState()
 	FW_SAFE_DELETE(myLevel);
 
 	ActionGameGlobals::GetInstance().SetEntityManager(nullptr);
+	FW_SAFE_DELETE(myEntityManager);
+	FW_SAFE_DELETE(myPhysicsWorld);
 }
 
 void LevelState::ResumeState()

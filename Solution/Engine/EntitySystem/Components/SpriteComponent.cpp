@@ -237,10 +237,11 @@ namespace Slush
 			return;
 		}
 
-		if (!myAnimationRuntime)
+		if (!myHasStartedAnimation)
 		{
-			myAnimationRuntime = animComponent->PlayAnimation(*myAnimation);
-			myAnimationRuntime->myIsLooping = myEntityPrefab.GetComponentData<SpriteComponent>().myLoopAnimation;
+			AnimationRuntime* animationRuntime = animComponent->PlayAnimation(*myAnimation);
+			animationRuntime->myIsLooping = myEntityPrefab.GetComponentData<SpriteComponent>().myLoopAnimation;
+			myHasStartedAnimation = true;
 		}
 
 		if (!animComponent->IsAnimationPlaying(*myAnimation) && myEntityPrefab.GetComponentData<SpriteComponent>().myRemoveEntityAfterAnimation)

@@ -35,10 +35,12 @@ namespace Slush
 		void ToggleEditorUI() { myShowEditorUI = !myShowEditorUI; }
 		bool IsEditorUIVisible() const { return myShowEditorUI; }
 
+		// Takes ownership of an unregistered layout, deleting it on replacement or DeleteAllLayouts().
 		void SetAppLayout(IAppLayout* aLayout);
+		void DeleteAllLayouts();
 
 		// Adds aLayout to the "Layouts" menu so it becomes switchable at runtime. Window takes ownership -
-		// aLayout stays alive for the Window's whole lifetime and switching the active layout never
+		// aLayout stays alive until DeleteAllLayouts() at app shutdown; switching the active layout never
 		// deletes or recreates it, unlike SetAppLayout(). Pass aSetAsActive to make it the active layout
 		// immediately (subject to the same unsaved-changes gating as a menu-driven switch).
 		void AddLayout(IAppLayout* aLayout, bool aSetAsActive = false);
@@ -98,8 +100,8 @@ namespace Slush
 		PendingTransition myPendingTransition = PendingTransition::None;
 		IAppLayout* myPendingLayoutTarget = nullptr;
 
-		// Layouts added via AddLayout() - owned by Window for its whole lifetime, distinct from a layout
-		// set directly via SetAppLayout() (which Window deletes on the next switch/destruction instead).
+		// Layouts added via AddLayout() - owned until DeleteAllLayouts(), distinct from an unregistered
+		// layout set via SetAppLayout() (which Window also deletes on replacement).
 		FW_GrowingArray<IAppLayout*> myLayouts;
 	};
 }

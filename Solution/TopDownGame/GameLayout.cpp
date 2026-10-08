@@ -49,7 +49,6 @@ GameLayout::GameLayout()
 
 GameLayout::~GameLayout()
 {
-	myStateStack->Clear();
 	FW_SAFE_DELETE(myStateStack);
 }
 

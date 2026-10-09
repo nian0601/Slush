@@ -84,7 +84,7 @@ namespace Slush
 		{
 		public:
 			~Element();
-			void Load(FW_FileParser& aFileParser);
+			bool Load(FW_FileParser& aFileParser);
 			void Save(FW_FileProcessor& aFileProcessor);
 
 			Field* AddField(const FW_String& aFieldName);

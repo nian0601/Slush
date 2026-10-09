@@ -12,6 +12,11 @@ namespace Slush
 
 		Slush::AssetParser parser;
 		Slush::AssetParser::Handle rootHandle = parser.Load(myAbsoluteFilePath.GetBuffer());
+		if (!rootHandle.IsValid())
+		{
+			SLUSH_ERROR("[Asset] Failed to parse '%s' (%s) at %s, leaving file untouched", myAssetName.GetBuffer(), GetTypeName(), myAbsoluteFilePath.GetBuffer());
+			return;
+		}
 
 		int loadedVersion = 0;
 		rootHandle.ParseOptionalIntField("version", loadedVersion, true);

@@ -169,6 +169,7 @@
     <ClInclude Include="Graphics\Animation\Interpolator.h" />
     <ClInclude Include="Graphics\CircleSprite.h" />
     <ClInclude Include="Graphics\Font.h" />
+    <ClInclude Include="Graphics\FallbackFontData.h" />
     <ClInclude Include="Graphics\RectSprite.h" />
     <ClInclude Include="Graphics\Text.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -232,6 +233,7 @@
     <ClCompile Include="Graphics\Animation\Interpolator.cpp" />
     <ClCompile Include="Graphics\CircleSprite.cpp" />
     <ClCompile Include="Graphics\Font.cpp" />
+    <ClCompile Include="Graphics\FallbackFontData.cpp" />
     <ClCompile Include="Graphics\RectSprite.cpp" />
     <ClCompile Include="Graphics\Text.cpp" />
     <ClCompile Include="imgui\imgui-SFML.cpp">

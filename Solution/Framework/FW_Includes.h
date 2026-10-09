@@ -1,7 +1,5 @@
 #pragma once
 
-#define FW_ARRAY_BOUNDS_CHECK
-
 #define FW_SAFE_DELETE(x) {delete x; x = nullptr;}
 
 #include "FW_Assert.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "assert.h"
+#include "FW_Assert.h"
 #include <cstring>
 
 enum GrowingArray_Errors
@@ -10,13 +10,11 @@ enum GrowingArray_Errors
 	_GROWINGARRAY_ERROR_COUNT,
 };
 
-#ifdef FW_ARRAY_BOUNDS_CHECK
 static const char* locGrowingArray_ErrorStrings[_GROWINGARRAY_ERROR_COUNT] = {
 	"Invalid size of growingarray",
 	"Index has to be 0 or more.",
 	"a index out of bounds!"
 };
-#endif
 
 template<typename ObjectType>
 class FW_GrowingArray
@@ -143,9 +141,7 @@ inline FW_GrowingArray<ObjectType>& FW_GrowingArray<ObjectType>::operator=(const
 template<typename ObjectType>
 inline void FW_GrowingArray<ObjectType>::Respace(int aNewSize)
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(aNewSize > 0, locGrowingArray_ErrorStrings[INVALID_SIZE]);
-#endif
 	myMaxSize += aNewSize;
 	ObjectType* newData = new ObjectType[myMaxSize];
 	if (myUseSafeModeFlag == true)
@@ -175,10 +171,8 @@ inline void FW_GrowingArray<ObjectType>::Reserve(int aNrOfItems)
 template<typename ObjectType>
 inline ObjectType& FW_GrowingArray<ObjectType>::operator[](const int& aIndex)
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(aIndex >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
 	FW_ASSERT(aIndex < myCurrentSize, locGrowingArray_ErrorStrings[HIGH_INDEX]);
-#endif
 
 	return myData[aIndex];
 }
@@ -186,10 +180,8 @@ inline ObjectType& FW_GrowingArray<ObjectType>::operator[](const int& aIndex)
 template<typename ObjectType>
 inline const ObjectType& FW_GrowingArray<ObjectType>::operator[](const int& aIndex) const
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(aIndex >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
 	FW_ASSERT(aIndex < myCurrentSize, locGrowingArray_ErrorStrings[HIGH_INDEX]);
-#endif
 
 	return myData[aIndex];
 }
@@ -255,10 +247,8 @@ inline void FW_GrowingArray<ObjectType>::DeleteCyclic(ObjectType& aObject)
 template<typename ObjectType>
 inline void FW_GrowingArray<ObjectType>::DeleteCyclicAtIndex(int aItemNumber)
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(aItemNumber >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
 	FW_ASSERT(aItemNumber < myCurrentSize, locGrowingArray_ErrorStrings[HIGH_INDEX]);
-#endif
 
 	delete myData[aItemNumber];
 	myData[aItemNumber] = nullptr;
@@ -268,10 +258,8 @@ inline void FW_GrowingArray<ObjectType>::DeleteCyclicAtIndex(int aItemNumber)
 template<typename ObjectType>
 inline void FW_GrowingArray<ObjectType>::DeleteNonCyclicAtIndex(int aItemNumber)
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(aItemNumber >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
 	FW_ASSERT(aItemNumber < myCurrentSize, locGrowingArray_ErrorStrings[HIGH_INDEX]);
-#endif
 
 	delete myData[aItemNumber];
 	myData[aItemNumber] = nullptr;
@@ -286,9 +274,7 @@ inline void FW_GrowingArray<ObjectType>::DeleteNonCyclicAtIndex(int aItemNumber)
 template<typename ObjectType>
 inline void FW_GrowingArray<ObjectType>::DeleteLast()
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(myCurrentSize >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
-#endif
 
 	// 'myCurrentSize' is one past the last index, so if we reduce the size first, then we can just use the new 'myCurrentSize' to delete the last entry
 	--myCurrentSize;
@@ -312,10 +298,8 @@ inline void FW_GrowingArray<ObjectType>::RemoveCyclic(const ObjectType& aObject)
 template<typename ObjectType>
 inline void FW_GrowingArray<ObjectType>::RemoveCyclicAtIndex(int aItemNumber)
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(aItemNumber >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
 	FW_ASSERT(aItemNumber < myCurrentSize, locGrowingArray_ErrorStrings[HIGH_INDEX]);
-#endif
 
 	myData[aItemNumber] = myData[--myCurrentSize];
 }
@@ -336,10 +320,8 @@ inline void FW_GrowingArray<ObjectType>::RemoveNonCyclic(const ObjectType& aObje
 template<typename ObjectType>
 inline void FW_GrowingArray<ObjectType>::RemoveNonCyclicAtIndex(int aItemNumber)
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(aItemNumber >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
 	FW_ASSERT(aItemNumber < myCurrentSize, locGrowingArray_ErrorStrings[HIGH_INDEX]);
-#endif
 
 	for (int i = aItemNumber; i < myCurrentSize - 1; ++i)
 	{
@@ -351,9 +333,7 @@ inline void FW_GrowingArray<ObjectType>::RemoveNonCyclicAtIndex(int aItemNumber)
 template<typename ObjectType>
 inline void FW_GrowingArray<ObjectType>::RemoveLast()
 {
-#ifdef FW_ARRAY_BOUNDS_CHECK
 	FW_ASSERT(myCurrentSize >= 0, locGrowingArray_ErrorStrings[LOW_INDEX]);
-#endif
 
 	--myCurrentSize;
 }

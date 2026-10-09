@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <stdlib.h>
 #include <stdio.h>
 #include "FW_Murmur.h"

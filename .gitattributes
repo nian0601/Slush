@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Engine writes these with LF; keep the working copy LF so a launch does not mark them modified
+*.sdebug text eol=lf

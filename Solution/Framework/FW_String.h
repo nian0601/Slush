@@ -46,6 +46,8 @@ public:
 	const char* GetBuffer() const;
 	char* GetRawBuffer();
 
+	// Index of the last character, NOT the character count: "abc" -> 2, "" -> -1.
+	// Pairs with SubStr's inclusive end, so SubStr(i, Length()) is "from i to the end".
 	int Length() const;
 	int MaxSize() const;
 	bool Empty() const;

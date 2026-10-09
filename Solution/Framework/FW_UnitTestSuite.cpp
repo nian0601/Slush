@@ -190,10 +190,24 @@ namespace FW_UnitTestSuite
 		FW_TEST_CHECK(FW_FileSystem::DirectoryExists(folderPath), "Expected an existing folder to stay");
 	}
 
+	void TestStringLength()
+	{
+		// Length() is the index of the last character, not the count. Callers rely on this together with SubStr's inclusive end
+		FW_String text = "abc";
+		FW_TEST_CHECK(text.Length() == 2, "Expected Length() to be the last index, one less than the character count");
+		FW_TEST_CHECK(text[text.Length()] == 'c', "Expected [Length()] to be the last character");
+		FW_TEST_CHECK(text.SubStr(1, text.Length()) == "bc", "Expected SubStr(i, Length()) to run to the end");
+
+		FW_String empty;
+		FW_TEST_CHECK(empty.Length() == -1, "Expected Length() of an empty string to be -1");
+		FW_TEST_CHECK(empty.Empty(), "Expected Empty() to be true for an empty string");
+	}
+
 	void RunFrameworkTests()
 	{
 		BeginSuite("Framework");
 		FW_RUN_TEST(TestFileProcessor);
 		FW_RUN_TEST(TestCreateFolderIfNecessary);
+		FW_RUN_TEST(TestStringLength);
 	}
 }

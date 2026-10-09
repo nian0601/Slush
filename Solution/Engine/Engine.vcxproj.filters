@@ -44,6 +44,7 @@
     <ClInclude Include="Core\Log.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="Graphics\Font.h" />
+    <ClInclude Include="Graphics\FallbackFontData.h" />
     <ClInclude Include="Graphics\Text.h" />
     <ClInclude Include="Graphics\SFMLHelpers.h" />
     <ClInclude Include="Core\Dockables\Dockable.h" />
@@ -122,6 +123,7 @@
     <ClCompile Include="Core\Log.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="Graphics\Font.cpp" />
+    <ClCompile Include="Graphics\FallbackFontData.cpp" />
     <ClCompile Include="Graphics\Text.cpp" />
     <ClCompile Include="Graphics\SFMLHelpers.cpp" />
     <ClCompile Include="Core\Dockables\Dockable.cpp" />

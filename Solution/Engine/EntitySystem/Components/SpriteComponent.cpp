@@ -85,6 +85,8 @@ namespace Slush
 	void SpriteComponent::Data::ResolveDependencies()
 	{
 		myTexture.ResolveDependency();
+		if (mySpriteType == SpriteType::Animated)
+			myAnimation->ResolveDependencies();
 	}
 
 	void SpriteComponent::Data::OnBuildUI()

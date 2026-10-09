@@ -44,7 +44,7 @@ namespace Slush
 				return *storage;
 		}
 			
-		FW_ASSERT("Failed to find storage for assettype");
+		FW_ASSERT(false, "Failed to find storage for assettype");
 		return *myAssetStorages[0];
 	}
 

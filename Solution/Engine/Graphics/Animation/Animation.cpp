@@ -54,14 +54,7 @@ namespace Slush
 
 			if (aRootHandle.HasField("spritesheettexture"))
 			{
-				FW_String texID;
-				aRootHandle.ParseStringField("spritesheettexture", texID);
-				Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
-
-				// This texture should be saved in something thats not meant to be tool-specific.
-				// And update how animations are updated, to make it apply this texture when this animation is started etc
-				myTexture = assets.GetAsset<Slush::Texture>(texID.GetBuffer());
-				FW_ASSERT(myTexture != nullptr, "Invalid texture used for spritesheet-animation");
+				myTexture.Parse(aRootHandle, "spritesheettexture");
 
 				if (const AnimationClip* clip = FindFirstSpriteSheetClip())
 				{
@@ -83,12 +76,14 @@ namespace Slush
 				myTracks[i]->OnParse(tracksHandle.ParseChildElement("track"));
 			}
 
-			if (myTexture)
-			{
-				FW_String texID = myTexture->GetAssetName();
-				aRootHandle.ParseStringField("spritesheettexture", texID);
-			}
+			if (!myTexture.GetName().Empty())
+				myTexture.Parse(aRootHandle, "spritesheettexture");
 		}
+	}
+
+	void Animation::ResolveDependencies()
+	{
+		myTexture.ResolveDependency();
 	}
 
 	void Animation::ParseLegacyTracks(AssetParser::Handle aRootHandle)
@@ -255,7 +250,7 @@ namespace Slush
 					}
 
 					myToolData.myPreviewSprite->SetSize(static_cast<float>(myToolData.myFrameSize.x), static_cast<float>(myToolData.myFrameSize.y));
-					myTexture = myToolData.myTextureToImport;
+					myTexture.Set(myToolData.myTextureToImport);
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -385,7 +380,12 @@ namespace Slush
 		if (!HasSpriteSheetClip())
 			return;
 
-		FW_ASSERT(myTexture);
+		const Texture* texture = myTexture.Get();
+		if (!texture)
+		{
+			ImGui::TextDisabled("missing spritesheet texture");
+			return;
+		}
 
 		ImGui::BeginDisabled(myToolData.myRuntime->myState != AnimationRuntime::NotStarted);
 		if (ImGui::Button("Start"))
@@ -437,7 +437,7 @@ namespace Slush
 		rect.position.y = static_cast<float>(frameRect.myTopLeft.y);
 		rect.size.x = static_cast<float>(frameRect.myExtents.x);
 		rect.size.y = static_cast<float>(frameRect.myExtents.y);
-		ImGui::Image(*myTexture->GetSFMLTexture(), { width * myToolData.myPreviewScale, height * myToolData.myPreviewScale }, rect);
+		ImGui::Image(*texture->GetSFMLTexture(), { width * myToolData.myPreviewScale, height * myToolData.myPreviewScale }, rect);
 	}
 
 }

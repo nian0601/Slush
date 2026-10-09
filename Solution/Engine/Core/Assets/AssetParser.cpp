@@ -300,14 +300,12 @@ namespace Slush
 		FW_String line;
 
 		if (!fileParser.ReadLine(line))
-		{
-			SLUSH_ERROR("AssetParser: Failed to read first line in file %s", fileParser.GetFilePath().GetBuffer());
 			return Handle();
-		}
 
 		fileParser.TrimBeginAndEnd(line);
 		myRootElement.myElementName = line;
-		myRootElement.Load(fileParser);
+		if (!myRootElement.Load(fileParser))
+			return Handle();
 
 		return Handle(&myRootElement);
 	}
@@ -331,17 +329,15 @@ namespace Slush
 		myChildElements.DeleteAll();
 	}
 
-	void AssetParser::Element::Load(FW_FileParser& aFileParser)
+	bool AssetParser::Element::Load(FW_FileParser& aFileParser)
 	{
 		FW_String line;
-		aFileParser.ReadLine(line);
+		if (!aFileParser.ReadLine(line))
+			return false;
 		aFileParser.TrimBeginAndEnd(line);
 
 		if (line != "{")
-		{
-			SLUSH_ERROR("AssetParser: Malformed Element, expected '{' but found '%s', in %s", line.GetBuffer(), aFileParser.GetFilePath().GetBuffer());
-			return;
-		}
+			return false;
 
 		while (aFileParser.ReadLine(line))
 		{
@@ -354,12 +350,13 @@ namespace Slush
 			if (words.Count() == 1)
 			{
 				if (words[0] == "}")
-					return;
+					return true;
 
 				Element* child = new Element();
 				child->myElementName = words[0];
-				child->Load(aFileParser);
 				myChildElements.Add(child);
+				if (!child->Load(aFileParser))
+					return false;
 			}
 			// Two means that its a field (key + value-pair)
 			else if (words.Count() == 2)
@@ -386,7 +383,7 @@ namespace Slush
 			}
 		}
 
-		SLUSH_ERROR("AssetParser: Malformed Element, reached eof without encountering '}', in %s", aFileParser.GetFilePath().GetBuffer());
+		return false;
 	}
 
 	void AssetParser::Element::Save(FW_FileProcessor& aFileProcessor)

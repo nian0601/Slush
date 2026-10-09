@@ -19,6 +19,8 @@ namespace Slush
 		const sf::Font* GetSFMLFont() const { return mySFMLFont; }
 
 	private:
+		void LoadFallback(const char* aFilePath);
+
 		sf::Font* mySFMLFont = nullptr;
 		FW_String myFilePath;
 	};

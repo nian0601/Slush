@@ -42,6 +42,13 @@ void CharacterAnimationSet::OnParse(Slush::AssetParser::Handle aRootHandle, unsi
 		myDeath->OnParse(deathAnimationHandle, aVersion);
 }
 
+void CharacterAnimationSet::ResolveDependencies()
+{
+	myWalk->ResolveDependencies();
+	myAttack->ResolveDependencies();
+	myDeath->ResolveDependencies();
+}
+
 void CharacterAnimationSet::BuildUI()
 {
 	if (ImGui::CollapsingHeader("Walk"))

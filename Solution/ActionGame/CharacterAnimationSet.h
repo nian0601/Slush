@@ -17,6 +17,7 @@ public:
 	~CharacterAnimationSet();
 
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
+	void ResolveDependencies() override;
 	void BuildUI();
 
 	Slush::Animation* myWalk;

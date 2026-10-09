@@ -2,6 +2,7 @@
 #include <FW_GrowingArray.h>
 #include <float.h>
 #include "Core\Assets\DataAsset.h"
+#include "Core/Assets/AssetReference.h"
 
 #include "AnimationTrack.h"
 
@@ -19,6 +20,7 @@ namespace Slush
 		~Animation();
 
 		void OnParse(AssetParser::Handle aRootHandle, unsigned int aVersion) override;
+		void ResolveDependencies() override;
 		void BuildUI();
 
 		void Update(AnimationRuntime& aRuntimeData) const;
@@ -27,7 +29,7 @@ namespace Slush
 		const AnimationClip* FindFirstSpriteSheetClip() const;
 
 		FW_GrowingArray<AnimationTrack*> myTracks;
-		const Texture* myTexture = nullptr;
+		AssetReference<Texture> myTexture;
 
 	private:
 		void ParseLegacyTracks(AssetParser::Handle aRootHandle);

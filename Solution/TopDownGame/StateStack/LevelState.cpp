@@ -7,14 +7,15 @@
 #include "TopDownGameGlobals.h"
 #include "TowerBuildMenu.h"
 #include "VictoryState.h"
+#include "GameOverState.h"
 
 #include "StateStack/StateStack.h"
 
 LevelState::LevelState(LevelData& aLevelData)
-	: myUIRenderer(TopDownGameGlobals::GetInstance().GetFont())
+	: myLevelData(aLevelData)
+	, myUIRenderer(TopDownGameGlobals::GetInstance().GetFont())
 {
-	myLevel = new Level(aLevelData, true);
-	myTowerBuildMenu = new TowerBuildMenu(*myLevel);
+	RestartLevel();
 }
 
 LevelState::~LevelState()
@@ -25,7 +26,7 @@ LevelState::~LevelState()
 
 Slush::IGameState::GameStateResult LevelState::Update()
 {
-	// Freeze on a resolved result while Render keeps drawing the level; #95 adds the Lost screen here.
+	// Freeze on a resolved result while Render keeps drawing the level behind the end screen.
 	if (myLevel->GetResult() == LevelResult::InProgress)
 	{
 		myLevel->Update();
@@ -35,12 +36,27 @@ Slush::IGameState::GameStateResult LevelState::Update()
 	{
 		myStateStack->PushSubState(new VictoryState());
 	}
+	else if (myLevel->GetResult() == LevelResult::Lost)
+	{
+		myStateStack->PushSubState(new GameOverState(*this));
+	}
 	return Slush::IGameState::KEEP;
 }
 
 void LevelState::Render()
 {
 	myLevel->Render();
-	myTowerBuildMenu->RenderPreview();
+	if (myLevel->GetResult() == LevelResult::InProgress)
+	{
+		myTowerBuildMenu->RenderPreview();
+	}
 	myUIRenderer.Render(myTowerBuildMenu->GetRenderCommands());
+}
+
+void LevelState::RestartLevel()
+{
+	FW_SAFE_DELETE(myTowerBuildMenu);
+	FW_SAFE_DELETE(myLevel);
+	myLevel = new Level(myLevelData, true);
+	myTowerBuildMenu = new TowerBuildMenu(*myLevel);
 }

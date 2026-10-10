@@ -4,6 +4,7 @@
 
 #include "Level/LevelData.h"
 #include "StateStack/LevelState.h"
+#include "StateStack/MainMenuState.h"
 #include "StateStack/TowerTestState.h"
 
 #include "Core/Assets/AssetStorage.h"
@@ -17,7 +18,6 @@
 
 namespace
 {
-	const char* const ourInitialLevelDataAssetName = "level_main";
 	const char* const ourTowerTestLevelDataAssetName = "level_test";
 }
 
@@ -27,9 +27,10 @@ GameLayout::GameLayout()
 	myStateStack = new Slush::StateStack();
 
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
+	Slush::CommandLineArgs& commandLineArgs = Slush::CommandLineArgs::GetInstance();
 
 	// Checked before normal level selection so the test harness stays reachable once #88's main menu lands.
-	if (Slush::CommandLineArgs::GetInstance().HasFlag("-towertest"))
+	if (commandLineArgs.HasFlag("-towertest"))
 	{
 		LevelData* testLevelData = assetRegistry.GetAsset<LevelData>(ourTowerTestLevelDataAssetName);
 		FW_ASSERT(testLevelData, "-towertest has no valid LevelData - expected a 'level_test' LevelData asset");
@@ -37,10 +38,20 @@ GameLayout::GameLayout()
 	}
 	else
 	{
-		LevelData* levelData = assetRegistry.GetAsset<LevelData>(ourInitialLevelDataAssetName);
-		FW_ASSERT(levelData, "Game has no valid LevelData - expected a 'level_main' LevelData asset");
-		// #88 and #89 replace this temporary hardcoded initial level selection.
-		myStateStack->PushMainState(new LevelState(*levelData));
+		myStateStack->PushMainState(new MainMenuState());
+		if (commandLineArgs.HasFlag("-level"))
+		{
+			if (const char* levelAssetName = commandLineArgs.GetString("-level"))
+			{
+				LevelData* levelData = assetRegistry.GetAsset<LevelData>(levelAssetName);
+				FW_ASSERT(levelData, "-level has no valid LevelData - requested '%s'", levelAssetName);
+				myStateStack->PushMainState(new LevelState(*levelData));
+			}
+			else
+			{
+				SLUSH_WARNING("Missing -level value; showing the main menu");
+			}
+		}
 	}
 
 	AddDockable(new Slush::GameViewDockable());

@@ -4,6 +4,7 @@
 
 #include "Level/LevelData.h"
 #include "StateStack/LevelState.h"
+#include "StateStack/MainMenuState.h"
 #include "StateStack/TowerTestState.h"
 
 #include "Core/Assets/AssetStorage.h"
@@ -17,7 +18,6 @@
 
 namespace
 {
-	const char* const ourInitialLevelDataAssetName = "level_main";
 	const char* const ourTowerTestLevelDataAssetName = "level_test";
 }
 
@@ -37,10 +37,7 @@ GameLayout::GameLayout()
 	}
 	else
 	{
-		LevelData* levelData = assetRegistry.GetAsset<LevelData>(ourInitialLevelDataAssetName);
-		FW_ASSERT(levelData, "Game has no valid LevelData - expected a 'level_main' LevelData asset");
-		// #88 and #89 replace this temporary hardcoded initial level selection.
-		myStateStack->PushMainState(new LevelState(*levelData));
+		myStateStack->PushMainState(new MainMenuState());
 	}
 
 	AddDockable(new Slush::GameViewDockable());

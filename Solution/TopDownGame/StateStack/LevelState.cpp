@@ -12,10 +12,10 @@
 #include "StateStack/StateStack.h"
 
 LevelState::LevelState(LevelData& aLevelData)
-	: myUIRenderer(TopDownGameGlobals::GetInstance().GetFont())
+	: myLevelData(aLevelData)
+	, myUIRenderer(TopDownGameGlobals::GetInstance().GetFont())
 {
-	myLevel = new Level(aLevelData, true);
-	myTowerBuildMenu = new TowerBuildMenu(*myLevel);
+	RestartLevel();
 }
 
 LevelState::~LevelState()
@@ -38,7 +38,7 @@ Slush::IGameState::GameStateResult LevelState::Update()
 	}
 	else if (myLevel->GetResult() == LevelResult::Lost)
 	{
-		myStateStack->PushSubState(new GameOverState());
+		myStateStack->PushSubState(new GameOverState(*this));
 	}
 	return Slush::IGameState::KEEP;
 }
@@ -51,4 +51,12 @@ void LevelState::Render()
 		myTowerBuildMenu->RenderPreview();
 	}
 	myUIRenderer.Render(myTowerBuildMenu->GetRenderCommands());
+}
+
+void LevelState::RestartLevel()
+{
+	FW_SAFE_DELETE(myTowerBuildMenu);
+	FW_SAFE_DELETE(myLevel);
+	myLevel = new Level(myLevelData, true);
+	myTowerBuildMenu = new TowerBuildMenu(*myLevel);
 }

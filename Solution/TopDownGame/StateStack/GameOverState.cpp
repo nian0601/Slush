@@ -1,13 +1,15 @@
 #include "stdafx.h"
 
 #include "GameOverState.h"
+#include "LevelState.h"
 #include "TopDownGameGlobals.h"
 
 #include "Core/Engine.h"
 #include "Core/Input.h"
 
-GameOverState::GameOverState()
-	: myFont(TopDownGameGlobals::GetInstance().GetFont())
+GameOverState::GameOverState(LevelState& aLevelState)
+	: myLevelState(aLevelState)
+	, myFont(TopDownGameGlobals::GetInstance().GetFont())
 	, myUIRenderer(myFont)
 {
 	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
@@ -36,6 +38,8 @@ Slush::IGameState::GameStateResult GameOverState::Update()
 
 		uiBuilder.Text("Game Over", myFont, 50);
 		uiBuilder.VerticalSpacing(60);
+		uiBuilder.Button("Restart Level", myFont, 25, myUIButtonStyle, 0xFF334453, 0xFFFFFFFF);
+		uiBuilder.VerticalSpacing(20);
 		uiBuilder.Button("Main Menu", myFont, 25, myUIButtonStyle, 0xFF334453, 0xFFFFFFFF);
 
 		uiBuilder.CloseElement();
@@ -43,6 +47,12 @@ Slush::IGameState::GameStateResult GameOverState::Update()
 	uiBuilder.Finish(myUIRenderCommands);
 
 	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
+	if (uiBuilder.WasClicked("Restart Level") || input.WasKeyReleased(Slush::Input::_1))
+	{
+		SLUSH_INFO("[GameOver] Restart Level");
+		myLevelState.RestartLevel();
+		return Slush::IGameState::POP_SUBSTATE;
+	}
 	if (uiBuilder.WasClicked("Main Menu") || input.WasKeyReleased(Slush::Input::_2))
 	{
 		SLUSH_INFO("[GameOver] Main Menu");

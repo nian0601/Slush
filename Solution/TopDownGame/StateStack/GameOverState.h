@@ -8,10 +8,12 @@ namespace Slush
 	class Font;
 }
 
+class LevelState;
+
 class GameOverState : public Slush::IGameState
 {
 public:
-	GameOverState();
+	GameOverState(LevelState& aLevelState);
 
 	void StartState() override;
 	GameStateResult Update() override;
@@ -19,6 +21,7 @@ public:
 	bool AllowPassThroughRender() override { return true; }
 
 private:
+	LevelState& myLevelState;
 	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::Font& myFont;

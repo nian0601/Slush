@@ -151,6 +151,7 @@
     <ClCompile Include="LevelEditorDockable.cpp" />
     <ClCompile Include="LevelEditorLayout.cpp" />
 	<ClCompile Include="GameLayout.cpp" />
+	<ClCompile Include="StateStack\GameOverState.cpp" />
 	<ClCompile Include="StateStack\LevelState.cpp" />
 	<ClCompile Include="StateStack\MainMenuState.cpp" />
 	<ClCompile Include="StateStack\LevelSelectState.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="LevelEditorDockable.h" />
     <ClInclude Include="LevelEditorLayout.h" />
 	<ClInclude Include="GameLayout.h" />
+	<ClInclude Include="StateStack\GameOverState.h" />
 	<ClInclude Include="StateStack\LevelState.h" />
 	<ClInclude Include="StateStack\MainMenuState.h" />
 	<ClInclude Include="StateStack\LevelSelectState.h" />

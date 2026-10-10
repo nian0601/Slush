@@ -40,21 +40,25 @@ LevelSelectState::LevelSelectState()
 	myUIButtonStyle.EnableButtonInteraction(0xFF888888);
 }
 
-Slush::IGameState::GameStateResult LevelSelectState::Update()
+void LevelSelectState::StartState()
 {
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
-	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
 	const FW_GrowingArray<Slush::Asset*>& assets = assetRegistry.GetAllAssets<LevelData>();
-	FW_GrowingArray<LevelData*> levels;
+	myLevels.RemoveAll();
 	for (Slush::Asset* asset : assets)
 	{
 		LevelData* levelData = static_cast<LevelData*>(asset);
 		// Zero-wave levels are harness content, not playable selections.
 		if (levelData->myTotalWaveCount > 0)
 		{
-			levels.Add(levelData);
+			myLevels.Add(levelData);
 		}
 	}
+}
+
+Slush::IGameState::GameStateResult LevelSelectState::Update()
+{
+	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
 
 	Slush::UIBuilder uiBuilder;
 	uiBuilder.Start();
@@ -68,13 +72,13 @@ Slush::IGameState::GameStateResult LevelSelectState::Update()
 		uiBuilder.GetStyle().SetAlingment(Slush::UIElementStyle::CENTER);
 		uiBuilder.Text("Select Level", myFont, 50);
 		uiBuilder.VerticalSpacing(60);
-		if (levels.Count() == 0)
+		if (myLevels.Count() == 0)
 		{
 			uiBuilder.Text("No levels available", myFont, 25);
 		}
-		for (int index = 0; index < levels.Count(); ++index)
+		for (int index = 0; index < myLevels.Count(); ++index)
 		{
-			FW_String label = GetLevelButtonLabel(*levels[index], index);
+			FW_String label = GetLevelButtonLabel(*myLevels[index], index);
 			uiBuilder.Button(label.GetBuffer(), myFont, 25, myUIButtonStyle, 0xFF333333, 0xFFFFFFFF);
 			uiBuilder.VerticalSpacing(20);
 		}
@@ -84,13 +88,13 @@ Slush::IGameState::GameStateResult LevelSelectState::Update()
 	}
 	uiBuilder.Finish(myUIRenderCommands);
 
-	for (int index = 0; index < levels.Count(); ++index)
+	for (int index = 0; index < myLevels.Count(); ++index)
 	{
-		FW_String label = GetLevelButtonLabel(*levels[index], index);
+		FW_String label = GetLevelButtonLabel(*myLevels[index], index);
 		if (uiBuilder.WasClicked(label.GetBuffer()) ||
 			(index < 9 && input.WasKeyReleased(static_cast<Slush::Input::KeyCode>(Slush::Input::_1 + index))))
 		{
-			myStateStack->PushSubState(new LevelState(*levels[index]));
+			myStateStack->PushSubState(new LevelState(*myLevels[index]));
 			return Slush::IGameState::KEEP;
 		}
 	}

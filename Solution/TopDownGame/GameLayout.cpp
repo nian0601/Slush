@@ -5,6 +5,7 @@
 #include "Level/LevelData.h"
 #include "StateStack/LevelState.h"
 #include "StateStack/MainMenuState.h"
+#include "StateStack/LevelSelectState.h"
 #include "StateStack/TowerTestState.h"
 
 #include "Core/Assets/AssetStorage.h"
@@ -51,6 +52,10 @@ GameLayout::GameLayout()
 			{
 				SLUSH_WARNING("Missing -level value; showing the main menu");
 			}
+		}
+		else if (commandLineArgs.HasFlag("-levelselect"))
+		{
+			myStateStack->PushMainState(new LevelSelectState());
 		}
 	}
 

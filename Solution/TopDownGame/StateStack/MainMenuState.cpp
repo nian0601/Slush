@@ -1,17 +1,10 @@
 #include "stdafx.h"
 
 #include "MainMenuState.h"
-#include "LevelState.h"
+#include "LevelSelectState.h"
 #include "TopDownGameGlobals.h"
-#include "Level/LevelData.h"
-#include "Core/Assets/AssetStorage.h"
 #include "Graphics/Window.h"
 #include "StateStack/StateStack.h"
-
-namespace
-{
-	const char* const ourInitialLevelDataAssetName = "level_main";
-}
 
 MainMenuState::MainMenuState()
 	: myUIRenderer(TopDownGameGlobals::GetInstance().GetFont())
@@ -51,11 +44,7 @@ Slush::IGameState::GameStateResult MainMenuState::Update()
 
 	if (uiBuilder.WasClicked("Start"))
 	{
-		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
-		LevelData* levelData = assetRegistry.GetAsset<LevelData>(ourInitialLevelDataAssetName);
-		FW_ASSERT(levelData, "Game has no valid LevelData - expected a 'level_main' LevelData asset");
-		// #89 replaces the Start target with the level select state.
-		myStateStack->PushMainState(new LevelState(*levelData));
+		myStateStack->PushMainState(new LevelSelectState());
 	}
 	else if (uiBuilder.WasClicked("Quit"))
 	{

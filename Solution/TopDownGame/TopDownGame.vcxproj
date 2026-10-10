@@ -154,6 +154,7 @@
 	<ClCompile Include="StateStack\LevelState.cpp" />
 	<ClCompile Include="StateStack\MainMenuState.cpp" />
 	<ClCompile Include="StateStack\TowerTestState.cpp" />
+	<ClCompile Include="StateStack\VictoryState.cpp" />
     <ClCompile Include="Level\NavmeshData.cpp" />
     <ClCompile Include="Level\LevelData.cpp" />
     <ClCompile Include="Level\WaveScaling.cpp" />
@@ -185,6 +186,7 @@
 	<ClInclude Include="StateStack\LevelState.h" />
 	<ClInclude Include="StateStack\MainMenuState.h" />
 	<ClInclude Include="StateStack\TowerTestState.h" />
+	<ClInclude Include="StateStack\VictoryState.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Level\NavmeshData.h" />
     <ClInclude Include="Level\LevelData.h" />

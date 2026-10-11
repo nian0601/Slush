@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+ï»¿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -61,6 +61,7 @@
     <ClInclude Include="Physics\PhysicsShapes.h" />
     <ClInclude Include="Physics\PhysicsWorld.h" />
     <ClInclude Include="UI\UIBuilder.h" />
+    <ClInclude Include="UI\UITheme.h" />
     <ClInclude Include="Core\Assets\AssetParser.h" />
     <ClInclude Include="Core\Assets\AssetReference.h" />
     <ClInclude Include="Core\Assets\AssetStorage.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="EntitySystem\Components\SpriteComponent.cpp" />
     <ClCompile Include="StateStack\StateStack.cpp" />
     <ClCompile Include="UI\UIBuilder.cpp" />
+    <ClCompile Include="UI\UITheme.cpp" />
     <ClCompile Include="Core\Assets\AssetParser.cpp" />
     <ClCompile Include="Core\Assets\Asset.cpp" />
     <ClCompile Include="Core\Assets\DataAsset.cpp" />

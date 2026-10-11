@@ -3,6 +3,7 @@
 #include "Core/EngineTestSuite.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/AssetRepository.h"
+#include "UI/UITheme.h"
 
 #include <FW_FileSystem.h>
 #include <FW_UnitTestSuite.h>
@@ -210,9 +211,27 @@ namespace Slush
 			FW_TEST_CHECK(writePath == expected, "Expected a new asset to go to the first mounted Asset Repository");
 		}
 
+		void TestUIThemeButtonStates()
+		{
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Normal, false) == UIState::Normal, "Normal stays normal away from the mouse");
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Normal, true) == UIState::Hovered, "Normal highlights under the mouse");
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Hovered, false) == UIState::Hovered, "Explicit hovered state stays hovered");
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Hovered, true) == UIState::Hovered, "Explicit hovered state stays hovered under the mouse");
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Selected, false) == UIState::Selected, "Selected stays selected away from the mouse");
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Selected, true) == UIState::Selected, "Selected keeps its look under the mouse");
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Disabled, false) == UIState::Disabled, "Disabled stays disabled away from the mouse");
+			FW_TEST_CHECK(UIThemeUtils::ResolveState(UIState::Disabled, true) == UIState::Disabled, "Disabled never highlights under the mouse");
+			FW_TEST_CHECK(UIThemeUtils::IsClickable(UIState::Normal), "Normal can be clicked");
+			FW_TEST_CHECK(UIThemeUtils::IsClickable(UIState::Hovered), "Hovered can be clicked");
+			FW_TEST_CHECK(UIThemeUtils::IsClickable(UIState::Selected), "Selected can be clicked");
+			FW_TEST_CHECK(!UIThemeUtils::IsClickable(UIState::Disabled), "Disabled cannot be clicked");
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
+
+			FW_RUN_TEST(TestUIThemeButtonStates);
 
 			FW_RUN_TEST(TestCommandLineArgsFlagPresent);
 			FW_RUN_TEST(TestCommandLineArgsFlagAbsent);

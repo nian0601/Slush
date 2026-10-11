@@ -4,6 +4,7 @@
 #include <UI/UIBuilder.h>
 
 class Level;
+class LevelHud;
 class LevelData;
 class TowerBuildMenu;
 
@@ -21,6 +22,7 @@ public:
 private:
 	LevelData& myLevelData;
 	Level* myLevel = nullptr;
+	LevelHud* myLevelHud = nullptr;
 	TowerBuildMenu* myTowerBuildMenu = nullptr;
 	Slush::UIRenderer myUIRenderer;
 };

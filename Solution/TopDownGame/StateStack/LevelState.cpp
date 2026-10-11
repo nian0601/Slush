@@ -4,6 +4,7 @@
 
 #include "Level/Level.h"
 #include "Level/LevelData.h"
+#include "LevelHud.h"
 #include "TopDownGameGlobals.h"
 #include "TowerBuildMenu.h"
 #include "VictoryState.h"
@@ -20,6 +21,7 @@ LevelState::LevelState(LevelData& aLevelData)
 
 LevelState::~LevelState()
 {
+	FW_SAFE_DELETE(myLevelHud);
 	FW_SAFE_DELETE(myTowerBuildMenu);
 	FW_SAFE_DELETE(myLevel);
 }
@@ -30,6 +32,7 @@ Slush::IGameState::GameStateResult LevelState::Update()
 	if (myLevel->GetResult() == LevelResult::InProgress)
 	{
 		myLevel->Update();
+		myLevelHud->Update();
 		myTowerBuildMenu->Update();
 	}
 	if (myLevel->GetResult() == LevelResult::Won)
@@ -51,12 +54,15 @@ void LevelState::Render()
 		myTowerBuildMenu->RenderPreview();
 	}
 	myUIRenderer.Render(myTowerBuildMenu->GetRenderCommands());
+	myUIRenderer.Render(myLevelHud->GetRenderCommands());
 }
 
 void LevelState::RestartLevel()
 {
+	FW_SAFE_DELETE(myLevelHud);
 	FW_SAFE_DELETE(myTowerBuildMenu);
 	FW_SAFE_DELETE(myLevel);
 	myLevel = new Level(myLevelData, true);
+	myLevelHud = new LevelHud(*myLevel);
 	myTowerBuildMenu = new TowerBuildMenu(*myLevel);
 }

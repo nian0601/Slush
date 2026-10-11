@@ -204,6 +204,7 @@
     <ClInclude Include="Graphics\Renderer.h" />
     <ClInclude Include="Graphics\Texture.h" />
     <ClInclude Include="UI\UIBuilder.h" />
+    <ClInclude Include="UI\UITheme.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Assets\Asset.cpp" />
@@ -285,6 +286,7 @@
     <ClCompile Include="Graphics\Renderer.cpp" />
     <ClCompile Include="Graphics\Texture.cpp" />
     <ClCompile Include="UI\UIBuilder.cpp" />
+    <ClCompile Include="UI\UITheme.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Framework\Framework.vcxproj">

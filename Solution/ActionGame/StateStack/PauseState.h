@@ -28,9 +28,6 @@ private:
 	Slush::EntityHandle myPlayerHandle;
 	const CharacterInfo& myCharacterInfo;
 
-	Slush::UIElementStyle myUIBackgroundStyle;
-	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::UIRenderer myUIRenderer;
-	Slush::Font& myFont;
 };

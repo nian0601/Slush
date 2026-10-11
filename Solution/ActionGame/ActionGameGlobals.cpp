@@ -65,6 +65,13 @@ void ActionGameGlobals::Destroy()
 	FW_SAFE_DELETE(ourInstance);
 }
 
+void ActionGameGlobals::SetFont(Slush::Font& aFont)
+{
+	myFont = &aFont;
+	myUITheme = Slush::UITheme();
+	myUITheme.myFont = &aFont;
+}
+
 Slush::Font& ActionGameGlobals::GetFont()
 {
 	FW_ASSERT(myFont != nullptr, "Need to set a Font");

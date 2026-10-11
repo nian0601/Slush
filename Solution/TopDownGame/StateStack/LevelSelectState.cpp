@@ -26,18 +26,7 @@ namespace
 
 LevelSelectState::LevelSelectState()
 	: myUIRenderer(TopDownGameGlobals::GetInstance().GetFont())
-	, myFont(TopDownGameGlobals::GetInstance().GetFont())
 {
-	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
-	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-	myUIButtonStyle.SetChildGap(8);
-	myUIButtonStyle.SetPadding(16, 16);
-	myUIButtonStyle.SetColor(0xFF333333);
-	myUIButtonStyle.SetOutlineColor(0xFF000000);
-	myUIButtonStyle.SetOutlineThickness(-1.f);
-	myUIButtonStyle.EnableButtonInteraction(0xFF888888);
 }
 
 void LevelSelectState::StartState()
@@ -61,29 +50,29 @@ Slush::IGameState::GameStateResult LevelSelectState::Update()
 	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
 
 	Slush::UIBuilder uiBuilder;
-	uiBuilder.Start();
-	uiBuilder.ScreenFade(0xAA121212);
+	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
+	uiBuilder.ScreenFade();
 	uiBuilder.Finish(myUIRenderCommands);
 
-	uiBuilder.Start();
+	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
 	{
 		uiBuilder.OpenElement();
 		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
 		uiBuilder.GetStyle().SetAlingment(Slush::UIElementStyle::CENTER);
-		uiBuilder.Text("Select Level", myFont, 50);
+		uiBuilder.Text("Select Level", Slush::UITextRole::Title);
 		uiBuilder.VerticalSpacing(60);
 		if (myLevels.Count() == 0)
 		{
-			uiBuilder.Text("No levels available", myFont, 25);
+			uiBuilder.Text("No levels available");
 		}
 		for (int index = 0; index < myLevels.Count(); ++index)
 		{
 			FW_String label = GetLevelButtonLabel(*myLevels[index], index);
-			uiBuilder.Button(label.GetBuffer(), myFont, 25, myUIButtonStyle, 0xFF333333, 0xFFFFFFFF);
+			uiBuilder.Button(label.GetBuffer(), Slush::UIState::Normal, { 250, 75 });
 			uiBuilder.VerticalSpacing(20);
 		}
 		uiBuilder.VerticalSpacing(20);
-		uiBuilder.Button("Back", myFont, 25, myUIButtonStyle, 0xFF333333, 0xFFFFFFFF);
+		uiBuilder.Button("Back", Slush::UIState::Normal, { 250, 75 });
 		uiBuilder.CloseElement();
 	}
 	uiBuilder.Finish(myUIRenderCommands);

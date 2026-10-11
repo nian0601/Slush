@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UI/UITheme.h"
+
 class Level;
 namespace Slush { class Font; }
 
@@ -11,7 +13,8 @@ public:
 
 	void SetLevel(Level* aLevel) { myLevel = aLevel; }
 	Level& GetLevel();
-	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
+	void SetFont(Slush::Font& aFont);
+	const Slush::UITheme& GetUITheme() const { return myUITheme; }
 	Slush::Font& GetFont();
 
 private:
@@ -22,4 +25,5 @@ private:
 
 	Level* myLevel = nullptr;
 	Slush::Font* myFont = nullptr;
+	Slush::UITheme myUITheme;
 };

@@ -54,6 +54,7 @@ These conventions differ from typical C++ defaults — follow them in this codeb
 - Exception: use a hard `FW_ASSERT` where the asset is a genuine invariant rather than a recoverable absence (e.g. `Level::Restart()`'s player spawn)
 - `AssetReference<T>` deliberately exposes no mutable string accessor — editor UI renders it read-only (`ImGui::Text`), not `ImGui::InputText`
 - Hoist a singleton's `Foo::GetInstance()` into a local reference before repeated or looped calls rather than re-invoking it per call (`AssetRegistry`, `ComponentRegistry`, `DependencyTracker`, `Engine` all use this singleton shape)
+- UI look comes from the game's `UITheme`, owned by its Globals. UI call sites pass no fonts, text sizes or hex colours and own no `UIElementStyle` members for look; size and arrangement stay at the call site.
 
 ## Testing
 

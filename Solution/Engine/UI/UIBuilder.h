@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UITheme.h"
+
 namespace Slush
 {
 	// https://www.youtube.com/watch?v=DYWTw19_8r4&t=100s&ab_channel=NicBarker
@@ -23,12 +25,6 @@ namespace Slush
 			TOP_TO_BOTTOM,
 		};
 
-		enum InteractionFlag
-		{
-			NONE,
-			BUTTON,
-		};
-
 		enum Alignment
 		{
 			TOP_LEFT,
@@ -48,8 +44,6 @@ namespace Slush
 		UIElementStyle& SetOutlineColor(int aColor);
 		UIElementStyle& SetOutlineThickness(float aThickness);
 
-		UIElementStyle& EnableButtonInteraction(int aHoverColor);
-
 		SizingMode myXSizing;
 		SizingMode myYSizing;
 		LayoutDirection myLayoutDirection;
@@ -62,9 +56,6 @@ namespace Slush
 		int myColor;
 		int myOutlineColor;
 		float myOutlineThickness;
-
-		int myInteractionFlags;
-		int myHoverColor;
 	};
 
 	class UIBuilder
@@ -83,7 +74,7 @@ namespace Slush
 			int myTextSize = 15;
 		};
 
-		void Start();
+		void Start(const UITheme& aTheme);
 		void Finish();
 		void Finish(FW_GrowingArray<RenderCommand>& outRenderCommands);
 		void GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands);
@@ -96,13 +87,19 @@ namespace Slush
 
 		UIElementStyle& GetStyle();
 
-		void Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor);
+		UIElementStyle& BeginPanel();
+		void EndPanel();
+		UIElementStyle& BeginFrame();
+		void EndFrame();
+		UIElementStyle& BeginButton(const char* aIdentifier, UIState aBaseState = UIState::Normal);
+		void EndButton();
+		void Button(const char* someText, UIState aBaseState = UIState::Normal, const Vector2i& aFixedSize = { 0, 0 });
+		void Text(const char* someText, UITextRole aRole = UITextRole::Body, UITextTone aTone = UITextTone::Default);
+		void TextHeader(const char* someText);
+		void ScreenFade();
+
 		void HorizontalSpacing(int aSize);
 		void VerticalSpacing(int aSize);
-		void ScreenFade(int aColor);
-		void Text(const char* someText, Font& aFont, int aTextSize, int aTextColor = 0xFFFFFFFF);
-		void TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor);
-		void TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor);
 		void Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect);
 
 		bool WasClicked(const char* aIdentifier) const;
@@ -118,6 +115,12 @@ namespace Slush
 			FW_String myIdentifier;
 
 			UIElementStyle myStyle;
+			const UIWidgetStyle* myWidgetStyle = nullptr;
+			UIState myBaseState = UIState::Normal;
+			bool myIsButton = false;
+			bool myIsMouseOver = false;
+			bool myIsThemedText = false;
+			UITextTone myTextTone = UITextTone::Default;
 
 			Vector2i myPosition;
 			Vector2i mySize;
@@ -133,6 +136,9 @@ namespace Slush
 			FW_GrowingArray<Element*> myChildren;
 		};
 
+		UIElementStyle& BeginWidget(const UIWidgetStyle& aStyle, const char* aIdentifier = nullptr);
+		void AssertTheme() const;
+		const UITheme* myTheme = nullptr;
 		Element myRoot;
 		Element* myCurrentElement = nullptr;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;

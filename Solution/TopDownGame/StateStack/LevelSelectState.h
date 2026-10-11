@@ -21,8 +21,6 @@ public:
 
 private:
 	FW_GrowingArray<LevelData*> myLevels;
-	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::UIRenderer myUIRenderer;
-	Slush::Font& myFont;
 };

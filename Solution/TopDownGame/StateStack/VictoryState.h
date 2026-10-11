@@ -18,9 +18,6 @@ public:
 	bool AllowPassThroughRender() override { return true; };
 
 private:
-	Slush::UIElementStyle myUIBackgroundStyle;
-	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
-	Slush::Font& myFont;
 	Slush::UIRenderer myUIRenderer;
 };

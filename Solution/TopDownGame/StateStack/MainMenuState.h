@@ -17,8 +17,6 @@ public:
 	void Render() override;
 
 private:
-	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::UIRenderer myUIRenderer;
-	Slush::Font& myFont;
 };

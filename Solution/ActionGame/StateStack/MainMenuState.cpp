@@ -9,29 +9,10 @@
 #include "CharacterSelectionState.h"
 
 MainMenuState::MainMenuState()
-	: myFont(ActionGameGlobals::GetInstance().GetFont())
-	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
+	: myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
 	myTilemap = new Tilemap();
 
-	myUIBackgroundStyle.SetPadding(16, 16);
-	myUIBackgroundStyle.SetChildGap(16);
-	myUIBackgroundStyle.SetColor(0xAA121212);
-	myUIBackgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
-	myUIBackgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-
-	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
-
-	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-	myUIButtonStyle.SetChildGap(8);
-	myUIButtonStyle.SetPadding(16, 16);
-
-	myUIButtonStyle.SetColor(0xFF333333);
-	myUIButtonStyle.SetOutlineColor(0xFF000000);
-	myUIButtonStyle.SetOutlineThickness(-1.f);
-	myUIButtonStyle.EnableButtonInteraction(0xFF888888);
 }
 
 MainMenuState::~MainMenuState()
@@ -48,20 +29,20 @@ Slush::IGameState::GameStateResult MainMenuState::Update()
 	}
 
 	Slush::UIBuilder uiBuilder;
-	uiBuilder.Start();
-	uiBuilder.ScreenFade(0xAA121212);
+	uiBuilder.Start(ActionGameGlobals::GetInstance().GetUITheme());
+	uiBuilder.ScreenFade();
 	uiBuilder.Finish(myUIRenderCommands);
 
-	uiBuilder.Start();
+	uiBuilder.Start(ActionGameGlobals::GetInstance().GetUITheme());
 	{
 		uiBuilder.OpenElement();
 		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
 
-		uiBuilder.Text("Action Game!", myFont, 50);
+		uiBuilder.Text("Action Game!", Slush::UITextRole::Title);
 		uiBuilder.VerticalSpacing(60);
-		uiBuilder.Button("Start Game", myFont, 25, myUIButtonStyle, 0xFF333333, 0xFFFFFFFF);
+		uiBuilder.Button("Start Game", Slush::UIState::Normal, { 250, 75 });
 		uiBuilder.VerticalSpacing(20);
-		uiBuilder.Button("Quit", myFont, 25, myUIButtonStyle, 0xFF333333, 0xFFFFFFFF);
+		uiBuilder.Button("Quit", Slush::UIState::Normal, { 250, 75 });
 
 		uiBuilder.CloseElement();
 	}

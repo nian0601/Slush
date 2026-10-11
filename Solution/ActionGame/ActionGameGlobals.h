@@ -9,6 +9,7 @@
 // casted into the actual asset, but maybe thats fine?
 #include "Core/Assets/AssetParser.h"
 #include "Core/Dockables/Dockable.h"
+#include "UI/UITheme.h"
 
 namespace Slush
 {
@@ -46,7 +47,8 @@ public:
 	static ActionGameGlobals& GetInstance();
 	static void Destroy();
 
-	void SetFont(Slush::Font& aFont) { myFont = &aFont; }
+	void SetFont(Slush::Font& aFont);
+	const Slush::UITheme& GetUITheme() const { return myUITheme; }
 
 	void SetEntityManager(Slush::EntityManager* anEntityManager) { myEntityManager = anEntityManager; }
 
@@ -62,6 +64,7 @@ private:
 	static ActionGameGlobals* ourInstance;
 
 	Slush::Font* myFont = nullptr;
+	Slush::UITheme myUITheme;
 
 	Slush::EntityManager* myEntityManager = nullptr;
 };

@@ -9,14 +9,8 @@
 
 GameOverState::GameOverState(LevelState& aLevelState)
 	: myLevelState(aLevelState)
-	, myFont(TopDownGameGlobals::GetInstance().GetFont())
-	, myUIRenderer(myFont)
+	, myUIRenderer(TopDownGameGlobals::GetInstance().GetFont())
 {
-	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
-	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetColor(0xFF334453);
-	myUIButtonStyle.EnableButtonInteraction(0xFF60758A);
 }
 
 void GameOverState::StartState()
@@ -27,20 +21,20 @@ void GameOverState::StartState()
 Slush::IGameState::GameStateResult GameOverState::Update()
 {
 	Slush::UIBuilder uiBuilder;
-	uiBuilder.Start();
-	uiBuilder.ScreenFade(0xAA121212);
+	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
+	uiBuilder.ScreenFade();
 	uiBuilder.Finish(myUIRenderCommands);
 
-	uiBuilder.Start();
+	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
 	{
 		uiBuilder.OpenElement();
 		uiBuilder.GetStyle().SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
 
-		uiBuilder.Text("Game Over", myFont, 50);
+		uiBuilder.Text("Game Over", Slush::UITextRole::Title);
 		uiBuilder.VerticalSpacing(60);
-		uiBuilder.Button("Restart Level", myFont, 25, myUIButtonStyle, 0xFF334453, 0xFFFFFFFF);
+		uiBuilder.Button("Restart Level", Slush::UIState::Normal, { 250, 75 });
 		uiBuilder.VerticalSpacing(20);
-		uiBuilder.Button("Main Menu", myFont, 25, myUIButtonStyle, 0xFF334453, 0xFFFFFFFF);
+		uiBuilder.Button("Main Menu", Slush::UIState::Normal, { 250, 75 });
 
 		uiBuilder.CloseElement();
 	}

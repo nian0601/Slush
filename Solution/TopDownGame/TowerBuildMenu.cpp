@@ -24,13 +24,12 @@ void TowerBuildMenu::Update()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
-	Slush::Font& font = TopDownGameGlobals::GetInstance().GetFont();
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
 
 	myRenderCommands.RemoveAll();
 	Slush::UIBuilder uiBuilder;
-	uiBuilder.Start();
+	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
 	uiBuilder.OpenElement().SetXSizing(Slush::UIElementStyle::GROW)
 		.SetYSizing(Slush::UIElementStyle::GROW)
 		.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
@@ -39,16 +38,11 @@ void TowerBuildMenu::Update()
 		.SetYSizing(Slush::UIElementStyle::GROW);
 	uiBuilder.CloseElement();
 
-	uiBuilder.OpenElement().SetXSizing(Slush::UIElementStyle::GROW)
+	uiBuilder.BeginPanel().SetXSizing(Slush::UIElementStyle::GROW)
 		.SetYSizing(Slush::UIElementStyle::FIXED, ourBarHeight)
 		.SetLayoutDirection(Slush::UIElementStyle::LEFT_TO_RIGHT)
-		.SetPadding(16, 12).SetChildGap(12).SetColor(0xDD18202A);
+		.SetPadding(16, 12).SetChildGap(12);
 
-	Slush::UIElementStyle buttonStyle;
-	buttonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 230)
-		.SetYSizing(Slush::UIElementStyle::FIXED, 64)
-		.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM)
-		.SetAlingment(Slush::UIElementStyle::CENTER);
 
 	for (Slush::Asset* asset : prefabs)
 	{
@@ -62,16 +56,13 @@ void TowerBuildMenu::Update()
 		label += ")";
 		const bool isSelected = prefab == mySelectedTowerPrefab;
 		const bool isAffordable = BuildCostComponent::GetCost(*prefab) <= myLevel.GetResources();
-		const int buttonColor = !isAffordable ? 0xFF242D36 : (isSelected ? 0xFF4379A6 : 0xFF334453);
-		buttonStyle.EnableButtonInteraction(isAffordable ? 0xFF60758A : 0xFF34414C);
-		buttonStyle.SetOutlineColor(isSelected ? 0xFF81C9FF : 0x00000000);
-		buttonStyle.SetOutlineThickness(isSelected ? 2.f : 0.f);
-		uiBuilder.Button(label.GetBuffer(), font, 20, buttonStyle, buttonColor, 0xFFFFFFFF);
+		const Slush::UIState state = isSelected ? Slush::UIState::Selected : (isAffordable ? Slush::UIState::Normal : Slush::UIState::Disabled);
+		uiBuilder.Button(label.GetBuffer(), state, { 230, 64 });
 	}
 	if (myFeedbackTimer.IsStarted() && !myFeedbackTimer.HasExpired())
-		uiBuilder.Text(myFeedbackText.GetBuffer(), font, 18, 0xFFFFD17A);
+		uiBuilder.Text(myFeedbackText.GetBuffer(), Slush::UITextRole::Small, Slush::UITextTone::Warning);
 
-	uiBuilder.CloseElement();
+	uiBuilder.EndPanel();
 	uiBuilder.CloseElement();
 	uiBuilder.Finish(myRenderCommands);
 

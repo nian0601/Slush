@@ -21,9 +21,6 @@ public:
 private:
 	Slush::EntityHandle myPlayerHandle;
 
-	Slush::UIElementStyle myUIBackgroundStyle;
-	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::UIRenderer myUIRenderer;
-	Slush::Font& myFont;
 };

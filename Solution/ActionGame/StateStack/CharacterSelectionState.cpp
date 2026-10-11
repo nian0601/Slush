@@ -11,26 +11,9 @@
 #include "Level\Tilemap.h"
 
 CharacterSelectionState::CharacterSelectionState()
-	: myFont(ActionGameGlobals::GetInstance().GetFont())
-	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
+	: myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
 	myTilemap = new Tilemap();
-
-	myUIBackgroundStyle.SetPadding(16, 16);
-	myUIBackgroundStyle.SetChildGap(16);
-	myUIBackgroundStyle.SetColor(0xAA121212);
-	myUIBackgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
-	myUIBackgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-
-	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-	myUIButtonStyle.SetChildGap(8);
-	myUIButtonStyle.SetPadding(16, 16);
-
-	myUIButtonStyle.SetColor(0xFF333333);
-	myUIButtonStyle.SetOutlineColor(0xFF000000);
-	myUIButtonStyle.SetOutlineThickness(-1.f);
-	myUIButtonStyle.EnableButtonInteraction(0xFF888888);
 
 	Slush::Engine::GetInstance().GetWindow().GetRenderer().StartFade(0.15f);
 }
@@ -54,13 +37,13 @@ Slush::IGameState::GameStateResult CharacterSelectionState::Update()
 
 	Slush::UIBuilder uiBuilder;
 
-	uiBuilder.Start();
-	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
+	uiBuilder.Start(ActionGameGlobals::GetInstance().GetUITheme());
+	uiBuilder.ScreenFade();
 	uiBuilder.Finish(myUIRenderCommands);
 
-	uiBuilder.Start();
+	uiBuilder.Start(ActionGameGlobals::GetInstance().GetUITheme());
 
-	uiBuilder.TextHeader("Choose your Hero!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
+	uiBuilder.TextHeader("Choose your Hero!");
 
 	uiBuilder.VerticalSpacing(50);
 
@@ -68,9 +51,7 @@ Slush::IGameState::GameStateResult CharacterSelectionState::Update()
 
 	uiBuilder.VerticalSpacing(50);
 
-	uiBuilder.OpenElement("Back", myUIButtonStyle);
-	uiBuilder.Text("Back", ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
-	uiBuilder.CloseElement();
+	uiBuilder.Button("Back");
 
 	uiBuilder.Finish(myUIRenderCommands);
 
@@ -102,27 +83,18 @@ void CharacterSelectionState::BuildCharacterDisplay(Slush::UIBuilder& aUIBUilder
 	Slush::AssetRegistry& assets = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& charAssets = assets.GetAllAssets<CharacterInfo>();
 
-	aUIBUilder.OpenElement(myUIBackgroundStyle);
+	aUIBUilder.BeginPanel().SetAlingment(Slush::UIElementStyle::CENTER);
 	for (Slush::Asset* charAsset : charAssets)
 	{
 		CharacterInfo* charInfo = static_cast<CharacterInfo*>(charAsset);
-		Slush::UIElementStyle& style = aUIBUilder.OpenElement(charInfo->myName.GetBuffer());
-		style.SetAlingment(Slush::UIElementStyle::CENTER);
-		style.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-		style.SetChildGap(8);
-		style.SetPadding(16, 16);
-
-		style.SetColor(0xFF333333);
-		style.SetOutlineColor(0xFF000000);
-		style.SetOutlineThickness(-1.f);
-		style.EnableButtonInteraction(0xFF888888);
+		aUIBUilder.BeginButton(charInfo->myName.GetBuffer());
 
 		if (const Slush::Texture* iconTexture = charInfo->myPortaitTexture.Get())
 			aUIBUilder.Image(iconTexture, charInfo->myPortaitTextureRect.myExtents, charInfo->myPortaitTextureRect);
 
-		aUIBUilder.Text(charInfo->myName.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
+		aUIBUilder.Text(charInfo->myName.GetBuffer());
 
-		aUIBUilder.CloseElement();
+		aUIBUilder.EndButton();
 	}
-	aUIBUilder.CloseElement();
+	aUIBUilder.EndPanel();
 }

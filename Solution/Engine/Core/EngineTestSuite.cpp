@@ -4,6 +4,7 @@
 #include "Core/CommandLineArgs.h"
 #include "Core/AssetRepository.h"
 #include "UI/UITheme.h"
+#include "UI/UIBuilder.h"
 
 #include <FW_FileSystem.h>
 #include <FW_UnitTestSuite.h>
@@ -227,11 +228,46 @@ namespace Slush
 			FW_TEST_CHECK(!UIThemeUtils::IsClickable(UIState::Disabled), "Disabled cannot be clicked");
 		}
 
+		void TestUIBuilderLayout()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			builder.Start(theme, { 800, 600 });
+			builder.OpenElement().SetColor(0xFFFFFFFF).SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+			builder.CloseElement();
+			builder.Finish(UIInputState());
+			FW_GrowingArray<UIBuilder::RenderCommand> commands;
+			builder.GenerateRenderCommands(commands);
+			FW_TEST_REQUIRE(commands.Count() == 1, "One element produces one command");
+			FW_TEST_CHECK(commands[0].mySize == Vector2f(100, 50), "Fixed size is preserved");
+			FW_TEST_CHECK(commands[0].myPosition == Vector2f(350, 275), "Root centres the element");
+		}
+
+		void TestUIBuilderClicks()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			for (int test = 0; test < 4; ++test)
+			{
+				builder.Start(theme, { 800, 600 });
+				builder.BeginButton("A", test == 3 ? UIState::Disabled : UIState::Normal)
+					.SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+				builder.EndButton();
+				UIInputState input;
+				input.myMousePosition = test == 1 ? Vector2i(0, 0) : Vector2i(400, 300);
+				input.myWasLeftMouseReleased = test != 2;
+				builder.Finish(input);
+				FW_TEST_CHECK(builder.WasClicked("A") == (test == 0), "Only an enabled button released inside is clicked");
+			}
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
 
 			FW_RUN_TEST(TestUIThemeButtonStates);
+			FW_RUN_TEST(TestUIBuilderLayout);
+			FW_RUN_TEST(TestUIBuilderClicks);
 
 			FW_RUN_TEST(TestCommandLineArgsFlagPresent);
 			FW_RUN_TEST(TestCommandLineArgsFlagAbsent);

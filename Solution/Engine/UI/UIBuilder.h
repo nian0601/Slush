@@ -10,6 +10,12 @@ namespace Slush
 	class Font;
 	class Texture;
 
+	struct UIInputState
+	{
+		Vector2i myMousePosition = { 0, 0 };
+		bool myWasLeftMouseReleased = false;
+	};
+
 	struct UIElementStyle
 	{
 		enum SizingMode
@@ -75,7 +81,9 @@ namespace Slush
 		};
 
 		void Start(const UITheme& aTheme);
+		void Start(const UITheme& aTheme, const Vector2i& aScreenSize);
 		void Finish();
+		void Finish(const UIInputState& anInputState);
 		void Finish(FW_GrowingArray<RenderCommand>& outRenderCommands);
 		void GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands);
 
@@ -151,7 +159,7 @@ namespace Slush
 
 		void CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis);
 		void CalculatePositions(Element& anElement);
-		bool HandleInput(Element& anElement);
+		bool HandleInput(Element& anElement, const UIInputState& anInputState);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};
 

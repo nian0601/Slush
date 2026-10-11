@@ -96,17 +96,22 @@ namespace Slush
 
 	void UIBuilder::Start(const UITheme& aTheme)
 	{
+		const Vector2f windowSize = Slush::Engine::GetInstance().GetWindow().GetRenderer().GetOffscreenBufferSize();
+		Start(aTheme, { static_cast<int>(windowSize.x), static_cast<int>(windowSize.y) });
+	}
+
+	void UIBuilder::Start(const UITheme& aTheme, const Vector2i& aScreenSize)
+	{
 		myTheme = &aTheme;
-		Vector2f windowSize = Slush::Engine::GetInstance().GetWindow().GetRenderer().GetOffscreenBufferSize();
 
 		myCurrentElement = nullptr;
 		myInteractiveElements.Clear();
 		myRoot.Reset();
 
 		myRoot.myStyle.Reset();
-		myRoot.mySize = { (int)windowSize.x, (int)windowSize.y };
-		myRoot.myStyle.myMinSize = { (int)windowSize.x, (int)windowSize.y };
-		myRoot.myStyle.myMaxSize = { (int)windowSize.x, (int)windowSize.y };
+		myRoot.mySize = aScreenSize;
+		myRoot.myStyle.myMinSize = aScreenSize;
+		myRoot.myStyle.myMaxSize = aScreenSize;
 		myRoot.myStyle.myXSizing = UIElementStyle::FIXED;
 		myRoot.myStyle.myYSizing = UIElementStyle::FIXED;
 		myRoot.myStyle.myColor = 0x44FFFFFF;
@@ -117,7 +122,7 @@ namespace Slush
 
 	void UIBuilder::AssertTheme() const
 	{
-		FW_ASSERT(myTheme != nullptr && myTheme->myFont != nullptr, "Themed widgets require Start(theme) and a font");
+		FW_ASSERT(myTheme != nullptr, "Themed widgets require Start(theme)");
 	}
 
 	UIElementStyle& UIBuilder::BeginWidget(const UIWidgetStyle& aStyle, const char* aIdentifier)
@@ -183,6 +188,7 @@ namespace Slush
 	void UIBuilder::Text(const char* someText, UITextRole aRole, UITextTone aTone)
 	{
 		AssertTheme();
+		FW_ASSERT(myTheme->myFont != nullptr, "Text requires a font");
 		FW_ASSERT(aRole != UITextRole::Count && aTone != UITextTone::Count);
 		OpenElement().SetAlingment(UIElementStyle::CENTER);
 		SetText(someText, *myTheme->myFont, myTheme->myTextSizes[static_cast<int>(aRole)]);
@@ -209,6 +215,15 @@ namespace Slush
 
 	void UIBuilder::Finish()
 	{
+		const Input& input = Engine::GetInstance().GetInput();
+		UIInputState inputState;
+		inputState.myMousePosition = input.GetMousePosition();
+		inputState.myWasLeftMouseReleased = input.WasMouseReleased(Input::LEFTMB);
+		Finish(inputState);
+	}
+
+	void UIBuilder::Finish(const UIInputState& anInputState)
+	{
 		FW_ASSERT(myCurrentElement == &myRoot, "Not all Elements are closed!");
 
 		CalculateSizeAlongAxis(myRoot, true);
@@ -218,7 +233,7 @@ namespace Slush
 
 		// Handle input
 		for (Element* child : myRoot.myChildren)
-			HandleInput(*child);
+			HandleInput(*child, anInputState);
 	}
 
 	void UIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
@@ -549,12 +564,11 @@ namespace Slush
 		}
 	}
 
-	bool UIBuilder::HandleInput(Element& anElement)
+	bool UIBuilder::HandleInput(Element& anElement, const UIInputState& anInputState)
 	{
-		const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
 		for (Element* child : anElement.myChildren)
 		{
-			if (HandleInput(*child))
+			if (HandleInput(*child, anInputState))
 				return true;
 		}
 
@@ -562,8 +576,8 @@ namespace Slush
 		{
 			myInteractiveElements[anElement.myIdentifier] = &anElement;
 			const Recti rect = MakeRectFromTopLeft(anElement.myPosition, anElement.mySize);
-			anElement.myIsMouseOver = Contains(rect, input.GetMousePosition());
-			if (UIThemeUtils::IsClickable(anElement.myBaseState) && anElement.myIsMouseOver && input.WasMouseReleased(Input::LEFTMB))
+			anElement.myIsMouseOver = Contains(rect, anInputState.myMousePosition);
+			if (UIThemeUtils::IsClickable(anElement.myBaseState) && anElement.myIsMouseOver && anInputState.myWasLeftMouseReleased)
 			{
 				anElement.myWasMouseReleased = true;
 				return true;

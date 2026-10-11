@@ -1,5 +1,7 @@
 #pragma once
 
+#include "UITheme.h"
+
 namespace Slush
 {
 	// https://www.youtube.com/watch?v=DYWTw19_8r4&t=100s&ab_channel=NicBarker
@@ -84,6 +86,7 @@ namespace Slush
 		};
 
 		void Start();
+		void Start(const UITheme& aTheme);
 		void Finish();
 		void Finish(FW_GrowingArray<RenderCommand>& outRenderCommands);
 		void GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands);
@@ -95,6 +98,17 @@ namespace Slush
 		void CloseElement();
 
 		UIElementStyle& GetStyle();
+
+		UIElementStyle& BeginPanel();
+		void EndPanel();
+		UIElementStyle& BeginFrame();
+		void EndFrame();
+		UIElementStyle& BeginButton(const char* aIdentifier, UIState aBaseState = UIState::Normal);
+		void EndButton();
+		void Button(const char* someText, UIState aBaseState = UIState::Normal, const Vector2i& aFixedSize = { 0, 0 });
+		void Text(const char* someText, UITextRole aRole = UITextRole::Body, UITextTone aTone = UITextTone::Default);
+		void TextHeader(const char* someText);
+		void ScreenFade();
 
 		void Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor);
 		void HorizontalSpacing(int aSize);
@@ -118,6 +132,12 @@ namespace Slush
 			FW_String myIdentifier;
 
 			UIElementStyle myStyle;
+			const UIWidgetStyle* myWidgetStyle = nullptr;
+			UIState myBaseState = UIState::Normal;
+			bool myIsButton = false;
+			bool myIsMouseOver = false;
+			bool myIsThemedText = false;
+			UITextTone myTextTone = UITextTone::Default;
 
 			Vector2i myPosition;
 			Vector2i mySize;
@@ -133,6 +153,9 @@ namespace Slush
 			FW_GrowingArray<Element*> myChildren;
 		};
 
+		UIElementStyle& BeginWidget(const UIWidgetStyle& aStyle, const char* aIdentifier = nullptr);
+		void AssertTheme() const;
+		const UITheme* myTheme = nullptr;
 		Element myRoot;
 		Element* myCurrentElement = nullptr;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;

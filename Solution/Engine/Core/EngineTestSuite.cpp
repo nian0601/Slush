@@ -261,6 +261,39 @@ namespace Slush
 			}
 		}
 
+		void TestUIBuilderMouseOver()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			UIInputState input;
+			input.myMousePosition = { 400, 300 };
+			for (int test = 0; test < 5; ++test)
+			{
+				builder.Start(theme, { 800, 600 });
+				FW_TEST_CHECK(!builder.IsMouseOverUI(), "Start clears the mouse-over result");
+				UIElementStyle& style = test == 2 ? builder.BeginPanel() : builder.OpenElement();
+				style.SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+				if (test < 2)
+					style.SetColor(0xFFFFFFFF);
+				if (test == 3)
+				{
+					style.SetXSizing(UIElementStyle::GROW).SetYSizing(UIElementStyle::GROW);
+					builder.VerticalSpacing(20);
+				}
+				if (test == 4)
+					style.SetOutlineColor(0xFFFFFFFF).SetOutlineThickness(-1.f);
+				builder.CloseElement();
+				input.myMousePosition = test == 1 ? Vector2i(0, 0) : Vector2i(400, 300);
+				builder.Finish(input);
+				FW_TEST_CHECK(builder.IsMouseOverUI() == (test != 1 && test != 3), "Visible content blocks; outside and invisible layout do not");
+			}
+			builder.Start(theme, { 800, 600 });
+			builder.ScreenFade();
+			input.myMousePosition = { 1, 1 };
+			builder.Finish(input);
+			FW_TEST_CHECK(builder.IsMouseOverUI(), "Screen fade blocks the entire screen");
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
@@ -268,6 +301,7 @@ namespace Slush
 			FW_RUN_TEST(TestUIThemeButtonStates);
 			FW_RUN_TEST(TestUIBuilderLayout);
 			FW_RUN_TEST(TestUIBuilderClicks);
+			FW_RUN_TEST(TestUIBuilderMouseOver);
 
 			FW_RUN_TEST(TestCommandLineArgsFlagPresent);
 			FW_RUN_TEST(TestCommandLineArgsFlagAbsent);

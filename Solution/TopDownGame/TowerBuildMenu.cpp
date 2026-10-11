@@ -23,7 +23,6 @@ TowerBuildMenu::TowerBuildMenu(Level& aLevel)
 void TowerBuildMenu::Update()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
-	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
 
@@ -65,6 +64,7 @@ void TowerBuildMenu::Update()
 	uiBuilder.EndPanel();
 	uiBuilder.CloseElement();
 	uiBuilder.Finish(myRenderCommands);
+	myIsMouseOverUI = uiBuilder.IsMouseOverUI();
 
 	if (engine.GetInput().WasMouseReleased(Slush::Input::RIGHTMB))
 		mySelectedTowerPrefab = nullptr;
@@ -84,9 +84,8 @@ void TowerBuildMenu::Update()
 	}
 
 	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
-	const float barTop = renderer.GetOffscreenBufferSize().y - ourBarHeight;
 	if (mySelectedTowerPrefab && engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB)
-		&& mousePosition.y < barTop)
+		&& !myIsMouseOverUI)
 	{
 		const PlaceTowerResult result = myLevel.TryPlaceTower(*mySelectedTowerPrefab, mousePosition);
 		if (result == PlaceTowerResult::NotAffordable)
@@ -108,14 +107,12 @@ void TowerBuildMenu::Update()
 
 void TowerBuildMenu::RenderPreview() const
 {
-	if (!mySelectedTowerPrefab)
+	if (!mySelectedTowerPrefab || myIsMouseOverUI)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
 	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
-	if (mousePosition.y >= renderer.GetOffscreenBufferSize().y - ourBarHeight)
-		return;
 
 	const Slush::SpriteComponent::Data& spriteData = mySelectedTowerPrefab->GetComponentData<Slush::SpriteComponent>();
 	const Vector2f halfSize = spriteData.mySize * 0.5f;

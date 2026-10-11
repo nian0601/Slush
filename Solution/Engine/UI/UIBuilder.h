@@ -111,6 +111,7 @@ namespace Slush
 		void Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect);
 
 		bool WasClicked(const char* aIdentifier) const;
+		bool IsMouseOverUI() const { return myIsMouseOverUI; }
 
 	private:
 		struct Element
@@ -149,6 +150,7 @@ namespace Slush
 		const UITheme* myTheme = nullptr;
 		Element myRoot;
 		Element* myCurrentElement = nullptr;
+		bool myIsMouseOverUI = false;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;
 
 		// Unsure about this interface, but text-rendering in general just doesnt feel great at the moment..
@@ -160,6 +162,8 @@ namespace Slush
 		void CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis);
 		void CalculatePositions(Element& anElement);
 		bool HandleInput(Element& anElement, const UIInputState& anInputState);
+		bool Draws(const Element& anElement) const;
+		void UpdateMouseOver(Element& anElement, const UIInputState& anInputState);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};
 

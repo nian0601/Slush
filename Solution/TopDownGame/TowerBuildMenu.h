@@ -23,4 +23,5 @@ private:
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myRenderCommands;
 	FW_String myFeedbackText;
 	Slush::Timer myFeedbackTimer;
+	bool myIsMouseOverUI = false;
 };

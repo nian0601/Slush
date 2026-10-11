@@ -103,6 +103,7 @@ namespace Slush
 	void UIBuilder::Start(const UITheme& aTheme, const Vector2i& aScreenSize)
 	{
 		myTheme = &aTheme;
+		myIsMouseOverUI = false;
 
 		myCurrentElement = nullptr;
 		myInteractiveElements.Clear();
@@ -230,6 +231,8 @@ namespace Slush
 		CalculateSizeAlongAxis(myRoot, false);
 
 		CalculatePositions(myRoot);
+		for (Element* child : myRoot.myChildren)
+			UpdateMouseOver(*child, anInputState);
 
 		// Handle input
 		for (Element* child : myRoot.myChildren)
@@ -562,6 +565,22 @@ namespace Slush
 				yOffset += child->mySize.y + anElement.myStyle.myChildGap;
 			}
 		}
+	}
+
+	bool UIBuilder::Draws(const Element& anElement) const
+	{
+		return anElement.myWidgetStyle || anElement.myTexture || !anElement.myText.Empty()
+			|| (anElement.myStyle.myColor & 0xFF000000) != 0
+			|| (anElement.myStyle.myOutlineThickness != 0.f && (anElement.myStyle.myOutlineColor & 0xFF000000) != 0);
+	}
+
+	void UIBuilder::UpdateMouseOver(Element& anElement, const UIInputState& anInputState)
+	{
+		anElement.myIsMouseOver = Contains(MakeRectFromTopLeft(anElement.myPosition, anElement.mySize), anInputState.myMousePosition);
+		if (anElement.myIsMouseOver && Draws(anElement))
+			myIsMouseOverUI = true;
+		for (Element* child : anElement.myChildren)
+			UpdateMouseOver(*child, anInputState);
 	}
 
 	bool UIBuilder::HandleInput(Element& anElement, const UIInputState& anInputState)

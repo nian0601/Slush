@@ -13,7 +13,7 @@ public:
 
 	TowerBuildMenu(Level& aLevel);
 
-	void Update();
+	void Update(bool aIsMouseOverOtherUI);
 	void RenderPreview() const;
 	const FW_GrowingArray<Slush::UIBuilder::RenderCommand>& GetRenderCommands() const { return myRenderCommands; }
 

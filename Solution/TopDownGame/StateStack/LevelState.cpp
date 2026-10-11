@@ -33,7 +33,7 @@ Slush::IGameState::GameStateResult LevelState::Update()
 	{
 		myLevel->Update();
 		myLevelHud->Update();
-		myTowerBuildMenu->Update();
+		myTowerBuildMenu->Update(myLevelHud->IsMouseOverUI());
 	}
 	if (myLevel->GetResult() == LevelResult::Won)
 	{

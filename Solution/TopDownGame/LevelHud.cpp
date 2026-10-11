@@ -54,4 +54,5 @@ void LevelHud::Update()
 
 	uiBuilder.EndPanel();
 	uiBuilder.Finish(myRenderCommands);
+	myIsMouseOverUI = uiBuilder.IsMouseOverUI();
 }

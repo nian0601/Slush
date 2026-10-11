@@ -245,6 +245,7 @@ namespace Slush
 
 	void UIBuilder::BuildTooltip(const Element& anElement)
 	{
+		FW_ASSERT(myCurrentElement == &myRoot, "Tooltip building requires all elements to be closed");
 		myCurrentElement = &myTooltip;
 		myTooltip.myWidgetStyle = &myTheme->myTooltip;
 		myTooltip.myStyle.SetPadding(myTheme->myTooltip.myPadding.x, myTheme->myTooltip.myPadding.y)

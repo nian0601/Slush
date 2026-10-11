@@ -37,6 +37,13 @@ namespace Slush
 			CENTER
 		};
 
+		enum class AnchorPoint
+		{
+			TOP_LEFT, TOP_CENTER, TOP_RIGHT,
+			CENTER_LEFT, CENTER, CENTER_RIGHT,
+			BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT
+		};
+
 		UIElementStyle() { Reset(); }
 		void Reset();
 
@@ -49,11 +56,15 @@ namespace Slush
 		UIElementStyle& SetColor(int aColor);
 		UIElementStyle& SetOutlineColor(int aColor);
 		UIElementStyle& SetOutlineThickness(float aThickness);
+		UIElementStyle& SetAnchor(AnchorPoint anAnchorPoint, const Vector2i& anOffset = { 0, 0 });
 
 		SizingMode myXSizing;
 		SizingMode myYSizing;
 		LayoutDirection myLayoutDirection;
 		Alignment myAlignment;
+		bool myIsAnchored;
+		AnchorPoint myAnchorPoint;
+		Vector2i myAnchorOffset;
 
 		Vector2i myMinSize;
 		Vector2i myMaxSize;
@@ -152,6 +163,7 @@ namespace Slush
 		Element* myCurrentElement = nullptr;
 		bool myIsMouseOverUI = false;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;
+		FW_GrowingArray<Element*> myDrawOrder;
 
 		// Unsure about this interface, but text-rendering in general just doesnt feel great at the moment..
 		// Need to ensure that the same font is used here and when rendering.
@@ -164,6 +176,7 @@ namespace Slush
 		bool HandleInput(Element& anElement, const UIInputState& anInputState);
 		bool Draws(const Element& anElement) const;
 		void UpdateMouseOver(Element& anElement, const UIInputState& anInputState);
+		void CollectDrawOrder(Element& anElement, FW_GrowingArray<Element*>& someAnchoredElements);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};
 

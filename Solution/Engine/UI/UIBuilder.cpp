@@ -16,6 +16,9 @@ namespace Slush
 		myYSizing = FIT;
 		myLayoutDirection = LEFT_TO_RIGHT;
 		myAlignment = TOP_LEFT;
+		myIsAnchored = false;
+		myAnchorPoint = AnchorPoint::TOP_LEFT;
+		myAnchorOffset = { 0, 0 };
 
 		myMinSize = { 0, 0 };
 		myMaxSize = { INT_MAX, INT_MAX };
@@ -92,6 +95,14 @@ namespace Slush
 		return *this;
 	}
 
+	UIElementStyle& UIElementStyle::SetAnchor(AnchorPoint anAnchorPoint, const Vector2i& anOffset)
+	{
+		myIsAnchored = true;
+		myAnchorPoint = anAnchorPoint;
+		myAnchorOffset = anOffset;
+		return *this;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 
 	void UIBuilder::Start(const UITheme& aTheme)
@@ -107,6 +118,7 @@ namespace Slush
 
 		myCurrentElement = nullptr;
 		myInteractiveElements.Clear();
+		myDrawOrder.RemoveAll();
 		myRoot.Reset();
 
 		myRoot.myStyle.Reset();
@@ -234,9 +246,17 @@ namespace Slush
 		for (Element* child : myRoot.myChildren)
 			UpdateMouseOver(*child, anInputState);
 
-		// Handle input
-		for (Element* child : myRoot.myChildren)
-			HandleInput(*child, anInputState);
+		FW_GrowingArray<Element*> anchoredElements;
+		CollectDrawOrder(myRoot, anchoredElements);
+		for (int i = 0; i < anchoredElements.Count(); ++i)
+			CollectDrawOrder(*anchoredElements[i], anchoredElements);
+
+		// Reverse draw order gives the top-most, deepest button first.
+		for (int i = myDrawOrder.Count() - 1; i >= 0; --i)
+		{
+			if (HandleInput(*myDrawOrder[i], anInputState))
+				break;
+		}
 	}
 
 	void UIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
@@ -247,8 +267,21 @@ namespace Slush
 
 	void UIBuilder::GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands)
 	{
-		for (Element* child : myRoot.myChildren)
-			GenerateRenderCommands(*child, outRenderCommands);
+		for (Element* element : myDrawOrder)
+			GenerateRenderCommands(*element, outRenderCommands);
+	}
+
+	void UIBuilder::CollectDrawOrder(Element& anElement, FW_GrowingArray<Element*>& someAnchoredElements)
+	{
+		if (&anElement != &myRoot)
+			myDrawOrder.Add(&anElement);
+		for (Element* child : anElement.myChildren)
+		{
+			if (child->myStyle.myIsAnchored)
+				someAnchoredElements.Add(child);
+			else
+				CollectDrawOrder(*child, someAnchoredElements);
+		}
 	}
 
 	UIElementStyle& UIBuilder::OpenElement(const char* aIdentifier /*= nullptr*/)
@@ -290,6 +323,12 @@ namespace Slush
 	{
 		int leftRightPadding = myCurrentElement->myStyle.myPadding.x * 2;
 		int topBottomPadding = myCurrentElement->myStyle.myPadding.y * 2;
+		int flowChildCount = 0;
+		for (Element* child : myCurrentElement->myChildren)
+		{
+			if (!child->myStyle.myIsAnchored)
+				++flowChildCount;
+		}
 
 		if (myCurrentElement->myStyle.myLayoutDirection == UIElementStyle::LEFT_TO_RIGHT)
 		{
@@ -297,11 +336,13 @@ namespace Slush
 
 			for (Element* child : myCurrentElement->myChildren)
 			{
+				if (child->myStyle.myIsAnchored)
+					continue;
 				myCurrentElement->mySize.x += child->mySize.x;
 				myCurrentElement->mySize.y = FW_Max(myCurrentElement->mySize.y, child->mySize.y + topBottomPadding);
 			}
 
-			int childGap = (myCurrentElement->myChildren.Count() - 1) * myCurrentElement->myStyle.myChildGap;
+			int childGap = FW_Max(0, flowChildCount - 1) * myCurrentElement->myStyle.myChildGap;
 			myCurrentElement->mySize.x += childGap;
 		}
 		else if (myCurrentElement->myStyle.myLayoutDirection == UIElementStyle::TOP_TO_BOTTOM)
@@ -310,11 +351,13 @@ namespace Slush
 
 			for (Element* child : myCurrentElement->myChildren)
 			{
+				if (child->myStyle.myIsAnchored)
+					continue;
 				myCurrentElement->mySize.y += child->mySize.y;
 				myCurrentElement->mySize.x = FW_Max(myCurrentElement->mySize.x, child->mySize.x + leftRightPadding);
 			}
 
-			int childGap = (myCurrentElement->myChildren.Count() - 1) * myCurrentElement->myStyle.myChildGap;
+			int childGap = FW_Max(0, flowChildCount - 1) * myCurrentElement->myStyle.myChildGap;
 			myCurrentElement->mySize.y += childGap;
 		}
 
@@ -408,6 +451,7 @@ namespace Slush
 		int innerContentSize = 0;
 		int totalPaddingAndChildGaps = parentPadding;
 		int numGrowContainers = 0;
+		int flowChildCount = 0;
 		FW_GrowingArray<Element*> resizables;
 
 		for (int i = 0; i < aParent.myChildren.Count(); ++i)
@@ -415,6 +459,17 @@ namespace Slush
 			Element* child = aParent.myChildren[i];
 			const int childSize = aIsXAxis ? child->mySize.x : child->mySize.y;
 			const UIElementStyle::SizingMode childSizingMode = aIsXAxis ? child->myStyle.myXSizing : child->myStyle.myYSizing;
+			if (child->myStyle.myIsAnchored)
+			{
+				if (childSizingMode == UIElementStyle::GROW)
+				{
+					int& size = aIsXAxis ? child->mySize.x : child->mySize.y;
+					const int minSize = aIsXAxis ? child->myStyle.myMinSize.x : child->myStyle.myMinSize.y;
+					const int maxSize = aIsXAxis ? child->myStyle.myMaxSize.x : child->myStyle.myMaxSize.y;
+					size = FW_Clamp(parentSize, minSize, maxSize);
+				}
+				continue;
+			}
 
 			if (childSizingMode == UIElementStyle::GROW)
 				resizables.Add(child);
@@ -425,7 +480,7 @@ namespace Slush
 				if (childSizingMode == UIElementStyle::GROW)
 					++numGrowContainers;
 
-				if (i > 0)
+				if (flowChildCount > 0)
 				{
 					innerContentSize += parentChildGap;
 					totalPaddingAndChildGaps += parentChildGap;
@@ -435,6 +490,7 @@ namespace Slush
 			{
 				innerContentSize = FW_Max(childSize, innerContentSize);
 			}
+			++flowChildCount;
 		}
 
 		if (sizingAlongAxis)
@@ -543,6 +599,14 @@ namespace Slush
 
 		for (Element* child : anElement.myChildren)
 		{
+			if (child->myStyle.myIsAnchored)
+			{
+				const int anchor = static_cast<int>(child->myStyle.myAnchorPoint);
+				child->myPosition.x = anElement.myPosition.x + (anElement.mySize.x - child->mySize.x) * (anchor % 3) / 2 + child->myStyle.myAnchorOffset.x;
+				child->myPosition.y = anElement.myPosition.y + (anElement.mySize.y - child->mySize.y) * (anchor / 3) / 2 + child->myStyle.myAnchorOffset.y;
+				CalculatePositions(*child);
+				continue;
+			}
 			if (child->myStyle.myAlignment == UIElementStyle::CENTER)
 			{
 				if (anElement.myStyle.myLayoutDirection == UIElementStyle::LEFT_TO_RIGHT)
@@ -579,23 +643,16 @@ namespace Slush
 		anElement.myIsMouseOver = Contains(MakeRectFromTopLeft(anElement.myPosition, anElement.mySize), anInputState.myMousePosition);
 		if (anElement.myIsMouseOver && Draws(anElement))
 			myIsMouseOverUI = true;
+		if (anElement.myIsButton)
+			myInteractiveElements[anElement.myIdentifier] = &anElement;
 		for (Element* child : anElement.myChildren)
 			UpdateMouseOver(*child, anInputState);
 	}
 
 	bool UIBuilder::HandleInput(Element& anElement, const UIInputState& anInputState)
 	{
-		for (Element* child : anElement.myChildren)
-		{
-			if (HandleInput(*child, anInputState))
-				return true;
-		}
-
 		if (anElement.myIsButton)
 		{
-			myInteractiveElements[anElement.myIdentifier] = &anElement;
-			const Recti rect = MakeRectFromTopLeft(anElement.myPosition, anElement.mySize);
-			anElement.myIsMouseOver = Contains(rect, anInputState.myMousePosition);
 			if (UIThemeUtils::IsClickable(anElement.myBaseState) && anElement.myIsMouseOver && anInputState.myWasLeftMouseReleased)
 			{
 				anElement.myWasMouseReleased = true;
@@ -645,9 +702,6 @@ namespace Slush
 		}
 		command.myText = anElement.myText;
 		command.myTextSize = anElement.myTextSize;
-
-		for (Element* child : anElement.myChildren)
-			GenerateRenderCommands(*child, outRenderCommands);
 	}
 
 	UIBuilder::Element::Element()

@@ -29,15 +29,8 @@ void TowerBuildMenu::Update()
 	myRenderCommands.RemoveAll();
 	Slush::UIBuilder uiBuilder;
 	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
-	uiBuilder.OpenElement().SetXSizing(Slush::UIElementStyle::GROW)
-		.SetYSizing(Slush::UIElementStyle::GROW)
-		.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-
-	uiBuilder.OpenElement().SetXSizing(Slush::UIElementStyle::GROW)
-		.SetYSizing(Slush::UIElementStyle::GROW);
-	uiBuilder.CloseElement();
-
 	uiBuilder.BeginPanel().SetXSizing(Slush::UIElementStyle::GROW)
+		.SetAnchor(Slush::UIElementStyle::AnchorPoint::BOTTOM_LEFT)
 		.SetYSizing(Slush::UIElementStyle::FIXED, ourBarHeight)
 		.SetLayoutDirection(Slush::UIElementStyle::LEFT_TO_RIGHT)
 		.SetPadding(16, 12).SetChildGap(12);
@@ -62,7 +55,6 @@ void TowerBuildMenu::Update()
 		uiBuilder.Text(myFeedbackText.GetBuffer(), Slush::UITextRole::Small, Slush::UITextTone::Warning);
 
 	uiBuilder.EndPanel();
-	uiBuilder.CloseElement();
 	uiBuilder.Finish(myRenderCommands);
 	myIsMouseOverUI = uiBuilder.IsMouseOverUI();
 

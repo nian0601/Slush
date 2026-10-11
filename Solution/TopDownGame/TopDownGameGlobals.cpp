@@ -41,6 +41,7 @@ void TopDownGameGlobals::SetFont(Slush::Font& aFont)
 	myUITheme.myTextSizes[static_cast<int>(Slush::UITextRole::Body)] = 18;
 	myUITheme.myPanel.myVisuals.Fill({ static_cast<int>(0xDD18202A), 0, 0.f });
 	myUITheme.myHeader = myUITheme.myPanel;
+	myUITheme.myTooltip.myVisuals.Fill({ static_cast<int>(0xF018202A), static_cast<int>(0xFF81C9FF), -1.f });
 
 	Slush::UIWidgetStyle& button = myUITheme.myButton;
 	button.myVisuals[static_cast<int>(Slush::UIState::Normal)] = { static_cast<int>(0xFF334453), 0, 0.f };

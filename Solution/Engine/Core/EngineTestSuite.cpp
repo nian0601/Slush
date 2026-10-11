@@ -4,6 +4,7 @@
 #include "Core/CommandLineArgs.h"
 #include "Core/AssetRepository.h"
 #include "UI/UITheme.h"
+#include "UI/UIBuilder.h"
 
 #include <FW_FileSystem.h>
 #include <FW_UnitTestSuite.h>
@@ -227,11 +228,170 @@ namespace Slush
 			FW_TEST_CHECK(!UIThemeUtils::IsClickable(UIState::Disabled), "Disabled cannot be clicked");
 		}
 
+		void TestUIBuilderLayout()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			builder.Start(theme, { 800, 600 });
+			builder.OpenElement().SetColor(0xFFFFFFFF).SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+			builder.CloseElement();
+			builder.Finish(UIInputState());
+			FW_GrowingArray<UIBuilder::RenderCommand> commands;
+			builder.GenerateRenderCommands(commands);
+			FW_TEST_REQUIRE(commands.Count() == 1, "One element produces one command");
+			FW_TEST_CHECK(commands[0].mySize == Vector2f(100, 50), "Fixed size is preserved");
+			FW_TEST_CHECK(commands[0].myPosition == Vector2f(350, 275), "Root centres the element");
+		}
+
+		void TestUIBuilderClicks()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			for (int test = 0; test < 4; ++test)
+			{
+				builder.Start(theme, { 800, 600 });
+				builder.BeginButton("A", test == 3 ? UIState::Disabled : UIState::Normal)
+					.SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+				builder.EndButton();
+				UIInputState input;
+				input.myMousePosition = test == 1 ? Vector2i(0, 0) : Vector2i(400, 300);
+				input.myWasLeftMouseReleased = test != 2;
+				builder.Finish(input);
+				FW_TEST_CHECK(builder.WasClicked("A") == (test == 0), "Only an enabled button released inside is clicked");
+			}
+		}
+
+		void TestUIBuilderMouseOver()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			UIInputState input;
+			input.myMousePosition = { 400, 300 };
+			for (int test = 0; test < 5; ++test)
+			{
+				builder.Start(theme, { 800, 600 });
+				FW_TEST_CHECK(!builder.IsMouseOverUI(), "Start clears the mouse-over result");
+				UIElementStyle& style = test == 2 ? builder.BeginPanel() : builder.OpenElement();
+				style.SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+				if (test < 2)
+					style.SetColor(0xFFFFFFFF);
+				if (test == 3)
+				{
+					style.SetXSizing(UIElementStyle::GROW).SetYSizing(UIElementStyle::GROW);
+					builder.VerticalSpacing(20);
+				}
+				if (test == 4)
+					style.SetOutlineColor(0xFFFFFFFF).SetOutlineThickness(-1.f);
+				builder.CloseElement();
+				input.myMousePosition = test == 1 ? Vector2i(0, 0) : Vector2i(400, 300);
+				builder.Finish(input);
+				FW_TEST_CHECK(builder.IsMouseOverUI() == (test != 1 && test != 3), "Visible content blocks; outside and invisible layout do not");
+			}
+			builder.Start(theme, { 800, 600 });
+			builder.ScreenFade();
+			input.myMousePosition = { 1, 1 };
+			builder.Finish(input);
+			FW_TEST_CHECK(builder.IsMouseOverUI(), "Screen fade blocks the entire screen");
+		}
+
+		void TestUIBuilderAnchors()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			const UIElementStyle::AnchorPoint anchors[] = {
+				UIElementStyle::AnchorPoint::TOP_LEFT, UIElementStyle::AnchorPoint::TOP_CENTER, UIElementStyle::AnchorPoint::TOP_RIGHT,
+				UIElementStyle::AnchorPoint::CENTER_LEFT, UIElementStyle::AnchorPoint::CENTER, UIElementStyle::AnchorPoint::CENTER_RIGHT,
+				UIElementStyle::AnchorPoint::BOTTOM_LEFT, UIElementStyle::AnchorPoint::BOTTOM_CENTER, UIElementStyle::AnchorPoint::BOTTOM_RIGHT
+			};
+			for (int i = 0; i < 11; ++i)
+			{
+				builder.Start(theme, { 800, 600 });
+				UIElementStyle& style = builder.OpenElement();
+				style.SetColor(0xFFFFFFFF).SetXSizing(i == 10 ? UIElementStyle::GROW : UIElementStyle::FIXED, 100)
+					.SetYSizing(UIElementStyle::FIXED, i == 10 ? 100 : 50);
+				style.SetAnchor(anchors[i < 9 ? i : 6], i == 9 ? Vector2i(10, -100) : Vector2i(0, 0));
+				builder.CloseElement();
+				builder.Finish(UIInputState());
+				FW_GrowingArray<UIBuilder::RenderCommand> commands;
+				builder.GenerateRenderCommands(commands);
+				FW_TEST_REQUIRE(commands.Count() == 1, "One anchored element");
+				Vector2f expectedPosition = i < 9 ? Vector2f(350.f * (i % 3), 275.f * (i / 3)) : (i == 9 ? Vector2f(10, 450) : Vector2f(0, 500));
+				FW_TEST_CHECK(commands[0].myPosition == expectedPosition, "Anchor aligns matching corners with offset");
+				FW_TEST_CHECK(commands[0].mySize == (i == 10 ? Vector2f(800, 100) : Vector2f(100, 50)), "Anchored GROW fills parent");
+			}
+		}
+
+		void TestUIBuilderAnchoredFlowAndPadding()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			const int paddings[] = { 0, 10 };
+			for (int padding : paddings)
+			{
+				builder.Start(theme, { 800, 600 });
+				builder.OpenElement().SetPadding(padding, padding).SetChildGap(20);
+				builder.OpenElement().SetColor(0xFFFFFFFF).SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+				builder.CloseElement();
+				builder.OpenElement().SetColor(0xFFFFFFFF).SetXSizing(UIElementStyle::FIXED, 300).SetYSizing(UIElementStyle::FIXED, 300)
+					.SetAnchor(UIElementStyle::AnchorPoint::BOTTOM_LEFT);
+				builder.CloseElement();
+				builder.CloseElement();
+				builder.Finish(UIInputState());
+				FW_GrowingArray<UIBuilder::RenderCommand> commands;
+				builder.GenerateRenderCommands(commands);
+				FW_TEST_REQUIRE(commands.Count() == 3, "Parent and two children");
+				FW_TEST_CHECK(commands[0].mySize == Vector2f(100.f + padding * 2, 50.f + padding * 2), "Anchored child adds no FIT size or gap");
+				FW_TEST_CHECK(commands[2].myPosition == commands[0].myPosition + Vector2f(0, commands[0].mySize.y - 300), "Anchor uses parent outer rect, ignoring padding");
+			}
+		}
+
+		void TestUIBuilderAnchoredDrawAndClickOrder()
+		{
+			UITheme theme;
+			UIBuilder builder;
+			builder.Start(theme, { 800, 600 });
+			builder.BeginButton("Anchored", UIState::Selected).SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50)
+				.SetAnchor(UIElementStyle::AnchorPoint::CENTER);
+			builder.EndButton();
+			builder.BeginButton("Flow").SetXSizing(UIElementStyle::FIXED, 100).SetYSizing(UIElementStyle::FIXED, 50);
+			builder.EndButton();
+			UIInputState input;
+			input.myMousePosition = { 400, 300 };
+			input.myWasLeftMouseReleased = true;
+			builder.Finish(input);
+			FW_GrowingArray<UIBuilder::RenderCommand> commands;
+			builder.GenerateRenderCommands(commands);
+			FW_TEST_REQUIRE(commands.Count() == 2, "Both overlapping buttons draw");
+			FW_TEST_CHECK(builder.WasClicked("Anchored") && !builder.WasClicked("Flow"), "Top-most anchored button alone receives the click");
+			FW_TEST_CHECK(builder.IsMouseOverUI(), "Anchored content participates in mouse-over");
+			FW_TEST_CHECK(commands[0].myColor == theme.myButton.myVisuals[static_cast<int>(UIState::Hovered)].myColor, "Flow button hover is still updated after another button consumes click");
+			FW_TEST_CHECK(commands[1].myColor == theme.myButton.myVisuals[static_cast<int>(UIState::Selected)].myColor, "Anchored button draws last despite being declared first");
+		}
+
+		void TestUIBuilderTooltipPlacement()
+		{
+			const Vector2i screenSize = { 800, 600 };
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(350, 275, 450, 325), { 200, 40 }, screenSize) == Vector2i(300, 231), "Tooltip is centred above with four pixel gap");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(350, 0, 450, 50), { 200, 40 }, screenSize) == Vector2i(300, 54), "Tooltip at top falls below element");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(0, 275, 100, 325), { 200, 40 }, screenSize) == Vector2i(0, 231), "Tooltip clamps to left edge");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(700, 275, 800, 325), { 200, 40 }, screenSize) == Vector2i(600, 231), "Tooltip clamps to right edge");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(16, 518, 246, 582), { 300, 40 }, screenSize) == Vector2i(0, 474), "Build bar tooltip fits above button");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(350, 0, 450, 590), { 200, 40 }, screenSize) == Vector2i(300, 560), "Fallback clamps to bottom edge");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(0, 0, 100, 50), { 900, 700 }, screenSize) == Vector2i(0, 0), "Oversized tooltip pins to screen origin");
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
 
 			FW_RUN_TEST(TestUIThemeButtonStates);
+			FW_RUN_TEST(TestUIBuilderLayout);
+			FW_RUN_TEST(TestUIBuilderClicks);
+			FW_RUN_TEST(TestUIBuilderMouseOver);
+			FW_RUN_TEST(TestUIBuilderAnchors);
+			FW_RUN_TEST(TestUIBuilderAnchoredFlowAndPadding);
+			FW_RUN_TEST(TestUIBuilderAnchoredDrawAndClickOrder);
+			FW_RUN_TEST(TestUIBuilderTooltipPlacement);
 
 			FW_RUN_TEST(TestCommandLineArgsFlagPresent);
 			FW_RUN_TEST(TestCommandLineArgsFlagAbsent);

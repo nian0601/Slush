@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UITheme.h"
+#include <FW_Rect.h>
 
 namespace Slush
 {
@@ -9,6 +10,17 @@ namespace Slush
 
 	class Font;
 	class Texture;
+
+	struct UIInputState
+	{
+		Vector2i myMousePosition = { 0, 0 };
+		bool myWasLeftMouseReleased = false;
+	};
+
+	namespace UITooltipUtils
+	{
+		Vector2i CalculatePosition(const Recti& anElementRect, const Vector2i& aTooltipSize, const Vector2i& aScreenSize);
+	}
 
 	struct UIElementStyle
 	{
@@ -31,6 +43,13 @@ namespace Slush
 			CENTER
 		};
 
+		enum class AnchorPoint
+		{
+			TOP_LEFT, TOP_CENTER, TOP_RIGHT,
+			CENTER_LEFT, CENTER, CENTER_RIGHT,
+			BOTTOM_LEFT, BOTTOM_CENTER, BOTTOM_RIGHT
+		};
+
 		UIElementStyle() { Reset(); }
 		void Reset();
 
@@ -43,11 +62,15 @@ namespace Slush
 		UIElementStyle& SetColor(int aColor);
 		UIElementStyle& SetOutlineColor(int aColor);
 		UIElementStyle& SetOutlineThickness(float aThickness);
+		UIElementStyle& SetAnchor(AnchorPoint anAnchorPoint, const Vector2i& anOffset = { 0, 0 });
 
 		SizingMode myXSizing;
 		SizingMode myYSizing;
 		LayoutDirection myLayoutDirection;
 		Alignment myAlignment;
+		bool myIsAnchored;
+		AnchorPoint myAnchorPoint;
+		Vector2i myAnchorOffset;
 
 		Vector2i myMinSize;
 		Vector2i myMaxSize;
@@ -75,7 +98,9 @@ namespace Slush
 		};
 
 		void Start(const UITheme& aTheme);
+		void Start(const UITheme& aTheme, const Vector2i& aScreenSize);
 		void Finish();
+		void Finish(const UIInputState& anInputState);
 		void Finish(FW_GrowingArray<RenderCommand>& outRenderCommands);
 		void GenerateRenderCommands(FW_GrowingArray<RenderCommand>& outRenderCommands);
 
@@ -96,6 +121,7 @@ namespace Slush
 		void Button(const char* someText, UIState aBaseState = UIState::Normal, const Vector2i& aFixedSize = { 0, 0 });
 		void Text(const char* someText, UITextRole aRole = UITextRole::Body, UITextTone aTone = UITextTone::Default);
 		void TextHeader(const char* someText);
+		void SetTooltip(const char* someText);
 		void ScreenFade();
 
 		void HorizontalSpacing(int aSize);
@@ -103,6 +129,7 @@ namespace Slush
 		void Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect);
 
 		bool WasClicked(const char* aIdentifier) const;
+		bool IsMouseOverUI() const { return myIsMouseOverUI; }
 
 	private:
 		struct Element
@@ -130,6 +157,7 @@ namespace Slush
 			Recti myTextureRect;
 			FW_String myText;
 			int myTextSize;
+			FW_String myTooltip;
 			bool myWasMouseReleased; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames
 
 			Element* myParent;
@@ -140,8 +168,12 @@ namespace Slush
 		void AssertTheme() const;
 		const UITheme* myTheme = nullptr;
 		Element myRoot;
+		Element myTooltip;
+		bool myHasTooltip = false;
 		Element* myCurrentElement = nullptr;
+		bool myIsMouseOverUI = false;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;
+		FW_GrowingArray<Element*> myDrawOrder;
 
 		// Unsure about this interface, but text-rendering in general just doesnt feel great at the moment..
 		// Need to ensure that the same font is used here and when rendering.
@@ -151,7 +183,11 @@ namespace Slush
 
 		void CalculateSizeAlongAxis(Element& aParent, bool aIsXAxis);
 		void CalculatePositions(Element& anElement);
-		bool HandleInput(Element& anElement);
+		bool HandleInput(Element& anElement, const UIInputState& anInputState);
+		bool Draws(const Element& anElement) const;
+		void UpdateMouseOver(Element& anElement, const UIInputState& anInputState);
+		void CollectDrawOrder(Element& anElement, FW_GrowingArray<Element*>& someAnchoredElements);
+		void BuildTooltip(const Element& anElement);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};
 

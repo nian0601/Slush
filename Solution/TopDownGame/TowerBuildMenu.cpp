@@ -23,22 +23,14 @@ TowerBuildMenu::TowerBuildMenu(Level& aLevel)
 void TowerBuildMenu::Update()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
-	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
 
 	myRenderCommands.RemoveAll();
 	Slush::UIBuilder uiBuilder;
 	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
-	uiBuilder.OpenElement().SetXSizing(Slush::UIElementStyle::GROW)
-		.SetYSizing(Slush::UIElementStyle::GROW)
-		.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-
-	uiBuilder.OpenElement().SetXSizing(Slush::UIElementStyle::GROW)
-		.SetYSizing(Slush::UIElementStyle::GROW);
-	uiBuilder.CloseElement();
-
 	uiBuilder.BeginPanel().SetXSizing(Slush::UIElementStyle::GROW)
+		.SetAnchor(Slush::UIElementStyle::AnchorPoint::BOTTOM_LEFT)
 		.SetYSizing(Slush::UIElementStyle::FIXED, ourBarHeight)
 		.SetLayoutDirection(Slush::UIElementStyle::LEFT_TO_RIGHT)
 		.SetPadding(16, 12).SetChildGap(12);
@@ -57,14 +49,26 @@ void TowerBuildMenu::Update()
 		const bool isSelected = prefab == mySelectedTowerPrefab;
 		const bool isAffordable = BuildCostComponent::GetCost(*prefab) <= myLevel.GetResources();
 		const Slush::UIState state = isSelected ? Slush::UIState::Selected : (isAffordable ? Slush::UIState::Normal : Slush::UIState::Disabled);
-		uiBuilder.Button(label.GetBuffer(), state, { 230, 64 });
+		uiBuilder.BeginButton(label.GetBuffer(), state)
+			.SetXSizing(Slush::UIElementStyle::FIXED, 230).SetYSizing(Slush::UIElementStyle::FIXED, 64);
+		uiBuilder.Text(label.GetBuffer());
+		if (state == Slush::UIState::Disabled)
+		{
+			FW_String tooltip = "Not enough resources (need ";
+			tooltip += BuildCostComponent::GetCost(*prefab);
+			tooltip += ", have ";
+			tooltip += myLevel.GetResources();
+			tooltip += ")";
+			uiBuilder.SetTooltip(tooltip.GetBuffer());
+		}
+		uiBuilder.EndButton();
 	}
 	if (myFeedbackTimer.IsStarted() && !myFeedbackTimer.HasExpired())
 		uiBuilder.Text(myFeedbackText.GetBuffer(), Slush::UITextRole::Small, Slush::UITextTone::Warning);
 
 	uiBuilder.EndPanel();
-	uiBuilder.CloseElement();
 	uiBuilder.Finish(myRenderCommands);
+	myIsMouseOverUI = uiBuilder.IsMouseOverUI();
 
 	if (engine.GetInput().WasMouseReleased(Slush::Input::RIGHTMB))
 		mySelectedTowerPrefab = nullptr;
@@ -84,9 +88,8 @@ void TowerBuildMenu::Update()
 	}
 
 	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
-	const float barTop = renderer.GetOffscreenBufferSize().y - ourBarHeight;
 	if (mySelectedTowerPrefab && engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB)
-		&& mousePosition.y < barTop)
+		&& !myIsMouseOverUI)
 	{
 		const PlaceTowerResult result = myLevel.TryPlaceTower(*mySelectedTowerPrefab, mousePosition);
 		if (result == PlaceTowerResult::NotAffordable)
@@ -108,14 +111,12 @@ void TowerBuildMenu::Update()
 
 void TowerBuildMenu::RenderPreview() const
 {
-	if (!mySelectedTowerPrefab)
+	if (!mySelectedTowerPrefab || myIsMouseOverUI)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
 	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
-	if (mousePosition.y >= renderer.GetOffscreenBufferSize().y - ourBarHeight)
-		return;
 
 	const Slush::SpriteComponent::Data& spriteData = mySelectedTowerPrefab->GetComponentData<Slush::SpriteComponent>();
 	const Vector2f halfSize = spriteData.mySize * 0.5f;

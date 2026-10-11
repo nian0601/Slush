@@ -24,9 +24,6 @@ namespace Slush
 		myColor = 0;
 		myOutlineColor = 0;
 		myOutlineThickness = 0.f;
-
-		myInteractionFlags = NONE;
-		myHoverColor = 0;
 	}
 
 	UIElementStyle& UIElementStyle::SetXSizing(UIElementStyle::SizingMode aSizingMode, int aSize /*= 0*/)
@@ -95,18 +92,11 @@ namespace Slush
 		return *this;
 	}
 
-	UIElementStyle& UIElementStyle::EnableButtonInteraction(int aHoverColor)
-	{
-		myInteractionFlags = UIElementStyle::BUTTON;
-		myHoverColor = aHoverColor;
-		return *this;
-	}
-
 	//////////////////////////////////////////////////////////////////////////
 
-	void UIBuilder::Start()
+	void UIBuilder::Start(const UITheme& aTheme)
 	{
-		myTheme = nullptr;
+		myTheme = &aTheme;
 		Vector2f windowSize = Slush::Engine::GetInstance().GetWindow().GetRenderer().GetOffscreenBufferSize();
 
 		myCurrentElement = nullptr;
@@ -123,12 +113,6 @@ namespace Slush
 
 		myRoot.myStyle.myAlignment = UIElementStyle::CENTER;
 		myRoot.myStyle.myLayoutDirection = UIElementStyle::TOP_TO_BOTTOM;
-	}
-
-	void UIBuilder::Start(const UITheme& aTheme)
-	{
-		Start();
-		myTheme = &aTheme;
 	}
 
 	void UIBuilder::AssertTheme() const
@@ -218,7 +202,9 @@ namespace Slush
 	void UIBuilder::ScreenFade()
 	{
 		AssertTheme();
-		ScreenFade(myTheme->myScreenFadeColor);
+		OpenElement().SetColor(myTheme->myScreenFadeColor)
+			.SetXSizing(UIElementStyle::GROW).SetYSizing(UIElementStyle::GROW);
+		CloseElement();
 	}
 
 	void UIBuilder::Finish()
@@ -340,19 +326,6 @@ namespace Slush
 		myCurrentElement->myStyle.SetYSizing(UIElementStyle::FIXED, static_cast<int>(textSize.y));
 	}
 
-	void UIBuilder::Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor)
-	{
-		OpenElement(someText, aStyle);
-		GetStyle().SetColor(aColor);
-
-		OpenElement();
-		SetText(someText, aFont, aTextSize);
-		GetStyle().SetColor(aTextColor);
-		CloseElement();
-
-		CloseElement();
-	}
-
 	void UIBuilder::HorizontalSpacing(int aSize)
 	{
 		OpenElement();
@@ -373,59 +346,6 @@ namespace Slush
 		style.SetColor(0x00000000);
 		style.SetXSizing(Slush::UIElementStyle::GROW);
 		style.SetYSizing(Slush::UIElementStyle::FIXED, aSize);
-
-		CloseElement();
-	}
-
-	void UIBuilder::ScreenFade(int aColor)
-	{
-		OpenElement();
-		Slush::UIElementStyle& style = GetStyle();
-		style.SetColor(aColor);
-		style.SetXSizing(Slush::UIElementStyle::GROW);
-		style.SetYSizing(Slush::UIElementStyle::GROW);
-
-		CloseElement();
-	}
-
-	void UIBuilder::Text(const char* someText, Font& aFont, int aTextSize, int aTextColor /*= 0xFFFFFFFF*/)
-	{
-		OpenElement().SetAlingment(Slush::UIElementStyle::CENTER);
-		SetText(someText, aFont, aTextSize);
-		GetStyle().SetColor(aTextColor);
-		CloseElement();
-	}
-
-	void UIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor)
-	{
-		OpenElement(aStyle);
-		GetStyle().SetXSizing(Slush::UIElementStyle::GROW);
-
-		OpenElement();
-		SetText(someText, aFont, aTextSize);
-		GetStyle().SetColor(aTextColor);
-		CloseElement();
-
-		CloseElement();
-	}
-
-	void UIBuilder::TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor)
-	{
-		OpenElement();
-
-		UIElementStyle& style = GetStyle();
-		style.SetPadding(16, 16);
-		style.SetChildGap(16);
-		style.SetColor(aBackgroundColor);
-		style.SetOutlineColor(0xFF000000);
-		style.SetOutlineThickness(-1.f);
-		style.SetXSizing(Slush::UIElementStyle::GROW);
-		style.SetAlingment(Slush::UIElementStyle::CENTER);
-
-		OpenElement();
-		SetText(someText, aFont, aTextSize);
-		GetStyle().SetColor(aTextColor);
-		CloseElement();
 
 		CloseElement();
 	}
@@ -649,24 +569,6 @@ namespace Slush
 				return true;
 			}
 			return false;
-		}
-
-		if (anElement.myStyle.myInteractionFlags != UIElementStyle::BUTTON)
-			return false;
-
-		myInteractiveElements[anElement.myIdentifier] = &anElement;
-
-		Recti rect = MakeRectFromTopLeft(anElement.myPosition, anElement.mySize);
-
-		if (Contains(rect, input.GetMousePosition()))
-		{
-			anElement.myStyle.myColor = anElement.myStyle.myHoverColor;
-
-			if (input.WasMouseReleased(Input::LEFTMB))
-			{
-				anElement.myWasMouseReleased = true;
-				return true;
-			}
 		}
 
 		return false;

@@ -25,12 +25,6 @@ namespace Slush
 			TOP_TO_BOTTOM,
 		};
 
-		enum InteractionFlag
-		{
-			NONE,
-			BUTTON,
-		};
-
 		enum Alignment
 		{
 			TOP_LEFT,
@@ -50,8 +44,6 @@ namespace Slush
 		UIElementStyle& SetOutlineColor(int aColor);
 		UIElementStyle& SetOutlineThickness(float aThickness);
 
-		UIElementStyle& EnableButtonInteraction(int aHoverColor);
-
 		SizingMode myXSizing;
 		SizingMode myYSizing;
 		LayoutDirection myLayoutDirection;
@@ -64,9 +56,6 @@ namespace Slush
 		int myColor;
 		int myOutlineColor;
 		float myOutlineThickness;
-
-		int myInteractionFlags;
-		int myHoverColor;
 	};
 
 	class UIBuilder
@@ -85,7 +74,6 @@ namespace Slush
 			int myTextSize = 15;
 		};
 
-		void Start();
 		void Start(const UITheme& aTheme);
 		void Finish();
 		void Finish(FW_GrowingArray<RenderCommand>& outRenderCommands);
@@ -110,13 +98,8 @@ namespace Slush
 		void TextHeader(const char* someText);
 		void ScreenFade();
 
-		void Button(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aColor, int aTextColor);
 		void HorizontalSpacing(int aSize);
 		void VerticalSpacing(int aSize);
-		void ScreenFade(int aColor);
-		void Text(const char* someText, Font& aFont, int aTextSize, int aTextColor = 0xFFFFFFFF);
-		void TextHeader(const char* someText, Font& aFont, int aTextSize, const UIElementStyle& aStyle, int aTextColor);
-		void TextHeader(const char* someText, Font& aFont, int aTextSize, int aBackgroundColor, int aTextColor);
 		void Image(const Slush::Texture* aTexture, const Vector2i& aSize, const Recti& aTextureRect);
 
 		bool WasClicked(const char* aIdentifier) const;

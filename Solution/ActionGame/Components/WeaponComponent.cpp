@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-
 #include "ActionGameGlobals.h"
 #include "DamageDealerComponent.h"
 #include "StatsComponent.h"
@@ -316,7 +315,6 @@ void WeaponComponent::Data::OnBuildUI()
 	}
 }
 
-
 WeaponComponent::WeaponComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
 	: Slush::Component(anEntity, anEntityPrefab)
 {
@@ -405,37 +403,19 @@ void WeaponComponent::HandleUpgrading(Slush::UIBuilder& aUIBuilder)
 		return;
 	}
 
-	aUIBuilder.Start();
+	aUIBuilder.Start(ActionGameGlobals::GetInstance().GetUITheme());
 
-	aUIBuilder.TextHeader(
-		"Weapon Upgrade!", 
-		ActionGameGlobals::GetInstance().GetFont(), 
-		32, 
-		0xAA121212, 
-		0xFFFFFFFF);
+	aUIBuilder.TextHeader("Weapon Upgrade!");
 
 	aUIBuilder.VerticalSpacing(20);
 
-	aUIBuilder.OpenElement()
-		.SetPadding(16, 16)
-		.SetChildGap(16)
-		.SetColor(0xAA121212)
-		.SetAlingment(Slush::UIElementStyle::CENTER);
+	aUIBuilder.BeginPanel().SetAlingment(Slush::UIElementStyle::CENTER);
 
 	for (const WeaponData* potentialUpgrade : myUpgradeSelection)
 	{
 		Weapon* weapon = GetWeapon(potentialUpgrade);
 
-		Slush::UIElementStyle& style = aUIBuilder.OpenElement(potentialUpgrade->GetAssetName().GetBuffer());
-		style.SetAlingment(Slush::UIElementStyle::CENTER);
-		style.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-		style.SetChildGap(8);
-		style.SetPadding(16, 16);
-
-		style.SetColor(0xFF333333);
-		style.SetOutlineColor(0xFF000000);
-		style.SetOutlineThickness(-1.f);
-		style.EnableButtonInteraction(0xFF888888);
+		aUIBuilder.BeginButton(potentialUpgrade->GetAssetName().GetBuffer());
 
 		if (const Slush::Texture* iconTexture = potentialUpgrade->myIconTexture.Get())
 			aUIBuilder.Image(iconTexture, { 45, 45 }, potentialUpgrade->myIconTextureRect);
@@ -447,14 +427,13 @@ void WeaponComponent::HandleUpgrading(Slush::UIBuilder& aUIBuilder)
 			text += weapon->GetRank()+1;
 		}
 
-		aUIBuilder.Text(text.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
+		aUIBuilder.Text(text.GetBuffer());
 
-		aUIBuilder.CloseElement();
+		aUIBuilder.EndButton();
 	}
 
-	aUIBuilder.CloseElement(); 
+	aUIBuilder.EndPanel();
 	aUIBuilder.Finish();
-
 
 	for (const WeaponData* potentialWeapon : myUpgradeSelection)
 	{

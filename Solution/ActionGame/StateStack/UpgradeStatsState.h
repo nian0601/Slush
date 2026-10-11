@@ -24,9 +24,6 @@ private:
 	FW_GrowingArray<StatType> myUpgradeOptions;
 	FW_GrowingArray<FW_String> myUpgradeLabels;
 
-	Slush::UIElementStyle myUIBackgroundStyle;
-	Slush::UIElementStyle myUIButtonStyle;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myUIRenderCommands;
 	Slush::UIRenderer myUIRenderer;
-	Slush::Font& myFont;
 };

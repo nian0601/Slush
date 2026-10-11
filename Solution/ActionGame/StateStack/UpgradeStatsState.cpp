@@ -10,23 +10,9 @@
 #include "Graphics\Renderer.h"
 
 UpgradeStatsState::UpgradeStatsState(Slush::EntityHandle aPlayerHandle)
-	: myFont(ActionGameGlobals::GetInstance().GetFont())
-	, myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
+	: myUIRenderer(ActionGameGlobals::GetInstance().GetFont())
 {
 	myPlayerHandle = aPlayerHandle;
-
-	myUIBackgroundStyle.SetPadding(16, 16);
-	myUIBackgroundStyle.SetChildGap(16);
-	myUIBackgroundStyle.SetColor(0xAA121212);
-	myUIBackgroundStyle.SetXSizing(Slush::UIElementStyle::FIT);
-	myUIBackgroundStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-
-	myUIButtonStyle.SetXSizing(Slush::UIElementStyle::FIXED, 250);
-	myUIButtonStyle.SetYSizing(Slush::UIElementStyle::FIXED, 75);
-	myUIButtonStyle.SetAlingment(Slush::UIElementStyle::CENTER);
-	myUIButtonStyle.SetColor(0xFFAAFFAF);
-	myUIButtonStyle.SetOutlineThickness(-1.f);
-	myUIButtonStyle.EnableButtonInteraction(0xFFDDDDDD);
 
 	Slush::Engine::GetInstance().GetWindow().GetRenderer().StartFade(0.15f);
 
@@ -102,29 +88,20 @@ Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 
 	Slush::UIBuilder uiBuilder;
 
-	uiBuilder.Start();
-	uiBuilder.ScreenFade(myUIBackgroundStyle.myColor);
+	uiBuilder.Start(ActionGameGlobals::GetInstance().GetUITheme());
+	uiBuilder.ScreenFade();
 	uiBuilder.Finish(myUIRenderCommands);
 
-	uiBuilder.Start();
+	uiBuilder.Start(ActionGameGlobals::GetInstance().GetUITheme());
 
-	uiBuilder.TextHeader("Leveled Up!", myFont, 32, myUIBackgroundStyle, 0xFFFFFFFF);
+	uiBuilder.TextHeader("Leveled Up!");
 
 	uiBuilder.VerticalSpacing(50);
 
-	uiBuilder.OpenElement(myUIBackgroundStyle);
+	uiBuilder.BeginPanel().SetAlingment(Slush::UIElementStyle::CENTER);
 	for (int i = 0; i < myUpgradeOptions.Count(); ++i)
 	{
-		Slush::UIElementStyle& style = uiBuilder.OpenElement(myUpgradeLabels[i].GetBuffer());
-		style.SetAlingment(Slush::UIElementStyle::CENTER);
-		style.SetLayoutDirection(Slush::UIElementStyle::TOP_TO_BOTTOM);
-		style.SetChildGap(8);
-		style.SetPadding(16, 16);
-
-		style.SetColor(0xFF333333);
-		style.SetOutlineColor(0xFF000000);
-		style.SetOutlineThickness(-1.f);
-		style.EnableButtonInteraction(0xFF888888);
+		uiBuilder.BeginButton(myUpgradeLabels[i].GetBuffer());
 
 		if (upgradeData)
 		{
@@ -132,17 +109,17 @@ Slush::IGameState::GameStateResult UpgradeStatsState::Update()
 			if (const Slush::Texture* iconTexture = statdata.myIconTexture.Get())
 				uiBuilder.Image(iconTexture, { 45, 45 }, statdata.myIconTextureRect);
 
-			uiBuilder.Text(myUpgradeLabels[i].GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 25, 0xFFFFFFFF);
+			uiBuilder.Text(myUpgradeLabels[i].GetBuffer());
 			FW_String upgradeValue;
 			upgradeValue += "+";
 			upgradeValue += static_cast<int>(statdata.myIncreasePerUpgrade * 100);
 			upgradeValue += "%";
-			uiBuilder.Text(upgradeValue.GetBuffer(), ActionGameGlobals::GetInstance().GetFont(), 18, 0xFF44FF44);
+			uiBuilder.Text(upgradeValue.GetBuffer(), Slush::UITextRole::Small, Slush::UITextTone::Positive);
 		}
 
-		uiBuilder.CloseElement();
+		uiBuilder.EndButton();
 	}
-	uiBuilder.CloseElement();
+	uiBuilder.EndPanel();
 
 	uiBuilder.Finish(myUIRenderCommands);
 

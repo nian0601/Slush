@@ -15,6 +15,9 @@ namespace Slush
 		myPanel.myPadding = { 16, 16 };
 		myPanel.myChildGap = 16;
 		myHeader = myPanel;
+		myTooltip.myVisuals.Fill({ static_cast<int>(0xF0121212), static_cast<int>(0xFF888888), -1.f });
+		myTooltip.myPadding = { 8, 6 };
+		myTooltip.myChildGap = 0;
 
 		myButton.myPadding = { 16, 16 };
 		myButton.myChildGap = 8;

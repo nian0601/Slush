@@ -49,7 +49,19 @@ void TowerBuildMenu::Update()
 		const bool isSelected = prefab == mySelectedTowerPrefab;
 		const bool isAffordable = BuildCostComponent::GetCost(*prefab) <= myLevel.GetResources();
 		const Slush::UIState state = isSelected ? Slush::UIState::Selected : (isAffordable ? Slush::UIState::Normal : Slush::UIState::Disabled);
-		uiBuilder.Button(label.GetBuffer(), state, { 230, 64 });
+		uiBuilder.BeginButton(label.GetBuffer(), state)
+			.SetXSizing(Slush::UIElementStyle::FIXED, 230).SetYSizing(Slush::UIElementStyle::FIXED, 64);
+		uiBuilder.Text(label.GetBuffer());
+		if (state == Slush::UIState::Disabled)
+		{
+			FW_String tooltip = "Not enough resources (need ";
+			tooltip += BuildCostComponent::GetCost(*prefab);
+			tooltip += ", have ";
+			tooltip += myLevel.GetResources();
+			tooltip += ")";
+			uiBuilder.SetTooltip(tooltip.GetBuffer());
+		}
+		uiBuilder.EndButton();
 	}
 	if (myFeedbackTimer.IsStarted() && !myFeedbackTimer.HasExpired())
 		uiBuilder.Text(myFeedbackText.GetBuffer(), Slush::UITextRole::Small, Slush::UITextTone::Warning);

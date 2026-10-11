@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UITheme.h"
+#include <FW_Rect.h>
 
 namespace Slush
 {
@@ -15,6 +16,11 @@ namespace Slush
 		Vector2i myMousePosition = { 0, 0 };
 		bool myWasLeftMouseReleased = false;
 	};
+
+	namespace UITooltipUtils
+	{
+		Vector2i CalculatePosition(const Recti& anElementRect, const Vector2i& aTooltipSize, const Vector2i& aScreenSize);
+	}
 
 	struct UIElementStyle
 	{
@@ -115,6 +121,7 @@ namespace Slush
 		void Button(const char* someText, UIState aBaseState = UIState::Normal, const Vector2i& aFixedSize = { 0, 0 });
 		void Text(const char* someText, UITextRole aRole = UITextRole::Body, UITextTone aTone = UITextTone::Default);
 		void TextHeader(const char* someText);
+		void SetTooltip(const char* someText);
 		void ScreenFade();
 
 		void HorizontalSpacing(int aSize);
@@ -150,6 +157,7 @@ namespace Slush
 			Recti myTextureRect;
 			FW_String myText;
 			int myTextSize;
+			FW_String myTooltip;
 			bool myWasMouseReleased; //dont store this in the element, it needs to be in some kind of cache-thingy that persists across frames
 
 			Element* myParent;
@@ -160,6 +168,8 @@ namespace Slush
 		void AssertTheme() const;
 		const UITheme* myTheme = nullptr;
 		Element myRoot;
+		Element myTooltip;
+		bool myHasTooltip = false;
 		Element* myCurrentElement = nullptr;
 		bool myIsMouseOverUI = false;
 		FW_Hashmap<FW_String, Element*> myInteractiveElements;
@@ -177,6 +187,7 @@ namespace Slush
 		bool Draws(const Element& anElement) const;
 		void UpdateMouseOver(Element& anElement, const UIInputState& anInputState);
 		void CollectDrawOrder(Element& anElement, FW_GrowingArray<Element*>& someAnchoredElements);
+		void BuildTooltip(const Element& anElement);
 		void GenerateRenderCommands(Element& anElement, FW_GrowingArray<RenderCommand>& outRenderCommands);
 	};
 

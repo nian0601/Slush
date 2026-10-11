@@ -10,6 +10,22 @@
 
 namespace Slush
 {
+	namespace UITooltipUtils
+	{
+		Vector2i CalculatePosition(const Recti& anElementRect, const Vector2i& aTooltipSize, const Vector2i& aScreenSize)
+		{
+			Vector2i position = {
+				anElementRect.myTopLeft.x + (anElementRect.myExtents.x - aTooltipSize.x) / 2,
+				anElementRect.myTopLeft.y - aTooltipSize.y - 4
+			};
+			if (position.y < 0)
+				position.y = anElementRect.myBottomRight.y + 4;
+			position.x = FW_Clamp(position.x, 0, FW_Max(0, aScreenSize.x - aTooltipSize.x));
+			position.y = FW_Clamp(position.y, 0, FW_Max(0, aScreenSize.y - aTooltipSize.y));
+			return position;
+		}
+	}
+
 	void UIElementStyle::Reset()
 	{
 		myXSizing = FIT;
@@ -115,6 +131,9 @@ namespace Slush
 	{
 		myTheme = &aTheme;
 		myIsMouseOverUI = false;
+		myHasTooltip = false;
+		myTooltip.Reset();
+		myTooltip.myStyle.Reset();
 
 		myCurrentElement = nullptr;
 		myInteractiveElements.Clear();
@@ -218,6 +237,28 @@ namespace Slush
 		CloseElement();
 	}
 
+	void UIBuilder::SetTooltip(const char* someText)
+	{
+		FW_ASSERT(myCurrentElement != nullptr && myCurrentElement != &myRoot, "Tooltip requires an open element");
+		myCurrentElement->myTooltip = someText;
+	}
+
+	void UIBuilder::BuildTooltip(const Element& anElement)
+	{
+		myCurrentElement = &myTooltip;
+		myTooltip.myWidgetStyle = &myTheme->myTooltip;
+		myTooltip.myStyle.SetPadding(myTheme->myTooltip.myPadding.x, myTheme->myTooltip.myPadding.y)
+			.SetChildGap(myTheme->myTooltip.myChildGap);
+		Text(anElement.myTooltip.GetBuffer(), UITextRole::Small);
+		CloseElement();
+		CalculateSizeAlongAxis(myTooltip, true);
+		CalculateSizeAlongAxis(myTooltip, false);
+		myTooltip.myPosition = UITooltipUtils::CalculatePosition(MakeRectFromTopLeft(anElement.myPosition, anElement.mySize), myTooltip.mySize, myRoot.mySize);
+		CalculatePositions(myTooltip);
+		myCurrentElement = &myRoot;
+		myHasTooltip = true;
+	}
+
 	void UIBuilder::ScreenFade()
 	{
 		AssertTheme();
@@ -257,6 +298,15 @@ namespace Slush
 			if (HandleInput(*myDrawOrder[i], anInputState))
 				break;
 		}
+		for (int i = myDrawOrder.Count() - 1; i >= 0; --i)
+		{
+			const Element& element = *myDrawOrder[i];
+			if (element.myIsMouseOver && !element.myTooltip.Empty())
+			{
+				BuildTooltip(element);
+				break;
+			}
+		}
 	}
 
 	void UIBuilder::Finish(FW_GrowingArray<RenderCommand>& outRenderCommands)
@@ -269,6 +319,12 @@ namespace Slush
 	{
 		for (Element* element : myDrawOrder)
 			GenerateRenderCommands(*element, outRenderCommands);
+		if (myHasTooltip)
+		{
+			GenerateRenderCommands(myTooltip, outRenderCommands);
+			for (Element* child : myTooltip.myChildren)
+				GenerateRenderCommands(*child, outRenderCommands);
+		}
 	}
 
 	void UIBuilder::CollectDrawOrder(Element& anElement, FW_GrowingArray<Element*>& someAnchoredElements)
@@ -729,6 +785,7 @@ namespace Slush
 		myTexture = nullptr;
 		myTextureRect = MakeRect(0, 0, 0, 0);
 		myText = "";
+		myTooltip = "";
 		myTextSize = 15;
 		myWasMouseReleased = false;
 

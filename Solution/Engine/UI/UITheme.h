@@ -37,6 +37,7 @@ namespace Slush
 		UIWidgetStyle myFrame;
 		UIWidgetStyle myButton;
 		UIWidgetStyle myHeader;
+		UIWidgetStyle myTooltip;
 		FW_StaticArray<int, static_cast<int>(UITextRole::Count)> myTextSizes;
 		FW_StaticArray<int, static_cast<int>(UITextTone::Count)> myTextColors;
 		int myScreenFadeColor = 0xAA121212;

@@ -368,6 +368,18 @@ namespace Slush
 			FW_TEST_CHECK(commands[1].myColor == theme.myButton.myVisuals[static_cast<int>(UIState::Selected)].myColor, "Anchored button draws last despite being declared first");
 		}
 
+		void TestUIBuilderTooltipPlacement()
+		{
+			const Vector2i screenSize = { 800, 600 };
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(350, 275, 450, 325), { 200, 40 }, screenSize) == Vector2i(300, 231), "Tooltip is centred above with four pixel gap");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(350, 0, 450, 50), { 200, 40 }, screenSize) == Vector2i(300, 54), "Tooltip at top falls below element");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(0, 275, 100, 325), { 200, 40 }, screenSize) == Vector2i(0, 231), "Tooltip clamps to left edge");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(700, 275, 800, 325), { 200, 40 }, screenSize) == Vector2i(600, 231), "Tooltip clamps to right edge");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(16, 518, 246, 582), { 300, 40 }, screenSize) == Vector2i(0, 474), "Build bar tooltip fits above button");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(350, 0, 450, 590), { 200, 40 }, screenSize) == Vector2i(300, 560), "Fallback clamps to bottom edge");
+			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(0, 0, 100, 50), { 900, 700 }, screenSize) == Vector2i(0, 0), "Oversized tooltip pins to screen origin");
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
@@ -379,6 +391,7 @@ namespace Slush
 			FW_RUN_TEST(TestUIBuilderAnchors);
 			FW_RUN_TEST(TestUIBuilderAnchoredFlowAndPadding);
 			FW_RUN_TEST(TestUIBuilderAnchoredDrawAndClickOrder);
+			FW_RUN_TEST(TestUIBuilderTooltipPlacement);
 
 			FW_RUN_TEST(TestCommandLineArgsFlagPresent);
 			FW_RUN_TEST(TestCommandLineArgsFlagAbsent);

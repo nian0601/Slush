@@ -20,7 +20,7 @@ TowerBuildMenu::TowerBuildMenu(Level& aLevel)
 {
 }
 
-void TowerBuildMenu::Update()
+void TowerBuildMenu::Update(bool aIsMouseOverOtherUI)
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
@@ -68,7 +68,7 @@ void TowerBuildMenu::Update()
 
 	uiBuilder.EndPanel();
 	uiBuilder.Finish(myRenderCommands);
-	myIsMouseOverUI = uiBuilder.IsMouseOverUI();
+	myIsMouseOverUI = aIsMouseOverOtherUI || uiBuilder.IsMouseOverUI();
 
 	if (engine.GetInput().WasMouseReleased(Slush::Input::RIGHTMB))
 		mySelectedTowerPrefab = nullptr;

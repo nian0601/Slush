@@ -9,15 +9,15 @@ namespace Slush { class EntityPrefab; }
 class TowerBuildMenu
 {
 public:
+	static const int ourBarHeight = 100;
+
 	TowerBuildMenu(Level& aLevel);
 
-	void Update();
+	void Update(bool aIsMouseOverOtherUI);
 	void RenderPreview() const;
 	const FW_GrowingArray<Slush::UIBuilder::RenderCommand>& GetRenderCommands() const { return myRenderCommands; }
 
 private:
-	static const int ourBarHeight = 100;
-
 	Level& myLevel;
 	const Slush::EntityPrefab* mySelectedTowerPrefab = nullptr;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myRenderCommands;

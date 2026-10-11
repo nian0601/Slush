@@ -4,6 +4,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Navmesh.cpp" />
+	<ClCompile Include="LevelHud.cpp" />
 	<ClCompile Include="TowerBuildMenu.cpp" />
     <ClCompile Include="NavmeshTestSuite.cpp" />
     <ClCompile Include="WaveScalingTestSuite.cpp" />
@@ -35,6 +36,7 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Navmesh.h" />
+	<ClInclude Include="LevelHud.h" />
 	<ClInclude Include="TowerBuildMenu.h" />
     <ClInclude Include="NavmeshTestSuite.h" />
     <ClInclude Include="WaveScalingTestSuite.h" />

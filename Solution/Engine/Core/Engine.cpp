@@ -60,7 +60,6 @@ namespace Slush
 	void Engine::BeginFrame()
 	{
 		Time::Update();
-		myLogger->Update();
 	}
 
 	void Engine::UpdateInput()

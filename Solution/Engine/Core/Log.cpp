@@ -5,6 +5,7 @@
 
 #include <time.h>
 #include <sys/timeb.h>
+#include <share.h>
 
 #include <FW_FileSystem.h>
 
@@ -25,7 +26,7 @@ namespace Slush
 		FW_String absoluteLogPath;
 		AssetRepository::GetDebugFilePath(logFileName, absoluteLogPath);
 
-		fopen_s(&myLogFile, absoluteLogPath.GetBuffer(), "w");
+		myLogFile = _fsopen(absoluteLogPath.GetBuffer(), "w", _SH_DENYWR);
 		FW_ASSERT(myLogFile != nullptr, "Failed to open %s for writing", logFileName.GetBuffer());
 
 		if (commandLineArgs.HasFlag("-logname") && !hasValidLogName)
@@ -64,27 +65,9 @@ namespace Slush
 		return true;
 	}
 
-	void Logger::Flush()
-	{
-		for (int i = myFlushedEntryCount; i < myEntries.Count(); ++i)
-		{
-			const LogEntry& entry = myEntries[i];
-			fprintf(myLogFile, "[%s] %s\n", Logger::GetSeverityText(entry.mySeverity), entry.myMessage.GetBuffer());
-		}
-
-		myFlushedEntryCount = myEntries.Count();
-		fflush(myLogFile);
-	}
-
-	void Logger::Update()
-	{
-		if (myFlushTimer.IsStarted() && myFlushTimer.HasExpired() && myEntries.Count() > myFlushedEntryCount)
-			Flush();
-	}
-
 	void Logger::ForceFlush()
 	{
-		Flush();
+		fflush(myLogFile);
 	}
 
 	void Logger::AddMessage(Severity aSeverity, const char *aFormattedString, ...)
@@ -120,9 +103,7 @@ namespace Slush
 		entry.myMessage += "]: ";
 		entry.myMessage += buffer;
 
-		myFlushTimer.Start(3.f);
-
-		if (myEntries.Count() - myFlushedEntryCount > 25)
-			Flush();
+		fprintf(myLogFile, "[%s] %s\n", Logger::GetSeverityText(entry.mySeverity), entry.myMessage.GetBuffer());
+		fflush(myLogFile);
 	}
 }

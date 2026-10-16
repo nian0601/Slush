@@ -13,6 +13,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 
 #include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 #include "imgui/imgui-SFML.h"
 #include <FW_FileSystem.h>
 
@@ -52,6 +53,7 @@ namespace Slush
 
 	void Window::Hide()
 	{
+		myIsHidden = true;
 		myRenderWindow->setVisible(false);
 	}
 
@@ -320,10 +322,33 @@ namespace Slush
 			myAppLayout->Render();
 	}
 
+	void Window::SaveAppLayoutConfigIfRequested()
+	{
+		if (ImGui::GetIO().WantSaveIniSettings)
+			SaveAppLayoutConfig();
+	}
+
 	void Window::SaveAppLayoutConfig()
 	{
+		ImGuiIO& imguiIO = ImGui::GetIO();
+		const bool hasPendingChanges = imguiIO.WantSaveIniSettings || ImGui::GetCurrentContext()->SettingsDirtyTimer > 0.f;
+		imguiIO.WantSaveIniSettings = false;
+
 		if (!myAppLayout)
 			return;
+
+		const char* layoutName = myAppLayout->GetName().GetBuffer();
+		if (myIsHidden)
+		{
+			SLUSH_INFO("[Window] Layout '%s': window hidden, not saved", layoutName);
+			return;
+		}
+
+		if (!hasPendingChanges)
+		{
+			SLUSH_INFO("[Window] Layout '%s': nothing pending, not saved", layoutName);
+			return;
+		}
 
 		FW_String settingName = "ImGUILayouts/";
 		settingName += myAppLayout->GetName();
@@ -339,12 +364,17 @@ namespace Slush
 		}
 
 		ImGui::SaveIniSettingsToDisk(path.GetBuffer());
+		SLUSH_INFO("[Window] Layout '%s': saved to %s", layoutName, path.GetBuffer());
 	}
 
 	void Window::LoadAppLayoutConfig()
 	{
 		if (!myAppLayout)
 			return;
+
+		// If we don't ClearIniSettings then Window-settings from previous Layouts gets merged into
+		// the new layout, which then gets saved to disk and clutters the file.
+		ImGui::ClearIniSettings();
 
 		FW_String settingName = "ImGUILayouts/";
 		settingName += myAppLayout->GetName();

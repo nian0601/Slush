@@ -95,6 +95,7 @@ namespace Slush
 	void Engine::BeginImGuiFrame()
 	{
 		ImGui::SFML::Update(*myWindow->GetRenderWindow(), Time::GetDelta());
+		myWindow->SaveAppLayoutConfigIfRequested();
 	}
 
 	void Engine::UpdateSimulation(IApp& anApp)

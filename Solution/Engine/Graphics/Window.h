@@ -47,6 +47,7 @@ namespace Slush
 
 		void UpdateAppLayout();
 		void RenderAppLayout();
+		void SaveAppLayoutConfigIfRequested();
 
 		// Called every frame (from Engine::Run()) while a close or a menu-driven layout switch is pending,
 		// until it's resolved or cancelled.
@@ -89,6 +90,7 @@ namespace Slush
 		sf::RenderWindow* myRenderWindow = nullptr;
 		Renderer* myRenderer = nullptr;
 		bool myShouldBeOpen = true;
+		bool myIsHidden = false;
 		bool myDisplayImGUIDemo = false;
 		bool myScreenshotRequested = false;
 		IAppLayout* myAppLayout = nullptr;

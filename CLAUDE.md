@@ -35,7 +35,7 @@ The script disables MSBuild worker-node reuse. An interrupted build can still le
 
 *(Optional, recommended if a lingering process or dirtied runtime file is a recurring problem)*
 Worktree-blocking processes: ActionGame.exe, BossMonster.exe, TopDownGame.exe, MSBuild.exe, mspdbsrv.exe
-Worktree-discardable paths: Assets/*/ImGUILayouts/*.ini, Workbed/*/Debug/DebugSettings.sdebug, Workbed/*/Debug/*
+Worktree-discardable paths: Workbed/*/Debug/DebugSettings.sdebug, Workbed/*/Debug/*
 
 ## Code style
 

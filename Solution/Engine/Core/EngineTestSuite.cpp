@@ -469,12 +469,21 @@ namespace Slush
 			FW_TEST_CHECK(!InputUtils::FindKeyCode("nonsense", key), "Unknown key rejected");
 		}
 
+		void TestScreenshotNames()
+		{
+			FW_TEST_CHECK(Logger::IsValidLogName("level_1") && Logger::IsValidLogName("a-b"), "Screenshot uses logname validation");
+			const char* invalid[] = { "", "x.png", "a b", "../x", nullptr };
+			for (const char* name : invalid)
+				FW_TEST_CHECK(!Logger::IsValidLogName(name), "Invalid screenshot name rejected");
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
 			FW_RUN_TEST(TestDebugScriptParsingAndFailure);
 			FW_RUN_TEST(TestDebugScriptWaits);
 			FW_RUN_TEST(TestInputKeyNames);
+			FW_RUN_TEST(TestScreenshotNames);
 
 			FW_RUN_TEST(TestUIThemeButtonStates);
 			FW_RUN_TEST(TestUIBuilderLayout);

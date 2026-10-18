@@ -63,6 +63,26 @@ namespace Slush
 			else
 				Engine::GetInstance().myInput->InjectKeyClick(key);
 		});
+		myDebugScriptRunner->RegisterCommand("screenshot", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (anArguments.Count() > 1)
+			{
+				aRunner.Fail("screenshot expects at most one name");
+				return;
+			}
+			const char* name = anArguments.IsEmpty() ? nullptr : anArguments[0].GetBuffer();
+			if (name && !Logger::IsValidLogName(name))
+			{
+				aRunner.Fail("invalid screenshot name: use only A-Z, a-z, 0-9, underscore or hyphen");
+				return;
+			}
+			Engine::GetInstance().GetWindow().RequestScreenshot(name);
+		});
+		myDebugScriptRunner->RegisterCommand("quit", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (aRunner.RequireArgumentCount(anArguments, 0))
+				Engine::GetInstance().GetWindow().QuitFromDebugScript();
+		});
 		CommandLineArgs& args = CommandLineArgs::GetInstance();
 		if (args.HasFlag("-debugscript"))
 		{

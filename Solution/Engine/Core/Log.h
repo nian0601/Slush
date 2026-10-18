@@ -76,8 +76,8 @@ namespace Slush
 		void ForceFlush();
 
 		const FW_GrowingArray<LogEntry>& GetEntries() const { return myEntries; }
-	private:
 		static bool IsValidLogName(const char* aLogName);
+	private:
 
 		FW_GrowingArray<LogEntry> myEntries;
 

@@ -17,12 +17,14 @@ namespace Slush
 		void QueueLine(const char* aText);
 		bool QueueFile(const char* aPath, bool aTruncate = false, bool anIsOptional = false);
 		void Step(float aDelta);
+		void Wait(float aDuration, bool anInFrames);
+		void WaitFor(const char* aTrigger, float aTimeout);
 		void PostTrigger(const char* aName);
 		void RequestClick(const char* aLabel);
 		bool ConsumeClick(const char* aLabel, bool anIsEnabled);
-		bool HasPendingClick() const { return !myPendingClick.Empty(); }
+		bool HasPendingClick() const { return !myClick.myPendingLabel.Empty(); }
 		void EndFrame();
-		bool HasFailed() const { return myHasFailed; }
+		bool HasFailed() const { return myReporting.myHasFailed; }
 		void Fail(const char* aMessage);
 		bool RequireArgumentCount(const Arguments& anArguments, int aCount);
 
@@ -32,25 +34,47 @@ namespace Slush
 			FW_String myName;
 			CommandCallback myCallback = nullptr;
 		};
-		static void WaitFor(DebugScriptRunner& aRunner, const Arguments& anArguments);
-		static bool ParseDuration(const char* aText, float& aValue, bool& anInFrames);
 		bool SatisfyTrigger();
-		static void Wait(DebugScriptRunner& aRunner, const Arguments& anArguments);
 		bool Tokenize(const char* aText, Arguments& anArguments);
 
+		struct QueueState
+		{
+			FW_GrowingArray<FW_String> myLines;
+			int myNextLine = 0;
+		};
+
+		struct WaitState
+		{
+			float myRemaining = 0.f;
+			bool myInFrames = false;
+			bool myIsWaiting = false;
+		};
+
+		struct TriggerState
+		{
+			FW_GrowingArray<FW_String> myPostedNames;
+			FW_String myWaitingName;
+			float myTimeout = 0.f;
+		};
+
+		struct ClickState
+		{
+			FW_String myPendingLabel;
+			bool myRequestedThisFrame = false;
+		};
+
+		struct ReportingState
+		{
+			Reporter myReporter = nullptr;
+			void* myContext = nullptr;
+			bool myHasFailed = false;
+		};
+
 		FW_GrowingArray<Command> myCommands;
-		FW_GrowingArray<FW_String> myLines;
-		int myNextLine = 0;
-		float myWaitRemaining = 0.f;
-		bool myWaitInFrames = false;
-		bool myIsWaiting = false;
-		bool myHasFailed = false;
-		FW_GrowingArray<FW_String> myTriggers;
-		FW_String myWaitingTrigger;
-		float myTriggerTimeout = 0.f;
-		FW_String myPendingClick;
-		bool myClickRequestedThisFrame = false;
-		Reporter myReporter = nullptr;
-		void* myReporterContext = nullptr;
+		QueueState myQueue;
+		WaitState myWait;
+		TriggerState myTrigger;
+		ClickState myClick;
+		ReportingState myReporting;
 	};
 }

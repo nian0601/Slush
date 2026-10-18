@@ -165,6 +165,40 @@ namespace Slush
 		aRunner.myIsWaiting = true;
 	}
 
+	void DebugScriptRunner::RequestClick(const char* aLabel)
+	{
+		if (myClickRequestedThisFrame)
+		{
+			Fail("only one click is allowed per frame");
+			return;
+		}
+		if (!aLabel || !*aLabel)
+		{
+			Fail("click expects a non-empty button label");
+			return;
+		}
+		myPendingClick = aLabel;
+		myClickRequestedThisFrame = true;
+	}
+
+	bool DebugScriptRunner::ConsumeClick(const char* aLabel, bool anIsEnabled)
+	{
+		if (myPendingClick.Empty() || myPendingClick != aLabel)
+			return false;
+		if (!anIsEnabled)
+			Fail((FW_String("button '") + aLabel + "' is disabled").GetBuffer());
+		myPendingClick.Clear();
+		return anIsEnabled;
+	}
+
+	void DebugScriptRunner::EndFrame()
+	{
+		if (!myPendingClick.Empty())
+			Fail((FW_String("no clickable button '") + myPendingClick + "' this frame").GetBuffer());
+		myPendingClick.Clear();
+		myClickRequestedThisFrame = false;
+	}
+
 	void DebugScriptRunner::PostTrigger(const char* aName)
 	{
 		myTriggers.AddUnique(FW_String(aName));

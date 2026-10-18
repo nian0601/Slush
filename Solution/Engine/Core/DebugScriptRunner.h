@@ -18,6 +18,10 @@ namespace Slush
 		bool QueueFile(const char* aPath, bool aTruncate = false, bool anIsOptional = false);
 		void Step(float aDelta);
 		void PostTrigger(const char* aName);
+		void RequestClick(const char* aLabel);
+		bool ConsumeClick(const char* aLabel, bool anIsEnabled);
+		bool HasPendingClick() const { return !myPendingClick.Empty(); }
+		void EndFrame();
 		bool HasFailed() const { return myHasFailed; }
 		void Fail(const char* aMessage);
 		bool RequireArgumentCount(const Arguments& anArguments, int aCount);
@@ -44,6 +48,8 @@ namespace Slush
 		FW_GrowingArray<FW_String> myTriggers;
 		FW_String myWaitingTrigger;
 		float myTriggerTimeout = 0.f;
+		FW_String myPendingClick;
+		bool myClickRequestedThisFrame = false;
 		Reporter myReporter = nullptr;
 		void* myReporterContext = nullptr;
 	};

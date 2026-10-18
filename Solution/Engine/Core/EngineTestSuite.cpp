@@ -477,6 +477,52 @@ namespace Slush
 				FW_TEST_CHECK(!Logger::IsValidLogName(name), "Invalid screenshot name rejected");
 		}
 
+		void TestDebugScriptClicks()
+		{
+			UITheme theme;
+			UIBuilder first;
+			UIBuilder second;
+			for (int test = 0; test < 3; ++test)
+			{
+				DebugScriptRunner runner;
+				UIInputState input;
+				input.myDebugScriptRunner = &runner;
+				runner.RequestClick(test == 2 ? "unknown" : "A");
+				first.Start(theme, { 800, 600 });
+				first.BeginButton("A", test == 1 ? UIState::Disabled : UIState::Normal);
+				first.EndButton();
+				first.Finish(input);
+				FW_TEST_CHECK(first.WasClicked("A") == (test == 0), "Script clicks only enabled matching buttons");
+				FW_TEST_CHECK(runner.HasPendingClick() == (test == 2), "Unknown label stays pending; matches are consumed");
+				second.Start(theme, { 800, 600 });
+				second.BeginButton("A");
+				second.EndButton();
+				second.Finish(input);
+				FW_TEST_CHECK(!second.WasClicked("A"), "First matching builder consumes the click");
+				runner.EndFrame();
+				FW_TEST_CHECK(runner.HasFailed() == (test != 0), "Disabled and missing labels fail");
+				FW_TEST_CHECK(!runner.HasPendingClick(), "End of frame drops unmatched clicks");
+			}
+			DebugScriptRunner duplicate;
+			duplicate.RegisterCommand("click", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+			{
+				if (aRunner.RequireArgumentCount(anArguments, 1))
+					aRunner.RequestClick(anArguments[0].GetBuffer());
+			});
+			duplicate.QueueLine("click first");
+			duplicate.QueueLine("click second");
+			duplicate.Step(0.f);
+			FW_TEST_CHECK(duplicate.HasFailed(), "Second click in a frame fails");
+			FW_TEST_CHECK(!duplicate.ConsumeClick("second", true), "Second click is ignored");
+			FW_TEST_CHECK(duplicate.ConsumeClick("first", true), "First click remains pending");
+			duplicate.RequestClick("third");
+			FW_TEST_CHECK(!duplicate.HasPendingClick(), "Consumed click still counts toward per-frame limit");
+			duplicate.EndFrame();
+			duplicate.RequestClick("next");
+			FW_TEST_CHECK(duplicate.ConsumeClick("next", true), "New frame accepts another click");
+			duplicate.EndFrame();
+		}
+
 		void TestDebugScriptTriggers()
 		{
 			locScriptCalls = 0;
@@ -531,6 +577,7 @@ namespace Slush
 			FW_RUN_TEST(TestDebugScriptParsingAndFailure);
 			FW_RUN_TEST(TestDebugScriptWaits);
 			FW_RUN_TEST(TestDebugScriptTriggers);
+			FW_RUN_TEST(TestDebugScriptClicks);
 			FW_RUN_TEST(TestInputKeyNames);
 			FW_RUN_TEST(TestScreenshotNames);
 

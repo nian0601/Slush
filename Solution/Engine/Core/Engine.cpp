@@ -78,6 +78,11 @@ namespace Slush
 			}
 			Engine::GetInstance().GetWindow().RequestScreenshot(name);
 		});
+		myDebugScriptRunner->RegisterCommand("click", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (aRunner.RequireArgumentCount(anArguments, 1))
+				aRunner.RequestClick(anArguments[0].GetBuffer());
+		});
 		myDebugScriptRunner->RegisterCommand("quit", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
 		{
 			if (aRunner.RequireArgumentCount(anArguments, 0))
@@ -202,6 +207,7 @@ namespace Slush
 			RenderFrame(anApp);
 			BuildEditorUI();
 			CompositeAndPresent();
+			myDebugScriptRunner->EndFrame();
 		}
 
 		myWindow->DeleteAllLayouts();

@@ -12,6 +12,7 @@ namespace Slush
 class UpgradeWeaponState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "upgradeweapon"; }
 	UpgradeWeaponState(Slush::EntityHandle aPlayerHandle);
 
 	GameStateResult Update() override;

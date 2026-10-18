@@ -13,6 +13,7 @@ class LevelData;
 class LevelSelectState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "levelselect"; }
 	LevelSelectState();
 
 	void StartState() override;

@@ -7,6 +7,7 @@ namespace Slush
 	DebugScriptRunner::DebugScriptRunner()
 	{
 		RegisterCommand("wait", &Wait);
+		RegisterCommand("waitfor", &WaitFor);
 	}
 
 	void DebugScriptRunner::SetReporter(Reporter aReporter, void* aContext)
@@ -138,28 +139,82 @@ namespace Slush
 		return true;
 	}
 
+	bool DebugScriptRunner::ParseDuration(const char* aText, float& aValue, bool& anInFrames)
+	{
+		char* end = nullptr;
+		double value = strtod(aText, &end);
+		bool hasDigit = *aText >= '0' && *aText <= '9';
+		if (!hasDigit && *aText == '.')
+			hasDigit = aText[1] >= '0' && aText[1] <= '9';
+		if (!hasDigit || end == aText || (*end != 's' && *end != 'f') || end[1] != '\0' || !_finite(value) || value < 0 || value > FLT_MAX)
+			return false;
+		aValue = static_cast<float>(value);
+		anInFrames = *end == 'f';
+		return true;
+	}
+
 	void DebugScriptRunner::Wait(DebugScriptRunner& aRunner, const Arguments& anArguments)
 	{
 		if (!aRunner.RequireArgumentCount(anArguments, 1))
 			return;
-		const char* text = anArguments[0].GetBuffer();
-		char* end = nullptr;
-		double value = strtod(text, &end);
-		bool hasDigit = *text >= '0' && *text <= '9';
-		if (!hasDigit && *text == '.')
-			hasDigit = text[1] >= '0' && text[1] <= '9';
-		if (!hasDigit || end == text || (*end != 's' && *end != 'f') || end[1] != '\0' || !_finite(value) || value < 0 || value > FLT_MAX)
+		if (!ParseDuration(anArguments[0].GetBuffer(), aRunner.myWaitRemaining, aRunner.myWaitInFrames))
 		{
 			aRunner.Fail("wait expects a non-negative duration with s or f suffix");
 			return;
 		}
-		aRunner.myWaitRemaining = static_cast<float>(value);
-		aRunner.myWaitInFrames = *end == 'f';
 		aRunner.myIsWaiting = true;
+	}
+
+	void DebugScriptRunner::PostTrigger(const char* aName)
+	{
+		myTriggers.AddUnique(FW_String(aName));
+		if (myReporter)
+			myReporter(false, (FW_String("[Trigger] ") + aName).GetBuffer(), myReporterContext);
+	}
+
+	bool DebugScriptRunner::SatisfyTrigger()
+	{
+		for (const FW_String& trigger : myTriggers)
+		{
+			if (trigger == myWaitingTrigger.GetBuffer())
+			{
+				myTriggers.RemoveAll();
+				myWaitingTrigger.Clear();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void DebugScriptRunner::WaitFor(DebugScriptRunner& aRunner, const Arguments& anArguments)
+	{
+		if (anArguments.Count() < 1 || anArguments.Count() > 2 || anArguments[0].Empty())
+		{
+			aRunner.Fail("waitfor expects a trigger and optional timeout in seconds");
+			return;
+		}
+		float timeout = 10.f;
+		bool frames = false;
+		if (anArguments.Count() == 2 && (!ParseDuration(anArguments[1].GetBuffer(), timeout, frames) || frames))
+		{
+			aRunner.Fail("waitfor timeout must be a non-negative duration in seconds");
+			return;
+		}
+		aRunner.myWaitingTrigger = anArguments[0];
+		aRunner.myTriggerTimeout = timeout;
+		aRunner.SatisfyTrigger();
 	}
 
 	void DebugScriptRunner::Step(float aDelta)
 	{
+		if (!myWaitingTrigger.Empty() && !SatisfyTrigger())
+		{
+			myTriggerTimeout -= aDelta;
+			if (myTriggerTimeout > 0.f)
+				return;
+			Fail((FW_String("timed out waiting for trigger '") + myWaitingTrigger + "'").GetBuffer());
+			myWaitingTrigger.Clear();
+		}
 		if (myIsWaiting)
 		{
 			myWaitRemaining -= myWaitInFrames ? 1.f : aDelta;
@@ -187,7 +242,7 @@ namespace Slush
 			}
 			if (!found)
 				Fail((FW_String("unknown debug command '") + name + "'").GetBuffer());
-			if (myIsWaiting)
+			if (myIsWaiting || !myWaitingTrigger.Empty())
 				break;
 		}
 		if (myNextLine == myLines.Count())

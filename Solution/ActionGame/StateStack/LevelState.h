@@ -13,6 +13,7 @@ class Level;
 class LevelState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "level"; }
 	LevelState(const CharacterInfo& aCharacterInfo);
 	~LevelState();
 

@@ -5,3 +5,5 @@
 **Debug script**: A text file or stream of debug-command lines run by the DebugScriptRunner.
 
 **Debug command**: One named, registered operation a debug-script line invokes. Bare "Command" is reserved for the future undoable Command system.
+
+**Trigger**: A named, payload-less notification posted through DebugScriptRunner::PostTrigger, which waitfor can block on. "Event" stays reserved for a future gameplay system.

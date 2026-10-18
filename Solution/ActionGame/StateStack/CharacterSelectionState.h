@@ -13,6 +13,7 @@ class Tilemap;
 class CharacterSelectionState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "characterselection"; }
 	CharacterSelectionState();
 	~CharacterSelectionState();
 

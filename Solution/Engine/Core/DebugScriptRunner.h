@@ -17,6 +17,7 @@ namespace Slush
 		void QueueLine(const char* aText);
 		bool QueueFile(const char* aPath, bool aTruncate = false, bool anIsOptional = false);
 		void Step(float aDelta);
+		void PostTrigger(const char* aName);
 		bool HasFailed() const { return myHasFailed; }
 		void Fail(const char* aMessage);
 		bool RequireArgumentCount(const Arguments& anArguments, int aCount);
@@ -27,6 +28,9 @@ namespace Slush
 			FW_String myName;
 			CommandCallback myCallback = nullptr;
 		};
+		static void WaitFor(DebugScriptRunner& aRunner, const Arguments& anArguments);
+		static bool ParseDuration(const char* aText, float& aValue, bool& anInFrames);
+		bool SatisfyTrigger();
 		static void Wait(DebugScriptRunner& aRunner, const Arguments& anArguments);
 		bool Tokenize(const char* aText, Arguments& anArguments);
 
@@ -37,6 +41,9 @@ namespace Slush
 		bool myWaitInFrames = false;
 		bool myIsWaiting = false;
 		bool myHasFailed = false;
+		FW_GrowingArray<FW_String> myTriggers;
+		FW_String myWaitingTrigger;
+		float myTriggerTimeout = 0.f;
 		Reporter myReporter = nullptr;
 		void* myReporterContext = nullptr;
 	};

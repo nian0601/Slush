@@ -11,6 +11,7 @@ namespace Slush
 class VictoryState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "victory"; }
 	VictoryState();
 
 	GameStateResult Update() override;

@@ -477,11 +477,60 @@ namespace Slush
 				FW_TEST_CHECK(!Logger::IsValidLogName(name), "Invalid screenshot name rejected");
 		}
 
+		void TestDebugScriptTriggers()
+		{
+			locScriptCalls = 0;
+			DebugScriptRunner runner;
+			runner.RegisterCommand("probe", &ScriptProbe);
+			runner.PostTrigger("first");
+			runner.PostTrigger("stale");
+			runner.QueueLine("waitfor first");
+			runner.QueueLine("probe before");
+			runner.QueueLine("waitfor stale 1s");
+			runner.QueueLine("probe after");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Pre-posted trigger satisfies immediately; satisfaction clears other triggers");
+			runner.Step(0.5f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Waitfor blocks");
+			runner.PostTrigger("stale");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 2 && !runner.HasFailed(), "Fresh trigger unblocks waitfor");
+			runner.QueueLine("wait 2f");
+			runner.QueueLine("waitfor during");
+			runner.QueueLine("probe during");
+			runner.Step(0.f);
+			runner.PostTrigger("during");
+			runner.Step(0.f);
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 3, "Trigger posted during preceding wait is retained");
+			runner.QueueLine("waitfor absent");
+			runner.QueueLine("probe timeout");
+			runner.Step(0.f);
+			runner.Step(9.f);
+			FW_TEST_CHECK(locScriptCalls == 3, "Default timeout is ten seconds");
+			runner.Step(1.f);
+			FW_TEST_CHECK(runner.HasFailed() && locScriptCalls == 4, "Timeout fails and continues");
+			DebugScriptRunner explicitTimeout;
+			explicitTimeout.QueueLine("waitfor absent 0.5s");
+			explicitTimeout.Step(0.f);
+			explicitTimeout.Step(0.5f);
+			FW_TEST_CHECK(explicitTimeout.HasFailed(), "Explicit timeout applied");
+			const char* invalid[] = { "waitfor", "waitfor x 2f", "waitfor x -1s", "waitfor x 2", "waitfor x abcs", "waitfor x 2s extra" };
+			for (const char* line : invalid)
+			{
+				DebugScriptRunner invalidRunner;
+				invalidRunner.QueueLine(line);
+				invalidRunner.Step(0.f);
+				FW_TEST_CHECK(invalidRunner.HasFailed(), "Invalid waitfor arguments rejected");
+			}
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
 			FW_RUN_TEST(TestDebugScriptParsingAndFailure);
 			FW_RUN_TEST(TestDebugScriptWaits);
+			FW_RUN_TEST(TestDebugScriptTriggers);
 			FW_RUN_TEST(TestInputKeyNames);
 			FW_RUN_TEST(TestScreenshotNames);
 

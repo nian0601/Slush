@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "Core/EngineTestSuite.h"
+#include "Core/DebugScriptRunner.h"
+#include "Core/Input.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/AssetRepository.h"
 #include "UI/UITheme.h"
@@ -380,9 +382,99 @@ namespace Slush
 			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(0, 0, 100, 50), { 900, 700 }, screenSize) == Vector2i(0, 0), "Oversized tooltip pins to screen origin");
 		}
 
+		int locScriptCalls = 0;
+		FW_String locScriptArgument;
+		int locScriptErrors = 0;
+
+		void ScriptProbe(DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (!aRunner.RequireArgumentCount(anArguments, 1))
+				return;
+			++locScriptCalls;
+			locScriptArgument = anArguments[0];
+		}
+
+		void TestDebugScriptParsingAndFailure()
+		{
+			locScriptCalls = 0;
+			locScriptErrors = 0;
+			DebugScriptRunner runner;
+			runner.SetReporter([](bool anIsError, const char*, void*) { if (anIsError) ++locScriptErrors; });
+			runner.RegisterCommand("probe", &ScriptProbe);
+			runner.QueueLine("   # ignored");
+			runner.QueueLine(" ");
+			runner.QueueLine("probe \"Restart Level\"");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 1 && locScriptArgument == "Restart Level", "Quotes preserve whitespace");
+			FW_TEST_CHECK(!runner.HasFailed(), "Comments and blanks are ignored");
+			runner.QueueLine("missing");
+			runner.QueueLine("probe");
+			runner.QueueLine("probe \"unterminated");
+			runner.QueueLine("probe after");
+			runner.Step(0.f);
+			FW_TEST_CHECK(runner.HasFailed() && locScriptErrors == 3, "Unknown command, arity and quotes each fail");
+			FW_TEST_CHECK(locScriptCalls == 2 && locScriptArgument == "after", "Failures do not abort later lines");
+		}
+
+		void TestDebugScriptWaits()
+		{
+			locScriptCalls = 0;
+			DebugScriptRunner runner;
+			runner.RegisterCommand("probe", &ScriptProbe);
+			runner.QueueLine("probe first");
+			runner.QueueLine("wait 0.5s");
+			runner.QueueLine("probe second");
+			runner.Step(100.f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Step runs until wait without charging preceding delta");
+			runner.QueueLine("wait 2f");
+			runner.QueueLine("probe third");
+			runner.Step(0.25f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Seconds wait blocks");
+			runner.Step(0.25f);
+			FW_TEST_CHECK(locScriptCalls == 2, "Queued lines follow running wait");
+			runner.Step(100.f);
+			FW_TEST_CHECK(locScriptCalls == 2, "Frame waits ignore delta");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 3 && !runner.HasFailed(), "Frame wait resumes after two frames");
+			const char* valid[] = { "wait 2s", "wait 0.5s", "wait 120f" };
+			for (const char* line : valid)
+			{
+				DebugScriptRunner validRunner;
+				validRunner.QueueLine(line);
+				validRunner.Step(0.f);
+				FW_TEST_CHECK(!validRunner.HasFailed(), "Valid wait accepted");
+			}
+			const char* invalid[] = { "wait 2", "wait -1s", "wait abcs", "wait 2ss", "wait nans", "wait 1e999s", "wait", "wait 1s extra" };
+			for (const char* line : invalid)
+			{
+				DebugScriptRunner invalidRunner;
+				invalidRunner.QueueLine(line);
+				invalidRunner.Step(0.f);
+				FW_TEST_CHECK(invalidRunner.HasFailed(), "Invalid duration fails");
+			}
+		}
+
+		void TestInputKeyNames()
+		{
+			for (int i = 0; i < Input::__COUNT; ++i)
+			{
+				Input::KeyCode key;
+				const char* name = InputUtils::GetKeyName(static_cast<Input::KeyCode>(i));
+				FW_TEST_CHECK(InputUtils::FindKeyCode(name, key) && key == i, "Unique round-trip for every key");
+				FW_String lower = name;
+				_strlwr_s(lower.GetRawBuffer(), lower.MaxSize());
+				FW_TEST_CHECK(InputUtils::FindKeyCode(lower.GetBuffer(), key) && key == i, "Case-insensitive key lookup");
+			}
+			Input::KeyCode key;
+			FW_TEST_CHECK(!InputUtils::FindKeyCode("nonsense", key), "Unknown key rejected");
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
+			FW_RUN_TEST(TestDebugScriptParsingAndFailure);
+			FW_RUN_TEST(TestDebugScriptWaits);
+			FW_RUN_TEST(TestInputKeyNames);
 
 			FW_RUN_TEST(TestUIThemeButtonStates);
 			FW_RUN_TEST(TestUIBuilderLayout);

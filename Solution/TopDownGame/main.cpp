@@ -81,9 +81,9 @@ int main(int argc, char** argv)
 	engine.Initialize();
 
 	App app;
-	engine.Run(app);
+	const int exitCode = engine.Run(app);
 
 	engine.Destroy();
 
-	return 0;
+	return exitCode;
 }

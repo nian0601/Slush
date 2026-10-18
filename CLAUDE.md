@@ -104,6 +104,9 @@ TopDownGame starts with Start and Quit buttons; Start opens level selection. `-l
 Label clicks are available for automated verification. Real mouse positions, movement and drags remain manual checks: describe them for the user rather than scripting fragile screen coordinates.
 
 Manual-test gate: launch `Workbed/<Game>/<Game>.exe` directly, no flags — real menu → character-select → gameplay flow, not the headless path above. `<Game>` is `ActionGame`/`BossMonster`/`TopDownGame`, inferred from the issue's `project:` label (`project:actiongame` → `ActionGame`; ask which game(s) for `project:engine` or anything ambiguous).
+Manual-test folder: Workbed
+Manual-test launch: project:actiongame -> Workbed/ActionGame/ActionGame.exe
+Manual-test launch: project:topdowngame -> Workbed/TopDownGame/TopDownGame.exe
 
 Use `-logname <name>` with verification launches to write `Debug/<name>.txt` instead of `debuglog.txt`, overwriting any existing log of that name. Names must be non-empty and contain only `[A-Za-z0-9_-]`; missing or invalid values fall back to `debuglog.txt` with a warning. With no flag, logging uses `debuglog.txt` as before. Agents running multiple verification launches should name each run rather than copy `debuglog.txt` around. All `Workbed/*/Debug/` files, including logs, debug input and screenshots, are gitignored, except the tracked `Debug/DebugSettings.sdebug`.
 

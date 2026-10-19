@@ -47,6 +47,11 @@ namespace Slush
 		// immediately (subject to the same unsaved-changes gating as a menu-driven switch).
 		void AddLayout(IAppLayout* aLayout, bool aSetAsActive = false);
 
+		// Switches to the added layout whose IAppLayout::GetName() matches aLayoutName, with the same
+		// unsaved-changes gating as AddLayout()'s aSetAsActive. Returns false if no added layout matches.
+		bool ActivateLayoutByName(const char* aLayoutName);
+		IAppLayout* GetActiveLayout() const { return myAppLayout; }
+
 		void UpdateAppLayout();
 		void RenderAppLayout();
 		void SaveAppLayoutConfigIfRequested();

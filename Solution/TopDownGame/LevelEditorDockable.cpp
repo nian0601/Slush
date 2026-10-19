@@ -5,24 +5,35 @@
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
-#include "Components/TowerCombatComponent.h"
+#include "LevelEditorLayout.h"
+#include "LevelEditorUtils.h"
+#include "TopDownGameGlobals.h"
 
 #include "Core/Assets/AssetStorage.h"
+#include "Core/Assets/DependencyTracker.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/Dockables/IAppLayout.h"
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Window.h"
-#include <EntitySystem/Components/SpriteComponent.h>
 #include <EntitySystem/EntityPrefab.h>
 #include <imgui/ImGuiWidgets.h>
 
-LevelEditorDockable::LevelEditorDockable(Level& aLevel)
+LevelEditorDockable::LevelEditorDockable(LevelEditorLayout& aLayout, Level& aLevel)
 	: Slush::DockableBase<LevelEditorDockable>(true)
-	, myLevel(aLevel)
+	, myLayout(aLayout)
+	, myLevel(&aLevel)
 {
-	myLevel.GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
+	myLevel->GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
+}
+
+void LevelEditorDockable::SetLevel(Level& aLevel)
+{
+	myLevel = &aLevel;
+	SetToolMode(ToolMode::None);
+	mySelectedUnlockIndex = 0;
+	myLevel->GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
 }
 
 void LevelEditorDockable::RenderOverlay() const
@@ -37,11 +48,15 @@ void LevelEditorDockable::RenderOverlay() const
 	RenderBoxCutPreview();
 	RenderManualCutPreview();
 	RenderStartAndGoalMarkers();
+
+	// With the editor UI visible the hint is drawn crisp as an ImGui overlay on the Game View instead
+	if (!engine.GetWindow().IsEditorUIVisible())
+		RenderToolHint();
 }
 
 void LevelEditorDockable::RenderBoxCutPreview() const
 {
-	if (!myIsBoxCutModeActive || !myBoxCutHasStartCorner)
+	if (myToolMode != ToolMode::BoxCut || !myBoxCutHasStartCorner)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -62,7 +77,7 @@ void LevelEditorDockable::RenderBoxCutPreview() const
 
 void LevelEditorDockable::RenderManualCutPreview() const
 {
-	if (!myIsManualCutModeActive || myCutPositions.IsEmpty())
+	if (myToolMode != ToolMode::ManualCut || myCutPositions.IsEmpty())
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -80,7 +95,7 @@ void LevelEditorDockable::RenderStartAndGoalMarkers() const
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
-	const LevelData& levelData = myLevel.GetLevelDataAsset();
+	const LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	const float markerRadius = 10.f;
 	const int startColor = 0xFF00FF00;
@@ -90,20 +105,58 @@ void LevelEditorDockable::RenderStartAndGoalMarkers() const
 	renderer.RenderCircle(levelData.myGoalPosition, markerRadius, goalColor);
 }
 
+void LevelEditorDockable::RenderToolHint() const
+{
+	const char* hint = GetToolHint();
+	if (!hint)
+		return;
+
+	const Slush::UITheme& theme = TopDownGameGlobals::GetInstance().GetUITheme();
+	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
+	renderer.RenderText(*theme.myFont, hint, Vector2f(20.f, 1030.f),
+		theme.myTextSizes[static_cast<int>(Slush::UITextRole::Body)],
+		theme.myTextColors[static_cast<int>(Slush::UITextTone::Default)]);
+}
+
+const char* LevelEditorDockable::GetToolHint() const
+{
+	switch (myToolMode)
+	{
+	case ToolMode::BoxCut: return "Box Cut: LMB first corner, LMB second corner. Esc cancels.";
+	case ToolMode::ManualCut: return "Manual Cut: LMB adds a point, RMB cuts the polygon. Esc cancels.";
+	case ToolMode::SetStart: return "Set Start: LMB places the start position. Esc cancels.";
+	case ToolMode::SetGoal: return "Set Goal: LMB places the goal position. Esc cancels.";
+	default: return nullptr;
+	}
+}
+
+void LevelEditorDockable::SetToolMode(ToolMode aToolMode)
+{
+	myToolMode = aToolMode;
+
+	// Any half-made box or polygon belongs to the tool being left
+	myBoxCutHasStartCorner = false;
+	myCutPositions.RemoveAll();
+}
+
 void LevelEditorDockable::OnUpdate()
 {
-	UpdateBoxCutMode();
-	UpdateManualCutMode();
-	UpdateSetStartMode();
-	UpdateSetGoalMode();
-	UpdatePlaceTowerMode();
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (engine.GetInput().WasKeyReleased(Slush::Input::ESC) || myLayout.IsPlaying())
+		SetToolMode(ToolMode::None);
+
+	switch (myToolMode)
+	{
+	case ToolMode::BoxCut: UpdateBoxCutMode(); break;
+	case ToolMode::ManualCut: UpdateManualCutMode(); break;
+	case ToolMode::SetStart: UpdateSetStartMode(); break;
+	case ToolMode::SetGoal: UpdateSetGoalMode(); break;
+	default: break;
+	}
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
 {
-	if (!myIsBoxCutModeActive)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 		return;
@@ -132,9 +185,6 @@ void LevelEditorDockable::UpdateBoxCutMode()
 
 void LevelEditorDockable::UpdateManualCutMode()
 {
-	if (!myIsManualCutModeActive)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 	{
@@ -149,9 +199,6 @@ void LevelEditorDockable::UpdateManualCutMode()
 
 void LevelEditorDockable::UpdateSetStartMode()
 {
-	if (!myIsSetStartModeActive)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 		return;
@@ -161,9 +208,6 @@ void LevelEditorDockable::UpdateSetStartMode()
 
 void LevelEditorDockable::UpdateSetGoalMode()
 {
-	if (!myIsSetGoalModeActive)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 		return;
@@ -171,21 +215,9 @@ void LevelEditorDockable::UpdateSetGoalMode()
 	SetGoalPosition(engine.GetInput().GetMousePositionf());
 }
 
-void LevelEditorDockable::UpdatePlaceTowerMode()
-{
-	if (!myIsPlaceTowerModeActive)
-		return;
-
-	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB) || myTowerPrefabToPlace == nullptr)
-		return;
-
-	myLevel.TryPlaceTower(*myTowerPrefabToPlace, engine.GetInput().GetMousePositionf());
-}
-
 void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions)
 {
-	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
 
 	Slush::AssetEditScope editScope(navmeshData);
 	navmeshData.myNavmesh.CutHole(someCutPositions);
@@ -194,9 +226,20 @@ void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCu
 	navmeshData.myNavmesh.GetAsTriangleMesh(myTriangleMesh);
 }
 
+void LevelEditorDockable::ResetNavmeshToDefaultGrid()
+{
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
+
+	Slush::AssetEditScope editScope(navmeshData);
+	navmeshData.myNavmesh.GenerateDefaultGrid();
+	navmeshData.MarkAsUnsaved();
+
+	navmeshData.myNavmesh.GetAsTriangleMesh(myTriangleMesh);
+}
+
 void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
 {
-	LevelData& levelData = myLevel.GetLevelDataAsset();
+	LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	Slush::AssetEditScope editScope(levelData);
 	levelData.myStartPosition = aPosition;
@@ -205,215 +248,239 @@ void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
 
 void LevelEditorDockable::SetGoalPosition(const Vector2f& aPosition)
 {
-	LevelData& levelData = myLevel.GetLevelDataAsset();
+	LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	Slush::AssetEditScope editScope(levelData);
 	levelData.myGoalPosition = aPosition;
 	levelData.MarkAsUnsaved();
 }
 
-void LevelEditorDockable::DisableBoxCutMode()
-{
-	if (!myIsBoxCutModeActive)
-		return;
-
-	myIsBoxCutModeActive = false;
-	myBoxCutHasStartCorner = false;
-}
-
-void LevelEditorDockable::DisableManualCutMode()
-{
-	if (!myIsManualCutModeActive)
-		return;
-
-	myIsManualCutModeActive = false;
-	myCutPositions.RemoveAll();
-}
-
-void LevelEditorDockable::DisableSetStartMode()
-{
-	myIsSetStartModeActive = false;
-}
-
-void LevelEditorDockable::DisableSetGoalMode()
-{
-	myIsSetGoalModeActive = false;
-}
-
-void LevelEditorDockable::DisablePlaceTowerMode()
-{
-	myIsPlaceTowerModeActive = false;
-}
-
 void LevelEditorDockable::OnBuildUI()
 {
+	BuildHeaderUI();
+
+	// Edits mid-play would desync from what's running, so everything below the Play button is read-only
+	ImGui::BeginDisabled(myLayout.IsPlaying());
+	if (ImGui::BeginTabBar("LevelEditorTabs"))
+	{
+		// Only the tab content scrolls - the header above stays put.
+		if (ImGui::BeginTabItem("Level"))
+		{
+			if (ImGui::BeginChild("LevelTab"))
+				BuildLevelTab();
+			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Navmesh"))
+		{
+			if (ImGui::BeginChild("NavmeshTab"))
+				BuildNavmeshTab();
+			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Waves"))
+		{
+			if (ImGui::BeginChild("WavesTab"))
+				BuildWavesTab();
+			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Debug"))
+		{
+			if (ImGui::BeginChild("DebugTab"))
+				BuildDebugTab();
+			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
+	}
+	ImGui::EndDisabled();
+}
+
+void LevelEditorDockable::BuildHeaderUI()
+{
+	const bool isPlaying = myLayout.IsPlaying();
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::MenuItem("Save"))
-			SaveAssets();
+		if (ImGui::BeginMenu("File", !isPlaying))
+		{
+			if (ImGui::MenuItem("New Level..."))
+				RequestAction(PendingAction::NewLevel);
+			if (ImGui::MenuItem("Duplicate Level..."))
+				RequestAction(PendingAction::DuplicateLevel);
+			if (ImGui::MenuItem("Open Level..."))
+				myWantToOpenOpenLevelDialog = true;
+
+			ImGui::Separator();
+			if (ImGui::MenuItem("Save", "Ctrl+S"))
+				SaveAssets();
+
+			ImGui::EndMenu();
+		}
 
 		ImGui::EndMenuBar();
 	}
 
-	if (mySaveBlockedTowerCount > 0)
+	if (isPlaying)
 	{
-		ImGui::Text("Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
-		ImGui::Separator();
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.65f, 0.15f, 0.15f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.2f, 0.2f, 1.f));
+		if (ImGui::Button(ICON_FA_STOP " Stop"))
+			myLayout.StopPlay();
+		ImGui::PopStyleColor(2);
 	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.5f, 0.2f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.65f, 0.25f, 1.f));
+		if (ImGui::Button(ICON_FA_PLAY " Play"))
+			myLayout.StartPlay();
+		ImGui::PopStyleColor(2);
+	}
+	ImGui::SameLine();
 
-	ImGui::Text("Enemies");
+	ImGui::BeginDisabled(isPlaying);
+	if (!isPlaying && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteGlobal))
+		SaveAssets();
 
-	if (ImGui::Button("Spawn Normal"))
-		myLevel.SpawnEnemyNormal();
+	if (ImGui::Button("Save"))
+		SaveAssets();
 
-	if (ImGui::Button("Spawn Fast"))
-		myLevel.SpawnEnemyFast();
+	ImGui::SameLine();
+	const bool hasUnsavedChanges = HasUnsavedChanges();
+	ImGui::Text("%s%s", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer(), hasUnsavedChanges ? " *" : "");
+	ImGui::SameLine();
+	if (hasUnsavedChanges)
+		ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "Unsaved changes");
+	else
+		ImGui::TextDisabled("Saved");
 
-	if (ImGui::Button("Spawn Slow"))
-		myLevel.SpawnEnemySlow();
-
-	if (ImGui::Button("Damage All Enemies"))
-		myLevel.DamageAllEnemies();
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextDisabled("Tool");
+	ImGui::SameLine();
+	BuildToolButton("None", ToolMode::None);
+	ImGui::SameLine();
+	BuildToolButton("Box Cut", ToolMode::BoxCut);
+	ImGui::SameLine();
+	BuildToolButton("Manual Cut", ToolMode::ManualCut);
+	ImGui::SameLine();
+	BuildToolButton("Set Start", ToolMode::SetStart);
+	ImGui::SameLine();
+	BuildToolButton("Set Goal", ToolMode::SetGoal);
+	ImGui::EndDisabled();
 
 	ImGui::Separator();
+}
 
-	ImGui::Text("Navmesh");
-	if (myIsBoxCutModeActive)
-	{
-		if (ImGui::Button("Disable Box Cut"))
-			DisableBoxCutMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Box Cut"))
-		{
-			myIsBoxCutModeActive = true;
-			myBoxCutHasStartCorner = false;
+void LevelEditorDockable::BuildToolButton(const char* aLabel, ToolMode aToolMode)
+{
+	const bool isActive = myToolMode == aToolMode;
+	if (isActive)
+		ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
 
-			DisableManualCutMode();
-			DisableSetStartMode();
-			DisableSetGoalMode();
-		}
-	}
+	if (ImGui::Button(aLabel) && !isActive)
+		SetToolMode(aToolMode);
 
-	if (myIsManualCutModeActive)
-	{
-		if (ImGui::Button("Disable Manual Cut"))
-			DisableManualCutMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Manual Cut"))
-		{
-			myIsManualCutModeActive = true;
-			myCutPositions.RemoveAll();
+	if (isActive)
+		ImGui::PopStyleColor();
+}
 
-			DisableBoxCutMode();
-			DisableSetStartMode();
-			DisableSetGoalMode();
-		}
-	}
+void LevelEditorDockable::BuildLevelTab()
+{
+	LevelData& levelData = myLevel->GetLevelDataAsset();
+	ImGui::Text("Level: %s", levelData.GetAssetName().GetBuffer());
 
-	if (ImGui::Button("Clear Navmesh"))
-	{
-		myLevel.GetNavmesh().GenerateDefaultGrid();
-		myLevel.GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
-	}
+	Slush::AssetEditScope editScope(levelData);
+	levelData.BuildLevelSettingsUI();
+
+	ImGui::Spacing();
+	ImGui::TextDisabled("Set Start / Set Goal click-place in the view.");
+}
+
+void LevelEditorDockable::BuildNavmeshTab()
+{
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
+	ImGui::Text("Navmesh: %s", navmeshData.GetAssetName().GetBuffer());
+	ImGui::Text("Triangles: %d", myTriangleMesh.myVertices.Count() / 3);
 
 	ImGui::Separator();
-	ImGui::Text("Start/Goal");
-	if (myIsSetStartModeActive)
-	{
-		if (ImGui::Button("Disable Set Start"))
-			DisableSetStartMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Set Start"))
-		{
-			myIsSetStartModeActive = true;
+	if (ImGui::Button("Box Cut"))
+		SetToolMode(ToolMode::BoxCut);
+	ImGui::SameLine();
+	if (ImGui::Button("Manual Cut"))
+		SetToolMode(ToolMode::ManualCut);
+	ImGui::SameLine();
+	if (ImGui::Button("Reset to Default Grid"))
+		ResetNavmeshToDefaultGrid();
 
-			DisableBoxCutMode();
-			DisableManualCutMode();
-			DisableSetGoalMode();
-		}
-	}
+	ImGui::Spacing();
+	ImGui::TextDisabled("Box Cut: LMB first corner, LMB second corner.");
+	ImGui::TextDisabled("Manual Cut: LMB adds points, RMB cuts the polygon.");
+}
 
-	if (myIsSetGoalModeActive)
-	{
-		if (ImGui::Button("Disable Set Goal"))
-			DisableSetGoalMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Set Goal"))
-		{
-			myIsSetGoalModeActive = true;
+void LevelEditorDockable::BuildWavesTab()
+{
+	LevelData& levelData = myLevel->GetLevelDataAsset();
+	Slush::AssetEditScope editScope(levelData);
+	levelData.BuildWaveScalingUI();
+}
 
-			DisableBoxCutMode();
-			DisableManualCutMode();
-			DisableSetStartMode();
-		}
-	}
-
+void LevelEditorDockable::BuildDebugTab()
+{
+	ImGui::TextWrapped("Waves don't run in edit mode. Use Play to test.");
 	ImGui::Separator();
 
-	ImGui::Text("Towers");
-	ImGui::Text("Resources: %d", myLevel.GetResources());
-	ImGui::Text("Lives: %d", myLevel.GetLives());
-	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
-	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
-	const char* selectedPrefabName = myTowerPrefabToPlace ? myTowerPrefabToPlace->GetAssetName().GetBuffer() : "Select a tower";
-	if (ImGui::BeginCombo("Tower Prefab", selectedPrefabName))
+	// Picks from the level's own unlock roster, so each level's Debug spawns follow what its waves can send.
+	const FW_GrowingArray<EnemyUnlockEntry>& unlocks = myLevel->GetLevelDataAsset().myEnemyUnlocks;
+	Slush::EntityPrefab* selectedPrefab = nullptr;
+	if (mySelectedUnlockIndex >= 0 && mySelectedUnlockIndex < unlocks.Count())
+		selectedPrefab = unlocks[mySelectedUnlockIndex].myEnemyPrefab.Get();
+
+	const char* selectedName = selectedPrefab ? selectedPrefab->GetAssetName().GetBuffer() : "Select an enemy";
+	if (ImGui::BeginCombo("Enemy", selectedName))
 	{
-		for (Slush::Asset* asset : prefabs)
+		for (int i = 0; i < unlocks.Count(); ++i)
 		{
-			Slush::EntityPrefab* prefab = static_cast<Slush::EntityPrefab*>(asset);
-			if (!TowerCombatComponent::IsBuildableTowerPrefab(*prefab))
+			Slush::EntityPrefab* prefab = unlocks[i].myEnemyPrefab.Get();
+			if (!prefab)
 				continue;
 
-			const bool isSelected = prefab == myTowerPrefabToPlace;
+			ImGui::PushID(i);
+			const bool isSelected = i == mySelectedUnlockIndex;
 			if (ImGui::Selectable(prefab->GetAssetName().GetBuffer(), isSelected))
-				myTowerPrefabToPlace = prefab;
+				mySelectedUnlockIndex = i;
 			if (isSelected)
 				ImGui::SetItemDefaultFocus();
+			ImGui::PopID();
 		}
 		ImGui::EndCombo();
 	}
 
-	if (myIsPlaceTowerModeActive)
-	{
-		if (ImGui::Button("Disable Place Tower"))
-			DisablePlaceTowerMode();
-	}
-	else if (ImGui::Button("Enable Place Tower"))
-	{
-		if (myTowerPrefabToPlace == nullptr)
-		{
-			SLUSH_WARNING("[Level Editor] Select a tower prefab before enabling tower placement");
-		}
-		else
-		{
-			myIsPlaceTowerModeActive = true;
-			DisableBoxCutMode();
-			DisableManualCutMode();
-			DisableSetStartMode();
-			DisableSetGoalMode();
-		}
-	}
+	ImGui::BeginDisabled(selectedPrefab == nullptr);
+	if (ImGui::Button("Spawn"))
+		myLevel->SpawnEnemy(*selectedPrefab);
+	ImGui::EndDisabled();
 
-	ImGui::Separator();
-	if (ImGui::CollapsingHeader("Waves"))
-	{
-		LevelData& levelData = myLevel.GetLevelDataAsset();
-		Slush::AssetEditScope editScope(levelData);
-		levelData.BuildWaveScalingUI();
-	}
+	ImGui::SameLine();
+	if (ImGui::Button("Damage All"))
+		myLevel->DamageAllEnemies();
+
+	ImGui::SameLine();
+	if (ImGui::Button("Clear Enemies"))
+		myLevel->ClearEnemies();
 }
 
 bool LevelEditorDockable::HasUnsavedChanges() const
 {
-	return myLevel.GetNavmeshDataAsset().HasUnsavedChanges() || myLevel.GetLevelDataAsset().HasUnsavedChanges();
+	return myLevel->GetNavmeshDataAsset().HasUnsavedChanges() || myLevel->GetLevelDataAsset().HasUnsavedChanges();
 }
 
 void LevelEditorDockable::OnCloseRequested()
@@ -422,20 +489,76 @@ void LevelEditorDockable::OnCloseRequested()
 	// name, and resolve immediately instead of opening one that would otherwise hang the close forever.
 	if (Slush::CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
 	{
-		if (myLevel.GetNavmeshDataAsset().HasUnsavedChanges())
-			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
+		if (myLevel->GetNavmeshDataAsset().HasUnsavedChanges())
+			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel->GetNavmeshDataAsset().GetAssetName().GetBuffer());
 
-		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
-			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
+		if (myLevel->GetLevelDataAsset().HasUnsavedChanges())
+			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
 
 		DiscardUnsavedChanges();
 		return;
 	}
 
+	myPendingAction = PendingAction::Close;
 	myWantToOpenUnsavedChangesPopup = true;
 }
 
+void LevelEditorDockable::RequestAction(PendingAction anAction, LevelData* aLevelToOpen)
+{
+	if (myLayout.IsPlaying())
+		return;
+
+	if (anAction == PendingAction::OpenLevel && aLevelToOpen == &myLevel->GetLevelDataAsset())
+		return;
+
+	myPendingAction = anAction;
+	myPendingLevelToOpen = aLevelToOpen;
+
+	if (HasUnsavedChanges())
+	{
+		myWantToOpenUnsavedChangesPopup = true;
+		return;
+	}
+
+	RunPendingAction();
+}
+
+void LevelEditorDockable::RunPendingAction()
+{
+	const PendingAction action = myPendingAction;
+	LevelData* levelToOpen = myPendingLevelToOpen;
+	myPendingAction = PendingAction::None;
+	myPendingLevelToOpen = nullptr;
+
+	switch (action)
+	{
+	case PendingAction::OpenLevel:
+		myLayout.OpenLevel(*levelToOpen);
+		break;
+	case PendingAction::NewLevel:
+		myNameDialogIsDuplicate = false;
+		myNewLevelName.Clear();
+		myWantToOpenNameDialog = true;
+		break;
+	case PendingAction::DuplicateLevel:
+		myNameDialogIsDuplicate = true;
+		myNewLevelName = myLevel->GetLevelDataAsset().GetAssetName();
+		myNewLevelName += "_copy";
+		myWantToOpenNameDialog = true;
+		break;
+	default:
+		break;
+	}
+}
+
 void LevelEditorDockable::OnBuildModals()
+{
+	BuildUnsavedChangesModal();
+	BuildNameModal();
+	BuildOpenLevelModal();
+}
+
+void LevelEditorDockable::BuildUnsavedChangesModal()
 {
 	if (myWantToOpenUnsavedChangesPopup)
 	{
@@ -446,34 +569,40 @@ void LevelEditorDockable::OnBuildModals()
 	if (ImGui::BeginPopupModal("Unsaved Changes", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("The following assets have unsaved changes:");
-		if (myLevel.GetNavmeshDataAsset().HasUnsavedChanges())
-			ImGui::BulletText("%s", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
-		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
-			ImGui::BulletText("%s", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
-		if (mySaveBlockedTowerCount > 0)
-			ImGui::Text("Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
+		if (myLevel->GetNavmeshDataAsset().HasUnsavedChanges())
+			ImGui::BulletText("%s", myLevel->GetNavmeshDataAsset().GetAssetName().GetBuffer());
+		if (myLevel->GetLevelDataAsset().HasUnsavedChanges())
+			ImGui::BulletText("%s", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
 
 		if (ImGui::Button("Save"))
 		{
-			if (SaveAssets())
-				ImGui::CloseCurrentPopup();
+			SaveAssets();
+			ImGui::CloseCurrentPopup();
+			RunPendingAction();
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Discard"))
 		{
-			DiscardUnsavedChanges();
+			if (myPendingAction == PendingAction::Close)
+				DiscardUnsavedChanges();
+			else
+				RevertUnsavedChanges();
+
 			ImGui::CloseCurrentPopup();
+			RunPendingAction();
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Cancel"))
 		{
-			if (myOwnerLayout)
+			if (myPendingAction == PendingAction::Close && myOwnerLayout)
 				myOwnerLayout->CancelCloseRequest();
 
+			myPendingAction = PendingAction::None;
+			myPendingLevelToOpen = nullptr;
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -481,38 +610,142 @@ void LevelEditorDockable::OnBuildModals()
 	}
 }
 
-bool LevelEditorDockable::SaveAssets()
+void LevelEditorDockable::BuildNameModal()
 {
-	mySaveBlockedTowerCount = GetPlacedTowerCount();
-	if (mySaveBlockedTowerCount > 0)
+	if (myWantToOpenNameDialog)
 	{
-		SLUSH_WARNING("[Level Editor] Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
-		return false;
+		ImGui::OpenPopup("Level Name");
+		myWantToOpenNameDialog = false;
 	}
 
-	myLevel.GetNavmeshDataAsset().Save();
-	myLevel.GetLevelDataAsset().Save();
-	return true;
+	if (ImGui::BeginPopupModal("Level Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		if (myNameDialogIsDuplicate)
+			ImGui::Text("Duplicate '%s'", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
+		else
+			ImGui::Text("New blank level");
+
+		if (ImGui::IsWindowAppearing())
+			ImGui::SetKeyboardFocusHere();
+		ImGui::InputText("Name", &myNewLevelName);
+
+		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
+		FW_GrowingArray<FW_String> levelNames;
+		for (const Slush::Asset* asset : assetRegistry.GetAllAssets<LevelData>())
+			levelNames.Add(asset->GetAssetName());
+		FW_GrowingArray<FW_String> navmeshNames;
+		for (const Slush::Asset* asset : assetRegistry.GetAllAssets<NavmeshData>())
+			navmeshNames.Add(asset->GetAssetName());
+
+		FW_String navmeshName;
+		LevelEditorUtils::GetNavmeshNameForLevel(myNewLevelName, navmeshName);
+		ImGui::TextDisabled("Creates %s.tdlevel and %s.navmesh", myNewLevelName.GetBuffer(), navmeshName.GetBuffer());
+
+		const LevelEditorUtils::NameError nameError = LevelEditorUtils::ValidateNewLevelName(myNewLevelName, levelNames, navmeshNames);
+		if (nameError != LevelEditorUtils::NameError::None)
+			ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "%s", LevelEditorUtils::GetNameErrorMessage(nameError));
+
+		ImGui::BeginDisabled(nameError != LevelEditorUtils::NameError::None);
+		if (ImGui::Button("Create"))
+		{
+			LevelData& levelData = myNameDialogIsDuplicate
+				? myLayout.DuplicateLevel(myNewLevelName, myLevel->GetLevelDataAsset())
+				: myLayout.CreateNewLevel(myNewLevelName);
+
+			ImGui::CloseCurrentPopup();
+			myLayout.OpenLevel(levelData);
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::EndPopup();
+	}
 }
 
-int LevelEditorDockable::GetPlacedTowerCount() const
+void LevelEditorDockable::BuildOpenLevelModal()
 {
-	FW_GrowingArray<Slush::EntityHandle> entities;
-	myLevel.GetEntityManager().GetAllEntities(entities);
-
-	int towerCount = 0;
-	for (const Slush::EntityHandle& handle : entities)
+	if (myWantToOpenOpenLevelDialog)
 	{
-		Slush::Entity* entity = handle.Get();
-		if (entity && !entity->myIsMarkedForRemoval && entity->GetComponent<TowerCombatComponent>())
-			++towerCount;
+		ImGui::OpenPopup("Open Level");
+		myWantToOpenOpenLevelDialog = false;
 	}
 
-	return towerCount;
+	if (ImGui::BeginPopupModal("Open Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		const LevelData* currentLevel = &myLevel->GetLevelDataAsset();
+		LevelData* levelToOpen = nullptr;
+		for (Slush::Asset* asset : Slush::AssetRegistry::GetInstance().GetAllAssets<LevelData>())
+		{
+			LevelData* levelData = static_cast<LevelData*>(asset);
+			FW_String label = levelData->GetAssetName();
+			if (levelData == currentLevel)
+				label += "  (current)";
+
+			if (ImGui::Selectable(label.GetBuffer(), levelData == currentLevel))
+				levelToOpen = levelData;
+		}
+
+		ImGui::Separator();
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+
+		if (levelToOpen)
+		{
+			ImGui::CloseCurrentPopup();
+			RequestAction(PendingAction::OpenLevel, levelToOpen);
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void LevelEditorDockable::BuildOpenLevelDropTarget()
+{
+	// Acts on the last item - the tab content child - so dropping a level anywhere in it opens it
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<LevelData>()))
+			RequestAction(PendingAction::OpenLevel, static_cast<LevelData*>(asset));
+
+		ImGui::EndDragDropTarget();
+	}
+}
+
+void LevelEditorDockable::SaveAssets()
+{
+	myLevel->GetNavmeshDataAsset().Save();
+	myLevel->GetLevelDataAsset().Save();
 }
 
 void LevelEditorDockable::DiscardUnsavedChanges()
 {
-	myLevel.GetNavmeshDataAsset().MarkAsSaved();
-	myLevel.GetLevelDataAsset().MarkAsSaved();
+	myLevel->GetNavmeshDataAsset().MarkAsSaved();
+	myLevel->GetLevelDataAsset().MarkAsSaved();
+}
+
+void LevelEditorDockable::RevertUnsavedChanges()
+{
+	// Leaving the level for another one, so the discarded edits must not stay in memory - the game's level
+	// select and Play read the same LevelData. Reload both assets from disk, then rebuild the Level, since
+	// the old one's entities may hold pointers into the navmesh that was just reloaded.
+	LevelData& levelData = myLevel->GetLevelDataAsset();
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
+
+	if (navmeshData.HasUnsavedChanges())
+		navmeshData.Load(navmeshData.GetFilePath().GetBuffer(), navmeshData.GetRepositoryIndex());
+
+	if (levelData.HasUnsavedChanges())
+	{
+		levelData.Load(levelData.GetFilePath().GetBuffer(), levelData.GetRepositoryIndex());
+
+		Slush::DependencyTracker& dependencyTracker = Slush::DependencyTracker::GetInstance();
+		dependencyTracker.BeginTrackingAsset(&levelData);
+		levelData.ResolveDependencies();
+		dependencyTracker.EndTrackingAsset();
+	}
+
+	myLayout.OpenLevel(levelData);
 }

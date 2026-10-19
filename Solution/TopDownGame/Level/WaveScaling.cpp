@@ -29,14 +29,27 @@ namespace WaveScaling
 		return FW_Clamp(weight, 0.f, 1.f);
 	}
 
-	int PickUnlockedEnemyIndex(const FW_GrowingArray<EnemyUnlockEntry>& anEnemyUnlocks, int aWaveIndex, float aDifficultyWeight, float aRandomRoll01)
+	void GetUnlockedEnemyIndices(const FW_GrowingArray<EnemyUnlockEntry>& anEnemyUnlocks, int aWaveIndex, FW_GrowingArray<int>& someOutIndices)
 	{
-		FW_GrowingArray<int> unlockedIndices;
+		someOutIndices.RemoveAll();
 		for (int i = 0; i < anEnemyUnlocks.Count(); ++i)
 		{
 			if (anEnemyUnlocks[i].myUnlockWave <= aWaveIndex)
-				unlockedIndices.Add(i);
+				someOutIndices.Add(i);
 		}
+	}
+
+	void GetWavePreview(int aWaveIndex, int aBaseEnemyCount, int anEnemyCountPerWaveIncrement, int aMaxEnemyCountPerWave,
+		const FW_GrowingArray<EnemyUnlockEntry>& anEnemyUnlocks, WavePreview& anOutPreview)
+	{
+		anOutPreview.myEnemyCount = GetEnemyCountForWave(aWaveIndex, aBaseEnemyCount, anEnemyCountPerWaveIncrement, aMaxEnemyCountPerWave);
+		GetUnlockedEnemyIndices(anEnemyUnlocks, aWaveIndex, anOutPreview.myUnlockedIndices);
+	}
+
+	int PickUnlockedEnemyIndex(const FW_GrowingArray<EnemyUnlockEntry>& anEnemyUnlocks, int aWaveIndex, float aDifficultyWeight, float aRandomRoll01)
+	{
+		FW_GrowingArray<int> unlockedIndices;
+		GetUnlockedEnemyIndices(anEnemyUnlocks, aWaveIndex, unlockedIndices);
 
 		if (unlockedIndices.IsEmpty())
 			return -1;

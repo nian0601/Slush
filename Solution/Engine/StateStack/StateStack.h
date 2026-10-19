@@ -23,6 +23,7 @@ namespace Slush
 		void Render();
 
 		void Clear();
+		bool IsEmpty() const { return myStates.IsEmpty(); }
 
 	private:
 		void PopMainState();

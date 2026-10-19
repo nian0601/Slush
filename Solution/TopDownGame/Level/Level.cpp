@@ -8,13 +8,15 @@
 #include "WaveScaling.h"
 #include "Components/HealthComponent.h"
 #include "Components/BuildCostComponent.h"
+#include "Components/MovementComponent.h"
 
 #include <EntitySystem\EntityPrefab.h>
 #include <EntitySystem\Components\SpriteComponent.h>
 
-Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
+Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh, bool anIsEditMode)
 {
 	myLevelData = &aLevelData;
+	myIsEditMode = anIsEditMode;
 	FW_ASSERT(myLevelData->myNavmeshData.Get() != nullptr, "Level's LevelData has an unresolved NavmeshData reference");
 	if (aShouldCopyNavmesh)
 	{
@@ -26,7 +28,11 @@ Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh)
 	myLives = myLevelData->myStartingLives;
 	SLUSH_INFO("[Lives] Starting lives: %d", myLives);
 
-	if (myLevelData->myPreFirstWaveGraceDuration > 0.f)
+	if (myIsEditMode)
+	{
+		// No waves run in edit mode, so there's no grace countdown or first wave to set up.
+	}
+	else if (myLevelData->myPreFirstWaveGraceDuration > 0.f)
 	{
 		// Startup loading happens before the first Time::Update(), so cached frame time is stale.
 		myNextWaveTimer.Start(myLevelData->myPreFirstWaveGraceDuration, true);
@@ -151,10 +157,14 @@ void Level::Update()
 	{
 		SpawnEnemySlow();
 	}
-	UpdateWaveSpawning();
+	if (!myIsEditMode)
+		UpdateWaveSpawning();
+
 	myEntityManager.Update();
 	myEntityManager.EndFrame();
-	UpdateResult();
+
+	if (!myIsEditMode)
+		UpdateResult();
 }
 
 void Level::Render()
@@ -181,6 +191,11 @@ void Level::SpawnEnemySlow()
 void Level::SpawnEnemy(const char* aPrefabName)
 {
 	myEntityManager.CreateEntity(myLevelData->myStartPosition, aPrefabName);
+}
+
+void Level::SpawnEnemy(const Slush::EntityPrefab& anEnemyPrefab)
+{
+	myEntityManager.CreateEntity(myLevelData->myStartPosition, anEnemyPrefab);
 }
 
 void Level::UpdateWaveSpawning()
@@ -324,5 +339,18 @@ void Level::DamageAllEnemies()
 
 		if (HealthComponent* health = entity->GetComponent<HealthComponent>())
 			health->DealDamage(10);
+	}
+}
+
+void Level::ClearEnemies()
+{
+	FW_GrowingArray<Slush::EntityHandle> entities;
+	myEntityManager.GetAllEntities(entities);
+
+	for (const Slush::EntityHandle& handle : entities)
+	{
+		Slush::Entity* entity = handle.Get();
+		if (entity && entity->GetComponent<MovementComponent>())
+			entity->myIsMarkedForRemoval = true;
 	}
 }

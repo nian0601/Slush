@@ -233,6 +233,20 @@ namespace Slush
 			RequestLayoutSwitch(*aLayout);
 	}
 
+	bool Window::ActivateLayoutByName(const char* aLayoutName)
+	{
+		for (IAppLayout* layout : myLayouts)
+		{
+			if (layout->GetName() == aLayoutName)
+			{
+				RequestLayoutSwitch(*layout);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	void Window::RequestLayoutSwitch(IAppLayout& aTarget)
 	{
 		if (!myAppLayout || !myAppLayout->HasUnsavedChanges())

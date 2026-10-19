@@ -84,6 +84,47 @@ namespace WaveScalingTestSuite
 		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 1.f, 0.999f) == 2, "Expected weight 1 to always pick the last unlocked entry, even with a near-1 roll");
 	}
 
+	void TestWavePreviewCountIsCappedAtMax()
+	{
+		FW_GrowingArray<EnemyUnlockEntry> unlocks = MakeThreeUnlocks();
+		WaveScaling::WavePreview preview;
+
+		WaveScaling::GetWavePreview(0, 3, 2, 8, unlocks, preview);
+		FW_TEST_CHECK(preview.myEnemyCount == 3, "Expected wave 0 to preview the base enemy count");
+		WaveScaling::GetWavePreview(2, 3, 2, 8, unlocks, preview);
+		FW_TEST_CHECK(preview.myEnemyCount == 7, "Expected the preview count to scale with the increment");
+		WaveScaling::GetWavePreview(9, 3, 2, 8, unlocks, preview);
+		FW_TEST_CHECK(preview.myEnemyCount == 8, "Expected the preview count to be capped at the max");
+	}
+
+	void TestWavePreviewPoolGrowsAtEachUnlockWave()
+	{
+		FW_GrowingArray<EnemyUnlockEntry> unlocks = MakeThreeUnlocks();
+		WaveScaling::WavePreview preview;
+
+		WaveScaling::GetWavePreview(1, 3, 1, 20, unlocks, preview);
+		FW_TEST_REQUIRE(preview.myUnlockedIndices.Count() == 1, "Expected only the wave-0 unlock in the pool before wave 2");
+		FW_TEST_CHECK(preview.myUnlockedIndices[0] == 0, "Expected the wave-0 unlock to be the pool");
+
+		WaveScaling::GetWavePreview(2, 3, 1, 20, unlocks, preview);
+		FW_TEST_REQUIRE(preview.myUnlockedIndices.Count() == 2, "Expected the wave-2 unlock to join the pool at wave 2");
+		FW_TEST_CHECK(preview.myUnlockedIndices[1] == 1, "Expected the pool to stay in list order");
+
+		WaveScaling::GetWavePreview(4, 3, 1, 20, unlocks, preview);
+		FW_TEST_CHECK(preview.myUnlockedIndices.Count() == 3, "Expected every unlock in the pool from wave 4");
+	}
+
+	void TestWavePreviewWithNoUnlocksHasEmptyPool()
+	{
+		FW_GrowingArray<EnemyUnlockEntry> unlocks;
+		WaveScaling::WavePreview preview;
+		preview.myUnlockedIndices.Add(42);
+
+		WaveScaling::GetWavePreview(3, 3, 1, 20, unlocks, preview);
+		FW_TEST_CHECK(preview.myUnlockedIndices.IsEmpty(), "Expected an empty pool, with stale entries cleared, when there are no unlocks");
+		FW_TEST_CHECK(preview.myEnemyCount == 6, "Expected the count to be computed even with no unlocks");
+	}
+
 	void RunTests()
 	{
 		FW_UnitTestSuite::BeginSuite("WaveScaling");
@@ -94,5 +135,8 @@ namespace WaveScalingTestSuite
 		FW_RUN_TEST(TestGetDifficultyWeightRampsAndClamps);
 		FW_RUN_TEST(TestPickUnlockedEnemyIndexNeverReturnsAboveUnlockThreshold);
 		FW_RUN_TEST(TestPickUnlockedEnemyIndexUniformAtZeroWeightAndLastAtOneWeight);
+		FW_RUN_TEST(TestWavePreviewCountIsCappedAtMax);
+		FW_RUN_TEST(TestWavePreviewPoolGrowsAtEachUnlockWave);
+		FW_RUN_TEST(TestWavePreviewWithNoUnlocksHasEmptyPool);
 	}
 }

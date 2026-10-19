@@ -16,6 +16,7 @@
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
 #include "WaveScalingTestSuite.h"
+#include "LevelEditorTestSuite.h"
 #include "GameLayout.h"
 #include "NavmeshDebuggingLayout.h"
 #include "LevelEditorLayout.h"
@@ -39,7 +40,22 @@ public:
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddLayout(new GameLayout(), true);
 		window.AddLayout(new NavmeshDebuggingLayout());
-		window.AddLayout(new LevelEditorLayout());
+		myLevelEditorLayout = new LevelEditorLayout();
+		window.AddLayout(myLevelEditorLayout);
+
+		Slush::CommandLineArgs& commandLineArgs = Slush::CommandLineArgs::GetInstance();
+		if (commandLineArgs.HasFlag("-layout"))
+		{
+			const char* layoutName = commandLineArgs.GetString("-layout");
+			if (!layoutName)
+			{
+				SLUSH_WARNING("Missing -layout value; keeping the default layout");
+			}
+			else if (!window.ActivateLayoutByName(layoutName))
+			{
+				SLUSH_WARNING("Unknown -layout '%s'; keeping the default layout", layoutName);
+			}
+		}
 	}
 
 	void Shutdown() override
@@ -51,13 +67,16 @@ public:
 	{
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 
-		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
-			engine.GetWindow().Close();
+		// The Level Editor uses Esc itself (cancel the active tool), so it never closes the app there.
+		Slush::Window& window = engine.GetWindow();
+		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC) && window.GetActiveLayout() != myLevelEditorLayout)
+			window.Close();
 
 	}
 
 private:
 	Slush::Font myFont;
+	LevelEditorLayout* myLevelEditorLayout = nullptr;
 };
 
 #include "Core/AssetRepository.h"
@@ -66,6 +85,7 @@ static void RunGameTests()
 {
 	NavmeshTestSuite::RunTests();
 	WaveScalingTestSuite::RunTests();
+	LevelEditorTestSuite::RunTests();
 }
 
 int main(int argc, char** argv)

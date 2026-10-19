@@ -9,7 +9,8 @@
 
 namespace Slush
 {
-	ContentBrowserDockable::ContentBrowserDockable()
+	ContentBrowserDockable::ContentBrowserDockable(ViewMode aDefaultViewMode)
+		: myViewMode(aDefaultViewMode)
 	{
 		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
 		const FW_GrowingArray<IAssetStorage*>& storages = assetRegistry.GetAllAssetStorages();
@@ -23,14 +24,38 @@ namespace Slush
 		const FW_GrowingArray<IAssetStorage*>& storages = assetRegistry.GetAllAssetStorages();
 		FW_ASSERT(myAssetFilters.Count() == storages.Count(), "New AssetType was registered after opening ContentBrowser, we dont handle that yet");
 
-		if (ImGui::CollapsingHeader("Filters"))
+		BuildFilterSidebar(storages);
+
+		ImGui::SameLine();
+
+		ImGui::BeginGroup();
+		if (ImGui::RadioButton("Grid", myViewMode == ViewMode::Grid))
+			myViewMode = ViewMode::Grid;
+		ImGui::SameLine();
+		if (ImGui::RadioButton("List", myViewMode == ViewMode::List))
+			myViewMode = ViewMode::List;
+
+		if (myViewMode == ViewMode::Grid)
+			BuildGridView(storages);
+		else
+			BuildListView(storages);
+		ImGui::EndGroup();
+	}
+
+	void ContentBrowserDockable::BuildFilterSidebar(const FW_GrowingArray<IAssetStorage*>& someStorages)
+	{
+		const float sidebarWidth = 140.0f;
+		if (ImGui::BeginChild("FilterSidebar", ImVec2(sidebarWidth, 0.0f), ImGuiChildFlags_Borders))
 		{
-			for (int i = 0; i < storages.Count(); ++i)
-				ImGui::Checkbox(storages[i]->GetAssetTypeName(), &myAssetFilters[i]);
+			ImGui::TextDisabled("Filters");
+			for (int i = 0; i < someStorages.Count(); ++i)
+				ImGui::Selectable(someStorages[i]->GetAssetTypeName(), &myAssetFilters[i]);
 		}
+		ImGui::EndChild();
+	}
 
-		ImGui::Separator();
-
+	void ContentBrowserDockable::BuildListView(const FW_GrowingArray<IAssetStorage*>& someStorages)
+	{
 		static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable;
 		if (ImGui::BeginTable("table_scrolly", 4, flags))
 		{
@@ -41,18 +66,12 @@ namespace Slush
 			ImGui::TableSetupColumn("Filepath", ImGuiTableColumnFlags_WidthStretch);
 			ImGui::TableHeadersRow();
 
-			bool isFilterEnabled = false;
-			for (bool& filter : myAssetFilters)
-				isFilterEnabled |= filter;
-
-			for (int i = 0; i < storages.Count(); ++i)
+			for (int i = 0; i < someStorages.Count(); ++i)
 			{
-				IAssetStorage* storage = storages[i];
-
-				if (isFilterEnabled && !myAssetFilters[i])
+				if (!IsStorageVisible(i))
 					continue;
 
-				const FW_GrowingArray<Asset*>& assets = storage->GetAllAssets();
+				const FW_GrowingArray<Asset*>& assets = someStorages[i]->GetAllAssets();
 				for (int j = 0; j < assets.Count(); ++j)
 				{
 					Slush::Asset* asset = assets[j];
@@ -65,17 +84,7 @@ namespace Slush
 					label += asset->GetAssetName();
 
 					ImGui::Selectable(label.GetBuffer(), false, ImGuiSelectableFlags_SpanAllColumns);
-					ImGui::BeingDraggedAsset(*asset, j);
-
-					ImGui::PushID(asset);
-					if (ImGui::BeginPopupContextItem("AssetContextMenu"))
-					{
-						if (ImGui::MenuItem("Show Dependencies"))
-							myOwnerLayout->OpenOrCreateDockable<DependencyTrackerDockable>()->SetSelectedAsset(asset);
-
-						ImGui::EndPopup();
-					}
-					ImGui::PopID();
+					BuildAssetInteraction(*asset, j);
 
 					ImGui::TableSetColumnIndex(1);
 					ImGui::Text("%s", asset->GetTypeName());
@@ -90,5 +99,79 @@ namespace Slush
 
 			ImGui::EndTable();
 		}
+	}
+
+	void ContentBrowserDockable::BuildGridView(const FW_GrowingArray<IAssetStorage*>& someStorages)
+	{
+		if (ImGui::BeginChild("AssetGrid", ImVec2(0.0f, 0.0f), ImGuiChildFlags_Borders))
+		{
+			const ImVec2 tileSize(130.0f, 64.0f);
+			const float spacing = ImGui::GetStyle().ItemSpacing.x;
+			const float availableWidth = ImGui::GetContentRegionAvail().x;
+			int columns = static_cast<int>((availableWidth + spacing) / (tileSize.x + spacing));
+			if (columns < 1)
+				columns = 1;
+
+			ImGui::PushStyleVar(ImGuiStyleVar_SelectableTextAlign, ImVec2(0.5f, 0.5f));
+
+			int tileIndex = 0;
+			for (int i = 0; i < someStorages.Count(); ++i)
+			{
+				if (!IsStorageVisible(i))
+					continue;
+
+				const FW_GrowingArray<Asset*>& assets = someStorages[i]->GetAllAssets();
+				for (int j = 0; j < assets.Count(); ++j)
+				{
+					Slush::Asset* asset = assets[j];
+
+					if (tileIndex % columns != 0)
+						ImGui::SameLine();
+					++tileIndex;
+
+					FW_String label = asset->GetTypeIcon();
+					label += "\n";
+					label += asset->GetAssetName();
+
+					ImGui::PushID(asset);
+					ImGui::Selectable(label.GetBuffer(), false, ImGuiSelectableFlags_None, tileSize);
+					const bool isHovered = ImGui::IsItemHovered();
+					BuildAssetInteraction(*asset, j);
+
+					// Long names get clipped by the tile, so show the full name on hover
+					if (isHovered && !ImGui::GetDragDropPayload())
+						ImGui::SetTooltip("%s", asset->GetAssetName().GetBuffer());
+					ImGui::PopID();
+				}
+			}
+
+			ImGui::PopStyleVar();
+		}
+		ImGui::EndChild();
+	}
+
+	void ContentBrowserDockable::BuildAssetInteraction(Asset& anAsset, int anAssetIndex)
+	{
+		ImGui::BeingDraggedAsset(anAsset, anAssetIndex);
+
+		ImGui::PushID(&anAsset);
+		if (ImGui::BeginPopupContextItem("AssetContextMenu"))
+		{
+			if (ImGui::MenuItem("Show Dependencies"))
+				myOwnerLayout->OpenOrCreateDockable<DependencyTrackerDockable>()->SetSelectedAsset(&anAsset);
+
+			ImGui::EndPopup();
+		}
+		ImGui::PopID();
+	}
+
+	bool ContentBrowserDockable::IsStorageVisible(int aStorageIndex) const
+	{
+		// No filter selected means show everything
+		bool isFilterEnabled = false;
+		for (const bool& filter : myAssetFilters)
+			isFilterEnabled |= filter;
+
+		return !isFilterEnabled || myAssetFilters[aStorageIndex];
 	}
 }

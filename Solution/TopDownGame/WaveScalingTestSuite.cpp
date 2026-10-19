@@ -7,6 +7,31 @@
 
 namespace WaveScalingTestSuite
 {
+	void TestEnemyUnlockOrderAllowsEmptySingleAscendingAndTies()
+	{
+		FW_GrowingArray<EnemyUnlockEntry> unlocks;
+		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "An empty roster is ordered");
+		unlocks.Add().myUnlockWave = 0;
+		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "A single entry is ordered");
+		unlocks.Add().myUnlockWave = 2;
+		unlocks.Add().myUnlockWave = 4;
+		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "Increasing unlock waves are ordered");
+		unlocks.Add().myUnlockWave = 4;
+		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "Equal unlock waves retain authored order");
+	}
+
+	void TestEnemyUnlockOrderRejectsAnyDescendingPair()
+	{
+		FW_GrowingArray<EnemyUnlockEntry> unlocks;
+		unlocks.Add().myUnlockWave = 0;
+		unlocks.Add().myUnlockWave = 4;
+		unlocks.Add().myUnlockWave = 2;
+		FW_TEST_CHECK(!WaveScaling::AreEnemyUnlocksAscending(unlocks), "A descending final pair must warn");
+		unlocks[0].myUnlockWave = 5;
+		unlocks[2].myUnlockWave = 6;
+		FW_TEST_CHECK(!WaveScaling::AreEnemyUnlocksAscending(unlocks), "A descending first pair must warn even when the last pair is ordered");
+	}
+
 	void TestGetEnemyCountForWaveScalesLinearlyAndRespectsCap()
 	{
 		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(0, 3, 1, 20) == 3, "Expected wave 0 to spawn the base enemy count");
@@ -62,6 +87,8 @@ namespace WaveScalingTestSuite
 	void RunTests()
 	{
 		FW_UnitTestSuite::BeginSuite("WaveScaling");
+		FW_RUN_TEST(TestEnemyUnlockOrderAllowsEmptySingleAscendingAndTies);
+		FW_RUN_TEST(TestEnemyUnlockOrderRejectsAnyDescendingPair);
 
 		FW_RUN_TEST(TestGetEnemyCountForWaveScalesLinearlyAndRespectsCap);
 		FW_RUN_TEST(TestGetDifficultyWeightRampsAndClamps);

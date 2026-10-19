@@ -401,6 +401,14 @@ void LevelEditorDockable::OnBuildUI()
 			DisableSetGoalMode();
 		}
 	}
+
+	ImGui::Separator();
+	if (ImGui::CollapsingHeader("Waves"))
+	{
+		LevelData& levelData = myLevel.GetLevelDataAsset();
+		Slush::AssetEditScope editScope(levelData);
+		levelData.BuildWaveScalingUI();
+	}
 }
 
 bool LevelEditorDockable::HasUnsavedChanges() const

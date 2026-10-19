@@ -4,6 +4,16 @@
 
 namespace WaveScaling
 {
+	bool AreEnemyUnlocksAscending(const FW_GrowingArray<EnemyUnlockEntry>& anEnemyUnlocks)
+	{
+		for (int i = 1; i < anEnemyUnlocks.Count(); ++i)
+		{
+			if (anEnemyUnlocks[i].myUnlockWave < anEnemyUnlocks[i - 1].myUnlockWave)
+				return false;
+		}
+		return true;
+	}
+
 	int GetEnemyCountForWave(int aWaveIndex, int aBaseEnemyCount, int anEnemyCountPerWaveIncrement, int aMaxEnemyCountPerWave)
 	{
 		int count = aBaseEnemyCount + aWaveIndex * anEnemyCountPerWaveIncrement;

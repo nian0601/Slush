@@ -5,9 +5,12 @@
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
+#include "LevelEditorLayout.h"
+#include "LevelEditorUtils.h"
 #include "TopDownGameGlobals.h"
 
 #include "Core/Assets/AssetStorage.h"
+#include "Core/Assets/DependencyTracker.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/Dockables/IAppLayout.h"
 #include "Core/Engine.h"
@@ -17,11 +20,20 @@
 #include <EntitySystem/EntityPrefab.h>
 #include <imgui/ImGuiWidgets.h>
 
-LevelEditorDockable::LevelEditorDockable(Level& aLevel)
+LevelEditorDockable::LevelEditorDockable(LevelEditorLayout& aLayout, Level& aLevel)
 	: Slush::DockableBase<LevelEditorDockable>(true)
-	, myLevel(aLevel)
+	, myLayout(aLayout)
+	, myLevel(&aLevel)
 {
-	myLevel.GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
+	myLevel->GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
+}
+
+void LevelEditorDockable::SetLevel(Level& aLevel)
+{
+	myLevel = &aLevel;
+	SetToolMode(ToolMode::None);
+	mySelectedUnlockIndex = 0;
+	myLevel->GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
 }
 
 void LevelEditorDockable::RenderOverlay() const
@@ -80,7 +92,7 @@ void LevelEditorDockable::RenderStartAndGoalMarkers() const
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
-	const LevelData& levelData = myLevel.GetLevelDataAsset();
+	const LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	const float markerRadius = 10.f;
 	const int startColor = 0xFF00FF00;
@@ -210,7 +222,7 @@ void LevelEditorDockable::UpdateSetGoalMode()
 
 void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions)
 {
-	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
 
 	Slush::AssetEditScope editScope(navmeshData);
 	navmeshData.myNavmesh.CutHole(someCutPositions);
@@ -221,7 +233,7 @@ void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCu
 
 void LevelEditorDockable::ResetNavmeshToDefaultGrid()
 {
-	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
 
 	Slush::AssetEditScope editScope(navmeshData);
 	navmeshData.myNavmesh.GenerateDefaultGrid();
@@ -232,7 +244,7 @@ void LevelEditorDockable::ResetNavmeshToDefaultGrid()
 
 void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
 {
-	LevelData& levelData = myLevel.GetLevelDataAsset();
+	LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	Slush::AssetEditScope editScope(levelData);
 	levelData.myStartPosition = aPosition;
@@ -241,7 +253,7 @@ void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
 
 void LevelEditorDockable::SetGoalPosition(const Vector2f& aPosition)
 {
-	LevelData& levelData = myLevel.GetLevelDataAsset();
+	LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	Slush::AssetEditScope editScope(levelData);
 	levelData.myGoalPosition = aPosition;
@@ -260,6 +272,7 @@ void LevelEditorDockable::OnBuildUI()
 			if (ImGui::BeginChild("LevelTab"))
 				BuildLevelTab();
 			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
 			ImGui::EndTabItem();
 		}
 
@@ -268,6 +281,7 @@ void LevelEditorDockable::OnBuildUI()
 			if (ImGui::BeginChild("NavmeshTab"))
 				BuildNavmeshTab();
 			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
 			ImGui::EndTabItem();
 		}
 
@@ -276,6 +290,7 @@ void LevelEditorDockable::OnBuildUI()
 			if (ImGui::BeginChild("WavesTab"))
 				BuildWavesTab();
 			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
 			ImGui::EndTabItem();
 		}
 
@@ -284,6 +299,7 @@ void LevelEditorDockable::OnBuildUI()
 			if (ImGui::BeginChild("DebugTab"))
 				BuildDebugTab();
 			ImGui::EndChild();
+			BuildOpenLevelDropTarget();
 			ImGui::EndTabItem();
 		}
 
@@ -295,17 +311,36 @@ void LevelEditorDockable::BuildHeaderUI()
 {
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::MenuItem("Save"))
-			SaveAssets();
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("New Level..."))
+				RequestAction(PendingAction::NewLevel);
+			if (ImGui::MenuItem("Duplicate Level..."))
+				RequestAction(PendingAction::DuplicateLevel);
+			if (ImGui::MenuItem("Open Level..."))
+				myWantToOpenOpenLevelDialog = true;
+
+			ImGui::Separator();
+			if (ImGui::MenuItem("Save", "Ctrl+S"))
+				SaveAssets();
+
+			ImGui::EndMenu();
+		}
 
 		ImGui::EndMenuBar();
 	}
+
+	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteGlobal))
+		SaveAssets();
 
 	if (ImGui::Button("Save"))
 		SaveAssets();
 
 	ImGui::SameLine();
-	if (HasUnsavedChanges())
+	const bool hasUnsavedChanges = HasUnsavedChanges();
+	ImGui::Text("%s%s", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer(), hasUnsavedChanges ? " *" : "");
+	ImGui::SameLine();
+	if (hasUnsavedChanges)
 		ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "Unsaved changes");
 	else
 		ImGui::TextDisabled("Saved");
@@ -341,7 +376,7 @@ void LevelEditorDockable::BuildToolButton(const char* aLabel, ToolMode aToolMode
 
 void LevelEditorDockable::BuildLevelTab()
 {
-	LevelData& levelData = myLevel.GetLevelDataAsset();
+	LevelData& levelData = myLevel->GetLevelDataAsset();
 	ImGui::Text("Level: %s", levelData.GetAssetName().GetBuffer());
 
 	Slush::AssetEditScope editScope(levelData);
@@ -353,7 +388,7 @@ void LevelEditorDockable::BuildLevelTab()
 
 void LevelEditorDockable::BuildNavmeshTab()
 {
-	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
 	ImGui::Text("Navmesh: %s", navmeshData.GetAssetName().GetBuffer());
 	ImGui::Text("Triangles: %d", myTriangleMesh.myVertices.Count() / 3);
 
@@ -374,7 +409,7 @@ void LevelEditorDockable::BuildNavmeshTab()
 
 void LevelEditorDockable::BuildWavesTab()
 {
-	LevelData& levelData = myLevel.GetLevelDataAsset();
+	LevelData& levelData = myLevel->GetLevelDataAsset();
 	Slush::AssetEditScope editScope(levelData);
 	levelData.BuildWaveScalingUI();
 }
@@ -385,7 +420,7 @@ void LevelEditorDockable::BuildDebugTab()
 	ImGui::Separator();
 
 	// Picks from the level's own unlock roster, so each level's Debug spawns follow what its waves can send.
-	const FW_GrowingArray<EnemyUnlockEntry>& unlocks = myLevel.GetLevelDataAsset().myEnemyUnlocks;
+	const FW_GrowingArray<EnemyUnlockEntry>& unlocks = myLevel->GetLevelDataAsset().myEnemyUnlocks;
 	Slush::EntityPrefab* selectedPrefab = nullptr;
 	if (mySelectedUnlockIndex >= 0 && mySelectedUnlockIndex < unlocks.Count())
 		selectedPrefab = unlocks[mySelectedUnlockIndex].myEnemyPrefab.Get();
@@ -412,21 +447,21 @@ void LevelEditorDockable::BuildDebugTab()
 
 	ImGui::BeginDisabled(selectedPrefab == nullptr);
 	if (ImGui::Button("Spawn"))
-		myLevel.SpawnEnemy(*selectedPrefab);
+		myLevel->SpawnEnemy(*selectedPrefab);
 	ImGui::EndDisabled();
 
 	ImGui::SameLine();
 	if (ImGui::Button("Damage All"))
-		myLevel.DamageAllEnemies();
+		myLevel->DamageAllEnemies();
 
 	ImGui::SameLine();
 	if (ImGui::Button("Clear Enemies"))
-		myLevel.ClearEnemies();
+		myLevel->ClearEnemies();
 }
 
 bool LevelEditorDockable::HasUnsavedChanges() const
 {
-	return myLevel.GetNavmeshDataAsset().HasUnsavedChanges() || myLevel.GetLevelDataAsset().HasUnsavedChanges();
+	return myLevel->GetNavmeshDataAsset().HasUnsavedChanges() || myLevel->GetLevelDataAsset().HasUnsavedChanges();
 }
 
 void LevelEditorDockable::OnCloseRequested()
@@ -435,20 +470,73 @@ void LevelEditorDockable::OnCloseRequested()
 	// name, and resolve immediately instead of opening one that would otherwise hang the close forever.
 	if (Slush::CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
 	{
-		if (myLevel.GetNavmeshDataAsset().HasUnsavedChanges())
-			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
+		if (myLevel->GetNavmeshDataAsset().HasUnsavedChanges())
+			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel->GetNavmeshDataAsset().GetAssetName().GetBuffer());
 
-		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
-			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
+		if (myLevel->GetLevelDataAsset().HasUnsavedChanges())
+			SLUSH_ERROR("[Level Editor] Closing with unsaved changes in '%s', discarding them (-hidewindow)", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
 
 		DiscardUnsavedChanges();
 		return;
 	}
 
+	myPendingAction = PendingAction::Close;
 	myWantToOpenUnsavedChangesPopup = true;
 }
 
+void LevelEditorDockable::RequestAction(PendingAction anAction, LevelData* aLevelToOpen)
+{
+	if (anAction == PendingAction::OpenLevel && aLevelToOpen == &myLevel->GetLevelDataAsset())
+		return;
+
+	myPendingAction = anAction;
+	myPendingLevelToOpen = aLevelToOpen;
+
+	if (HasUnsavedChanges())
+	{
+		myWantToOpenUnsavedChangesPopup = true;
+		return;
+	}
+
+	RunPendingAction();
+}
+
+void LevelEditorDockable::RunPendingAction()
+{
+	const PendingAction action = myPendingAction;
+	LevelData* levelToOpen = myPendingLevelToOpen;
+	myPendingAction = PendingAction::None;
+	myPendingLevelToOpen = nullptr;
+
+	switch (action)
+	{
+	case PendingAction::OpenLevel:
+		myLayout.OpenLevel(*levelToOpen);
+		break;
+	case PendingAction::NewLevel:
+		myNameDialogIsDuplicate = false;
+		myNewLevelName.Clear();
+		myWantToOpenNameDialog = true;
+		break;
+	case PendingAction::DuplicateLevel:
+		myNameDialogIsDuplicate = true;
+		myNewLevelName = myLevel->GetLevelDataAsset().GetAssetName();
+		myNewLevelName += "_copy";
+		myWantToOpenNameDialog = true;
+		break;
+	default:
+		break;
+	}
+}
+
 void LevelEditorDockable::OnBuildModals()
+{
+	BuildUnsavedChangesModal();
+	BuildNameModal();
+	BuildOpenLevelModal();
+}
+
+void LevelEditorDockable::BuildUnsavedChangesModal()
 {
 	if (myWantToOpenUnsavedChangesPopup)
 	{
@@ -459,32 +547,40 @@ void LevelEditorDockable::OnBuildModals()
 	if (ImGui::BeginPopupModal("Unsaved Changes", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 	{
 		ImGui::Text("The following assets have unsaved changes:");
-		if (myLevel.GetNavmeshDataAsset().HasUnsavedChanges())
-			ImGui::BulletText("%s", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
-		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
-			ImGui::BulletText("%s", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
+		if (myLevel->GetNavmeshDataAsset().HasUnsavedChanges())
+			ImGui::BulletText("%s", myLevel->GetNavmeshDataAsset().GetAssetName().GetBuffer());
+		if (myLevel->GetLevelDataAsset().HasUnsavedChanges())
+			ImGui::BulletText("%s", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
 
 		if (ImGui::Button("Save"))
 		{
 			SaveAssets();
 			ImGui::CloseCurrentPopup();
+			RunPendingAction();
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Discard"))
 		{
-			DiscardUnsavedChanges();
+			if (myPendingAction == PendingAction::Close)
+				DiscardUnsavedChanges();
+			else
+				RevertUnsavedChanges();
+
 			ImGui::CloseCurrentPopup();
+			RunPendingAction();
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Cancel"))
 		{
-			if (myOwnerLayout)
+			if (myPendingAction == PendingAction::Close && myOwnerLayout)
 				myOwnerLayout->CancelCloseRequest();
 
+			myPendingAction = PendingAction::None;
+			myPendingLevelToOpen = nullptr;
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -492,14 +588,142 @@ void LevelEditorDockable::OnBuildModals()
 	}
 }
 
+void LevelEditorDockable::BuildNameModal()
+{
+	if (myWantToOpenNameDialog)
+	{
+		ImGui::OpenPopup("Level Name");
+		myWantToOpenNameDialog = false;
+	}
+
+	if (ImGui::BeginPopupModal("Level Name", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		if (myNameDialogIsDuplicate)
+			ImGui::Text("Duplicate '%s'", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
+		else
+			ImGui::Text("New blank level");
+
+		if (ImGui::IsWindowAppearing())
+			ImGui::SetKeyboardFocusHere();
+		ImGui::InputText("Name", &myNewLevelName);
+
+		Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
+		FW_GrowingArray<FW_String> levelNames;
+		for (const Slush::Asset* asset : assetRegistry.GetAllAssets<LevelData>())
+			levelNames.Add(asset->GetAssetName());
+		FW_GrowingArray<FW_String> navmeshNames;
+		for (const Slush::Asset* asset : assetRegistry.GetAllAssets<NavmeshData>())
+			navmeshNames.Add(asset->GetAssetName());
+
+		FW_String navmeshName;
+		LevelEditorUtils::GetNavmeshNameForLevel(myNewLevelName, navmeshName);
+		ImGui::TextDisabled("Creates %s.tdlevel and %s.navmesh", myNewLevelName.GetBuffer(), navmeshName.GetBuffer());
+
+		const LevelEditorUtils::NameError nameError = LevelEditorUtils::ValidateNewLevelName(myNewLevelName, levelNames, navmeshNames);
+		if (nameError != LevelEditorUtils::NameError::None)
+			ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "%s", LevelEditorUtils::GetNameErrorMessage(nameError));
+
+		ImGui::BeginDisabled(nameError != LevelEditorUtils::NameError::None);
+		if (ImGui::Button("Create"))
+		{
+			LevelData& levelData = myNameDialogIsDuplicate
+				? myLayout.DuplicateLevel(myNewLevelName, myLevel->GetLevelDataAsset())
+				: myLayout.CreateNewLevel(myNewLevelName);
+
+			ImGui::CloseCurrentPopup();
+			myLayout.OpenLevel(levelData);
+		}
+		ImGui::EndDisabled();
+
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+
+		ImGui::EndPopup();
+	}
+}
+
+void LevelEditorDockable::BuildOpenLevelModal()
+{
+	if (myWantToOpenOpenLevelDialog)
+	{
+		ImGui::OpenPopup("Open Level");
+		myWantToOpenOpenLevelDialog = false;
+	}
+
+	if (ImGui::BeginPopupModal("Open Level", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		const LevelData* currentLevel = &myLevel->GetLevelDataAsset();
+		LevelData* levelToOpen = nullptr;
+		for (Slush::Asset* asset : Slush::AssetRegistry::GetInstance().GetAllAssets<LevelData>())
+		{
+			LevelData* levelData = static_cast<LevelData*>(asset);
+			FW_String label = levelData->GetAssetName();
+			if (levelData == currentLevel)
+				label += "  (current)";
+
+			if (ImGui::Selectable(label.GetBuffer(), levelData == currentLevel))
+				levelToOpen = levelData;
+		}
+
+		ImGui::Separator();
+		if (ImGui::Button("Cancel"))
+			ImGui::CloseCurrentPopup();
+
+		if (levelToOpen)
+		{
+			ImGui::CloseCurrentPopup();
+			RequestAction(PendingAction::OpenLevel, levelToOpen);
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
+void LevelEditorDockable::BuildOpenLevelDropTarget()
+{
+	// Acts on the last item - the tab content child - so dropping a level anywhere in it opens it
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (Slush::Asset* asset = ImGui::AcceptDraggedAsset(Slush::GetAssetID<LevelData>()))
+			RequestAction(PendingAction::OpenLevel, static_cast<LevelData*>(asset));
+
+		ImGui::EndDragDropTarget();
+	}
+}
+
 void LevelEditorDockable::SaveAssets()
 {
-	myLevel.GetNavmeshDataAsset().Save();
-	myLevel.GetLevelDataAsset().Save();
+	myLevel->GetNavmeshDataAsset().Save();
+	myLevel->GetLevelDataAsset().Save();
 }
 
 void LevelEditorDockable::DiscardUnsavedChanges()
 {
-	myLevel.GetNavmeshDataAsset().MarkAsSaved();
-	myLevel.GetLevelDataAsset().MarkAsSaved();
+	myLevel->GetNavmeshDataAsset().MarkAsSaved();
+	myLevel->GetLevelDataAsset().MarkAsSaved();
+}
+
+void LevelEditorDockable::RevertUnsavedChanges()
+{
+	// Leaving the level for another one, so the discarded edits must not stay in memory - the game's level
+	// select and Play read the same LevelData. Reload both assets from disk, then rebuild the Level, since
+	// the old one's entities may hold pointers into the navmesh that was just reloaded.
+	LevelData& levelData = myLevel->GetLevelDataAsset();
+	NavmeshData& navmeshData = myLevel->GetNavmeshDataAsset();
+
+	if (navmeshData.HasUnsavedChanges())
+		navmeshData.Load(navmeshData.GetFilePath().GetBuffer(), navmeshData.GetRepositoryIndex());
+
+	if (levelData.HasUnsavedChanges())
+	{
+		levelData.Load(levelData.GetFilePath().GetBuffer(), levelData.GetRepositoryIndex());
+
+		Slush::DependencyTracker& dependencyTracker = Slush::DependencyTracker::GetInstance();
+		dependencyTracker.BeginTrackingAsset(&levelData);
+		levelData.ResolveDependencies();
+		dependencyTracker.EndTrackingAsset();
+	}
+
+	myLayout.OpenLevel(levelData);
 }

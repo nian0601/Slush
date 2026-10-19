@@ -8,6 +8,8 @@
 	<ClCompile Include="TowerBuildMenu.cpp" />
     <ClCompile Include="NavmeshTestSuite.cpp" />
     <ClCompile Include="WaveScalingTestSuite.cpp" />
+    <ClCompile Include="LevelEditorTestSuite.cpp" />
+    <ClCompile Include="LevelEditorUtils.cpp" />
     <ClCompile Include="NavmeshDebuggerDockable.cpp" />
     <ClCompile Include="NavmeshDebuggingLayout.cpp" />
     <ClCompile Include="LevelEditorDockable.cpp" />
@@ -40,6 +42,8 @@
 	<ClInclude Include="TowerBuildMenu.h" />
     <ClInclude Include="NavmeshTestSuite.h" />
     <ClInclude Include="WaveScalingTestSuite.h" />
+    <ClInclude Include="LevelEditorTestSuite.h" />
+    <ClInclude Include="LevelEditorUtils.h" />
     <ClInclude Include="NavmeshDebuggerDockable.h" />
     <ClInclude Include="NavmeshDebuggingLayout.h" />
     <ClInclude Include="LevelEditorDockable.h" />

@@ -4,6 +4,8 @@
 #include "Navmesh.h"
 
 class Level;
+class LevelData;
+class LevelEditorLayout;
 
 namespace Slush
 {
@@ -13,7 +15,10 @@ namespace Slush
 class LevelEditorDockable : public Slush::DockableBase<LevelEditorDockable>
 {
 public:
-	LevelEditorDockable(Level& aLevel);
+	LevelEditorDockable(LevelEditorLayout& aLayout, Level& aLevel);
+
+	// Points the editor at a freshly built Level (the layout owns it), resetting the active tool.
+	void SetLevel(Level& aLevel);
 
 	const char* GetName() const override { return "Level Editor"; }
 
@@ -28,6 +33,17 @@ protected:
 	void OnBuildModals() override;
 
 private:
+	// What to do once unsaved changes are resolved (Save or Discard) - anything that leaves the current level
+	// goes through the Unsaved Changes prompt first.
+	enum class PendingAction
+	{
+		None,
+		Close,
+		OpenLevel,
+		NewLevel,
+		DuplicateLevel,
+	};
+
 	// One active tool at a time - picking a tool replaces the current one.
 	enum class ToolMode
 	{
@@ -68,10 +84,22 @@ private:
 	void SetStartPosition(const Vector2f& aPosition);
 	void SetGoalPosition(const Vector2f& aPosition);
 
-	void SaveAssets();
-	void DiscardUnsavedChanges();
+	void RequestAction(PendingAction anAction, LevelData* aLevelToOpen = nullptr);
+	void RunPendingAction();
 
-	Level& myLevel;
+	void BuildUnsavedChangesModal();
+	void BuildNameModal();
+	void BuildOpenLevelModal();
+	void BuildOpenLevelDropTarget();
+
+	void SaveAssets();
+	// Close path: the app is going away, so the edits only need to stop counting as unsaved.
+	void DiscardUnsavedChanges();
+	// Level-switch path: reloads the edited assets from disk and rebuilds the Level.
+	void RevertUnsavedChanges();
+
+	LevelEditorLayout& myLayout;
+	Level* myLevel = nullptr;
 
 	ToolMode myToolMode = ToolMode::None;
 
@@ -81,6 +109,14 @@ private:
 	FW_GrowingArray<Vector2f> myCutPositions;
 
 	bool myWantToOpenUnsavedChangesPopup = false;
+	PendingAction myPendingAction = PendingAction::None;
+	LevelData* myPendingLevelToOpen = nullptr;
+
+	bool myWantToOpenNameDialog = false;
+	bool myNameDialogIsDuplicate = false;
+	FW_String myNewLevelName;
+
+	bool myWantToOpenOpenLevelDialog = false;
 	int mySelectedUnlockIndex = 0;
 
 	Navmesh::TriangleMesh myTriangleMesh;

@@ -5,6 +5,8 @@
 // Pure, stateless wave-scaling math - no dependency on Level/entities, so it's testable in isolation.
 namespace WaveScaling
 {
+	bool AreEnemyUnlocksAscending(const FW_GrowingArray<EnemyUnlockEntry>& anEnemyUnlocks);
+
 	int GetEnemyCountForWave(int aWaveIndex, int aBaseEnemyCount, int anEnemyCountPerWaveIncrement, int aMaxEnemyCountPerWave);
 	float GetDifficultyWeight(int aWaveIndex, int aDifficultyRampWaveCount);
 

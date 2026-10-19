@@ -26,6 +26,7 @@ public:
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 	void ResolveDependencies() override;
 	void BuildUI() override;
+	void BuildWaveScalingUI();
 
 	Vector2f myStartPosition;
 	Vector2f myGoalPosition;

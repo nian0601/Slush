@@ -48,6 +48,9 @@ public:
 	float myPreFirstWaveGraceDuration = 10.f;
 
 private:
+	void BuildEnemyUnlocksUI();
+	void BuildWavePreviewUI();
+
 	void OnLoad(Slush::AssetParser::Handle aRootHandle);
 	void OnSave(Slush::AssetParser::Handle aRootHandle);
 };

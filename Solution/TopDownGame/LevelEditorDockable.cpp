@@ -50,7 +50,7 @@ void LevelEditorDockable::RenderOverlay() const
 	RenderStartAndGoalMarkers();
 
 	// With the editor UI visible the hint is drawn crisp as an ImGui overlay on the Game View instead
-	if (!Slush::Engine::GetInstance().GetWindow().IsEditorUIVisible())
+	if (!engine.GetWindow().IsEditorUIVisible())
 		RenderToolHint();
 }
 

@@ -9,6 +9,7 @@
 #include "Core/Assets/AssetStorage.h"
 #include "Core/Engine.h"
 #include "Core/Dockables/GameViewDockable.h"
+#include "Core/Dockables/ContentBrowserDockable.h"
 #include "Core/Dockables/LogDockable.h"
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
@@ -29,6 +30,7 @@ LevelEditorLayout::LevelEditorLayout()
 
 	myLevelEditorDockable = new LevelEditorDockable(*myLevel);
 	AddDockable(myLevelEditorDockable);
+	AddDockable(new Slush::ContentBrowserDockable(Slush::ContentBrowserDockable::ViewMode::Grid));
 	AddDockable(new Slush::LogDockable());
 }
 

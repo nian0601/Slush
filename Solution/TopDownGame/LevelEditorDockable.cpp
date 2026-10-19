@@ -5,6 +5,7 @@
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
+#include "TopDownGameGlobals.h"
 
 #include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
@@ -13,7 +14,6 @@
 #include "Core/Input.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Window.h"
-#include <EntitySystem/Components/SpriteComponent.h>
 #include <EntitySystem/EntityPrefab.h>
 #include <imgui/ImGuiWidgets.h>
 
@@ -36,11 +36,12 @@ void LevelEditorDockable::RenderOverlay() const
 	RenderBoxCutPreview();
 	RenderManualCutPreview();
 	RenderStartAndGoalMarkers();
+	RenderToolHint();
 }
 
 void LevelEditorDockable::RenderBoxCutPreview() const
 {
-	if (!myIsBoxCutModeActive || !myBoxCutHasStartCorner)
+	if (myToolMode != ToolMode::BoxCut || !myBoxCutHasStartCorner)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -61,7 +62,7 @@ void LevelEditorDockable::RenderBoxCutPreview() const
 
 void LevelEditorDockable::RenderManualCutPreview() const
 {
-	if (!myIsManualCutModeActive || myCutPositions.IsEmpty())
+	if (myToolMode != ToolMode::ManualCut || myCutPositions.IsEmpty())
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -89,8 +90,46 @@ void LevelEditorDockable::RenderStartAndGoalMarkers() const
 	renderer.RenderCircle(levelData.myGoalPosition, markerRadius, goalColor);
 }
 
+void LevelEditorDockable::RenderToolHint() const
+{
+	const char* hint = GetToolHint();
+	if (!hint)
+		return;
+
+	const Slush::UITheme& theme = TopDownGameGlobals::GetInstance().GetUITheme();
+	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
+	renderer.RenderText(*theme.myFont, hint, Vector2f(20.f, 1030.f),
+		theme.myTextSizes[static_cast<int>(Slush::UITextRole::Body)],
+		theme.myTextColors[static_cast<int>(Slush::UITextTone::Default)]);
+}
+
+const char* LevelEditorDockable::GetToolHint() const
+{
+	switch (myToolMode)
+	{
+	case ToolMode::BoxCut: return "Box Cut: LMB first corner, LMB second corner. Esc cancels.";
+	case ToolMode::ManualCut: return "Manual Cut: LMB adds a point, RMB cuts the polygon. Esc cancels.";
+	case ToolMode::SetStart: return "Set Start: LMB places the start position. Esc cancels.";
+	case ToolMode::SetGoal: return "Set Goal: LMB places the goal position. Esc cancels.";
+	default: return nullptr;
+	}
+}
+
+void LevelEditorDockable::SetToolMode(ToolMode aToolMode)
+{
+	myToolMode = aToolMode;
+
+	// Any half-made box or polygon belongs to the tool being left
+	myBoxCutHasStartCorner = false;
+	myCutPositions.RemoveAll();
+}
+
 void LevelEditorDockable::OnUpdate()
 {
+	Slush::Engine& engine = Slush::Engine::GetInstance();
+	if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
+		SetToolMode(ToolMode::None);
+
 	UpdateBoxCutMode();
 	UpdateManualCutMode();
 	UpdateSetStartMode();
@@ -99,7 +138,7 @@ void LevelEditorDockable::OnUpdate()
 
 void LevelEditorDockable::UpdateBoxCutMode()
 {
-	if (!myIsBoxCutModeActive)
+	if (myToolMode != ToolMode::BoxCut)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -130,7 +169,7 @@ void LevelEditorDockable::UpdateBoxCutMode()
 
 void LevelEditorDockable::UpdateManualCutMode()
 {
-	if (!myIsManualCutModeActive)
+	if (myToolMode != ToolMode::ManualCut)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -147,7 +186,7 @@ void LevelEditorDockable::UpdateManualCutMode()
 
 void LevelEditorDockable::UpdateSetStartMode()
 {
-	if (!myIsSetStartModeActive)
+	if (myToolMode != ToolMode::SetStart)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -159,7 +198,7 @@ void LevelEditorDockable::UpdateSetStartMode()
 
 void LevelEditorDockable::UpdateSetGoalMode()
 {
-	if (!myIsSetGoalModeActive)
+	if (myToolMode != ToolMode::SetGoal)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -175,6 +214,17 @@ void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCu
 
 	Slush::AssetEditScope editScope(navmeshData);
 	navmeshData.myNavmesh.CutHole(someCutPositions);
+	navmeshData.MarkAsUnsaved();
+
+	navmeshData.myNavmesh.GetAsTriangleMesh(myTriangleMesh);
+}
+
+void LevelEditorDockable::ResetNavmeshToDefaultGrid()
+{
+	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
+
+	Slush::AssetEditScope editScope(navmeshData);
+	navmeshData.myNavmesh.GenerateDefaultGrid();
 	navmeshData.MarkAsUnsaved();
 
 	navmeshData.myNavmesh.GetAsTriangleMesh(myTriangleMesh);
@@ -198,35 +248,50 @@ void LevelEditorDockable::SetGoalPosition(const Vector2f& aPosition)
 	levelData.MarkAsUnsaved();
 }
 
-void LevelEditorDockable::DisableBoxCutMode()
-{
-	if (!myIsBoxCutModeActive)
-		return;
-
-	myIsBoxCutModeActive = false;
-	myBoxCutHasStartCorner = false;
-}
-
-void LevelEditorDockable::DisableManualCutMode()
-{
-	if (!myIsManualCutModeActive)
-		return;
-
-	myIsManualCutModeActive = false;
-	myCutPositions.RemoveAll();
-}
-
-void LevelEditorDockable::DisableSetStartMode()
-{
-	myIsSetStartModeActive = false;
-}
-
-void LevelEditorDockable::DisableSetGoalMode()
-{
-	myIsSetGoalModeActive = false;
-}
-
 void LevelEditorDockable::OnBuildUI()
+{
+	BuildHeaderUI();
+
+	if (ImGui::BeginTabBar("LevelEditorTabs"))
+	{
+		// Only the tab content scrolls - the header above stays put.
+		if (ImGui::BeginTabItem("Level"))
+		{
+			if (ImGui::BeginChild("LevelTab"))
+				BuildLevelTab();
+			ImGui::EndChild();
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Navmesh"))
+		{
+			if (ImGui::BeginChild("NavmeshTab"))
+				BuildNavmeshTab();
+			ImGui::EndChild();
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Waves"))
+		{
+			if (ImGui::BeginChild("WavesTab"))
+				BuildWavesTab();
+			ImGui::EndChild();
+			ImGui::EndTabItem();
+		}
+
+		if (ImGui::BeginTabItem("Debug"))
+		{
+			if (ImGui::BeginChild("DebugTab"))
+				BuildDebugTab();
+			ImGui::EndChild();
+			ImGui::EndTabItem();
+		}
+
+		ImGui::EndTabBar();
+	}
+}
+
+void LevelEditorDockable::BuildHeaderUI()
 {
 	if (ImGui::BeginMenuBar())
 	{
@@ -236,102 +301,88 @@ void LevelEditorDockable::OnBuildUI()
 		ImGui::EndMenuBar();
 	}
 
-	BuildDebugSpawnUI();
+	if (ImGui::Button("Save"))
+		SaveAssets();
+
+	ImGui::SameLine();
+	if (HasUnsavedChanges())
+		ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "Unsaved changes");
+	else
+		ImGui::TextDisabled("Saved");
+
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextDisabled("Tool");
+	ImGui::SameLine();
+	BuildToolButton("None", ToolMode::None);
+	ImGui::SameLine();
+	BuildToolButton("Box Cut", ToolMode::BoxCut);
+	ImGui::SameLine();
+	BuildToolButton("Manual Cut", ToolMode::ManualCut);
+	ImGui::SameLine();
+	BuildToolButton("Set Start", ToolMode::SetStart);
+	ImGui::SameLine();
+	BuildToolButton("Set Goal", ToolMode::SetGoal);
 
 	ImGui::Separator();
-
-	ImGui::Text("Navmesh");
-	if (myIsBoxCutModeActive)
-	{
-		if (ImGui::Button("Disable Box Cut"))
-			DisableBoxCutMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Box Cut"))
-		{
-			myIsBoxCutModeActive = true;
-			myBoxCutHasStartCorner = false;
-
-			DisableManualCutMode();
-			DisableSetStartMode();
-			DisableSetGoalMode();
-		}
-	}
-
-	if (myIsManualCutModeActive)
-	{
-		if (ImGui::Button("Disable Manual Cut"))
-			DisableManualCutMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Manual Cut"))
-		{
-			myIsManualCutModeActive = true;
-			myCutPositions.RemoveAll();
-
-			DisableBoxCutMode();
-			DisableSetStartMode();
-			DisableSetGoalMode();
-		}
-	}
-
-	if (ImGui::Button("Clear Navmesh"))
-	{
-		myLevel.GetNavmesh().GenerateDefaultGrid();
-		myLevel.GetNavmesh().GetAsTriangleMesh(myTriangleMesh);
-	}
-
-	ImGui::Separator();
-	ImGui::Text("Start/Goal");
-	if (myIsSetStartModeActive)
-	{
-		if (ImGui::Button("Disable Set Start"))
-			DisableSetStartMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Set Start"))
-		{
-			myIsSetStartModeActive = true;
-
-			DisableBoxCutMode();
-			DisableManualCutMode();
-			DisableSetGoalMode();
-		}
-	}
-
-	if (myIsSetGoalModeActive)
-	{
-		if (ImGui::Button("Disable Set Goal"))
-			DisableSetGoalMode();
-	}
-	else
-	{
-		if (ImGui::Button("Enable Set Goal"))
-		{
-			myIsSetGoalModeActive = true;
-
-			DisableBoxCutMode();
-			DisableManualCutMode();
-			DisableSetStartMode();
-		}
-	}
-
-	ImGui::Separator();
-
-	if (ImGui::CollapsingHeader("Waves"))
-	{
-		LevelData& levelData = myLevel.GetLevelDataAsset();
-		Slush::AssetEditScope editScope(levelData);
-		levelData.BuildWaveScalingUI();
-	}
 }
 
-void LevelEditorDockable::BuildDebugSpawnUI()
+void LevelEditorDockable::BuildToolButton(const char* aLabel, ToolMode aToolMode)
 {
-	ImGui::Text("Enemies");
+	const bool isActive = myToolMode == aToolMode;
+	if (isActive)
+		ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+
+	if (ImGui::Button(aLabel) && !isActive)
+		SetToolMode(aToolMode);
+
+	if (isActive)
+		ImGui::PopStyleColor();
+}
+
+void LevelEditorDockable::BuildLevelTab()
+{
+	LevelData& levelData = myLevel.GetLevelDataAsset();
+	ImGui::Text("Level: %s", levelData.GetAssetName().GetBuffer());
+
+	Slush::AssetEditScope editScope(levelData);
+	levelData.BuildLevelSettingsUI();
+
+	ImGui::Spacing();
+	ImGui::TextDisabled("Set Start / Set Goal click-place in the view.");
+}
+
+void LevelEditorDockable::BuildNavmeshTab()
+{
+	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
+	ImGui::Text("Navmesh: %s", navmeshData.GetAssetName().GetBuffer());
+	ImGui::Text("Triangles: %d", myTriangleMesh.myVertices.Count() / 3);
+
+	ImGui::Separator();
+	if (ImGui::Button("Box Cut"))
+		SetToolMode(ToolMode::BoxCut);
+	ImGui::SameLine();
+	if (ImGui::Button("Manual Cut"))
+		SetToolMode(ToolMode::ManualCut);
+	ImGui::SameLine();
+	if (ImGui::Button("Reset to Default Grid"))
+		ResetNavmeshToDefaultGrid();
+
+	ImGui::Spacing();
+	ImGui::TextDisabled("Box Cut: LMB first corner, LMB second corner.");
+	ImGui::TextDisabled("Manual Cut: LMB adds points, RMB cuts the polygon.");
+}
+
+void LevelEditorDockable::BuildWavesTab()
+{
+	LevelData& levelData = myLevel.GetLevelDataAsset();
+	Slush::AssetEditScope editScope(levelData);
+	levelData.BuildWaveScalingUI();
+}
+
+void LevelEditorDockable::BuildDebugTab()
+{
+	ImGui::TextWrapped("Waves don't run in edit mode. Use Play to test.");
+	ImGui::Separator();
 
 	// Picks from the level's own unlock roster, so each level's Debug spawns follow what its waves can send.
 	const FW_GrowingArray<EnemyUnlockEntry>& unlocks = myLevel.GetLevelDataAsset().myEnemyUnlocks;

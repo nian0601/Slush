@@ -26,6 +26,8 @@ public:
 	void OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion) override;
 	void ResolveDependencies() override;
 	void BuildUI() override;
+	// The parts of BuildUI(), so the Level Editor can show them on separate tabs
+	void BuildLevelSettingsUI();
 	void BuildWaveScalingUI();
 
 	Vector2f myStartPosition;

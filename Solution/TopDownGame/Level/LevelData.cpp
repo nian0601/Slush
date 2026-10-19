@@ -28,11 +28,14 @@ void LevelData::ResolveDependencies()
 
 void LevelData::BuildUI()
 {
-	Slush::ImGuiWidgets::InputFloat2("Start Position", &myStartPosition.x);
-	Slush::ImGuiWidgets::InputFloat2("Goal Position", &myGoalPosition.x);
-	Slush::ImGuiWidgets::InputInt("Starting Resources", &myStartingResources);
-	Slush::ImGuiWidgets::InputInt("Starting Lives", &myStartingLives);
+	BuildLevelSettingsUI();
 
+	if (ImGui::CollapsingHeader("Waves"))
+		BuildWaveScalingUI();
+}
+
+void LevelData::BuildLevelSettingsUI()
+{
 	ImGui::Text("Navmesh: %s", myNavmeshData.GetName().GetBuffer());
 	if (ImGui::BeginDragDropTarget())
 	{
@@ -45,8 +48,10 @@ void LevelData::BuildUI()
 		ImGui::EndDragDropTarget();
 	}
 
-	if (ImGui::CollapsingHeader("Waves"))
-		BuildWaveScalingUI();
+	Slush::ImGuiWidgets::InputInt("Starting Resources", &myStartingResources);
+	Slush::ImGuiWidgets::InputInt("Starting Lives", &myStartingLives);
+	Slush::ImGuiWidgets::InputFloat2("Start Position", &myStartPosition.x);
+	Slush::ImGuiWidgets::InputFloat2("Goal Position", &myGoalPosition.x);
 }
 
 void LevelData::BuildWaveScalingUI()

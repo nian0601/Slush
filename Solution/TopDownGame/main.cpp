@@ -39,7 +39,8 @@ public:
 		Slush::Window& window = Slush::Engine::GetInstance().GetWindow();
 		window.AddLayout(new GameLayout(), true);
 		window.AddLayout(new NavmeshDebuggingLayout());
-		window.AddLayout(new LevelEditorLayout());
+		myLevelEditorLayout = new LevelEditorLayout();
+		window.AddLayout(myLevelEditorLayout);
 
 		Slush::CommandLineArgs& commandLineArgs = Slush::CommandLineArgs::GetInstance();
 		if (commandLineArgs.HasFlag("-layout"))
@@ -65,13 +66,16 @@ public:
 	{
 		Slush::Engine& engine = Slush::Engine::GetInstance();
 
-		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
-			engine.GetWindow().Close();
+		// The Level Editor uses Esc itself (cancel the active tool), so it never closes the app there.
+		Slush::Window& window = engine.GetWindow();
+		if (engine.GetInput().WasKeyReleased(Slush::Input::ESC) && window.GetActiveLayout() != myLevelEditorLayout)
+			window.Close();
 
 	}
 
 private:
 	Slush::Font myFont;
+	LevelEditorLayout* myLevelEditorLayout = nullptr;
 };
 
 #include "Core/AssetRepository.h"

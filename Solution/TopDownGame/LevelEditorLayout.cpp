@@ -39,6 +39,35 @@ namespace
 		aLevelData.ResolveDependencies();
 		dependencyTracker.EndTrackingAsset();
 	}
+
+	// The game image is scaled down to fit the dock, so the editor's info text goes on top of it as ImGui instead
+	class LevelEditorGameViewDockable : public Slush::GameViewDockable
+	{
+	public:
+		LevelEditorGameViewDockable(const LevelEditorLayout& aLayout)
+			: myLayout(aLayout)
+		{}
+
+	protected:
+		void OnBuildOverlay(const Rectf& aGameViewRect) override
+		{
+			const float margin = 8.f;
+			if (myLayout.IsPlaying())
+			{
+				const FW_String note = myLayout.GetPlayingNote();
+				DrawOverlayText(aGameViewRect.myTopLeft + Vector2f(margin, margin), note.GetBuffer(), ImGui::GetColorU32(ImGuiCol_PlotHistogram));
+			}
+			else if (const char* hint = myLayout.GetToolHint())
+			{
+				const float height = ImGui::GetTextLineHeight() + ImGui::GetStyle().FramePadding.y * 2.f;
+				const Vector2f position(aGameViewRect.myTopLeft.x + margin, aGameViewRect.myBottomRight.y - height - margin);
+				DrawOverlayText(position, hint, ImGui::GetColorU32(ImGuiCol_Text));
+			}
+		}
+
+	private:
+		const LevelEditorLayout& myLayout;
+	};
 }
 
 LevelEditorLayout::LevelEditorLayout()
@@ -48,7 +77,7 @@ LevelEditorLayout::LevelEditorLayout()
 	myLevel = new Level(levelData, false, true);
 	myPlayStateStack = new Slush::StateStack();
 
-	AddDockable(new Slush::GameViewDockable());
+	AddDockable(new LevelEditorGameViewDockable(*this));
 
 	myLevelEditorDockable = new LevelEditorDockable(*this, *myLevel);
 	AddDockable(myLevelEditorDockable);
@@ -189,7 +218,10 @@ void LevelEditorLayout::OnRender()
 	if (IsPlaying())
 	{
 		myPlayStateStack->Render();
-		RenderPlayingNote();
+
+		// With the editor UI visible the note is drawn crisp as an ImGui overlay on the Game View instead
+		if (!engine.GetWindow().IsEditorUIVisible())
+			RenderPlayingNote();
 	}
 	else
 	{
@@ -200,11 +232,22 @@ void LevelEditorLayout::OnRender()
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();
 }
 
-void LevelEditorLayout::RenderPlayingNote() const
+FW_String LevelEditorLayout::GetPlayingNote() const
 {
 	FW_String note = "Playing ";
 	note += myLevel->GetLevelDataAsset().GetAssetName();
 	note += " (unsaved edits included). F5 / Esc stops.";
+	return note;
+}
+
+const char* LevelEditorLayout::GetToolHint() const
+{
+	return myLevelEditorDockable->GetToolHint();
+}
+
+void LevelEditorLayout::RenderPlayingNote() const
+{
+	const FW_String note = GetPlayingNote();
 
 	const Slush::UITheme& theme = TopDownGameGlobals::GetInstance().GetUITheme();
 	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();

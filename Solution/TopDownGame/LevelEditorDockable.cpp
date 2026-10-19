@@ -48,7 +48,10 @@ void LevelEditorDockable::RenderOverlay() const
 	RenderBoxCutPreview();
 	RenderManualCutPreview();
 	RenderStartAndGoalMarkers();
-	RenderToolHint();
+
+	// With the editor UI visible the hint is drawn crisp as an ImGui overlay on the Game View instead
+	if (!Slush::Engine::GetInstance().GetWindow().IsEditorUIVisible())
+		RenderToolHint();
 }
 
 void LevelEditorDockable::RenderBoxCutPreview() const
@@ -142,17 +145,18 @@ void LevelEditorDockable::OnUpdate()
 	if (engine.GetInput().WasKeyReleased(Slush::Input::ESC) || myLayout.IsPlaying())
 		SetToolMode(ToolMode::None);
 
-	UpdateBoxCutMode();
-	UpdateManualCutMode();
-	UpdateSetStartMode();
-	UpdateSetGoalMode();
+	switch (myToolMode)
+	{
+	case ToolMode::BoxCut: UpdateBoxCutMode(); break;
+	case ToolMode::ManualCut: UpdateManualCutMode(); break;
+	case ToolMode::SetStart: UpdateSetStartMode(); break;
+	case ToolMode::SetGoal: UpdateSetGoalMode(); break;
+	default: break;
+	}
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
 {
-	if (myToolMode != ToolMode::BoxCut)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 		return;
@@ -181,9 +185,6 @@ void LevelEditorDockable::UpdateBoxCutMode()
 
 void LevelEditorDockable::UpdateManualCutMode()
 {
-	if (myToolMode != ToolMode::ManualCut)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 	{
@@ -198,9 +199,6 @@ void LevelEditorDockable::UpdateManualCutMode()
 
 void LevelEditorDockable::UpdateSetStartMode()
 {
-	if (myToolMode != ToolMode::SetStart)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 		return;
@@ -210,9 +208,6 @@ void LevelEditorDockable::UpdateSetStartMode()
 
 void LevelEditorDockable::UpdateSetGoalMode()
 {
-	if (myToolMode != ToolMode::SetGoal)
-		return;
-
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
 		return;

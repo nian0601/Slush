@@ -32,6 +32,10 @@ public:
 	void StartPlay();
 	void StopPlay();
 
+	// Info text for the game view: the playing note while playing, otherwise the active tool's hint (null when none).
+	FW_String GetPlayingNote() const;
+	const char* GetToolHint() const;
+
 protected:
 	void OnUpdate() override;
 	void OnRender() override;

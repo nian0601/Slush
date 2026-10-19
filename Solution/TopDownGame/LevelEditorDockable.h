@@ -24,6 +24,9 @@ public:
 
 	void RenderOverlay() const;
 
+	// Null when no tool is active.
+	const char* GetToolHint() const;
+
 protected:
 	void OnUpdate() override;
 	void OnBuildUI() override;
@@ -55,7 +58,6 @@ private:
 	};
 
 	void SetToolMode(ToolMode aToolMode);
-	const char* GetToolHint() const;
 
 	void UpdateBoxCutMode();
 	void UpdateManualCutMode();

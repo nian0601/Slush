@@ -7,17 +7,21 @@
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
+#include "StateStack/LevelState.h"
+#include "TopDownGameGlobals.h"
 
 #include "Core/AssetRepository.h"
 #include "Core/Assets/AssetStorage.h"
 #include "Core/Assets/DependencyTracker.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/Engine.h"
+#include "Core/Input.h"
 #include "Core/Dockables/ContentBrowserDockable.h"
 #include "Core/Dockables/GameViewDockable.h"
 #include "Core/Dockables/LogDockable.h"
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
+#include "StateStack/StateStack.h"
 
 #include <FW_FileSystem.h>
 
@@ -42,6 +46,7 @@ LevelEditorLayout::LevelEditorLayout()
 {
 	LevelData& levelData = GetStartupLevel();
 	myLevel = new Level(levelData, false, true);
+	myPlayStateStack = new Slush::StateStack();
 
 	AddDockable(new Slush::GameViewDockable());
 
@@ -56,11 +61,15 @@ LevelEditorLayout::LevelEditorLayout()
 
 LevelEditorLayout::~LevelEditorLayout()
 {
+	FW_SAFE_DELETE(myPlayStateStack);
 	FW_SAFE_DELETE(myLevel);
 }
 
 void LevelEditorLayout::OpenLevel(LevelData& aLevelData)
 {
+	if (IsPlaying())
+		StopPlay();
+
 	FW_SAFE_DELETE(myLevel);
 	myLevel = new Level(aLevelData, false, true);
 	myLevelEditorDockable->SetLevel(*myLevel);
@@ -115,8 +124,60 @@ LevelData& LevelEditorLayout::DuplicateLevel(const FW_String& aLevelName, const 
 	return levelData;
 }
 
+bool LevelEditorLayout::IsPlaying() const
+{
+	return !myPlayStateStack->IsEmpty();
+}
+
+void LevelEditorLayout::StartPlay()
+{
+	FW_ASSERT(!IsPlaying(), "StartPlay while already playing");
+	SLUSH_INFO("[Level Editor] Play '%s'", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
+	myPlayStateStack->PushMainState(new LevelState(myLevel->GetLevelDataAsset()));
+}
+
+void LevelEditorLayout::StopPlay()
+{
+	myPlayStateStack->Clear();
+	OnPlayEnded();
+}
+
+void LevelEditorLayout::OnPlayEnded()
+{
+	// The play Level registered itself as the current level and is gone now; point the globals back at the
+	// editor's Level right away instead of waiting for its next Update().
+	TopDownGameGlobals::GetInstance().SetLevel(myLevel);
+	SLUSH_INFO("[Level Editor] Stopped playing '%s'", myLevel->GetLevelDataAsset().GetAssetName().GetBuffer());
+}
+
 void LevelEditorLayout::OnUpdate()
 {
+	// F5 toggles Play/Stop and Esc stops - the only way to drive Play from a debug script, since
+	// script clicks only reach UIBuilder buttons, not ImGui.
+	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
+	if (input.WasKeyReleased(Slush::Input::_F5))
+	{
+		if (IsPlaying())
+			StopPlay();
+		else
+			StartPlay();
+	}
+	else if (IsPlaying() && input.WasKeyReleased(Slush::Input::ESC))
+	{
+		StopPlay();
+	}
+
+	if (IsPlaying())
+	{
+		myPlayStateStack->Update();
+
+		// The end screens' Main Menu pops the LevelState, which empties the stack: back to edit mode
+		if (!IsPlaying())
+			OnPlayEnded();
+
+		return;
+	}
+
 	myLevel->Update();
 }
 
@@ -125,10 +186,31 @@ void LevelEditorLayout::OnRender()
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.GetWindow().GetRenderer().StartOffscreenBuffer();
 
-	myLevelEditorDockable->RenderOverlay();
-	myLevel->Render();
+	if (IsPlaying())
+	{
+		myPlayStateStack->Render();
+		RenderPlayingNote();
+	}
+	else
+	{
+		myLevelEditorDockable->RenderOverlay();
+		myLevel->Render();
+	}
 
 	engine.GetWindow().GetRenderer().EndOffscreenBuffer();
+}
+
+void LevelEditorLayout::RenderPlayingNote() const
+{
+	FW_String note = "Playing ";
+	note += myLevel->GetLevelDataAsset().GetAssetName();
+	note += " (unsaved edits included). F5 / Esc stops.";
+
+	const Slush::UITheme& theme = TopDownGameGlobals::GetInstance().GetUITheme();
+	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
+	renderer.RenderText(*theme.myFont, note, Vector2f(20.f, 20.f),
+		theme.myTextSizes[static_cast<int>(Slush::UITextRole::Small)],
+		theme.myTextColors[static_cast<int>(Slush::UITextTone::Warning)]);
 }
 
 LevelData& LevelEditorLayout::GetStartupLevel() const

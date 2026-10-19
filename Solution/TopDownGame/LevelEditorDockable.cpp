@@ -139,7 +139,7 @@ void LevelEditorDockable::SetToolMode(ToolMode aToolMode)
 void LevelEditorDockable::OnUpdate()
 {
 	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (engine.GetInput().WasKeyReleased(Slush::Input::ESC))
+	if (engine.GetInput().WasKeyReleased(Slush::Input::ESC) || myLayout.IsPlaying())
 		SetToolMode(ToolMode::None);
 
 	UpdateBoxCutMode();
@@ -264,6 +264,8 @@ void LevelEditorDockable::OnBuildUI()
 {
 	BuildHeaderUI();
 
+	// Edits mid-play would desync from what's running, so everything below the Play button is read-only
+	ImGui::BeginDisabled(myLayout.IsPlaying());
 	if (ImGui::BeginTabBar("LevelEditorTabs"))
 	{
 		// Only the tab content scrolls - the header above stays put.
@@ -305,13 +307,15 @@ void LevelEditorDockable::OnBuildUI()
 
 		ImGui::EndTabBar();
 	}
+	ImGui::EndDisabled();
 }
 
 void LevelEditorDockable::BuildHeaderUI()
 {
+	const bool isPlaying = myLayout.IsPlaying();
 	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::BeginMenu("File"))
+		if (ImGui::BeginMenu("File", !isPlaying))
 		{
 			if (ImGui::MenuItem("New Level..."))
 				RequestAction(PendingAction::NewLevel);
@@ -330,7 +334,26 @@ void LevelEditorDockable::BuildHeaderUI()
 		ImGui::EndMenuBar();
 	}
 
-	if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteGlobal))
+	if (isPlaying)
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.65f, 0.15f, 0.15f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.2f, 0.2f, 1.f));
+		if (ImGui::Button(ICON_FA_STOP " Stop"))
+			myLayout.StopPlay();
+		ImGui::PopStyleColor(2);
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.15f, 0.5f, 0.2f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.2f, 0.65f, 0.25f, 1.f));
+		if (ImGui::Button(ICON_FA_PLAY " Play"))
+			myLayout.StartPlay();
+		ImGui::PopStyleColor(2);
+	}
+	ImGui::SameLine();
+
+	ImGui::BeginDisabled(isPlaying);
+	if (!isPlaying && ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S, ImGuiInputFlags_RouteGlobal))
 		SaveAssets();
 
 	if (ImGui::Button("Save"))
@@ -357,6 +380,7 @@ void LevelEditorDockable::BuildHeaderUI()
 	BuildToolButton("Set Start", ToolMode::SetStart);
 	ImGui::SameLine();
 	BuildToolButton("Set Goal", ToolMode::SetGoal);
+	ImGui::EndDisabled();
 
 	ImGui::Separator();
 }
@@ -486,6 +510,9 @@ void LevelEditorDockable::OnCloseRequested()
 
 void LevelEditorDockable::RequestAction(PendingAction anAction, LevelData* aLevelToOpen)
 {
+	if (myLayout.IsPlaying())
+		return;
+
 	if (anAction == PendingAction::OpenLevel && aLevelToOpen == &myLevel->GetLevelDataAsset())
 		return;
 

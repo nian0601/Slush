@@ -7,6 +7,11 @@ class Level;
 class LevelData;
 class LevelEditorDockable;
 
+namespace Slush
+{
+	class StateStack;
+}
+
 class LevelEditorLayout : public Slush::IAppLayout
 {
 public:
@@ -21,6 +26,12 @@ public:
 	LevelData& CreateNewLevel(const FW_String& aLevelName);
 	LevelData& DuplicateLevel(const FW_String& aLevelName, const LevelData& aSourceLevel);
 
+	// Play runs a real LevelState on the open level's in-memory data (unsaved edits included) in its own
+	// StateStack. LevelState plays on a copy of the navmesh, so stopping returns to the unchanged editor.
+	bool IsPlaying() const;
+	void StartPlay();
+	void StopPlay();
+
 protected:
 	void OnUpdate() override;
 	void OnRender() override;
@@ -30,6 +41,10 @@ private:
 	bool ReadRememberedLevelName(FW_String& anOutLevelName) const;
 	void WriteRememberedLevelName(const FW_String& aLevelName) const;
 
+	void OnPlayEnded();
+	void RenderPlayingNote() const;
+
 	Level* myLevel = nullptr;
+	Slush::StateStack* myPlayStateStack = nullptr;
 	LevelEditorDockable* myLevelEditorDockable = nullptr;
 };

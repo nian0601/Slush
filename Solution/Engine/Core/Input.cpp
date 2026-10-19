@@ -1,14 +1,11 @@
 #include "stdafx.h"
 #include "Input.h"
 
-#include "Core/Log.h"
-#include "Core/AssetRepository.h"
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include <FW_FileSystem.h>
 
 namespace Slush
 {
@@ -61,21 +58,6 @@ namespace Slush
 
 		return sf::Keyboard::Key::Escape;
 	}
-	bool IsUnsignedInteger(const FW_String& aString)
-	{
-		if (aString.Empty())
-			return false;
-
-		for (int i = 0; i < aString.Length(); ++i)
-		{
-			char c = aString[i];
-			if (c < '0' || c > '9')
-				return false;
-		}
-
-		return true;
-	}
-
 	sf::Mouse::Button GetSFMLMouseButton(Input::MouseButton aEngineMouseButton)
 	{
 		switch (aEngineMouseButton)
@@ -156,61 +138,6 @@ namespace Slush
 		myMousePosition.y = static_cast<int>(myMousePositionf.y + 0.5f);
 	}
 
-	void Input::PollDebugInputFile(bool aIsImGuiCapturingKeyboard)
-	{
-		FW_String absolutePath;
-		AssetRepository::GetDebugFilePath("debug_input.txt", absolutePath);
-
-		FILE* file = nullptr;
-		fopen_s(&file, absolutePath.GetBuffer(), "r");
-		if (!file)
-			return;
-
-		bool hadContent = false;
-
-		char lineBuffer[256];
-		while (fgets(lineBuffer, sizeof(lineBuffer), file))
-		{
-			hadContent = true;
-
-			if (aIsImGuiCapturingKeyboard)
-				continue;
-
-			FW_String line = lineBuffer;
-			FW_FileSystem::TrimBeginAndEnd(line);
-			if (line.Empty())
-				continue;
-
-			if (!IsUnsignedInteger(line))
-			{
-				SLUSH_ERROR("PollDebugInputFile: expected an integer KeyCode value, got '%s' in debug_input.txt", line.GetBuffer());
-				continue;
-			}
-
-			int keyCodeValue = FW_FileSystem::GetInt(line);
-			if (keyCodeValue < 0 || keyCodeValue >= KeyCode::__COUNT)
-			{
-				SLUSH_ERROR("PollDebugInputFile: KeyCode value %d out of range in debug_input.txt", keyCodeValue);
-				continue;
-			}
-
-			InjectKeyClick(static_cast<KeyCode>(keyCodeValue));
-		}
-
-		fclose(file);
-
-		if (hadContent && aIsImGuiCapturingKeyboard)
-			SLUSH_ERROR("PollDebugInputFile: discarded debug_input.txt, ImGui has captured keyboard input");
-
-		if (hadContent)
-		{
-			FILE* truncateFile = nullptr;
-			fopen_s(&truncateFile, absolutePath.GetBuffer(), "w");
-			if (truncateFile)
-				fclose(truncateFile);
-		}
-	}
-
 	void Input::UpdateState(State& aState)
 	{
 		switch (aState)
@@ -225,6 +152,29 @@ namespace Slush
 		case KEYSTATE_NONE:
 			// Dont do anything
 			break;
+		}
+	}
+
+	namespace InputUtils
+	{
+		const char* GetKeyName(Input::KeyCode aKey)
+		{
+			static const char* names[] = { "LEFT", "RIGHT", "UP", "DOWN", "Q", "W", "E", "A", "S", "D", "Z", "X", "V", "SPACE", "ESC", "DEL", "HYPHEN", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12" };
+			static_assert(sizeof(names) / sizeof(names[0]) == Input::__COUNT, "Every key needs a name");
+			return aKey >= 0 && aKey < Input::__COUNT ? names[aKey] : "";
+		}
+
+		bool FindKeyCode(const char* aName, Input::KeyCode& aKey)
+		{
+			for (int i = 0; i < Input::__COUNT; ++i)
+			{
+				if (_stricmp(aName, GetKeyName(static_cast<Input::KeyCode>(i))) == 0)
+				{
+					aKey = static_cast<Input::KeyCode>(i);
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

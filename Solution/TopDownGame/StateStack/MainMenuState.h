@@ -11,6 +11,7 @@ namespace Slush
 class MainMenuState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "mainmenu"; }
 	MainMenuState();
 
 	GameStateResult Update() override;

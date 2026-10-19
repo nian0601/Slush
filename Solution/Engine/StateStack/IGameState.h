@@ -21,6 +21,8 @@ namespace Slush
 		virtual void EndState() {};
 		virtual void ResumeState() {};
 
+		virtual const char* GetTriggerName() const = 0;
+
 		virtual GameStateResult Update() = 0;
 		virtual void Render() {};
 

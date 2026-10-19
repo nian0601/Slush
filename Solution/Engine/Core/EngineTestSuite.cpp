@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "Core/EngineTestSuite.h"
+#include "Core/DebugScriptRunner.h"
+#include "Core/Input.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/AssetRepository.h"
 #include "UI/UITheme.h"
@@ -380,9 +382,204 @@ namespace Slush
 			FW_TEST_CHECK(UITooltipUtils::CalculatePosition(MakeRect(0, 0, 100, 50), { 900, 700 }, screenSize) == Vector2i(0, 0), "Oversized tooltip pins to screen origin");
 		}
 
+		int locScriptCalls = 0;
+		FW_String locScriptArgument;
+		int locScriptErrors = 0;
+
+		void ScriptProbe(DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (!aRunner.RequireArgumentCount(anArguments, 1))
+				return;
+			++locScriptCalls;
+			locScriptArgument = anArguments[0];
+		}
+
+		void TestDebugScriptParsingAndFailure()
+		{
+			locScriptCalls = 0;
+			locScriptErrors = 0;
+			DebugScriptRunner runner;
+			runner.SetReporter([](bool anIsError, const char*, void*) { if (anIsError) ++locScriptErrors; });
+			runner.RegisterCommand("probe", &ScriptProbe);
+			runner.QueueLine("   # ignored");
+			runner.QueueLine(" ");
+			runner.QueueLine("probe \"Restart Level\"");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 1 && locScriptArgument == "Restart Level", "Quotes preserve whitespace");
+			FW_TEST_CHECK(!runner.HasFailed(), "Comments and blanks are ignored");
+			runner.QueueLine("missing");
+			runner.QueueLine("probe");
+			runner.QueueLine("probe \"unterminated");
+			runner.QueueLine("probe after");
+			runner.Step(0.f);
+			FW_TEST_CHECK(runner.HasFailed() && locScriptErrors == 3, "Unknown command, arity and quotes each fail");
+			FW_TEST_CHECK(locScriptCalls == 2 && locScriptArgument == "after", "Failures do not abort later lines");
+		}
+
+		void TestDebugScriptWaits()
+		{
+			locScriptCalls = 0;
+			DebugScriptRunner runner;
+			runner.RegisterCommand("probe", &ScriptProbe);
+			runner.QueueLine("probe first");
+			runner.QueueLine("wait 0.5s");
+			runner.QueueLine("probe second");
+			runner.Step(100.f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Step runs until wait without charging preceding delta");
+			runner.QueueLine("wait 2f");
+			runner.QueueLine("probe third");
+			runner.Step(0.25f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Seconds wait blocks");
+			runner.Step(0.25f);
+			FW_TEST_CHECK(locScriptCalls == 2, "Queued lines follow running wait");
+			runner.Step(100.f);
+			FW_TEST_CHECK(locScriptCalls == 2, "Frame waits ignore delta");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 3 && !runner.HasFailed(), "Frame wait resumes after two frames");
+			const char* valid[] = { "wait 2s", "wait 0.5s", "wait 120f" };
+			for (const char* line : valid)
+			{
+				DebugScriptRunner validRunner;
+				validRunner.QueueLine(line);
+				validRunner.Step(0.f);
+				FW_TEST_CHECK(!validRunner.HasFailed(), "Valid wait accepted");
+			}
+			const char* invalid[] = { "wait 2", "wait -1s", "wait abcs", "wait 2ss", "wait nans", "wait 1e999s", "wait", "wait 1s extra" };
+			for (const char* line : invalid)
+			{
+				DebugScriptRunner invalidRunner;
+				invalidRunner.QueueLine(line);
+				invalidRunner.Step(0.f);
+				FW_TEST_CHECK(invalidRunner.HasFailed(), "Invalid duration fails");
+			}
+		}
+
+		void TestInputKeyNames()
+		{
+			for (int i = 0; i < Input::__COUNT; ++i)
+			{
+				Input::KeyCode key;
+				const char* name = InputUtils::GetKeyName(static_cast<Input::KeyCode>(i));
+				FW_TEST_CHECK(InputUtils::FindKeyCode(name, key) && key == i, "Unique round-trip for every key");
+				FW_String lower = name;
+				_strlwr_s(lower.GetRawBuffer(), lower.MaxSize());
+				FW_TEST_CHECK(InputUtils::FindKeyCode(lower.GetBuffer(), key) && key == i, "Case-insensitive key lookup");
+			}
+			Input::KeyCode key;
+			FW_TEST_CHECK(!InputUtils::FindKeyCode("nonsense", key), "Unknown key rejected");
+		}
+
+		void TestScreenshotNames()
+		{
+			FW_TEST_CHECK(Logger::IsValidLogName("level_1") && Logger::IsValidLogName("a-b"), "Screenshot uses logname validation");
+			const char* invalid[] = { "", "x.png", "a b", "../x", nullptr };
+			for (const char* name : invalid)
+				FW_TEST_CHECK(!Logger::IsValidLogName(name), "Invalid screenshot name rejected");
+		}
+
+		void TestDebugScriptClicks()
+		{
+			UITheme theme;
+			UIBuilder first;
+			UIBuilder second;
+			for (int test = 0; test < 3; ++test)
+			{
+				DebugScriptRunner runner;
+				UIInputState input;
+				input.myDebugScriptRunner = &runner;
+				runner.RequestClick(test == 2 ? "unknown" : "A");
+				first.Start(theme, { 800, 600 });
+				first.BeginButton("A", test == 1 ? UIState::Disabled : UIState::Normal);
+				first.EndButton();
+				first.Finish(input);
+				FW_TEST_CHECK(first.WasClicked("A") == (test == 0), "Script clicks only enabled matching buttons");
+				FW_TEST_CHECK(runner.HasPendingClick() == (test == 2), "Unknown label stays pending; matches are consumed");
+				second.Start(theme, { 800, 600 });
+				second.BeginButton("A");
+				second.EndButton();
+				second.Finish(input);
+				FW_TEST_CHECK(!second.WasClicked("A"), "First matching builder consumes the click");
+				runner.EndFrame();
+				FW_TEST_CHECK(runner.HasFailed() == (test != 0), "Disabled and missing labels fail");
+				FW_TEST_CHECK(!runner.HasPendingClick(), "End of frame drops unmatched clicks");
+			}
+			DebugScriptRunner duplicate;
+			duplicate.RegisterCommand("click", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+			{
+				if (aRunner.RequireArgumentCount(anArguments, 1))
+					aRunner.RequestClick(anArguments[0].GetBuffer());
+			});
+			duplicate.QueueLine("click first");
+			duplicate.QueueLine("click second");
+			duplicate.Step(0.f);
+			FW_TEST_CHECK(duplicate.HasFailed(), "Second click in a frame fails");
+			FW_TEST_CHECK(!duplicate.ConsumeClick("second", true), "Second click is ignored");
+			FW_TEST_CHECK(duplicate.ConsumeClick("first", true), "First click remains pending");
+			duplicate.RequestClick("third");
+			FW_TEST_CHECK(!duplicate.HasPendingClick(), "Consumed click still counts toward per-frame limit");
+			duplicate.EndFrame();
+			duplicate.RequestClick("next");
+			FW_TEST_CHECK(duplicate.ConsumeClick("next", true), "New frame accepts another click");
+			duplicate.EndFrame();
+		}
+
+		void TestDebugScriptTriggers()
+		{
+			locScriptCalls = 0;
+			DebugScriptRunner runner;
+			runner.RegisterCommand("probe", &ScriptProbe);
+			runner.PostTrigger("first");
+			runner.PostTrigger("stale");
+			runner.QueueLine("waitfor first");
+			runner.QueueLine("probe before");
+			runner.QueueLine("waitfor stale 1s");
+			runner.QueueLine("probe after");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Pre-posted trigger satisfies immediately; satisfaction clears other triggers");
+			runner.Step(0.5f);
+			FW_TEST_CHECK(locScriptCalls == 1, "Waitfor blocks");
+			runner.PostTrigger("stale");
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 2 && !runner.HasFailed(), "Fresh trigger unblocks waitfor");
+			runner.QueueLine("wait 2f");
+			runner.QueueLine("waitfor during");
+			runner.QueueLine("probe during");
+			runner.Step(0.f);
+			runner.PostTrigger("during");
+			runner.Step(0.f);
+			runner.Step(0.f);
+			FW_TEST_CHECK(locScriptCalls == 3, "Trigger posted during preceding wait is retained");
+			runner.QueueLine("waitfor absent");
+			runner.QueueLine("probe timeout");
+			runner.Step(0.f);
+			runner.Step(9.f);
+			FW_TEST_CHECK(locScriptCalls == 3, "Default timeout is ten seconds");
+			runner.Step(1.f);
+			FW_TEST_CHECK(runner.HasFailed() && locScriptCalls == 4, "Timeout fails and continues");
+			DebugScriptRunner explicitTimeout;
+			explicitTimeout.QueueLine("waitfor absent 0.5s");
+			explicitTimeout.Step(0.f);
+			explicitTimeout.Step(0.5f);
+			FW_TEST_CHECK(explicitTimeout.HasFailed(), "Explicit timeout applied");
+			const char* invalid[] = { "waitfor", "waitfor x 2f", "waitfor x -1s", "waitfor x 2", "waitfor x abcs", "waitfor x 2s extra" };
+			for (const char* line : invalid)
+			{
+				DebugScriptRunner invalidRunner;
+				invalidRunner.QueueLine(line);
+				invalidRunner.Step(0.f);
+				FW_TEST_CHECK(invalidRunner.HasFailed(), "Invalid waitfor arguments rejected");
+			}
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Engine");
+			FW_RUN_TEST(TestDebugScriptParsingAndFailure);
+			FW_RUN_TEST(TestDebugScriptWaits);
+			FW_RUN_TEST(TestDebugScriptTriggers);
+			FW_RUN_TEST(TestDebugScriptClicks);
+			FW_RUN_TEST(TestInputKeyNames);
+			FW_RUN_TEST(TestScreenshotNames);
 
 			FW_RUN_TEST(TestUIThemeButtonStates);
 			FW_RUN_TEST(TestUIBuilderLayout);

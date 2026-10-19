@@ -7,6 +7,7 @@ namespace Slush
 	class Input;
 	class IApp;
 	class Logger;
+	class DebugScriptRunner;
 
 	class Engine
 	{
@@ -17,10 +18,12 @@ namespace Slush
 		void Initialize();
 		void Shutdown();
 
-		void Run(IApp& anApp);
+		int Run(IApp& anApp);
 
 		const Input& GetInput() const { return *myInput; }
 		Logger& GetLogger() { return *myLogger; }
+
+		DebugScriptRunner& GetDebugScriptRunner() { return *myDebugScriptRunner; }
 
 		Window& GetWindow() { return *myWindow; }
 
@@ -41,5 +44,6 @@ namespace Slush
 		Window* myWindow = nullptr;
 		Input* myInput = nullptr;
 		Logger* myLogger = nullptr;
+		DebugScriptRunner* myDebugScriptRunner = nullptr;
 	};
 }

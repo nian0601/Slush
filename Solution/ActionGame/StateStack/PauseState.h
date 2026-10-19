@@ -13,6 +13,7 @@ class CharacterInfo;
 class PauseState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "pause"; }
 	PauseState(Slush::EntityHandle aPlayerHandle, const CharacterInfo& aCharacterInfo);
 
 	GameStateResult Update() override;

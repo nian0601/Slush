@@ -2,9 +2,19 @@
 
 #include "IGameState.h"
 #include "StateStack.h"
+#include "Core/Engine.h"
+#include "Core/DebugScriptRunner.h"
 
 namespace Slush
 {
+	namespace StateStackUtils
+	{
+		void PostTrigger(const IGameState& aState, bool anIsActive)
+		{
+			FW_String name = FW_String("gamestate.") + aState.GetTriggerName() + (anIsActive ? ".active" : ".inactive");
+			Engine::GetInstance().GetDebugScriptRunner().PostTrigger(name.GetBuffer());
+		}
+	}
 	StateStack::~StateStack()
 	{
 		Clear();
@@ -12,6 +22,8 @@ namespace Slush
 
 	void StateStack::PushMainState(IGameState* aState)
 	{
+		if (!myStates.IsEmpty() && !myStates.GetLast().IsEmpty())
+			StateStackUtils::PostTrigger(*myStates.GetLast().GetLast(), false);
 		myStates.Add();
 		myMainIndex = myStates.Count() - 1;
 		PushSubState(aState);
@@ -20,11 +32,14 @@ namespace Slush
 	void StateStack::PushSubState(IGameState* aState)
 	{
 		FW_GrowingArray<IGameState*>& stateList = myStates.GetLast();
+		if (!stateList.IsEmpty())
+			StateStackUtils::PostTrigger(*stateList.GetLast(), false);
 		stateList.Add(aState);
 		mySubIndex = stateList.Count() - 1;
 
 		aState->myStateStack = this;
 		aState->StartState();
+		StateStackUtils::PostTrigger(*aState, true);
 	}
 
 	void StateStack::Update()
@@ -76,6 +91,7 @@ namespace Slush
 		else
 		{
 			myStates.GetLast().GetLast()->ResumeState();
+			StateStackUtils::PostTrigger(*myStates.GetLast().GetLast(), true);
 		}
 
 	}
@@ -84,11 +100,15 @@ namespace Slush
 	{
 		FW_GrowingArray<IGameState*>& stateList = myStates.GetLast();
 		FW_ASSERT(!stateList.IsEmpty(), "Cant pop an empty stack");
+		StateStackUtils::PostTrigger(*stateList.GetLast(), false);
 		stateList.GetLast()->EndState();
 		stateList.DeleteLast();
 
 		if (!stateList.IsEmpty())
+		{
 			stateList.GetLast()->ResumeState();
+			StateStackUtils::PostTrigger(*stateList.GetLast(), true);
+		}
 	}
 
 	void StateStack::RenderStateAtIndex(int aSubIndex)

@@ -8,6 +8,7 @@ namespace Slush
 	// https://www.youtube.com/watch?v=DYWTw19_8r4&t=100s&ab_channel=NicBarker
 	// https://www.youtube.com/watch?v=by9lQvpvMIc&ab_channel=NicBarker
 
+	class DebugScriptRunner;
 	class Font;
 	class Texture;
 
@@ -15,6 +16,7 @@ namespace Slush
 	{
 		Vector2i myMousePosition = { 0, 0 };
 		bool myWasLeftMouseReleased = false;
+		DebugScriptRunner* myDebugScriptRunner = nullptr;
 	};
 
 	namespace UITooltipUtils

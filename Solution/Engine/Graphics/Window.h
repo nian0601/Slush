@@ -1,4 +1,5 @@
 #pragma once
+#include "FW_String.h"
 
 namespace sf
 {
@@ -20,7 +21,7 @@ namespace Slush
 		void PumpEvents();
 		void RenderOffscreenBufferToImGUI();
 
-		void RequestScreenshot() { myScreenshotRequested = true; }
+		void RequestScreenshot(const char* aName = nullptr);
 
 		void BuildEditorChrome();
 		void Composite();
@@ -29,6 +30,7 @@ namespace Slush
 		// Single chokepoint for every way of quitting - resolves any unsaved changes (via the owning
 		// IAppLayout's Dockables) before actually closing. With no unsaved changes, closes immediately.
 		void Close();
+		void QuitFromDebugScript();
 
 		void Hide();
 
@@ -93,6 +95,7 @@ namespace Slush
 		bool myIsHidden = false;
 		bool myDisplayImGUIDemo = false;
 		bool myScreenshotRequested = false;
+		FW_String myScreenshotName;
 		IAppLayout* myAppLayout = nullptr;
 
 		// A close and a menu-driven layout switch both go through this same pending-transition flow, so

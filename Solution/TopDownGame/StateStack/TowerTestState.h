@@ -16,6 +16,7 @@ namespace Slush
 class TowerTestState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "towertest"; }
 	TowerTestState(LevelData& aLevelData);
 	~TowerTestState();
 

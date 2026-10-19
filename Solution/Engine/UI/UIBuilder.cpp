@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "UIBuilder.h"
+#include "Core/DebugScriptRunner.h"
 #include <Core\Engine.h>
 #include <Graphics\Window.h>
 #include <Graphics\Renderer.h>
@@ -272,6 +273,7 @@ namespace Slush
 	{
 		const Input& input = Engine::GetInstance().GetInput();
 		UIInputState inputState;
+		inputState.myDebugScriptRunner = &Engine::GetInstance().GetDebugScriptRunner();
 		inputState.myMousePosition = input.GetMousePosition();
 		inputState.myWasLeftMouseReleased = input.WasMouseReleased(Input::LEFTMB);
 		Finish(inputState);
@@ -298,6 +300,15 @@ namespace Slush
 		{
 			if (HandleInput(*myDrawOrder[i], anInputState))
 				break;
+		}
+		if (anInputState.myDebugScriptRunner)
+		{
+			for (Element* element : myDrawOrder)
+			{
+				if (element->myIsButton && anInputState.myDebugScriptRunner->ConsumeClick(
+					element->myIdentifier.GetBuffer(), UIThemeUtils::IsClickable(element->myBaseState)))
+					element->myWasMouseReleased = true;
+			}
 		}
 		for (int i = myDrawOrder.Count() - 1; i >= 0; --i)
 		{

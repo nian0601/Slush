@@ -3,6 +3,7 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 #include "Core/Log.h"
+#include "Core/DebugScriptRunner.h"
 #include "Core/AssetRepository.h"
 #include "Core/Dockables/Dockable.h"
 #include "Core/Dockables/IAppLayout.h"
@@ -162,6 +163,23 @@ namespace Slush
 		myRenderWindow->clear();
 	}
 
+	void Window::RequestScreenshot(const char* aName)
+	{
+		myScreenshotName = aName ? aName : "";
+		myScreenshotRequested = true;
+	}
+
+	void Window::QuitFromDebugScript()
+	{
+		if (myAppLayout && myAppLayout->HasUnsavedChanges())
+		{
+			SLUSH_WARNING("[DebugScript] quit discarded unsaved asset changes");
+		}
+		myPendingTransition = PendingTransition::None;
+		myPendingLayoutTarget = nullptr;
+		ConfirmClose("debug script quit");
+	}
+
 	void Window::SaveScreenshot()
 	{
 		sf::Texture texture;
@@ -172,20 +190,21 @@ namespace Slush
 		sf::Image image = texture.copyToImage();
 
 		FW_String absoluteScreenshotPath;
-		AssetRepository::GetDebugFilePath("screenshot.png", absoluteScreenshotPath);
+		AssetRepository::GetDebugFilePath(myScreenshotName.Empty() ? FW_String("screenshot.png") : myScreenshotName + ".png", absoluteScreenshotPath);
 
 		FW_String absolutePreviousPath;
 		AssetRepository::GetDebugFilePath("screenshot_previous.png", absolutePreviousPath);
 
 		FW_FileSystem::FileInfo existingScreenshotInfo;
-		if (FW_FileSystem::GetFileInfo(absoluteScreenshotPath, existingScreenshotInfo))
+		if (myScreenshotName.Empty() && FW_FileSystem::GetFileInfo(absoluteScreenshotPath, existingScreenshotInfo))
 		{
 			if (!FW_FileSystem::RenameFile(absoluteScreenshotPath, absolutePreviousPath))
 				SLUSH_ERROR("SaveScreenshot: failed to rotate '%s' to '%s'", absoluteScreenshotPath.GetBuffer(), absolutePreviousPath.GetBuffer());
 		}
 
 		bool saveSuccess = image.saveToFile(absoluteScreenshotPath.GetBuffer());
-		FW_ASSERT(saveSuccess);
+		if (!saveSuccess)
+			Engine::GetInstance().GetDebugScriptRunner().Fail("could not save screenshot");
 	}
 
 	void Window::Close()

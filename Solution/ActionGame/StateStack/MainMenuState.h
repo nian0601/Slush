@@ -13,6 +13,7 @@ class Tilemap;
 class MainMenuState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "mainmenu"; }
 	MainMenuState();
 	~MainMenuState();
 

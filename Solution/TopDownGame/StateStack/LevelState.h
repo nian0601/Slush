@@ -11,6 +11,7 @@ class TowerBuildMenu;
 class LevelState : public Slush::IGameState
 {
 public:
+	const char* GetTriggerName() const override { return "level"; }
 	LevelState(LevelData& aLevelData);
 	~LevelState();
 

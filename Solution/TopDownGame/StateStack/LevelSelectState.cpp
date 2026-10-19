@@ -47,8 +47,6 @@ void LevelSelectState::StartState()
 
 Slush::IGameState::GameStateResult LevelSelectState::Update()
 {
-	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
-
 	Slush::UIBuilder uiBuilder;
 	uiBuilder.Start(TopDownGameGlobals::GetInstance().GetUITheme());
 	uiBuilder.ScreenFade();
@@ -80,8 +78,7 @@ Slush::IGameState::GameStateResult LevelSelectState::Update()
 	for (int index = 0; index < myLevels.Count(); ++index)
 	{
 		FW_String label = GetLevelButtonLabel(*myLevels[index], index);
-		if (uiBuilder.WasClicked(label.GetBuffer()) ||
-			(index < 9 && input.WasKeyReleased(static_cast<Slush::Input::KeyCode>(Slush::Input::_1 + index))))
+		if (uiBuilder.WasClicked(label.GetBuffer()))
 		{
 			myStateStack->PushSubState(new LevelState(*myLevels[index]));
 			return Slush::IGameState::KEEP;

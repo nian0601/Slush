@@ -40,14 +40,13 @@ Slush::IGameState::GameStateResult GameOverState::Update()
 	}
 	uiBuilder.Finish(myUIRenderCommands);
 
-	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
-	if (uiBuilder.WasClicked("Restart Level") || input.WasKeyReleased(Slush::Input::_1))
+	if (uiBuilder.WasClicked("Restart Level"))
 	{
 		SLUSH_INFO("[GameOver] Restart Level");
 		myLevelState.RestartLevel();
 		return Slush::IGameState::POP_SUBSTATE;
 	}
-	if (uiBuilder.WasClicked("Main Menu") || input.WasKeyReleased(Slush::Input::_2))
+	if (uiBuilder.WasClicked("Main Menu"))
 	{
 		SLUSH_INFO("[GameOver] Main Menu");
 		return Slush::IGameState::POP_MAINSTATE;

@@ -156,6 +156,7 @@
     <ClInclude Include="Core\Dockables\LogDockable.h" />
     <ClInclude Include="Core\Dockables\TextureViewerDockable.h" />
     <ClInclude Include="Core\CommandLineArgs.h" />
+    <ClInclude Include="Core\DebugScriptRunner.h" />
     <ClInclude Include="Core\Engine.h" />
     <ClInclude Include="Core\EditorTheme.h" />
     <ClInclude Include="Core\AssetRepository.h" />
@@ -222,6 +223,7 @@
     <ClCompile Include="Core\Dockables\LogDockable.cpp" />
     <ClCompile Include="Core\Dockables\TextureViewerDockable.cpp" />
     <ClCompile Include="Core\CommandLineArgs.cpp" />
+    <ClCompile Include="Core\DebugScriptRunner.cpp" />
     <ClCompile Include="Core\Engine.cpp" />
     <ClCompile Include="Core\EditorTheme.cpp" />
     <ClCompile Include="Core\AssetRepository.cpp" />

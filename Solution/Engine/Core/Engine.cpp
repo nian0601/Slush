@@ -3,6 +3,8 @@
 #include "Core/Engine.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/Input.h"
+#include "Core/DebugScriptRunner.h"
+#include "Core/AssetRepository.h"
 #include "Core/Time.h"
 #include "Core/IApp.h"
 #include "Core/Log.h"
@@ -10,7 +12,7 @@
 #include "Graphics/Window.h"
 #include "Graphics/Renderer.h"
 
-#include <windows.h>
+
 
 #include "Core/EditorTheme.h"
 
@@ -37,6 +39,64 @@ namespace Slush
 		myWindow = new Window(1920, 1080);
 		myInput = new Input();
 		Time::Init();
+		myDebugScriptRunner = new DebugScriptRunner();
+		myDebugScriptRunner->SetReporter([](bool anIsError, const char* aMessage, void*)
+		{
+			if (anIsError)
+			{
+				SLUSH_ERROR("[DebugScript] %s", aMessage);
+			}
+			else
+			{
+				SLUSH_INFO("%s", aMessage);
+			}
+		});
+		myDebugScriptRunner->RegisterCommand("key", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (!aRunner.RequireArgumentCount(anArguments, 1))
+				return;
+			Input::KeyCode key;
+			if (!InputUtils::FindKeyCode(anArguments[0].GetBuffer(), key))
+				aRunner.Fail("unknown key name");
+			else if (ImGui::GetIO().WantCaptureKeyboard)
+				aRunner.Fail("key skipped: ImGui has captured keyboard input");
+			else
+				Engine::GetInstance().myInput->InjectKeyClick(key);
+		});
+		myDebugScriptRunner->RegisterCommand("screenshot", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (anArguments.Count() > 1)
+			{
+				aRunner.Fail("screenshot expects at most one name");
+				return;
+			}
+			const char* name = anArguments.IsEmpty() ? nullptr : anArguments[0].GetBuffer();
+			if (name && !Logger::IsValidLogName(name))
+			{
+				aRunner.Fail("invalid screenshot name: use only A-Z, a-z, 0-9, underscore or hyphen");
+				return;
+			}
+			Engine::GetInstance().GetWindow().RequestScreenshot(name);
+		});
+		myDebugScriptRunner->RegisterCommand("click", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (aRunner.RequireArgumentCount(anArguments, 1))
+				aRunner.RequestClick(anArguments[0].GetBuffer());
+		});
+		myDebugScriptRunner->RegisterCommand("quit", [](DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (aRunner.RequireArgumentCount(anArguments, 0))
+				Engine::GetInstance().GetWindow().QuitFromDebugScript();
+		});
+		CommandLineArgs& args = CommandLineArgs::GetInstance();
+		if (args.HasFlag("-debugscript"))
+		{
+			const char* path = args.GetString("-debugscript");
+			if (path)
+				myDebugScriptRunner->QueueFile(path);
+			else
+				myDebugScriptRunner->Fail("-debugscript requires a path");
+		}
 
 		if (CommandLineArgs::GetInstance().HasFlag("-hidewindow"))
 			myWindow->Hide();
@@ -50,6 +110,7 @@ namespace Slush
 	{
 		CommandLineArgs::Destroy();
 
+		FW_SAFE_DELETE(myDebugScriptRunner);
 		FW_SAFE_DELETE(myInput);
 		FW_SAFE_DELETE(myWindow);
 
@@ -71,11 +132,13 @@ namespace Slush
 
 		if (CommandLineArgs::GetInstance().HasFlag("-usedebuginput"))
 		{
-			myInput->PollDebugInputFile(imguiIO.WantCaptureKeyboard);
+			FW_String path;
+			AssetRepository::GetDebugFilePath("debug_input.txt", path);
+			myDebugScriptRunner->QueueFile(path.GetBuffer(), true, true);
 
-			if (myInput->WasKeyPressed(Slush::Input::_F9))
-				myWindow->Close();
 		}
+
+		myDebugScriptRunner->Step(Time::GetDelta());
 
 		if (!imguiIO.WantCaptureMouse || myByPassImGUIInputRestriction)
 		{
@@ -130,7 +193,7 @@ namespace Slush
 		myWindow->Present();
 	}
 
-	void Engine::Run(IApp& anApp)
+	int Engine::Run(IApp& anApp)
 	{
 		anApp.Initialize();
 
@@ -144,9 +207,11 @@ namespace Slush
 			RenderFrame(anApp);
 			BuildEditorUI();
 			CompositeAndPresent();
+			myDebugScriptRunner->EndFrame();
 		}
 
 		myWindow->DeleteAllLayouts();
 		anApp.Shutdown();
+		return myDebugScriptRunner->HasFailed() ? 1 : 0;
 	}
 }

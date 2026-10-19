@@ -23,7 +23,7 @@ LevelEditorLayout::LevelEditorLayout()
 {
 	LevelData* levelData = Slush::AssetRegistry::GetInstance().GetAsset<LevelData>(ourLevelDataAssetName);
 	FW_ASSERT(levelData, "Level Editor has no valid LevelData - expected a 'level_main' LevelData asset");
-	myLevel = new Level(*levelData, false);
+	myLevel = new Level(*levelData, false, true);
 
 	AddDockable(new Slush::GameViewDockable());
 

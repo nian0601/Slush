@@ -27,7 +27,9 @@ enum class LevelResult
 class Level
 {
 public:
-	Level(LevelData& aLevelData, bool aShouldCopyNavmesh);
+	// anIsEditMode is the Level Editor's still level: no wave spawning and no win/lose result, only
+	// entities (debug-spawned enemies) update.
+	Level(LevelData& aLevelData, bool aShouldCopyNavmesh, bool anIsEditMode = false);
 	~Level();
 
 	Navmesh& GetNavmesh();
@@ -41,7 +43,9 @@ public:
 	void SpawnEnemyNormal();
 	void SpawnEnemyFast();
 	void SpawnEnemySlow();
+	void SpawnEnemy(const Slush::EntityPrefab& anEnemyPrefab);
 	void DamageAllEnemies();
+	void ClearEnemies();
 
 	bool IsInGracePeriod() const { return myIsInGracePeriod; }
 	bool HasNextWave() const;
@@ -69,6 +73,7 @@ private:
 	void UpdateResult();
 
 	LevelData* myLevelData = nullptr;
+	bool myIsEditMode = false;
 	Navmesh* myNavmeshCopy = nullptr;
 	Slush::EntityManager myEntityManager;
 	int myResources = 0;

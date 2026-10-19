@@ -32,7 +32,6 @@ private:
 	void UpdateManualCutMode();
 	void UpdateSetStartMode();
 	void UpdateSetGoalMode();
-	void UpdatePlaceTowerMode();
 
 	void RenderBoxCutPreview() const;
 	void RenderManualCutPreview() const;
@@ -42,7 +41,6 @@ private:
 	void DisableManualCutMode();
 	void DisableSetStartMode();
 	void DisableSetGoalMode();
-	void DisablePlaceTowerMode();
 
 	// Shared by both cut modes - wraps the CutHole() call in an AssetEditScope and marks the NavmeshData
 	// asset dirty, since CutHole() itself is a direct field write, not one of the ImGuiWidgets:: calls
@@ -53,8 +51,9 @@ private:
 	void SetStartPosition(const Vector2f& aPosition);
 	void SetGoalPosition(const Vector2f& aPosition);
 
-	bool SaveAssets();
-	int GetPlacedTowerCount() const;
+	void BuildDebugSpawnUI();
+
+	void SaveAssets();
 	void DiscardUnsavedChanges();
 
 	Level& myLevel;
@@ -68,11 +67,9 @@ private:
 
 	bool myIsSetStartModeActive = false;
 	bool myIsSetGoalModeActive = false;
-	bool myIsPlaceTowerModeActive = false;
-	Slush::EntityPrefab* myTowerPrefabToPlace = nullptr;
 
 	bool myWantToOpenUnsavedChangesPopup = false;
-	int mySaveBlockedTowerCount = 0;
+	int mySelectedUnlockIndex = 0;
 
 	Navmesh::TriangleMesh myTriangleMesh;
 };

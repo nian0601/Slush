@@ -40,6 +40,20 @@ public:
 		window.AddLayout(new GameLayout(), true);
 		window.AddLayout(new NavmeshDebuggingLayout());
 		window.AddLayout(new LevelEditorLayout());
+
+		Slush::CommandLineArgs& commandLineArgs = Slush::CommandLineArgs::GetInstance();
+		if (commandLineArgs.HasFlag("-layout"))
+		{
+			const char* layoutName = commandLineArgs.GetString("-layout");
+			if (!layoutName)
+			{
+				SLUSH_WARNING("Missing -layout value; keeping the default layout");
+			}
+			else if (!window.ActivateLayoutByName(layoutName))
+			{
+				SLUSH_WARNING("Unknown -layout '%s'; keeping the default layout", layoutName);
+			}
+		}
 	}
 
 	void Shutdown() override

@@ -5,7 +5,6 @@
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
-#include "Components/TowerCombatComponent.h"
 
 #include "Core/Assets/AssetStorage.h"
 #include "Core/CommandLineArgs.h"
@@ -96,7 +95,6 @@ void LevelEditorDockable::OnUpdate()
 	UpdateManualCutMode();
 	UpdateSetStartMode();
 	UpdateSetGoalMode();
-	UpdatePlaceTowerMode();
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
@@ -171,18 +169,6 @@ void LevelEditorDockable::UpdateSetGoalMode()
 	SetGoalPosition(engine.GetInput().GetMousePositionf());
 }
 
-void LevelEditorDockable::UpdatePlaceTowerMode()
-{
-	if (!myIsPlaceTowerModeActive)
-		return;
-
-	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB) || myTowerPrefabToPlace == nullptr)
-		return;
-
-	myLevel.TryPlaceTower(*myTowerPrefabToPlace, engine.GetInput().GetMousePositionf());
-}
-
 void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions)
 {
 	NavmeshData& navmeshData = myLevel.GetNavmeshDataAsset();
@@ -240,11 +226,6 @@ void LevelEditorDockable::DisableSetGoalMode()
 	myIsSetGoalModeActive = false;
 }
 
-void LevelEditorDockable::DisablePlaceTowerMode()
-{
-	myIsPlaceTowerModeActive = false;
-}
-
 void LevelEditorDockable::OnBuildUI()
 {
 	if (ImGui::BeginMenuBar())
@@ -255,25 +236,7 @@ void LevelEditorDockable::OnBuildUI()
 		ImGui::EndMenuBar();
 	}
 
-	if (mySaveBlockedTowerCount > 0)
-	{
-		ImGui::Text("Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
-		ImGui::Separator();
-	}
-
-	ImGui::Text("Enemies");
-
-	if (ImGui::Button("Spawn Normal"))
-		myLevel.SpawnEnemyNormal();
-
-	if (ImGui::Button("Spawn Fast"))
-		myLevel.SpawnEnemyFast();
-
-	if (ImGui::Button("Spawn Slow"))
-		myLevel.SpawnEnemySlow();
-
-	if (ImGui::Button("Damage All Enemies"))
-		myLevel.DamageAllEnemies();
+	BuildDebugSpawnUI();
 
 	ImGui::Separator();
 
@@ -358,57 +321,56 @@ void LevelEditorDockable::OnBuildUI()
 
 	ImGui::Separator();
 
-	ImGui::Text("Towers");
-	ImGui::Text("Resources: %d", myLevel.GetResources());
-	ImGui::Text("Lives: %d", myLevel.GetLives());
-	Slush::AssetRegistry& assetRegistry = Slush::AssetRegistry::GetInstance();
-	const FW_GrowingArray<Slush::Asset*>& prefabs = assetRegistry.GetAllAssets<Slush::EntityPrefab>();
-	const char* selectedPrefabName = myTowerPrefabToPlace ? myTowerPrefabToPlace->GetAssetName().GetBuffer() : "Select a tower";
-	if (ImGui::BeginCombo("Tower Prefab", selectedPrefabName))
-	{
-		for (Slush::Asset* asset : prefabs)
-		{
-			Slush::EntityPrefab* prefab = static_cast<Slush::EntityPrefab*>(asset);
-			if (!TowerCombatComponent::IsBuildableTowerPrefab(*prefab))
-				continue;
-
-			const bool isSelected = prefab == myTowerPrefabToPlace;
-			if (ImGui::Selectable(prefab->GetAssetName().GetBuffer(), isSelected))
-				myTowerPrefabToPlace = prefab;
-			if (isSelected)
-				ImGui::SetItemDefaultFocus();
-		}
-		ImGui::EndCombo();
-	}
-
-	if (myIsPlaceTowerModeActive)
-	{
-		if (ImGui::Button("Disable Place Tower"))
-			DisablePlaceTowerMode();
-	}
-	else if (ImGui::Button("Enable Place Tower"))
-	{
-		if (myTowerPrefabToPlace == nullptr)
-		{
-			SLUSH_WARNING("[Level Editor] Select a tower prefab before enabling tower placement");
-		}
-		else
-		{
-			myIsPlaceTowerModeActive = true;
-			DisableBoxCutMode();
-			DisableManualCutMode();
-			DisableSetStartMode();
-			DisableSetGoalMode();
-		}
-	}
-
-	ImGui::Separator();
 	if (ImGui::CollapsingHeader("Waves"))
 	{
 		LevelData& levelData = myLevel.GetLevelDataAsset();
 		Slush::AssetEditScope editScope(levelData);
 		levelData.BuildWaveScalingUI();
 	}
+}
+
+void LevelEditorDockable::BuildDebugSpawnUI()
+{
+	ImGui::Text("Enemies");
+
+	// Picks from the level's own unlock roster, so each level's Debug spawns follow what its waves can send.
+	const FW_GrowingArray<EnemyUnlockEntry>& unlocks = myLevel.GetLevelDataAsset().myEnemyUnlocks;
+	Slush::EntityPrefab* selectedPrefab = nullptr;
+	if (mySelectedUnlockIndex >= 0 && mySelectedUnlockIndex < unlocks.Count())
+		selectedPrefab = unlocks[mySelectedUnlockIndex].myEnemyPrefab.Get();
+
+	const char* selectedName = selectedPrefab ? selectedPrefab->GetAssetName().GetBuffer() : "Select an enemy";
+	if (ImGui::BeginCombo("Enemy", selectedName))
+	{
+		for (int i = 0; i < unlocks.Count(); ++i)
+		{
+			Slush::EntityPrefab* prefab = unlocks[i].myEnemyPrefab.Get();
+			if (!prefab)
+				continue;
+
+			ImGui::PushID(i);
+			const bool isSelected = i == mySelectedUnlockIndex;
+			if (ImGui::Selectable(prefab->GetAssetName().GetBuffer(), isSelected))
+				mySelectedUnlockIndex = i;
+			if (isSelected)
+				ImGui::SetItemDefaultFocus();
+			ImGui::PopID();
+		}
+		ImGui::EndCombo();
+	}
+
+	ImGui::BeginDisabled(selectedPrefab == nullptr);
+	if (ImGui::Button("Spawn"))
+		myLevel.SpawnEnemy(*selectedPrefab);
+	ImGui::EndDisabled();
+
+	ImGui::SameLine();
+	if (ImGui::Button("Damage All"))
+		myLevel.DamageAllEnemies();
+
+	ImGui::SameLine();
+	if (ImGui::Button("Clear Enemies"))
+		myLevel.ClearEnemies();
 }
 
 bool LevelEditorDockable::HasUnsavedChanges() const
@@ -450,13 +412,11 @@ void LevelEditorDockable::OnBuildModals()
 			ImGui::BulletText("%s", myLevel.GetNavmeshDataAsset().GetAssetName().GetBuffer());
 		if (myLevel.GetLevelDataAsset().HasUnsavedChanges())
 			ImGui::BulletText("%s", myLevel.GetLevelDataAsset().GetAssetName().GetBuffer());
-		if (mySaveBlockedTowerCount > 0)
-			ImGui::Text("Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
 
 		if (ImGui::Button("Save"))
 		{
-			if (SaveAssets())
-				ImGui::CloseCurrentPopup();
+			SaveAssets();
+			ImGui::CloseCurrentPopup();
 		}
 
 		ImGui::SameLine();
@@ -481,34 +441,10 @@ void LevelEditorDockable::OnBuildModals()
 	}
 }
 
-bool LevelEditorDockable::SaveAssets()
+void LevelEditorDockable::SaveAssets()
 {
-	mySaveBlockedTowerCount = GetPlacedTowerCount();
-	if (mySaveBlockedTowerCount > 0)
-	{
-		SLUSH_WARNING("[Level Editor] Save blocked: %d tower(s) currently placed - remove them or restart before saving", mySaveBlockedTowerCount);
-		return false;
-	}
-
 	myLevel.GetNavmeshDataAsset().Save();
 	myLevel.GetLevelDataAsset().Save();
-	return true;
-}
-
-int LevelEditorDockable::GetPlacedTowerCount() const
-{
-	FW_GrowingArray<Slush::EntityHandle> entities;
-	myLevel.GetEntityManager().GetAllEntities(entities);
-
-	int towerCount = 0;
-	for (const Slush::EntityHandle& handle : entities)
-	{
-		Slush::Entity* entity = handle.Get();
-		if (entity && !entity->myIsMarkedForRemoval && entity->GetComponent<TowerCombatComponent>())
-			++towerCount;
-	}
-
-	return towerCount;
 }
 
 void LevelEditorDockable::DiscardUnsavedChanges()

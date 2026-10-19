@@ -281,8 +281,6 @@ void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 	aRootHandle.ParseFloatField("interWaveRestDuration", myInterWaveRestDuration);
 	aRootHandle.ParseFloatField("preFirstWaveGraceDuration", myPreFirstWaveGraceDuration);
 
-	// Cleared first so reloading an already-loaded LevelData (Level Editor discard) doesn't keep stale entries
-	myEnemyUnlocks.RemoveAll();
 	Slush::AssetParser::Handle enemyUnlocksHandle = aRootHandle.ParseChildElement("enemyUnlocks");
 	if (enemyUnlocksHandle.IsValid())
 	{

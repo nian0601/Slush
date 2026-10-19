@@ -120,3 +120,29 @@ Agent summaries, findings, PR/issue bodies and other scratch output belong in th
 ## Issue tracking
 
 Work is tracked on GitHub Issues at `nian0601/Slush` (migrated from Trello). Valid `project:` label values: `project:engine` (Slush Engine/Framework code), `project:actiongame` (ActionGame-specific code), `project:topdowngame` (TopDownGame-specific code), `project:tooling` (Claude Code skills, CLAUDE.md, repo workflow tooling). Revisit if this needs to be more granular (e.g. per-game, as BossMonster becomes active) or consolidated.
+
+## Autonomy
+
+Gates are defined in `~/.claude/skills/shared/workflow.md` section 7. `G1` is granted because nothing lands unseen: every change still goes through a GitHub PR whose Merge click is the actual review gate (`## Repo etiquette`), and every call made under `G1` is filed as an `agent-flagged` issue for later review.
+
+Granted: **`G1`** (judgment calls).
+Withheld: **`G2`** (merge), **`G3`** (close) — moot under the PR flow: merging stays the user's Merge click, and the PR's `Closes #<N>` closes the issue. Withheld rather than granted so dropping the PR flow would never quietly start merging. **`G4`** — every plan is reviewed before it becomes an issue.
+
+Each always-halt below fires only when the issue's phases don't call for it; a plan that does is caught earlier, at plan review (see below).
+
+Always halt regardless:
+
+- New STL usage (see `## Code style`; `G1` doesn't get around the approval rule).
+- A change that requires mass-resaving `Assets/` files, i.e. existing files no longer load correctly unless rewritten. A `DataAsset` version bump (`DEFINE_ASSET`'s last argument) on its own isn't a halt: `DataAsset::Load()` passes the file's version to `OnParse`, so old files can keep loading.
+- Build-config changes beyond adding/removing source files: include paths, linked libraries, compiler/linker flags, configurations/platforms, `Directory.Build.props`, `build.bat`.
+- Adding, removing or upgrading third-party code (`SFML/`, `Solution/Engine/imgui/`, or a new library).
+
+Plan review escalates:
+
+- A plan that calls for new STL usage.
+- A plan that calls for build-config changes beyond adding/removing source files (include paths, linked libraries, compiler/linker flags, configurations/platforms, `Directory.Build.props`, `build.bat`).
+- A plan that calls for adding, removing or upgrading third-party code (`SFML/`, `Solution/Engine/imgui/`, or a new library).
+
+A plan requiring a mass resave of `Assets/` is already escalated by baseline item 2 (stored schema / data migration), so it isn't repeated here.
+
+The non-delegable floor in `workflow.md` section 7 applies on top of these and cannot be waived here. No grant skips the manual-test gate (`## Testing`).

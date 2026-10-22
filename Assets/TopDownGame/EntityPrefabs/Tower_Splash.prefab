@@ -15,12 +15,12 @@ Entity Prefab
 	{
 		version 1
 		range 300.000
-		cooldown 1.000
+		cooldown 1.500
 		projectiletype Projectile_Splash
 	}
 	buildcost
 	{
 		version 1
-		cost 75
+		cost 100
 	}
 }

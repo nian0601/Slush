@@ -279,8 +279,7 @@ void Level::UpdateWaveSpawning()
 
 void Level::SpawnWaveEnemy()
 {
-	float difficultyWeight = WaveScaling::GetDifficultyWeight(myCurrentWaveIndex, myLevelData->myDifficultyRampWaveCount);
-	int unlockIndex = WaveScaling::PickUnlockedEnemyIndex(myLevelData->myEnemyUnlocks, myCurrentWaveIndex, difficultyWeight, FW_RandFloat());
+	int unlockIndex = WaveScaling::PickUnlockedEnemyIndex(myLevelData->myEnemyUnlocks, myCurrentWaveIndex, FW_RandFloat());
 	if (unlockIndex < 0)
 		return;
 

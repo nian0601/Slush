@@ -66,8 +66,6 @@ void LevelData::BuildWaveScalingUI()
 			myEnemyCountPerWaveIncrement = FW_Max(myEnemyCountPerWaveIncrement, 0);
 		if (Slush::ImGuiWidgets::InputInt("Max Count / Wave", &myMaxEnemyCountPerWave))
 			myMaxEnemyCountPerWave = FW_Max(myMaxEnemyCountPerWave, 0);
-		if (Slush::ImGuiWidgets::InputInt("Difficulty Ramp Waves", &myDifficultyRampWaveCount))
-			myDifficultyRampWaveCount = FW_Max(myDifficultyRampWaveCount, 0);
 	}
 
 	if (ImGui::CollapsingHeader("Timing", ImGuiTreeNodeFlags_DefaultOpen))
@@ -95,11 +93,12 @@ void LevelData::BuildEnemyUnlocksUI()
 	int removeIndex = -1;
 
 	const ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingFixedFit;
-	if (ImGui::BeginTable("EnemyUnlocks", 4, tableFlags))
+	if (ImGui::BeginTable("EnemyUnlocks", 5, tableFlags))
 	{
 		ImGui::TableSetupColumn("#");
 		ImGui::TableSetupColumn("Enemy prefab", ImGuiTableColumnFlags_WidthStretch);
 		ImGui::TableSetupColumn("Unlock wave");
+		ImGui::TableSetupColumn("Weight");
 		ImGui::TableSetupColumn("");
 		ImGui::TableHeadersRow();
 
@@ -135,6 +134,11 @@ void LevelData::BuildEnemyUnlocksUI()
 				unlock.myUnlockWave = FW_Max(unlock.myUnlockWave, 0);
 
 			ImGui::TableSetColumnIndex(3);
+			ImGui::SetNextItemWidth(90.f);
+			if (Slush::ImGuiWidgets::InputInt("##Weight", &unlock.myWeight))
+				unlock.myWeight = FW_Max(unlock.myWeight, 1);
+
+			ImGui::TableSetColumnIndex(4);
 			ImGui::BeginDisabled(i == 0);
 			if (Slush::ImGuiWidgets::Button(ICON_FA_ARROW_UP))
 			{
@@ -171,10 +175,8 @@ void LevelData::BuildEnemyUnlocksUI()
 		myEnemyUnlocks.RemoveNonCyclicAtIndex(removeIndex);
 
 	if (Slush::ImGuiWidgets::Button("+ Add"))
-		myEnemyUnlocks.Add();
+		myEnemyUnlocks.Add() = EnemyUnlockEntry();
 
-	if (!WaveScaling::AreEnemyUnlocksAscending(myEnemyUnlocks))
-		ImGui::TextWrapped("Warning: unlock waves are not in ascending order. List order controls enemy difficulty.");
 	for (const EnemyUnlockEntry& unlock : myEnemyUnlocks)
 	{
 		if (!unlock.myEnemyPrefab.Get())
@@ -187,7 +189,7 @@ void LevelData::BuildEnemyUnlocksUI()
 
 void LevelData::BuildWavePreviewUI()
 {
-	ImGui::TextDisabled("Waves are 0-based. The pool is every unlocked enemy; later waves favour the later ones.");
+	ImGui::TextDisabled("Waves are 0-based. The pool is every unlocked enemy, picked by summed weight per prefab.");
 
 	const ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingFixedFit;
 	if (ImGui::BeginTable("WavePreview", 3, tableFlags))
@@ -203,13 +205,19 @@ void LevelData::BuildWavePreviewUI()
 			WaveScaling::GetWavePreview(wave, myBaseEnemyCount, myEnemyCountPerWaveIncrement, myMaxEnemyCountPerWave, myEnemyUnlocks, preview);
 
 			FW_String pool;
-			for (int i = 0; i < preview.myUnlockedIndices.Count(); ++i)
+			for (int i = 0; i < preview.myPrefabWeights.Count(); ++i)
 			{
 				if (i > 0)
 					pool += ", ";
 
-				const EnemyUnlockEntry& unlock = myEnemyUnlocks[preview.myUnlockedIndices[i]];
-				pool += unlock.myEnemyPrefab.Get() ? unlock.myEnemyPrefab.GetName().GetBuffer() : "(missing)";
+				const WaveScaling::PrefabWeight& prefabWeight = preview.myPrefabWeights[i];
+				int percent = static_cast<int>(100.f * prefabWeight.myWeight / preview.myTotalWeight + 0.5f);
+				pool += prefabWeight.myPrefabName.Empty() ? "(missing)" : prefabWeight.myPrefabName.GetBuffer();
+				pool += " ";
+				pool += prefabWeight.myWeight;
+				pool += " (";
+				pool += percent;
+				pool += "%)";
 			}
 
 			ImGui::TableNextRow();
@@ -240,7 +248,6 @@ void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
 	aRootHandle.ParseIntField("baseEnemyCount", myBaseEnemyCount);
 	aRootHandle.ParseIntField("enemyCountPerWaveIncrement", myEnemyCountPerWaveIncrement);
 	aRootHandle.ParseIntField("maxEnemyCountPerWave", myMaxEnemyCountPerWave);
-	aRootHandle.ParseIntField("difficultyRampWaveCount", myDifficultyRampWaveCount);
 	aRootHandle.ParseFloatField("enemySpawnInterval", myEnemySpawnInterval);
 	aRootHandle.ParseFloatField("interWaveRestDuration", myInterWaveRestDuration);
 	aRootHandle.ParseFloatField("preFirstWaveGraceDuration", myPreFirstWaveGraceDuration);
@@ -257,9 +264,12 @@ void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
 		{
 			Slush::AssetParser::Handle unlockHandle = enemyUnlocksHandle.GetChildElementAtIndex(i);
 
+			// Reset first: Reserve() reuses old slots, and a pre-v6 file has no weight field to overwrite them with
 			EnemyUnlockEntry& unlock = myEnemyUnlocks[i];
+			unlock = EnemyUnlockEntry();
 			unlock.myEnemyPrefab.Parse(unlockHandle, "enemyPrefab");
 			unlockHandle.ParseIntField("unlockWave", unlock.myUnlockWave);
+			unlockHandle.ParseIntField("weight", unlock.myWeight);
 		}
 	}
 }
@@ -276,7 +286,6 @@ void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 	aRootHandle.ParseIntField("baseEnemyCount", myBaseEnemyCount);
 	aRootHandle.ParseIntField("enemyCountPerWaveIncrement", myEnemyCountPerWaveIncrement);
 	aRootHandle.ParseIntField("maxEnemyCountPerWave", myMaxEnemyCountPerWave);
-	aRootHandle.ParseIntField("difficultyRampWaveCount", myDifficultyRampWaveCount);
 	aRootHandle.ParseFloatField("enemySpawnInterval", myEnemySpawnInterval);
 	aRootHandle.ParseFloatField("interWaveRestDuration", myInterWaveRestDuration);
 	aRootHandle.ParseFloatField("preFirstWaveGraceDuration", myPreFirstWaveGraceDuration);
@@ -290,6 +299,7 @@ void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 
 			unlock.myEnemyPrefab.Parse(unlockHandle, "enemyPrefab");
 			unlockHandle.ParseIntField("unlockWave", unlock.myUnlockWave);
+			unlockHandle.ParseIntField("weight", unlock.myWeight);
 		}
 	}
 }

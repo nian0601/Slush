@@ -15,7 +15,7 @@ Entity Prefab
 	{
 		version 1
 		speed 500.000
-		damage 30
-		splashradius 75.000
+		damage 15
+		splashradius 60.000
 	}
 }

@@ -1,6 +1,6 @@
 LevelData 
 { 
-	version 5 
+	version 6 
 	navmeshData navmesh_second 
 	startingResources 100 
 	startingLives 20 
@@ -8,7 +8,6 @@ LevelData
 	baseEnemyCount 4 
 	enemyCountPerWaveIncrement 2 
 	maxEnemyCountPerWave 20 
-	difficultyRampWaveCount 10 
 	enemySpawnInterval 0.250 
 	interWaveRestDuration 3.000 
 	preFirstWaveGraceDuration 10.000 
@@ -28,16 +27,19 @@ LevelData
 		{ 
 			enemyPrefab Enemy_Slow 
 			unlockWave 0 
+			weight 1 
 		} 
 		unlock 
 		{ 
 			enemyPrefab Enemy_Normal 
 			unlockWave 2 
+			weight 1 
 		} 
 		unlock 
 		{ 
 			enemyPrefab Enemy_Fast 
 			unlockWave 4 
+			weight 1 
 		} 
 	} 
 } 

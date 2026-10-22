@@ -3,49 +3,46 @@
 #include "WaveScalingTestSuite.h"
 #include "Level/WaveScaling.h"
 
+#include <Core/AssetRepository.h>
+
 #include <FW_UnitTestSuite.h>
 
 namespace WaveScalingTestSuite
 {
-	void TestEnemyUnlockOrderAllowsEmptySingleAscendingAndTies()
+	struct NamedUnlock
 	{
-		FW_GrowingArray<EnemyUnlockEntry> unlocks;
-		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "An empty roster is ordered");
-		unlocks.Add().myUnlockWave = 0;
-		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "A single entry is ordered");
-		unlocks.Add().myUnlockWave = 2;
-		unlocks.Add().myUnlockWave = 4;
-		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "Increasing unlock waves are ordered");
-		unlocks.Add().myUnlockWave = 4;
-		FW_TEST_CHECK(WaveScaling::AreEnemyUnlocksAscending(unlocks), "Equal unlock waves retain authored order");
-	}
+		const char* myPrefabName;
+		int myUnlockWave;
+		int myWeight;
+	};
 
-	void TestEnemyUnlockOrderRejectsAnyDescendingPair()
+	// AssetReference only takes a name through Parse() or a real asset, and assets aren't loaded
+	// during tests, so named entries round-trip through a scratch file in the Debug folder.
+	void MakeNamedUnlocks(const NamedUnlock* someUnlocks, int aCount, FW_GrowingArray<EnemyUnlockEntry>& someOutUnlocks)
 	{
-		FW_GrowingArray<EnemyUnlockEntry> unlocks;
-		unlocks.Add().myUnlockWave = 0;
-		unlocks.Add().myUnlockWave = 4;
-		unlocks.Add().myUnlockWave = 2;
-		FW_TEST_CHECK(!WaveScaling::AreEnemyUnlocksAscending(unlocks), "A descending final pair must warn");
-		unlocks[0].myUnlockWave = 5;
-		unlocks[2].myUnlockWave = 6;
-		FW_TEST_CHECK(!WaveScaling::AreEnemyUnlocksAscending(unlocks), "A descending first pair must warn even when the last pair is ordered");
-	}
+		FW_String testFilePath;
+		Slush::AssetRepository::GetDebugFilePath("wavescaling_unlocks_test.txt", testFilePath);
 
-	void TestGetEnemyCountForWaveScalesLinearlyAndRespectsCap()
-	{
-		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(0, 3, 1, 20) == 3, "Expected wave 0 to spawn the base enemy count");
-		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(1, 3, 1, 20) == 4, "Expected the enemy count to increase linearly with wave index");
-		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(5, 3, 1, 20) == 8, "Expected the enemy count to keep scaling linearly across several waves");
-		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(100, 3, 1, 20) == 20, "Expected the enemy count to be capped at the configured maximum");
-	}
+		Slush::AssetParser writer;
+		Slush::AssetParser::Handle writeHandle = writer.StartWriting("enemyUnlocks");
+		for (int i = 0; i < aCount; ++i)
+		{
+			FW_String prefabName = someUnlocks[i].myPrefabName;
+			writeHandle.ParseChildElement("unlock").ParseStringField("enemyPrefab", prefabName);
+		}
+		writer.FinishWriting(testFilePath.GetBuffer());
 
-	void TestGetDifficultyWeightRampsAndClamps()
-	{
-		FW_TEST_CHECK(WaveScaling::GetDifficultyWeight(0, 10) == 0.f, "Expected wave 0 to have zero difficulty weight");
-		FW_TEST_CHECK(WaveScaling::GetDifficultyWeight(5, 10) == 0.5f, "Expected the difficulty weight to ramp linearly partway through the ramp window");
-		FW_TEST_CHECK(WaveScaling::GetDifficultyWeight(10, 10) == 1.f, "Expected the difficulty weight to reach 1 exactly at the end of the ramp window");
-		FW_TEST_CHECK(WaveScaling::GetDifficultyWeight(20, 10) == 1.f, "Expected the difficulty weight to clamp at 1 past the ramp window");
+		Slush::AssetParser reader;
+		Slush::AssetParser::Handle readHandle = reader.Load(testFilePath.GetBuffer());
+		someOutUnlocks.RemoveAll();
+		for (int i = 0; i < aCount; ++i)
+		{
+			EnemyUnlockEntry& unlock = someOutUnlocks.Add();
+			unlock = EnemyUnlockEntry();
+			unlock.myEnemyPrefab.Parse(readHandle.GetChildElementAtIndex(i), "enemyPrefab");
+			unlock.myUnlockWave = someUnlocks[i].myUnlockWave;
+			unlock.myWeight = someUnlocks[i].myWeight;
+		}
 	}
 
 	FW_GrowingArray<EnemyUnlockEntry> MakeThreeUnlocks()
@@ -57,31 +54,80 @@ namespace WaveScalingTestSuite
 		return unlocks;
 	}
 
-	void TestPickUnlockedEnemyIndexNeverReturnsAboveUnlockThreshold()
+	void TestGetEnemyCountForWaveScalesLinearlyAndRespectsCap()
 	{
-		FW_GrowingArray<EnemyUnlockEntry> unlocks = MakeThreeUnlocks();
-
-		// At wave 1, only the wave-0 entry (index 0) is unlocked - the wave-2 and wave-4 entries aren't yet.
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 1, 0.f, 0.f) == 0, "Expected only the wave-0 entry to be pickable before its wave-2 sibling unlocks");
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 1, 1.f, 0.99f) == 0, "Expected only the wave-0 entry to be pickable regardless of weight/roll before wave 2");
-
-		// At wave -1 (below every unlock threshold), nothing is unlocked.
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, -1, 0.f, 0.5f) == -1, "Expected no pickable entry below every unlock threshold");
+		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(0, 3, 1, 20) == 3, "Expected wave 0 to spawn the base enemy count");
+		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(1, 3, 1, 20) == 4, "Expected the enemy count to increase linearly with wave index");
+		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(5, 3, 1, 20) == 8, "Expected the enemy count to keep scaling linearly across several waves");
+		FW_TEST_CHECK(WaveScaling::GetEnemyCountForWave(100, 3, 1, 20) == 20, "Expected the enemy count to be capped at the configured maximum");
 	}
 
-	void TestPickUnlockedEnemyIndexUniformAtZeroWeightAndLastAtOneWeight()
+	void TestPickNeverReturnsNotYetUnlockedEntries()
+	{
+		FW_GrowingArray<EnemyUnlockEntry> unlocks = MakeThreeUnlocks();
+		unlocks[1].myWeight = 100;
+		unlocks[2].myWeight = 100;
+
+		// At wave 1, only the wave-0 entry is unlocked, however heavy the later ones are
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 1, 0.f) == 0, "Expected only the wave-0 entry to be pickable before wave 2, with roll 0");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 1, 0.5f) == 0, "Expected only the wave-0 entry to be pickable before wave 2, with a mid roll");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 1, 0.9999f) == 0, "Expected only the wave-0 entry to be pickable before wave 2, with a roll near 1");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 3, 0.9999f) == 1, "Expected the wave-4 entry to stay unpickable at wave 3");
+	}
+
+	void TestPickWithNoUnlocksReturnsMinusOne()
+	{
+		FW_GrowingArray<EnemyUnlockEntry> unlocks;
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 3, 0.5f) == -1, "Expected -1 with an empty roster");
+
+		unlocks = MakeThreeUnlocks();
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, -1, 0.5f) == -1, "Expected -1 below every unlock threshold");
+	}
+
+	void TestPickEqualWeightsSplitRollEvenly()
 	{
 		FW_GrowingArray<EnemyUnlockEntry> unlocks = MakeThreeUnlocks();
 
-		// At wave 4, all three entries are unlocked (indices 0, 1, 2).
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.f, 0.0f) == 0, "Expected a zero roll at zero weight to pick the first unlocked entry");
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.f, 0.4f) == 1, "Expected a mid roll at zero weight to pick the middle unlocked entry");
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.f, 0.8f) == 2, "Expected a high roll at zero weight to pick the last unlocked entry");
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.f, 0.999f) == 2, "Expected a roll near 1 at zero weight to still pick the last unlocked entry rather than overrun");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.f) == 0, "Expected roll 0 to pick the first unlocked entry");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.32f) == 0, "Expected a roll in the first third to pick the first entry");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.34f) == 1, "Expected a roll in the middle third to pick the middle entry");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.65f) == 1, "Expected a roll in the middle third to pick the middle entry");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.67f) == 2, "Expected a roll in the last third to pick the last entry");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 0.9999f) == 2, "Expected a roll just under 1 to pick the last unlocked entry rather than overrun");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 1.f) == 2, "Expected a roll of exactly 1 to clamp to the last unlocked entry");
+	}
 
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 1.f, 0.0f) == 2, "Expected weight 1 to always pick the last unlocked entry, even with a zero roll");
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 1.f, 0.5f) == 2, "Expected weight 1 to always pick the last unlocked entry, even with a mid roll");
-		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 4, 1.f, 0.999f) == 2, "Expected weight 1 to always pick the last unlocked entry, even with a near-1 roll");
+	void TestPickHeavierEntryClaimsItsShare()
+	{
+		// Weights 1 and 3: the second entry owns the roll range [0.25, 1)
+		FW_GrowingArray<EnemyUnlockEntry> unlocks;
+		unlocks.Add().myWeight = 1;
+		unlocks.Add().myWeight = 3;
+
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 0, 0.24f) == 0, "Expected a roll under 1/4 to pick the weight-1 entry");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 0, 0.26f) == 1, "Expected a roll over 1/4 to pick the weight-3 entry");
+		FW_TEST_CHECK(WaveScaling::PickUnlockedEnemyIndex(unlocks, 0, 0.9999f) == 1, "Expected a roll just under 1 to pick the weight-3 entry");
+	}
+
+	void TestPickStackedEntriesMatchSummedWeight()
+	{
+		// A, B, B (each weight 1) should split the roll exactly like A 1, B 2
+		const NamedUnlock stacked[] = { { "A", 0, 1 }, { "B", 0, 1 }, { "B", 0, 1 } };
+		FW_GrowingArray<EnemyUnlockEntry> stackedUnlocks;
+		MakeNamedUnlocks(stacked, 3, stackedUnlocks);
+
+		const NamedUnlock summed[] = { { "A", 0, 1 }, { "B", 0, 2 } };
+		FW_GrowingArray<EnemyUnlockEntry> summedUnlocks;
+		MakeNamedUnlocks(summed, 2, summedUnlocks);
+
+		const float rolls[] = { 0.f, 0.2f, 0.32f, 0.34f, 0.5f, 0.7f, 0.9999f };
+		for (float roll : rolls)
+		{
+			int stackedPick = WaveScaling::PickUnlockedEnemyIndex(stackedUnlocks, 0, roll);
+			int summedPick = WaveScaling::PickUnlockedEnemyIndex(summedUnlocks, 0, roll);
+			FW_TEST_REQUIRE(stackedPick >= 0 && summedPick >= 0, "Expected a pick with everything unlocked");
+			FW_TEST_CHECK(stackedUnlocks[stackedPick].myEnemyPrefab.GetName() == summedUnlocks[summedPick].myEnemyPrefab.GetName(), "Expected two stacked entries to pick like one entry with the summed weight");
+		}
 	}
 
 	void TestWavePreviewCountIsCappedAtMax()
@@ -114,29 +160,51 @@ namespace WaveScalingTestSuite
 		FW_TEST_CHECK(preview.myUnlockedIndices.Count() == 3, "Expected every unlock in the pool from wave 4");
 	}
 
+	void TestWavePreviewGroupsStackedEntriesPerPrefab()
+	{
+		const NamedUnlock named[] = { { "Slow", 0, 1 }, { "Fast", 2, 1 }, { "Normal", 2, 1 }, { "Fast", 4, 2 } };
+		FW_GrowingArray<EnemyUnlockEntry> unlocks;
+		MakeNamedUnlocks(named, 4, unlocks);
+		WaveScaling::WavePreview preview;
+
+		WaveScaling::GetWavePreview(1, 3, 1, 20, unlocks, preview);
+		FW_TEST_REQUIRE(preview.myPrefabWeights.Count() == 1, "Expected one prefab in the pool before wave 2");
+		FW_TEST_CHECK(preview.myTotalWeight == 1, "Expected the total weight of the single unlock");
+
+		WaveScaling::GetWavePreview(4, 3, 1, 20, unlocks, preview);
+		FW_TEST_REQUIRE(preview.myPrefabWeights.Count() == 3, "Expected the second Fast entry to group with the first, not add a fourth prefab");
+		FW_TEST_CHECK(preview.myTotalWeight == 5, "Expected the total weight to sum every unlocked entry");
+		FW_TEST_CHECK(preview.myPrefabWeights[0].myPrefabName == "Slow" && preview.myPrefabWeights[0].myWeight == 1, "Expected Slow first, weight 1");
+		FW_TEST_CHECK(preview.myPrefabWeights[1].myPrefabName == "Fast" && preview.myPrefabWeights[1].myWeight == 3, "Expected Fast in first-unlocked order, its two entries summed to 3");
+		FW_TEST_CHECK(preview.myPrefabWeights[2].myPrefabName == "Normal" && preview.myPrefabWeights[2].myWeight == 1, "Expected Normal last, weight 1");
+	}
+
 	void TestWavePreviewWithNoUnlocksHasEmptyPool()
 	{
 		FW_GrowingArray<EnemyUnlockEntry> unlocks;
 		WaveScaling::WavePreview preview;
 		preview.myUnlockedIndices.Add(42);
+		preview.myPrefabWeights.Add().myWeight = 42;
 
 		WaveScaling::GetWavePreview(3, 3, 1, 20, unlocks, preview);
 		FW_TEST_CHECK(preview.myUnlockedIndices.IsEmpty(), "Expected an empty pool, with stale entries cleared, when there are no unlocks");
+		FW_TEST_CHECK(preview.myPrefabWeights.IsEmpty(), "Expected no grouped prefabs, with stale entries cleared, when there are no unlocks");
+		FW_TEST_CHECK(preview.myTotalWeight == 0, "Expected zero total weight when there are no unlocks");
 		FW_TEST_CHECK(preview.myEnemyCount == 6, "Expected the count to be computed even with no unlocks");
 	}
 
 	void RunTests()
 	{
 		FW_UnitTestSuite::BeginSuite("WaveScaling");
-		FW_RUN_TEST(TestEnemyUnlockOrderAllowsEmptySingleAscendingAndTies);
-		FW_RUN_TEST(TestEnemyUnlockOrderRejectsAnyDescendingPair);
-
 		FW_RUN_TEST(TestGetEnemyCountForWaveScalesLinearlyAndRespectsCap);
-		FW_RUN_TEST(TestGetDifficultyWeightRampsAndClamps);
-		FW_RUN_TEST(TestPickUnlockedEnemyIndexNeverReturnsAboveUnlockThreshold);
-		FW_RUN_TEST(TestPickUnlockedEnemyIndexUniformAtZeroWeightAndLastAtOneWeight);
+		FW_RUN_TEST(TestPickNeverReturnsNotYetUnlockedEntries);
+		FW_RUN_TEST(TestPickWithNoUnlocksReturnsMinusOne);
+		FW_RUN_TEST(TestPickEqualWeightsSplitRollEvenly);
+		FW_RUN_TEST(TestPickHeavierEntryClaimsItsShare);
+		FW_RUN_TEST(TestPickStackedEntriesMatchSummedWeight);
 		FW_RUN_TEST(TestWavePreviewCountIsCappedAtMax);
 		FW_RUN_TEST(TestWavePreviewPoolGrowsAtEachUnlockWave);
+		FW_RUN_TEST(TestWavePreviewGroupsStackedEntriesPerPrefab);
 		FW_RUN_TEST(TestWavePreviewWithNoUnlocksHasEmptyPool);
 	}
 }

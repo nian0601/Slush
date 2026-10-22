@@ -9,17 +9,19 @@ namespace Slush
 	class EntityPrefab;
 }
 
-// One entry in a map's ordered enemy roster - ascending myUnlockWave = ascending difficulty.
+// One entry in a map's enemy roster. From myUnlockWave on, its weight joins the wave's weighted pick;
+// several entries for the same prefab add up, so a later entry shifts the mix without removing anything.
 struct EnemyUnlockEntry
 {
 	Slush::AssetReference<Slush::EntityPrefab> myEnemyPrefab;
 	int myUnlockWave = 0;
+	int myWeight = 1;
 };
 
 class LevelData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("LevelData", "tdlevel", "levels", ICON_FA_MAP, 5);
+	DEFINE_ASSET("LevelData", "tdlevel", "levels", ICON_FA_MAP, 6);
 
 	LevelData(const char* aName, unsigned int aAssetID);
 
@@ -42,7 +44,6 @@ public:
 	int myBaseEnemyCount = 3;
 	int myEnemyCountPerWaveIncrement = 1;
 	int myMaxEnemyCountPerWave = 20;
-	int myDifficultyRampWaveCount = 10;
 	float myEnemySpawnInterval = 0.5f;
 	float myInterWaveRestDuration = 5.f;
 	float myPreFirstWaveGraceDuration = 10.f;

@@ -1,0 +1,43 @@
+LevelData 
+{ 
+	version 5 
+	navmeshData navmesh_second 
+	startingResources 100 
+	startingLives 20 
+	totalWaveCount 15 
+	baseEnemyCount 4 
+	enemyCountPerWaveIncrement 2 
+	maxEnemyCountPerWave 20 
+	difficultyRampWaveCount 10 
+	enemySpawnInterval 0.250 
+	interWaveRestDuration 3.000 
+	preFirstWaveGraceDuration 10.000 
+	startPosition 
+	{ 
+		x 112.488 
+		y 828.514 
+	} 
+	goalPosition 
+	{ 
+		x 1867.608 
+		y 112.629 
+	} 
+	enemyUnlocks 
+	{ 
+		unlock 
+		{ 
+			enemyPrefab Enemy_Slow 
+			unlockWave 0 
+		} 
+		unlock 
+		{ 
+			enemyPrefab Enemy_Normal 
+			unlockWave 2 
+		} 
+		unlock 
+		{ 
+			enemyPrefab Enemy_Fast 
+			unlockWave 4 
+		} 
+	} 
+} 

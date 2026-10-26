@@ -63,6 +63,7 @@ public:
 
 	LevelResult GetResult() const { return myResult; }
 
+	Vector2f ResolveTowerPosition(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aRequestedPosition);
 	PlaceTowerResult TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition);
 
 private:

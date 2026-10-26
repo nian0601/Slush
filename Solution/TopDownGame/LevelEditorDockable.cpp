@@ -2,6 +2,7 @@
 
 #include "LevelEditorDockable.h"
 
+#include "Components/MovementComponent.h"
 #include "Level/Level.h"
 #include "Level/LevelData.h"
 #include "Level/NavmeshData.h"
@@ -100,6 +101,11 @@ void LevelEditorDockable::RenderStartAndGoalMarkers() const
 	const float markerRadius = 10.f;
 	const int startColor = 0xFF00FF00;
 	const int goalColor = 0xFF0000FF;
+	const int clearanceColor = 0xA0FFFFFF;
+	const int blockedClearanceColor = 0xFFFF0000;
+
+	renderer.RenderCircle(levelData.myStartPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, myIsStartClear ? clearanceColor : blockedClearanceColor, 2.f);
+	renderer.RenderCircle(levelData.myGoalPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, myIsGoalClear ? clearanceColor : blockedClearanceColor, 2.f);
 
 	renderer.RenderCircle(levelData.myStartPosition, markerRadius, startColor);
 	renderer.RenderCircle(levelData.myGoalPosition, markerRadius, goalColor);
@@ -153,6 +159,33 @@ void LevelEditorDockable::OnUpdate()
 	case ToolMode::SetGoal: UpdateSetGoalMode(); break;
 	default: break;
 	}
+
+	UpdateEndpointProblems();
+}
+
+void LevelEditorDockable::UpdateEndpointProblems()
+{
+	const LevelData& levelData = myLevel->GetLevelDataAsset();
+	const Navmesh& navmesh = myLevel->GetNavmeshDataAsset().myNavmesh;
+
+	// Several unlock entries can share a prefab; it only needs listing once.
+	FW_GrowingArray<Slush::EntityPrefab*> rosterPrefabs;
+	FW_GrowingArray<LevelEditorUtils::RosterRadius> rosterRadii;
+	for (const EnemyUnlockEntry& unlock : levelData.myEnemyUnlocks)
+	{
+		Slush::EntityPrefab* prefab = unlock.myEnemyPrefab.Get();
+		if (!prefab || rosterPrefabs.Contains(prefab) || !prefab->Has<MovementComponent>())
+			continue;
+
+		rosterPrefabs.Add(prefab);
+		LevelEditorUtils::RosterRadius& rosterRadius = rosterRadii.Add();
+		rosterRadius.myEnemyName = prefab->GetAssetName();
+		rosterRadius.myRadius = prefab->GetComponentData<MovementComponent>().myRadius;
+	}
+
+	LevelEditorUtils::GetEndpointProblems(navmesh, levelData.myStartPosition, levelData.myGoalPosition, levelData.myEndpointClearance, rosterRadii, myEndpointProblems);
+	myIsStartClear = LevelEditorUtils::IsEndpointClear(navmesh, levelData.myStartPosition, levelData.myEndpointClearance);
+	myIsGoalClear = LevelEditorUtils::IsEndpointClear(navmesh, levelData.myGoalPosition, levelData.myEndpointClearance);
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
@@ -403,6 +436,9 @@ void LevelEditorDockable::BuildLevelTab()
 
 	ImGui::Spacing();
 	ImGui::TextDisabled("Set Start / Set Goal click-place in the view.");
+
+	for (const FW_String& problem : myEndpointProblems)
+		ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "%s", problem.GetBuffer());
 }
 
 void LevelEditorDockable::BuildNavmeshTab()

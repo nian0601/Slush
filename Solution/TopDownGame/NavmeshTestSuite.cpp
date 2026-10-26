@@ -660,6 +660,21 @@ namespace NavmeshTestSuite
 			FW_TEST_CHECK(GetDistanceToGridBoundary(waypoint) > 0.f, "Expected every waypoint to stay on the mesh");
 	}
 
+	void TestDistanceToNearestWall()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		AddRectHole(mesh, 860.f, 300.f, 1100.f, 636.f);
+
+		const float Epsilon = 0.01f;
+		FW_TEST_CHECK(fabsf(mesh.GetDistanceToNearestWall(Vector2f{ 400.f, 468.f }) - 380.f) < Epsilon, "Expected an open point's distance to be to the nearest outer edge (left, 380 away)");
+		FW_TEST_CHECK(fabsf(mesh.GetDistanceToNearestWall(Vector2f{ 1500.f, 30.f }) - 10.f) < Epsilon, "Expected a point 10 below the top edge to be 10 from a wall");
+		FW_TEST_CHECK(fabsf(mesh.GetDistanceToNearestWall(Vector2f{ 840.f, 468.f }) - 20.f) < Epsilon, "Expected a point 20 left of the hole to be 20 from a wall");
+		FW_TEST_CHECK(fabsf(mesh.GetDistanceToNearestWall(Vector2f{ 1110.f, 646.f }) - Length(Vector2f{ 10.f, 10.f })) < Epsilon, "Expected a point diagonally off the hole's corner to measure to that corner");
+		FW_TEST_CHECK(mesh.GetDistanceToNearestWall(Vector2f{ 1000.f, 468.f }) < 0.f, "Expected a point inside the cut hole to be off the mesh");
+		FW_TEST_CHECK(mesh.GetDistanceToNearestWall(Vector2f{ -50.f, 468.f }) < 0.f, "Expected a point outside the grid to be off the mesh");
+	}
+
 	void RunTests()
 	{
 		FW_UnitTestSuite::BeginSuite("Navmesh");
@@ -684,5 +699,6 @@ namespace NavmeshTestSuite
 		FW_RUN_TEST(TestStringPullKeepsRadiusAroundHoleCorners);
 		FW_RUN_TEST(TestStringPullKeepsRadiusAlongStraightWall);
 		FW_RUN_TEST(TestStringPullFallsBackWhenCornerOffsetLeavesMesh);
+		FW_RUN_TEST(TestDistanceToNearestWall);
 	}
 }

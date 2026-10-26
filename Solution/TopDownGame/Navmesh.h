@@ -76,6 +76,8 @@ public:
 	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
 	bool IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const;
+	// Distance to the closest wall (outer or cut boundary), or a negative value when the point is off the mesh.
+	float GetDistanceToNearestWall(const Vector2f& aPosition) const;
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 
 	int GetTriangleCount() const;

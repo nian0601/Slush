@@ -1134,6 +1134,49 @@ namespace
 	}
 }
 
+float Navmesh::GetDistanceToNearestWall(const Vector2f& aPosition) const
+{
+	Triangle* startTriangle = FindTriangleContaining(aPosition);
+	if (startTriangle == nullptr)
+		return -1.f;
+
+	// Flood outward across open edges, skipping any edge already farther away than the closest wall
+	// found so far. The straight line to the closest wall only crosses edges closer than that wall,
+	// so it's always reached.
+	float closestSq = -1.f;
+	FW_GrowingArray<Triangle*> visitedTriangles;
+	FW_GrowingArray<Triangle*> openTriangles;
+	visitedTriangles.Add(startTriangle);
+	openTriangles.Add(startTriangle);
+	while (!openTriangles.IsEmpty())
+	{
+		Triangle* triangle = openTriangles.GetLast();
+		openTriangles.RemoveLast();
+
+		for (Edge* edge : triangle->myEdges)
+		{
+			const float distanceSq = DistancePointToSegmentSq(aPosition, edge->myVertices[0]->myPos, edge->myVertices[1]->myPos);
+			if (closestSq >= 0.f && distanceSq >= closestSq)
+				continue;
+
+			if (IsWallEdge(edge))
+			{
+				closestSq = distanceSq;
+				continue;
+			}
+
+			Triangle* neighbor = edge->myTriangles[0] == triangle ? edge->myTriangles[1] : edge->myTriangles[0];
+			if (visitedTriangles.Contains(neighbor))
+				continue;
+
+			visitedTriangles.Add(neighbor);
+			openTriangles.Add(neighbor);
+		}
+	}
+
+	return closestSq >= 0.f ? sqrtf(closestSq) : -1.f;
+}
+
 bool Navmesh::IsWallEdge(const Edge* anEdge)
 {
 	return anEdge->myTriangles[0] == nullptr || anEdge->myTriangles[1] == nullptr;

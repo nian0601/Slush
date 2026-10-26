@@ -41,6 +41,11 @@ public:
 	{
 		Vector2f myLeft;
 		Vector2f myRight;
+
+		// For an end on a wall vertex: where to push that end, per unit of agent radius, to keep the
+		// radius from the walls meeting there. Zero for an open-floor end.
+		Vector2f myLeftWallOffset;
+		Vector2f myRightWallOffset;
 	};
 
 	struct PathCorridor
@@ -49,7 +54,7 @@ public:
 	};
 
 	bool BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
-	bool StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
+	bool StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints) const;
 
 	// Agent clearance: anAgentRadius is checked per triangle crossing at query time, so one
 	// mesh serves every agent size and nothing is rebuilt or eroded per size. Portal (edge)
@@ -62,6 +67,11 @@ public:
 	// generalized to pinches between walls that aren't vertices of the triangle itself.
 	// See Demyen & Buro, "Efficient Triangulation-Based Pathfinding" (AAAI 2006):
 	// https://cdn.aaai.org/AAAI/2006/AAAI06-148.pdf
+	// String-pulling then keeps the radius too: before the funnel runs, each portal end on a
+	// wall vertex is pushed out along the bisector of the walls meeting there until both are
+	// the radius away, so the path runs the radius off straight walls and turns around each
+	// corner at one such point. One point instead of an arc keeps the path a plain polyline
+	// for movement code; enemies are small enough that the sharp turn reads fine.
 	// A radius of 0 is a point agent and gives exactly the unchecked result.
 	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
@@ -137,6 +147,8 @@ private:
 	bool CanCrossEdge(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const;
 	bool HasPortalClearance(Edge* aPortal, float anAgentRadius) const;
 	bool HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const;
+	Vector2f GetWallCornerOffset(Vertex* aVertex, Edge* aPortal) const;
+	Vector2f GetPushedPortalEnd(const Vector2f& anEnd, const Vector2f& aWallOffset, float anAgentRadius) const;
 
 	Vertex* GetVertex(int x, int y) const;
 	Edge* GetEdgeWithVertex(Vertex* aV, Edge* aE1, Edge* aE2) const;

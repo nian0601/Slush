@@ -304,6 +304,8 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 				Portal& portal = outCorridor.myPortals.Add();
 				portal.myLeft = left->myPos;
 				portal.myRight = right->myPos;
+				portal.myLeftWallOffset = GetWallCornerOffset(left, edge);
+				portal.myRightWallOffset = GetWallCornerOffset(right, edge);
 
 				prevLeft = left;
 				prevRight = right;
@@ -387,7 +389,7 @@ namespace
 	}
 }
 
-bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const
+bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints) const
 {
 	outWaypoints.RemoveAll();
 
@@ -406,8 +408,8 @@ bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const Pa
 	portalRights.Add(aStart);
 	for (const Portal& portal : aCorridor.myPortals)
 	{
-		portalLefts.Add(portal.myLeft);
-		portalRights.Add(portal.myRight);
+		portalLefts.Add(GetPushedPortalEnd(portal.myLeft, portal.myLeftWallOffset, anAgentRadius));
+		portalRights.Add(GetPushedPortalEnd(portal.myRight, portal.myRightWallOffset, anAgentRadius));
 	}
 	portalLefts.Add(aGoal);
 	portalRights.Add(aGoal);
@@ -496,7 +498,7 @@ bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAg
 	// (guaranteeing the zero-portal same-triangle case) and stays untouched on failure.
 	if (outCorridor != nullptr)
 		*outCorridor = foundCorridor;
-	return StringPull(aStart, aGoal, foundCorridor, outWaypoints);
+	return StringPull(aStart, aGoal, foundCorridor, anAgentRadius, outWaypoints);
 }
 
 Navmesh::Vertex* Navmesh::GetVertex(int x, int y) const
@@ -1404,6 +1406,109 @@ bool Navmesh::HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* 
 	}
 
 	return true;
+}
+
+namespace
+{
+	const float MaxCornerOffsetPerRadius = 3.f;
+
+	const int OffMeshSearchIterations = 20;
+
+	float GetAngleBetween(const Vector2f& aFirst, const Vector2f& aSecond)
+	{
+		return acosf(FW_Clamp(Dot(GetNormalized(aFirst), GetNormalized(aSecond)), -1.f, 1.f));
+	}
+}
+
+Vector2f Navmesh::GetWallCornerOffset(Vertex* aVertex, Edge* aPortal) const
+{
+	// Walk the triangles around aVertex from the portal in both directions until each side hits a
+	// wall edge. Those two walls bound the free wedge the portal is in; the angles walked add up to
+	// the wedge's interior angle.
+	Edge* walls[2] = { nullptr, nullptr };
+	float anglesToWall[2] = { 0.f, 0.f };
+	for (int side = 0; side < 2; ++side)
+	{
+		Edge* edge = aPortal;
+		Triangle* triangle = aPortal->myTriangles[side];
+		while (triangle != nullptr)
+		{
+			Edge* nextEdge = triangle->GetOtherEdge(edge, aVertex);
+			const Vertex* edgeOther = edge->myVertices[0] == aVertex ? edge->myVertices[1] : edge->myVertices[0];
+			const Vertex* nextOther = nextEdge->myVertices[0] == aVertex ? nextEdge->myVertices[1] : nextEdge->myVertices[0];
+			anglesToWall[side] += GetAngleBetween(edgeOther->myPos - aVertex->myPos, nextOther->myPos - aVertex->myPos);
+
+			if (nextEdge == aPortal)
+				return Vector2f();
+
+			if (IsWallEdge(nextEdge))
+			{
+				walls[side] = nextEdge;
+				break;
+			}
+
+			triangle = nextEdge->myTriangles[0] == triangle ? nextEdge->myTriangles[1] : nextEdge->myTriangles[0];
+			edge = nextEdge;
+		}
+	}
+
+	if (walls[0] == nullptr || walls[1] == nullptr)
+		return Vector2f();
+
+	// Every portal in the same wedge must get a bit-identical offset, so the funnel sees one corner
+	// point rather than several a float error apart. So everything below is symmetric in the two
+	// walls; only which side of them the wedge lies on comes from the walk.
+	const Vector2f wallDir = GetNormalized((walls[0]->myVertices[0] == aVertex ? walls[0]->myVertices[1] : walls[0]->myVertices[0])->myPos - aVertex->myPos);
+	const Vector2f otherWallDir = GetNormalized((walls[1]->myVertices[0] == aVertex ? walls[1]->myVertices[1] : walls[1]->myVertices[0])->myPos - aVertex->myPos);
+	const bool isWedgeOverHalfTurn = anglesToWall[0] + anglesToWall[1] > FW_PI;
+
+	Vector2f bisector = wallDir + otherWallDir;
+	if (Length2(bisector) > 0.000001f)
+	{
+		bisector = GetNormalized(bisector);
+		if (isWedgeOverHalfTurn)
+			bisector = -bisector;
+	}
+	else
+	{
+		// A straight wall: point square off it, into the wedge the portal is in.
+		const Vector2f portalDir = (aPortal->myVertices[0] == aVertex ? aPortal->myVertices[1] : aPortal->myVertices[0])->myPos - aVertex->myPos;
+		const Vector2f along = wallDir - otherWallDir;
+		bisector = GetNormalized(Vector2f{ -along.y, along.x });
+		if (Dot(bisector, portalDir) < 0.f)
+			bisector = -bisector;
+	}
+
+	// Pushed out by r / sin(half the wedge angle), both walls are r away; sin(half) is the same for
+	// the wedge and for the angle between the walls measured the other way round.
+	const float halfAngleSin = sinf(GetAngleBetween(wallDir, otherWallDir) / 2.f);
+	const float offsetLength = halfAngleSin > 1.f / MaxCornerOffsetPerRadius ? 1.f / halfAngleSin : MaxCornerOffsetPerRadius;
+	return bisector * offsetLength;
+}
+
+Vector2f Navmesh::GetPushedPortalEnd(const Vector2f& anEnd, const Vector2f& aWallOffset, float anAgentRadius) const
+{
+	if (anAgentRadius <= 0.f || (aWallOffset.x == 0.f && aWallOffset.y == 0.f))
+		return anEnd;
+
+	const Vector2f fullOffset = aWallOffset * anAgentRadius;
+	if (FindTriangleContaining(anEnd + fullOffset) != nullptr)
+		return anEnd + fullOffset;
+
+	// Something else is in the way along the bisector, closer than the full offset: stop halfway to
+	// where it leaves the mesh, the best clearance between the two along that line.
+	float onMesh = 0.f;
+	float offMesh = 1.f;
+	for (int i = 0; i < OffMeshSearchIterations; ++i)
+	{
+		const float middle = (onMesh + offMesh) / 2.f;
+		if (FindTriangleContaining(anEnd + fullOffset * middle) != nullptr)
+			onMesh = middle;
+		else
+			offMesh = middle;
+	}
+
+	return anEnd + fullOffset * (onMesh / 2.f);
 }
 
 Navmesh::Triangle::~Triangle()

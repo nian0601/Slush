@@ -778,6 +778,89 @@ bool Navmesh::IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const
 	return true;
 }
 
+Vector2f Navmesh::ResolveBoxSnap(const Vector2f& aPosition, const Vector2f& aHalfSize) const
+{
+	Vector2f resolved = aPosition;
+	float bestDistance = ourBoxSnapDistance;
+	bool found = false;
+	if (aHalfSize.x <= 0.f || aHalfSize.y <= 0.f)
+		return resolved;
+
+	// Enumerating X first and replacing only for a smaller adjustment gives X
+	// precedence on ties, followed by the mesh's stable boundary order.
+	for (int axis = 0; axis < 2; ++axis)
+	{
+		const float requested = axis == 0 ? aPosition.x : aPosition.y;
+		const float halfSize = axis == 0 ? aHalfSize.x : aHalfSize.y;
+		const float fixedPosition = axis == 0 ? aPosition.y : aPosition.x;
+		const float fixedHalfSize = axis == 0 ? aHalfSize.y : aHalfSize.x;
+		for (const Edge* edge : myEdges)
+		{
+			if (edge->myTriangles[0] && edge->myTriangles[1])
+				continue;
+			const Vector2f start = edge->myVertices[0]->myPos;
+			const Vector2f end = edge->myVertices[1]->myPos;
+			const double fixedStart = axis == 0 ? start.y : start.x;
+			const double fixedEnd = axis == 0 ? end.y : end.x;
+			double first = 0.0;
+			double last = 1.0;
+			if (fixedStart == fixedEnd)
+			{
+				if (fixedStart < fixedPosition - fixedHalfSize || fixedStart > fixedPosition + fixedHalfSize)
+					continue;
+			}
+			else
+			{
+				double entry = (fixedPosition - fixedHalfSize - fixedStart) / (fixedEnd - fixedStart);
+				double exit = (fixedPosition + fixedHalfSize - fixedStart) / (fixedEnd - fixedStart);
+				if (entry > exit)
+				{
+					const double temporary = entry;
+					entry = exit;
+					exit = temporary;
+				}
+				first = FW_Max(first, entry);
+				last = FW_Min(last, exit);
+				if (first > last)
+					continue;
+			}
+
+			// Clip the finite segment to the box's unchanged coordinate. Its two
+			// extrema give corner/edge contacts, including original segment endpoints.
+			const double movingStart = axis == 0 ? start.x : start.y;
+			const double movingEnd = axis == 0 ? end.x : end.y;
+			for (int endpoint = 0; endpoint < 2; ++endpoint)
+			{
+				const float contact = float(movingStart + (movingEnd - movingStart) * (endpoint == 0 ? first : last));
+				for (int side = -1; side <= 1; side += 2)
+				{
+					const float coordinate = contact + side * halfSize;
+					const float distance = fabsf(coordinate - requested);
+					if (distance > bestDistance || (found && distance >= bestDistance))
+						continue;
+					Vector2f candidate = aPosition;
+					if (axis == 0)
+						candidate.x = coordinate;
+					else
+						candidate.y = coordinate;
+					FW_GrowingArray<Vector2f> footprint;
+					footprint.Add(candidate - aHalfSize);
+					footprint.Add({ candidate.x + aHalfSize.x, candidate.y - aHalfSize.y });
+					footprint.Add(candidate + aHalfSize);
+					footprint.Add({ candidate.x - aHalfSize.x, candidate.y + aHalfSize.y });
+					if (IsAreaFullyOnMesh(footprint))
+					{
+						resolved = candidate;
+						bestDistance = distance;
+						found = true;
+					}
+				}
+			}
+		}
+	}
+	return resolved;
+}
+
 int Navmesh::GetTriangleCount() const
 {
 	return myTriangles.Count();

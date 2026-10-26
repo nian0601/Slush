@@ -53,6 +53,8 @@ public:
 	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
 	bool IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const;
+	static constexpr float ourBoxSnapDistance = 8.f;
+	Vector2f ResolveBoxSnap(const Vector2f& aPosition, const Vector2f& aHalfSize) const;
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 
 	int GetTriangleCount() const;

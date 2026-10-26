@@ -150,7 +150,7 @@ void NavmeshDebuggerDockable::UpdatePathfindTestMode()
 	myPathfindTestHasStart = false;
 
 	FW_GrowingArray<Vector2f> waypoints;
-	if (!myNavmesh.FindPath(myPathfindTestStart, goal, waypoints))
+	if (!myNavmesh.FindPath(myPathfindTestStart, goal, 0.f, waypoints))
 		return;
 
 	PathfindResult& result = myPathfindResults.Add();

@@ -28,7 +28,7 @@ MovementComponent::MovementComponent(Slush::Entity& anEntity, const Slush::Entit
 void MovementComponent::OnEnterWorld()
 {
 	Level& level = TopDownGameGlobals::GetInstance().GetLevel();
-	const bool foundPath = level.GetNavmesh().FindPath(myEntity.myPosition, level.GetLevelDataAsset().myGoalPosition, myWaypoints);
+	const bool foundPath = level.GetNavmesh().FindPath(myEntity.myPosition, level.GetLevelDataAsset().myGoalPosition, 0.f, myWaypoints);
 	if (!foundPath)
 	{
 		SLUSH_ERROR("Enemy '%s' could not find a path from the level start to its goal", myEntityPrefab.GetAssetName().GetBuffer());

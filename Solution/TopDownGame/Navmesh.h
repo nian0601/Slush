@@ -50,7 +50,20 @@ public:
 
 	bool BuildEdgeCenterPath(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
 	bool StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, FW_GrowingArray<Vector2f>& outWaypoints) const;
-	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
+
+	// Agent clearance: anAgentRadius is checked per triangle crossing at query time, so one
+	// mesh serves every agent size and nothing is rebuilt or eroded per size. Portal (edge)
+	// length alone is wrong on this mesh both ways: short edges between open-floor vertices
+	// would falsely block, and a long edge past a narrow pinch would falsely pass. Instead
+	// each crossing checks the exit edge has a stretch at least the radius from every wall,
+	// and that walls don't pinch shut the passage through the triangle around the entry and
+	// exit edges' shared corner. The second is Demyen's triangle width, adapted to count only
+	// walls as obstacles (this mesh is built from a grid, so most vertices are open floor) and
+	// generalized to pinches between walls that aren't vertices of the triangle itself.
+	// See Demyen & Buro, "Efficient Triangulation-Based Pathfinding" (AAAI 2006):
+	// https://cdn.aaai.org/AAAI/2006/AAAI06-148.pdf
+	// A radius of 0 is a point agent and gives exactly the unchecked result.
+	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
 	bool IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const;
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
@@ -117,7 +130,13 @@ private:
 	void Clear();
 
 	Triangle* FindTriangleContaining(const Vector2f& aPosition) const;
-	bool FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const;
+	bool FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const;
+
+	static bool IsWallEdge(const Edge* anEdge);
+	static bool IsWallVertex(const Vertex* aVertex);
+	bool CanCrossEdge(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const;
+	bool HasPortalClearance(Edge* aPortal, float anAgentRadius) const;
+	bool HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const;
 
 	Vertex* GetVertex(int x, int y) const;
 	Edge* GetEdgeWithVertex(Vertex* aV, Edge* aE1, Edge* aE2) const;

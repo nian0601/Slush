@@ -207,7 +207,7 @@ Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) co
 	return nullptr;
 }
 
-bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, PathCorridor& outCorridor) const
+bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const
 {
 	FW_GrowingArray<AStarNode> nodes;
 
@@ -313,6 +313,7 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 		}
 
 		Triangle* currentTriangle = nodes[bestIndex].myTriangle;
+		Edge* entryEdge = nodes[bestIndex].myEdgeFromParent;
 		Vector2f currentCenter = currentTriangle->GetCenterPosition();
 		float currentGCost = nodes[bestIndex].myGCost;
 
@@ -324,6 +325,9 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 			{
 				Triangle* neighbor = edge->myTriangles[t];
 				if (neighbor == nullptr || neighbor == currentTriangle)
+					continue;
+
+				if (anAgentRadius > 0.f && !CanCrossEdge(currentTriangle, entryEdge, edge, anAgentRadius))
 					continue;
 
 				float tentativeGCost = currentGCost + Length(neighbor->GetCenterPosition() - currentCenter);
@@ -473,7 +477,7 @@ bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const Pa
 	return true;
 }
 
-bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor) const
+bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor) const
 {
 	Triangle* startTriangle = FindTriangleContaining(aStart);
 	Triangle* goalTriangle = FindTriangleContaining(aGoal);
@@ -483,7 +487,7 @@ bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, FW_Growing
 	PathCorridor foundCorridor;
 	if (startTriangle != goalTriangle)
 	{
-		if (!FindTrianglePath(aStart, startTriangle, goalTriangle, foundCorridor))
+		if (!FindTrianglePath(aStart, startTriangle, goalTriangle, anAgentRadius, foundCorridor))
 			return false;
 	}
 
@@ -981,6 +985,422 @@ bool Navmesh::IsInsideCutArea(const FW_GrowingArray<Vector2f>& aCutPositions, Tr
 
 		if (Dot(cutLine.myNormal, triangleToCutCenter) > 0.f)
 			return false;
+	}
+
+	return true;
+}
+
+namespace
+{
+	// Clearance checks treat a gap exactly as wide as the agent as open, so shave a hair off
+	// to keep float error from closing it.
+	const float ClearanceEpsilon = 0.001f;
+
+	struct BlockedInterval
+	{
+		float myStart;
+		float myEnd;
+	};
+
+	bool SegmentsCross(const Vector2f& aA, const Vector2f& aB, const Vector2f& aC, const Vector2f& aD)
+	{
+		const float abC = Cross(aB - aA, aC - aA);
+		const float abD = Cross(aB - aA, aD - aA);
+		const float cdA = Cross(aD - aC, aA - aC);
+		const float cdB = Cross(aD - aC, aB - aC);
+		return ((abC > 0.f) != (abD > 0.f)) && ((cdA > 0.f) != (cdB > 0.f)) && abC != 0.f && abD != 0.f && cdA != 0.f && cdB != 0.f;
+	}
+
+	float DistanceSegmentToSegmentSq(const Vector2f& aA, const Vector2f& aB, const Vector2f& aC, const Vector2f& aD)
+	{
+		if (SegmentsCross(aA, aB, aC, aD))
+			return 0.f;
+
+		float distanceSq = DistancePointToSegmentSq(aA, aC, aD);
+		distanceSq = FW_Min(distanceSq, DistancePointToSegmentSq(aB, aC, aD));
+		distanceSq = FW_Min(distanceSq, DistancePointToSegmentSq(aC, aA, aB));
+		distanceSq = FW_Min(distanceSq, DistancePointToSegmentSq(aD, aA, aB));
+		return distanceSq;
+	}
+
+	void AddBlockedInterval(float aStart, float anEnd, FW_GrowingArray<BlockedInterval>& outIntervals)
+	{
+		aStart = FW_Max(aStart, 0.f);
+		anEnd = FW_Min(anEnd, 1.f);
+		if (aStart >= anEnd)
+			return;
+
+		BlockedInterval& interval = outIntervals.Add();
+		interval.myStart = aStart;
+		interval.myEnd = anEnd;
+	}
+
+	// Narrows [ioMin, ioMax] to the t where aValue + aSlope * t lies strictly inside (aLow, aHigh).
+	bool ClipLinearRange(float aValue, float aSlope, float aLow, float aHigh, float& ioMin, float& ioMax)
+	{
+		if (aSlope == 0.f)
+			return aValue > aLow && aValue < aHigh;
+
+		float tLow = (aLow - aValue) / aSlope;
+		float tHigh = (aHigh - aValue) / aSlope;
+		if (tLow > tHigh)
+		{
+			const float swap = tLow;
+			tLow = tHigh;
+			tHigh = swap;
+		}
+
+		ioMin = FW_Max(ioMin, tLow);
+		ioMax = FW_Min(ioMax, tHigh);
+		return ioMin < ioMax;
+	}
+
+	// The part of the portal segment aPortalStart + t * (aPortalEnd - aPortalStart), t in [0, 1],
+	// that lies closer than aRadius to the wall segment, as up to three intervals that together
+	// cover one connected range (the wall's capsule is convex).
+	void AddWallBlockedIntervals(const Vector2f& aPortalStart, const Vector2f& aPortalEnd, const Vector2f& aWallStart, const Vector2f& aWallEnd, float aRadius, FW_GrowingArray<BlockedInterval>& outIntervals)
+	{
+		const Vector2f portalDir = aPortalEnd - aPortalStart;
+		const float portalLength2 = Length2(portalDir);
+
+		const Vector2f wallEnds[2] = { aWallStart, aWallEnd };
+		for (const Vector2f& center : wallEnds)
+		{
+			const Vector2f fromCenter = aPortalStart - center;
+			const float a = portalLength2;
+			const float b = 2.f * Dot(fromCenter, portalDir);
+			const float c = Length2(fromCenter) - aRadius * aRadius;
+			const float discriminant = b * b - 4.f * a * c;
+			if (a == 0.f || discriminant <= 0.f)
+				continue;
+
+			const float root = sqrtf(discriminant);
+			AddBlockedInterval((-b - root) / (2.f * a), (-b + root) / (2.f * a), outIntervals);
+		}
+
+		const Vector2f wallDir = aWallEnd - aWallStart;
+		const float wallLength = Length(wallDir);
+		if (wallLength == 0.f)
+			return;
+
+		const Vector2f along = wallDir / wallLength;
+		const Vector2f across{ -along.y, along.x };
+		const Vector2f fromWallStart = aPortalStart - aWallStart;
+
+		float tMin = 0.f;
+		float tMax = 1.f;
+		if (!ClipLinearRange(Dot(fromWallStart, along), Dot(portalDir, along), 0.f, wallLength, tMin, tMax))
+			return;
+		if (!ClipLinearRange(Dot(fromWallStart, across), Dot(portalDir, across), -aRadius, aRadius, tMin, tMax))
+			return;
+
+		AddBlockedInterval(tMin, tMax, outIntervals);
+	}
+
+	bool IsUnitRangeFullyCovered(const FW_GrowingArray<BlockedInterval>& someIntervals)
+	{
+		// Open intervals: one ending exactly where the next starts leaves that point free.
+		float covered = 0.f;
+		bool coversStart = false;
+		for (const BlockedInterval& interval : someIntervals)
+		{
+			if (interval.myStart <= 0.f)
+			{
+				coversStart = true;
+				covered = FW_Max(covered, interval.myEnd);
+			}
+		}
+
+		if (!coversStart)
+			return false;
+
+		bool madeProgress = true;
+		while (madeProgress && covered < 1.f)
+		{
+			madeProgress = false;
+			for (const BlockedInterval& interval : someIntervals)
+			{
+				if (interval.myStart < covered && interval.myEnd > covered)
+				{
+					covered = interval.myEnd;
+					madeProgress = true;
+				}
+			}
+		}
+
+		return covered >= 1.f;
+	}
+}
+
+bool Navmesh::IsWallEdge(const Edge* anEdge)
+{
+	return anEdge->myTriangles[0] == nullptr || anEdge->myTriangles[1] == nullptr;
+}
+
+bool Navmesh::IsWallVertex(const Vertex* aVertex)
+{
+	for (const Edge* edge : aVertex->myEdges)
+	{
+		if (IsWallEdge(edge))
+			return true;
+	}
+
+	return false;
+}
+
+bool Navmesh::CanCrossEdge(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const
+{
+	if (!HasPortalClearance(anExitEdge, anAgentRadius))
+		return false;
+
+	// The start triangle has no entry edge, so nothing is passed through inside it.
+	if (anEntryEdge == nullptr)
+		return true;
+
+	return HasTransitClearance(aTriangle, anEntryEdge, anExitEdge, anAgentRadius);
+}
+
+bool Navmesh::HasPortalClearance(Edge* aPortal, float anAgentRadius) const
+{
+	const Vector2f& portalStart = aPortal->myVertices[0]->myPos;
+	const Vector2f& portalEnd = aPortal->myVertices[1]->myPos;
+	const float blockingRadius = anAgentRadius - ClearanceEpsilon;
+	const float blockingRadiusSq = blockingRadius * blockingRadius;
+
+	// Flood out from the portal's two triangles across open edges, only through edges within the
+	// agent radius of the portal; every wall that could be closer than that is reached this way.
+	FW_GrowingArray<Triangle*> visitedTriangles;
+	FW_GrowingArray<Triangle*> openTriangles;
+	visitedTriangles.Add(aPortal->myTriangles[0]);
+	visitedTriangles.Add(aPortal->myTriangles[1]);
+	openTriangles.Add(aPortal->myTriangles[0]);
+	openTriangles.Add(aPortal->myTriangles[1]);
+
+	FW_GrowingArray<BlockedInterval> blockedIntervals;
+	while (!openTriangles.IsEmpty())
+	{
+		Triangle* triangle = openTriangles.GetLast();
+		openTriangles.RemoveLast();
+
+		for (Edge* edge : triangle->myEdges)
+		{
+			const Vector2f& edgeStart = edge->myVertices[0]->myPos;
+			const Vector2f& edgeEnd = edge->myVertices[1]->myPos;
+			if (DistanceSegmentToSegmentSq(portalStart, portalEnd, edgeStart, edgeEnd) >= blockingRadiusSq)
+				continue;
+
+			if (IsWallEdge(edge))
+			{
+				AddWallBlockedIntervals(portalStart, portalEnd, edgeStart, edgeEnd, blockingRadius, blockedIntervals);
+				continue;
+			}
+
+			Triangle* neighbor = edge->myTriangles[0] == triangle ? edge->myTriangles[1] : edge->myTriangles[0];
+			if (visitedTriangles.Contains(neighbor))
+				continue;
+
+			visitedTriangles.Add(neighbor);
+			openTriangles.Add(neighbor);
+		}
+	}
+
+	return !IsUnitRangeFullyCovered(blockedIntervals);
+}
+
+namespace
+{
+	float DistanceSegmentToTriangleSq(const Vector2f& aStart, const Vector2f& anEnd, const Vector2f& aT0, const Vector2f& aT1, const Vector2f& aT2)
+	{
+		if (FW_Intersection::PointInsideTriangle(aStart, aT0, aT1, aT2) || FW_Intersection::PointInsideTriangle(anEnd, aT0, aT1, aT2))
+			return 0.f;
+
+		float distanceSq = DistanceSegmentToSegmentSq(aStart, anEnd, aT0, aT1);
+		distanceSq = FW_Min(distanceSq, DistanceSegmentToSegmentSq(aStart, anEnd, aT1, aT2));
+		distanceSq = FW_Min(distanceSq, DistanceSegmentToSegmentSq(aStart, anEnd, aT2, aT0));
+		return distanceSq;
+	}
+
+	Vector2f ClosestPointOnSegment(const Vector2f& aPoint, const Vector2f& aStart, const Vector2f& anEnd)
+	{
+		const Vector2f dir = anEnd - aStart;
+		const float length2 = Length2(dir);
+		if (length2 == 0.f)
+			return aStart;
+
+		return aStart + dir * FW_Clamp(Dot(aPoint - aStart, dir) / length2, 0.f, 1.f);
+	}
+
+	// A closest pair of points between segments AB and CD (not unique when they're parallel).
+	void GetClosestPointsBetweenSegments(const Vector2f& aA, const Vector2f& aB, const Vector2f& aC, const Vector2f& aD, Vector2f& outOnAB, Vector2f& outOnCD)
+	{
+		if (SegmentsCross(aA, aB, aC, aD))
+		{
+			const float abC = Cross(aB - aA, aC - aA);
+			const float abD = Cross(aB - aA, aD - aA);
+			outOnCD = aC + (aD - aC) * (abC / (abC - abD));
+			outOnAB = outOnCD;
+			return;
+		}
+
+		outOnAB = aA;
+		outOnCD = ClosestPointOnSegment(aA, aC, aD);
+		float bestSq = Length2(outOnCD - outOnAB);
+
+		const Vector2f candidatesOnAB[3] = { aB, ClosestPointOnSegment(aC, aA, aB), ClosestPointOnSegment(aD, aA, aB) };
+		const Vector2f candidatesOnCD[3] = { ClosestPointOnSegment(aB, aC, aD), aC, aD };
+		for (int i = 0; i < 3; ++i)
+		{
+			const float distanceSq = Length2(candidatesOnCD[i] - candidatesOnAB[i]);
+			if (distanceSq < bestSq)
+			{
+				bestSq = distanceSq;
+				outOnAB = candidatesOnAB[i];
+				outOnCD = candidatesOnCD[i];
+			}
+		}
+	}
+
+	float GetLargerWallDistanceSq(const Vector2f& aPoint, const Vector2f& aWallA0, const Vector2f& aWallA1, const Vector2f& aWallB0, const Vector2f& aWallB1)
+	{
+		return FW_Max(DistancePointToSegmentSq(aPoint, aWallA0, aWallA1), DistancePointToSegmentSq(aPoint, aWallB0, aWallB1));
+	}
+
+	const int TernarySearchIterations = 30;
+
+	float GetMinLargerWallDistanceSqAlongLine(const Vector2f& aLineStart, const Vector2f& aLineEnd, const Vector2f& aWallA0, const Vector2f& aWallA1, const Vector2f& aWallB0, const Vector2f& aWallB1)
+	{
+		float low = 0.f;
+		float high = 1.f;
+		for (int i = 0; i < TernarySearchIterations; ++i)
+		{
+			const float first = low + (high - low) / 3.f;
+			const float second = high - (high - low) / 3.f;
+			const float firstValue = GetLargerWallDistanceSq(aLineStart + (aLineEnd - aLineStart) * first, aWallA0, aWallA1, aWallB0, aWallB1);
+			const float secondValue = GetLargerWallDistanceSq(aLineStart + (aLineEnd - aLineStart) * second, aWallA0, aWallA1, aWallB0, aWallB1);
+			if (firstValue < secondValue)
+				high = second;
+			else
+				low = first;
+		}
+
+		return GetLargerWallDistanceSq(aLineStart + (aLineEnd - aLineStart) * ((low + high) / 2.f), aWallA0, aWallA1, aWallB0, aWallB1);
+	}
+
+	// Minimum over the triangle (aCorner, aSideA, aSideB) of the larger squared distance to the two
+	// walls. The larger distance is convex over the plane, so nested ternary searches find it: the
+	// outer one over lines parallel to aSideA-aSideB, the inner one along each line.
+	float GetMinLargerWallDistanceSqInTriangle(const Vector2f& aCorner, const Vector2f& aSideA, const Vector2f& aSideB, const Vector2f& aWallA0, const Vector2f& aWallA1, const Vector2f& aWallB0, const Vector2f& aWallB1)
+	{
+		float low = 0.f;
+		float high = 1.f;
+		for (int i = 0; i < TernarySearchIterations; ++i)
+		{
+			const float first = low + (high - low) / 3.f;
+			const float second = high - (high - low) / 3.f;
+			const float firstValue = GetMinLargerWallDistanceSqAlongLine(aCorner + (aSideA - aCorner) * first, aCorner + (aSideB - aCorner) * first, aWallA0, aWallA1, aWallB0, aWallB1);
+			const float secondValue = GetMinLargerWallDistanceSqAlongLine(aCorner + (aSideA - aCorner) * second, aCorner + (aSideB - aCorner) * second, aWallA0, aWallA1, aWallB0, aWallB1);
+			if (firstValue < secondValue)
+				high = second;
+			else
+				low = first;
+		}
+
+		const float lineT = (low + high) / 2.f;
+		return GetMinLargerWallDistanceSqAlongLine(aCorner + (aSideA - aCorner) * lineT, aCorner + (aSideB - aCorner) * lineT, aWallA0, aWallA1, aWallB0, aWallB1);
+	}
+}
+
+bool Navmesh::HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const
+{
+	// Any path through the triangle from the entry edge to the exit edge crosses every segment from
+	// their shared vertex C to the opposite edge AB. So the crossing is blocked exactly when the
+	// parts of the triangle closer than the radius to some wall link up into a chain from C to AB.
+	// With C a wall vertex and one wall across AB this is Demyen's "width < 2r" test; the chain
+	// form also catches pinches between walls that aren't vertices of this triangle.
+	Vertex* corner = anEntryEdge->GetSharedVertex(anExitEdge);
+	const Vector2f& cornerPos = corner->myPos;
+	const Vector2f& sideA = (anEntryEdge->myVertices[0] == corner ? anEntryEdge->myVertices[1] : anEntryEdge->myVertices[0])->myPos;
+	const Vector2f& sideB = (anExitEdge->myVertices[0] == corner ? anExitEdge->myVertices[1] : anExitEdge->myVertices[0])->myPos;
+
+	const float blockingRadius = anAgentRadius - ClearanceEpsilon;
+	const float blockingRadiusSq = blockingRadius * blockingRadius;
+
+	// Every wall closer than the radius to the triangle, by the same bounded flood as the portal check.
+	FW_GrowingArray<Edge*> walls;
+	FW_GrowingArray<Triangle*> visitedTriangles;
+	FW_GrowingArray<Triangle*> openTriangles;
+	visitedTriangles.Add(aTriangle);
+	openTriangles.Add(aTriangle);
+	while (!openTriangles.IsEmpty())
+	{
+		Triangle* triangle = openTriangles.GetLast();
+		openTriangles.RemoveLast();
+
+		for (Edge* edge : triangle->myEdges)
+		{
+			if (DistanceSegmentToTriangleSq(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, cornerPos, sideA, sideB) >= blockingRadiusSq)
+				continue;
+
+			if (IsWallEdge(edge))
+			{
+				walls.Add(edge);
+				continue;
+			}
+
+			Triangle* neighbor = edge->myTriangles[0] == triangle ? edge->myTriangles[1] : edge->myTriangles[0];
+			if (visitedTriangles.Contains(neighbor))
+				continue;
+
+			visitedTriangles.Add(neighbor);
+			openTriangles.Add(neighbor);
+		}
+	}
+
+	FW_GrowingArray<bool> isReached;
+	FW_GrowingArray<int> reachedOpen;
+	for (Edge* wall : walls)
+	{
+		const bool touchesCorner = DistancePointToSegmentSq(cornerPos, wall->myVertices[0]->myPos, wall->myVertices[1]->myPos) < blockingRadiusSq;
+		isReached.Add(touchesCorner);
+		if (touchesCorner)
+			reachedOpen.Add(isReached.Count() - 1);
+	}
+
+	while (!reachedOpen.IsEmpty())
+	{
+		const int wallIndex = reachedOpen.GetLast();
+		reachedOpen.RemoveLast();
+
+		const Vector2f& wallStart = walls[wallIndex]->myVertices[0]->myPos;
+		const Vector2f& wallEnd = walls[wallIndex]->myVertices[1]->myPos;
+		if (DistanceSegmentToSegmentSq(wallStart, wallEnd, sideA, sideB) < blockingRadiusSq)
+			return false;
+
+		for (int otherIndex = 0; otherIndex < walls.Count(); ++otherIndex)
+		{
+			if (isReached[otherIndex])
+				continue;
+
+			const Vector2f& otherStart = walls[otherIndex]->myVertices[0]->myPos;
+			const Vector2f& otherEnd = walls[otherIndex]->myVertices[1]->myPos;
+			if (DistanceSegmentToSegmentSq(wallStart, wallEnd, otherStart, otherEnd) >= 4.f * blockingRadiusSq)
+				continue;
+
+			// Linked when some point of the triangle is closer than the radius to both walls. The
+			// overlap usually contains the midpoint of the walls' closest points, so try that first.
+			Vector2f onWall;
+			Vector2f onOther;
+			GetClosestPointsBetweenSegments(wallStart, wallEnd, otherStart, otherEnd, onWall, onOther);
+			bool isLinked = FW_Intersection::PointInsideTriangle((onWall + onOther) / 2.f, cornerPos, sideA, sideB);
+			if (!isLinked)
+				isLinked = GetMinLargerWallDistanceSqInTriangle(cornerPos, sideA, sideB, wallStart, wallEnd, otherStart, otherEnd) < blockingRadiusSq;
+
+			if (isLinked)
+			{
+				isReached[otherIndex] = true;
+				reachedOpen.Add(otherIndex);
+			}
+		}
 	}
 
 	return true;

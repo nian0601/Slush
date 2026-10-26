@@ -510,6 +510,43 @@ namespace NavmeshTestSuite
 		FW_TEST_CHECK(!corridor.myPortals.IsEmpty(), "Test setup: expected the path to cross at least one edge");
 	}
 
+	void TestFindPathRadiusUsesCostlierOpenEntryIntoTriangle()
+	{
+		// Triangle T (P, Q, R) sits just below a wall notch at Q. The cheap route enters T over PQ,
+		// but PQ -> QR is pinched shut at Q (the notch is 10 from PR). The only other way in is a
+		// longer loop around the left and under T, entering over PR, and PR -> QR is wide open.
+		FW_GrowingArray<Vector2f> vertices;
+		vertices.Add(Vector2f{ 0.f, 0.f });			// 0: P
+		vertices.Add(Vector2f{ 200.f, 10.f });		// 1: Q, bottom of the notch
+		vertices.Add(Vector2f{ 400.f, 0.f });		// 2: R
+		vertices.Add(Vector2f{ 100.f, 200.f });		// 3: A
+		vertices.Add(Vector2f{ 300.f, 200.f });		// 4: B
+		vertices.Add(Vector2f{ -200.f, 0.f });		// 5: E
+		vertices.Add(Vector2f{ 200.f, -200.f });	// 6: D
+
+		// T, upper-left (start), upper-right (goal), left, lower-left, below T.
+		const int indices[] = { 0, 1, 2,  0, 1, 3,  1, 2, 4,  3, 0, 5,  5, 0, 6,  0, 2, 6 };
+		FW_GrowingArray<int> triangleIndices;
+		for (int index : indices)
+			triangleIndices.Add(index);
+
+		Navmesh mesh;
+		LoadHandBuiltMesh(mesh, vertices, triangleIndices);
+		FW_TEST_REQUIRE(mesh.GetTriangleCount() == 6, "Test setup: expected the hand-built mesh to load");
+
+		const Vector2f start{ 100.f, 100.f };
+		const Vector2f goal{ 300.f, 100.f };
+
+		FW_GrowingArray<Vector2f> waypoints;
+		Navmesh::PathCorridor pointCorridor;
+		FW_TEST_REQUIRE(mesh.FindPath(start, goal, 0.f, waypoints, &pointCorridor), "Expected a point agent to find a path");
+		FW_TEST_CHECK(pointCorridor.myPortals.Count() == 2, "Test setup: expected the point path to take the cheap route through T");
+
+		Navmesh::PathCorridor radiusCorridor;
+		FW_TEST_REQUIRE(mesh.FindPath(start, goal, 16.f, waypoints, &radiusCorridor), "Expected radius 16 to find the path entering T over its open edge");
+		FW_TEST_CHECK(radiusCorridor.myPortals.Count() == 5, "Expected radius 16 to take the loop around the left and under T");
+	}
+
 	void TestFindPathRadiusMatchesPointPathOnOpenGrid()
 	{
 		Navmesh mesh;
@@ -695,6 +732,7 @@ namespace NavmeshTestSuite
 		FW_RUN_TEST(TestFindPathRadiusBlocksNarrowDiagonalPinch);
 		FW_RUN_TEST(TestFindPathRadiusBlocksNarrowCorridor);
 		FW_RUN_TEST(TestFindPathRadiusPassesShortOpenFloorEdge);
+		FW_RUN_TEST(TestFindPathRadiusUsesCostlierOpenEntryIntoTriangle);
 		FW_RUN_TEST(TestFindPathRadiusMatchesPointPathOnOpenGrid);
 		FW_RUN_TEST(TestStringPullKeepsRadiusAroundHoleCorners);
 		FW_RUN_TEST(TestStringPullKeepsRadiusAlongStraightWall);

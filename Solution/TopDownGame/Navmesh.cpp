@@ -322,6 +322,8 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 		for (int e = 0; e < 3; ++e)
 		{
 			Edge* edge = currentTriangle->myEdges[e];
+			if (edge == entryEdge)
+				continue;
 
 			for (int t = 0; t < 2; ++t)
 			{
@@ -334,10 +336,13 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 
 				float tentativeGCost = currentGCost + Length(neighbor->GetCenterPosition() - currentCenter);
 
+				// With a radius, which edges a triangle may be left over depends on the edge it was
+				// entered over, so each (triangle, entry edge) pair is its own search node. Otherwise a
+				// cheap entry that is pinched shut toward the goal would hide a costlier open one.
 				int existingIndex = -1;
 				for (int i = 0; i < nodes.Count(); ++i)
 				{
-					if (nodes[i].myTriangle == neighbor)
+					if (nodes[i].myTriangle == neighbor && (anAgentRadius <= 0.f || nodes[i].myEdgeFromParent == edge))
 					{
 						existingIndex = i;
 						break;

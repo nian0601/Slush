@@ -148,6 +148,7 @@
     <ClCompile Include="NavmeshTestSuite.cpp" />
     <ClCompile Include="WaveScalingTestSuite.cpp" />
     <ClCompile Include="LevelEditorTestSuite.cpp" />
+    <ClCompile Include="LevelTestSuite.cpp" />
     <ClCompile Include="LevelEditorUtils.cpp" />
     <ClCompile Include="NavmeshDebuggerDockable.cpp" />
     <ClCompile Include="NavmeshDebuggingLayout.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="NavmeshTestSuite.h" />
     <ClInclude Include="WaveScalingTestSuite.h" />
     <ClInclude Include="LevelEditorTestSuite.h" />
+    <ClInclude Include="LevelTestSuite.h" />
     <ClInclude Include="LevelEditorUtils.h" />
     <ClInclude Include="NavmeshDebuggerDockable.h" />
     <ClInclude Include="NavmeshDebuggingLayout.h" />

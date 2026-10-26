@@ -106,23 +106,37 @@ void TowerBuildMenu::Update(bool aIsMouseOverOtherUI)
 			myFeedbackText = "Can't build there";
 			myFeedbackTimer.Start(2.f);
 		}
+		else if (result == PlaceTowerResult::TooCloseToEndpoint)
+		{
+			myFeedbackText = "Too close to the start or goal";
+			myFeedbackTimer.Start(2.f);
+		}
 	}
 }
 
 void TowerBuildMenu::RenderPreview() const
 {
-	if (!mySelectedTowerPrefab || myIsMouseOverUI)
+	if (!mySelectedTowerPrefab)
 		return;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
+	const int outlineColor = 0xFF66CCFF;
+
+	// The no-build zones around start and goal, for as long as a tower is selected.
+	const LevelData& levelData = myLevel.GetLevelDataAsset();
+	renderer.RenderCircle(levelData.myStartPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, outlineColor, 2.f);
+	renderer.RenderCircle(levelData.myGoalPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, outlineColor, 2.f);
+
+	if (myIsMouseOverUI)
+		return;
+
 	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
 
 	const Slush::SpriteComponent::Data& spriteData = mySelectedTowerPrefab->GetComponentData<Slush::SpriteComponent>();
 	const Vector2f halfSize = spriteData.mySize * 0.5f;
 	const Vector2f topLeft = mousePosition - halfSize;
 	const Vector2f bottomRight = mousePosition + halfSize;
-	const int outlineColor = 0xFF66CCFF;
 	renderer.RenderLine(topLeft, Vector2f{ bottomRight.x, topLeft.y }, outlineColor);
 	renderer.RenderLine(Vector2f{ bottomRight.x, topLeft.y }, bottomRight, outlineColor);
 	renderer.RenderLine(bottomRight, Vector2f{ topLeft.x, bottomRight.y }, outlineColor);

@@ -12,7 +12,7 @@ namespace Slush
 }
 
 // Deterministic tower placement/attack test harness, started with the -towertest flag.
-// F1-F5 run placement scenarios through Level::TryPlaceTower and log PASS/FAIL, F6/F7 spawn enemies.
+// F1-F5 and F8 run placement scenarios through Level::TryPlaceTower and log PASS/FAIL, F6/F7 spawn enemies.
 class TowerTestState : public Slush::IGameState
 {
 public:

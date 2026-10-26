@@ -17,6 +17,7 @@
 #include "NavmeshTestSuite.h"
 #include "WaveScalingTestSuite.h"
 #include "LevelEditorTestSuite.h"
+#include "LevelTestSuite.h"
 #include "GameLayout.h"
 #include "NavmeshDebuggingLayout.h"
 #include "LevelEditorLayout.h"
@@ -86,6 +87,7 @@ static void RunGameTests()
 	NavmeshTestSuite::RunTests();
 	WaveScalingTestSuite::RunTests();
 	LevelEditorTestSuite::RunTests();
+	LevelTestSuite::RunTests();
 }
 
 int main(int argc, char** argv)

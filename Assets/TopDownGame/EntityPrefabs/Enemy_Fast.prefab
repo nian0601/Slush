@@ -1,33 +1,41 @@
-Entity Prefab
-{
-	version 1
-	sprite
-	{
-		version 1
-		color -256
-		size
-		{
-			width 32.000
-			height 32.000
-		}
-	}
-	movement
-	{
-		version 1
-		movespeed 200.000
-	}
-	health
-	{
-		version 1
-		maxhealth 20
-	}
-	killreward
-	{
-		version 1
-		reward 10
-	}
-	targetable
-	{
-		version 1
-	}
-}
+Entity Prefab 
+{ 
+	version 1 
+	sprite 
+	{ 
+		version 1 
+		color -256 
+		size 
+		{ 
+			width 32.000 
+			height 32.000 
+		} 
+		floatColor 
+		{ 
+			r 1.000 
+			g 1.000 
+			b 1.000 
+			a 1.000 
+		} 
+	} 
+	movement 
+	{ 
+		version 2 
+		movespeed 200.000 
+		radius 16.000 
+	} 
+	health 
+	{ 
+		version 1 
+		maxhealth 20 
+	} 
+	killreward 
+	{ 
+		version 1 
+		reward 10 
+	} 
+	targetable 
+	{ 
+		version 1 
+	} 
+} 

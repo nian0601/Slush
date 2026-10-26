@@ -10,6 +10,93 @@
 
 namespace NavmeshTestSuite
 {
+	FW_GrowingArray<Vector2f> MakeBox(float aLeft, float aTop, float aRight, float aBottom)
+	{
+		FW_GrowingArray<Vector2f> box;
+		box.Add({ aLeft, aTop });
+		box.Add({ aRight, aTop });
+		box.Add({ aRight, aBottom });
+		box.Add({ aLeft, aBottom });
+		return box;
+	}
+
+	void CheckMeshGeometry(const Navmesh& aMesh)
+	{
+		Navmesh::TriangleMesh triangles;
+		aMesh.GetAsTriangleMesh(triangles);
+		for (int i = 0; i < triangles.myVertices.Count(); i += 3)
+		{
+			const float area = fabsf(Cross(triangles.myVertices[i + 1] - triangles.myVertices[i],
+				triangles.myVertices[i + 2] - triangles.myVertices[i]));
+			FW_TEST_CHECK(area > 0.000001f, "Cuts must not create degenerate triangles");
+		}
+	}
+
+	void TestBoundaryContactAndOverlap()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		FW_TEST_CHECK(mesh.IsAreaFullyOnMesh(MakeBox(20.f, 20.f, 100.f, 100.f)), "Outer corner and edges may touch");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(19.9f, 20.f, 100.f, 100.f)), "Footprint must stay inside outer boundary");
+		mesh.CutHole(MakeBox(500.f, 300.f, 700.f, 500.f));
+		FW_TEST_CHECK(mesh.IsAreaFullyOnMesh(MakeBox(400.f, 350.f, 500.f, 450.f)), "Partial collinear hole-edge contact is allowed");
+		FW_TEST_CHECK(mesh.IsAreaFullyOnMesh(MakeBox(400.f, 200.f, 500.f, 300.f)), "Hole corner contact is allowed");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(400.f, 350.f, 500.01f, 450.f)), "Small positive overlap is still rejected");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(500.f, 300.f, 700.f, 500.f)), "Matching a hole is blocked even with all corners on its boundary");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(450.f, 250.f, 750.f, 550.f)), "Enclosed hole is blocked");
+
+		Navmesh concave;
+		concave.GenerateDefaultGrid();
+		concave.CutHole(MakeBox(500.f, -20.f, 550.f, 400.f));
+		FW_TEST_CHECK(!concave.IsAreaFullyOnMesh(MakeBox(450.f, 300.f, 600.f, 450.f)), "Concave notch is blocked even with open corners and center");
+
+		Navmesh angled;
+		angled.GenerateDefaultGrid();
+		FW_GrowingArray<Vector2f> slope;
+		slope.Add({ 500.f, 300.f });
+		slope.Add({ 700.f, 500.f });
+		slope.Add({ 500.f, 500.f });
+		angled.CutHole(slope);
+		FW_TEST_CHECK(angled.IsAreaFullyOnMesh(MakeBox(600.f, 300.f, 650.f, 400.f)), "A box corner may touch an angled boundary");
+		FW_TEST_CHECK(!angled.IsAreaFullyOnMesh(MakeBox(600.f, 300.f, 650.f, 400.1f)), "Crossing an angled boundary is rejected");
+		angled.CutHole(MakeBox(600.f, 300.f, 650.f, 400.f));
+		CheckMeshGeometry(angled);
+	}
+
+	void TestTouchingCutsBlockPathsWithoutSeams()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		// Cover the complete height with accepted, edge-touching rectangles.
+		for (int i = 0; i < 7; ++i)
+		{
+			const auto box = MakeBox(700.f, 20.f + i * 128.f, 748.f, 148.f + i * 128.f);
+			FW_TEST_REQUIRE(mesh.IsAreaFullyOnMesh(box), "Every adjacent wall piece must be placeable");
+			mesh.CutHole(box);
+			FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(box), "Cut footprint must become blocked");
+			CheckMeshGeometry(mesh);
+		}
+		FW_GrowingArray<Vector2f> path;
+		FW_TEST_CHECK(!mesh.FindPath({ 600.f, 468.f }, { 850.f, 468.f }, path), "A touching wall must have no traversable seam");
+
+		Navmesh corners;
+		corners.GenerateDefaultGrid();
+		corners.CutHole(MakeBox(500.f, 300.f, 550.f, 350.f));
+		const auto touching = MakeBox(550.f, 350.f, 600.f, 400.f);
+		FW_TEST_REQUIRE(corners.IsAreaFullyOnMesh(touching), "Corner-touching cut must be placeable");
+		corners.CutHole(touching);
+		FW_TEST_CHECK(!corners.IsAreaFullyOnMesh(touching), "Corner-touching cut must remove its full footprint");
+		CheckMeshGeometry(corners);
+
+		Navmesh precision;
+		precision.GenerateDefaultGrid();
+		precision.CutHole(MakeBox(500.f, 300.f, 550.f, 350.f));
+		precision.CutHole(MakeBox(550.f, 300.3f, 600.f, 349.7f));
+		FW_TEST_CHECK(precision.HasVertexNear({ 550.f, 300.3f }, 0.001f), "Sub-unit partial contact must keep the exact new endpoint");
+		FW_TEST_CHECK(precision.HasVertexNear({ 550.f, 300.f }, 0.001f), "Sub-unit contact must preserve the previous cut endpoint");
+		CheckMeshGeometry(precision);
+	}
+
 	float GetTotalPathLength(const FW_GrowingArray<Vector2f>& aWaypoints)
 	{
 		float length = 0.f;
@@ -417,6 +504,8 @@ namespace NavmeshTestSuite
 		FW_RUN_TEST(TestFindPathFailsOutsideMesh);
 		FW_RUN_TEST(TestFindPathFailsWhenCutDisconnectsStartFromGoal);
 		FW_RUN_TEST(TestIsAreaFullyOnMesh);
+		FW_RUN_TEST(TestBoundaryContactAndOverlap);
+		FW_RUN_TEST(TestTouchingCutsBlockPathsWithoutSeams);
 		FW_RUN_TEST(TestFindPathSameTriangleYieldsStraightPath);
 		FW_RUN_TEST(TestStringPullIsNoLongerThanEdgeCenterPath);
 		FW_RUN_TEST(TestStringPullCanReFunnelAnExistingCorridorFromANewStart);

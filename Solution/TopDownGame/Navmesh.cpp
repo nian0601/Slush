@@ -664,6 +664,32 @@ void Navmesh::DeleteTriangle(Triangle* aTriangle)
 
 namespace
 {
+	const float GeometryEpsilon = 0.0001f;
+
+	double CrossPrecise(const Vector2f& aLeft, const Vector2f& aRight)
+	{
+		return double(aLeft.x) * aRight.y - double(aLeft.y) * aRight.x;
+	}
+
+	bool IsPointOnSegment(const Vector2f& aPoint, const Vector2f& aStart, const Vector2f& anEnd)
+	{
+		const Vector2f direction = anEnd - aStart;
+		const double lengthSquared = Length2(direction);
+		const double projection = Dot(aPoint - aStart, direction);
+		return projection >= 0.0 && projection <= lengthSquared
+			&& fabs(CrossPrecise(direction, aPoint - aStart)) <= GeometryEpsilon * Length(direction);
+	}
+
+	bool IsPointOnPolygon(const Vector2f& aPoint, const FW_GrowingArray<Vector2f>& aPolygon)
+	{
+		for (int i = 0; i < aPolygon.Count(); ++i)
+		{
+			if (IsPointOnSegment(aPoint, aPolygon[i], aPolygon[(i + 1) % aPolygon.Count()]))
+				return true;
+		}
+		return false;
+	}
+
 	bool IsPointInsidePolygon(const Vector2f& aPoint, const FW_GrowingArray<Vector2f>& aPolygon)
 	{
 		bool isInside = false;
@@ -693,39 +719,58 @@ bool Navmesh::IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const
 	if (aPolygon.Count() < 3)
 		return false;
 
+	Vector2f center;
 	for (const Vector2f& point : aPolygon)
 	{
-		bool isOnMesh = false;
-		for (const Triangle* triangle : myTriangles)
-		{
-			if (triangle->PointInside(point))
-			{
-				isOnMesh = true;
-				break;
-			}
-		}
-
-		if (!isOnMesh)
+		center += point;
+		if (!FindTriangleContaining(point))
 			return false;
 	}
+
+	// Corners alone cannot distinguish a footprint matching a hole from open space.
+	center /= float(aPolygon.Count());
+	if (!FindTriangleContaining(center))
+		return false;
 
 	for (const Edge* edge : myEdges)
 	{
 		if (edge->myTriangles[0] != nullptr && edge->myTriangles[1] != nullptr)
 			continue;
 
-		FW_Intersection::LineSegment boundaryEdge;
-		boundaryEdge.myStart = edge->myVertices[0]->myPos;
-		boundaryEdge.myEnd = edge->myVertices[1]->myPos;
-		if (IsPointInsidePolygon(boundaryEdge.myStart, aPolygon) || IsPointInsidePolygon(boundaryEdge.myEnd, aPolygon))
-			return false;
-
+		const Vector2f start = edge->myVertices[0]->myPos;
+		const Vector2f direction = edge->myVertices[1]->myPos - start;
+		// Split a boundary at every footprint crossing. Any open interval strictly
+		// inside the footprint means blocked space enters it, including enclosed holes
+		// and concave notches. Collinear edges and isolated corner contact are allowed.
+		FW_GrowingArray<double> parameters;
+		parameters.Add(0.0);
+		parameters.Add(1.0);
 		for (int i = 0; i < aPolygon.Count(); ++i)
 		{
-			FW_Intersection::LineSegment polygonEdge;
-			polygonEdge.myStart = aPolygon[i];
-			polygonEdge.myEnd = aPolygon[(i + 1) % aPolygon.Count()];
-			if (FW_Intersection::LineSegmentVsLineSegment(boundaryEdge, polygonEdge))
+			const Vector2f polygonStart = aPolygon[i];
+			const Vector2f polygonDirection = aPolygon[(i + 1) % aPolygon.Count()] - polygonStart;
+			const double denominator = CrossPrecise(direction, polygonDirection);
+			if (denominator != 0.0)
+			{
+				const double t = CrossPrecise(polygonStart - start, polygonDirection) / denominator;
+				const double u = CrossPrecise(polygonStart - start, direction) / denominator;
+				if (t > 0.0 && t < 1.0 && u >= 0.0 && u <= 1.0)
+					parameters.Add(t);
+			}
+		}
+		for (int i = 1; i < parameters.Count(); ++i)
+		{
+			for (int j = i; j > 0 && parameters[j] < parameters[j - 1]; --j)
+			{
+				const double previous = parameters[j - 1];
+				parameters[j - 1] = parameters[j];
+				parameters[j] = previous;
+			}
+		}
+		for (int i = 1; i < parameters.Count(); ++i)
+		{
+			const Vector2f midpoint = start + direction * float((parameters[i - 1] + parameters[i]) * 0.5);
+			if (!IsPointOnPolygon(midpoint, aPolygon) && IsPointInsidePolygon(midpoint, aPolygon))
 				return false;
 		}
 	}
@@ -772,19 +817,13 @@ void Navmesh::CutPolygon(const FW_GrowingArray<Vector2f>& aPolygonPoints)
 
 namespace
 {
-	const float CutterVertexEpsilon = 1.f;
+	const float CutterVertexEpsilon = GeometryEpsilon;
 }
 
 void Navmesh::EnsureCutterVerticesExist(const FW_GrowingArray<Vector2f>& aPolygonPoints)
 {
-	// A cutter shape's own corner points are never guaranteed to land on an existing mesh edge, so
-	// without this step Cut()'s edge-crossing logic below only ever creates vertices where a cut
-	// segment crosses an *existing* edge - the shape's own corners can fall anywhere inside a
-	// triangle and drift from the clicked/authored positions. Snapping within CutterVertexEpsilon
-	// instead of always inserting exactly avoids scattering near-duplicate vertices/edges a hair's
-	// width apart from whatever's already there (e.g. re-cutting close to a previous cut's own
-	// corners, or a corner that's already effectively on a shared edge/vertex by construction).
-	// The remaining imprecision is bounded by the epsilon rather than by triangle size.
+	// Reuse only numerically coincident geometry. A world-unit tolerance would move
+	// existing cut boundaries and disagree with placement's overlap validation.
 	for (const Vector2f& point : aPolygonPoints)
 	{
 		if (FindNearbyVertex(point, CutterVertexEpsilon) != nullptr)
@@ -810,47 +849,31 @@ void Navmesh::Cut(const Vector2f& aV1, const Vector2f& aV2)
 	FW_GrowingArray<CutEdge> cuttingEdges;
 	CollectCutEdges(cuttingLine, cuttingEdges);
 
-	FW_GrowingArray<Triangle*> oldTriangles;
 	for (CutEdge& cutEdge : cuttingEdges)
 	{
-		Vertex* cutVertex = CreateVertex(cutEdge.myCutPosition);
-
-		Edge* newEdge1 = CreateEdge(cutEdge.myEdge->myVertices[0], cutVertex);
-		Edge* newEdge2 = CreateEdge(cutVertex, cutEdge.myEdge->myVertices[1]);
-		CutTriangle(cutEdge.myEdge->myTriangles[0], cutEdge.myEdge, cutVertex, newEdge1, newEdge2);
-		CutTriangle(cutEdge.myEdge->myTriangles[1], cutEdge.myEdge, cutVertex, newEdge1, newEdge2);
-
-		oldTriangles.Add(cutEdge.myEdge->myTriangles[0]);
-		oldTriangles.Add(cutEdge.myEdge->myTriangles[1]);
-	}
-
-	for (Triangle* oldTriangle : oldTriangles)
-	{
-		if (oldTriangle)
-			DeleteTriangle(oldTriangle);
+		// Update triangles immediately: a later crossing can share a triangle with
+		// this one and must split the replacement rather than the original triangle.
+		SplitEdgeAtPosition(cutEdge.myEdge, cutEdge.myCutPosition);
 	}
 }
 
 void Navmesh::CollectCutEdges(const FW_Intersection::LineSegment& aCuttingLine, FW_GrowingArray<CutEdge>& outCutEdges) const
 {
-	// LineSegmentVsLineSegment's general (non-parallel) case is endpoint-inclusive, so a cutting
-	// segment that starts/ends exactly on an existing vertex (as EnsureCutterVerticesExist now
-	// guarantees) reports a spurious "crossing" against every edge incident to that vertex, right
-	// at the segment's own endpoint. That's not an interior crossing needing a new vertex there -
-	// the vertex already exists - so skip any hit that lands on the cutting segment's own start/end.
-	const float DegenerateEpsilonSq = 0.0001f;
-
-	FW_Intersection::LineSegment edgeSegment;
-	Vector2f intersectionPoint;
+	const Vector2f cutDirection = aCuttingLine.myEnd - aCuttingLine.myStart;
 	for (Edge* edge : myEdges)
 	{
-		edgeSegment.myStart = edge->myVertices[0]->myPos;
-		edgeSegment.myEnd = edge->myVertices[1]->myPos;
-		if (FW_Intersection::LineSegmentVsLineSegment(aCuttingLine, edgeSegment, &intersectionPoint))
+		const Vector2f start = edge->myVertices[0]->myPos;
+		const Vector2f end = edge->myVertices[1]->myPos;
+		const Vector2f direction = end - start;
+		const double denominator = CrossPrecise(cutDirection, direction);
+		if (denominator == 0.0)
+			continue; // Collinear contact needs no split.
+		const double t = CrossPrecise(start - aCuttingLine.myStart, direction) / denominator;
+		const double u = CrossPrecise(start - aCuttingLine.myStart, cutDirection) / denominator;
+		if (t > 0.0 && t < 1.0 && u > 0.0 && u < 1.0)
 		{
-			if (Length2(intersectionPoint - aCuttingLine.myStart) <= DegenerateEpsilonSq)
-				continue;
-			if (Length2(intersectionPoint - aCuttingLine.myEnd) <= DegenerateEpsilonSq)
+			const Vector2f intersectionPoint = start + direction * float(u);
+			if (FindNearbyVertex(intersectionPoint, CutterVertexEpsilon))
 				continue;
 
 			CutEdge& cutEdge = outCutEdges.Add();
@@ -996,7 +1019,18 @@ Navmesh::Triangle::~Triangle()
 
 bool Navmesh::Triangle::PointInside(const Vector2f& aPoint) const
 {
-	return FW_Intersection::PointInsideTriangle(aPoint, myVertices[0]->myPos, myVertices[1]->myPos, myVertices[2]->myPos);
+	bool positive = false;
+	bool negative = false;
+	for (int i = 0; i < 3; ++i)
+	{
+		const Vector2f start = myVertices[i]->myPos;
+		const Vector2f direction = myVertices[(i + 1) % 3]->myPos - start;
+		const double side = CrossPrecise(direction, aPoint - start);
+		const double tolerance = GeometryEpsilon * Length(direction);
+		positive |= side > tolerance;
+		negative |= side < -tolerance;
+	}
+	return !(positive && negative);
 }
 
 Navmesh::Edge* Navmesh::Triangle::FindIntersectingEdge(const FW_Intersection::Ray& aRay) const

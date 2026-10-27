@@ -207,14 +207,15 @@ Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) co
 	return nullptr;
 }
 
-bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const
+bool Navmesh::FindTrianglePath(const Vector2f& aStart, const Vector2f& aGoal, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const
 {
 	FW_GrowingArray<AStarNode> nodes;
 
 	AStarNode& startNode = nodes.Add();
 	startNode.myTriangle = aStartTriangle;
+	startNode.myPosition = aStart;
 	startNode.myGCost = 0.f;
-	startNode.myFCost = Length(aStartTriangle->GetCenterPosition() - aGoalTriangle->GetCenterPosition());
+	startNode.myFCost = Length(aStart - aGoal);
 
 	while (true)
 	{
@@ -316,7 +317,7 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 
 		Triangle* currentTriangle = nodes[bestIndex].myTriangle;
 		Edge* entryEdge = nodes[bestIndex].myEdgeFromParent;
-		Vector2f currentCenter = currentTriangle->GetCenterPosition();
+		Vector2f currentPosition = nodes[bestIndex].myPosition;
 		float currentGCost = nodes[bestIndex].myGCost;
 
 		for (int e = 0; e < 3; ++e)
@@ -334,15 +335,20 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 				if (anAgentRadius > 0.f && !CanCrossEdge(currentTriangle, entryEdge, edge, anAgentRadius))
 					continue;
 
-				float tentativeGCost = currentGCost + Length(neighbor->GetCenterPosition() - currentCenter);
+				// Cost runs between points on the crossed edges rather than triangle centres, so the chosen
+				// chain is one the funnel can pull tight around corners (see FindPath).
+				const Vector2f position = GetSearchPointOnPortal(edge, currentPosition, aGoal, anAgentRadius);
+				const float tentativeGCost = currentGCost + Length(position - currentPosition);
+				const float heuristic = Length(aGoal - position);
 
-				// With a radius, which edges a triangle may be left over depends on the edge it was
-				// entered over, so each (triangle, entry edge) pair is its own search node. Otherwise a
-				// cheap entry that is pinched shut toward the goal would hide a costlier open one.
+				// Each (triangle, entry edge) pair is its own search node: a node's position lies on its
+				// entry edge, and with a radius, which edges a triangle may be left over depends on the
+				// edge it was entered over. Otherwise a cheap entry that is pinched shut toward the goal
+				// would hide a costlier open one.
 				int existingIndex = -1;
 				for (int i = 0; i < nodes.Count(); ++i)
 				{
-					if (nodes[i].myTriangle == neighbor && (anAgentRadius <= 0.f || nodes[i].myEdgeFromParent == edge))
+					if (nodes[i].myTriangle == neighbor && nodes[i].myEdgeFromParent == edge)
 					{
 						existingIndex = i;
 						break;
@@ -354,8 +360,9 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 					if (tentativeGCost >= nodes[existingIndex].myGCost)
 						continue;
 
+					nodes[existingIndex].myPosition = position;
 					nodes[existingIndex].myGCost = tentativeGCost;
-					nodes[existingIndex].myFCost = tentativeGCost + Length(neighbor->GetCenterPosition() - aGoalTriangle->GetCenterPosition());
+					nodes[existingIndex].myFCost = tentativeGCost + heuristic;
 					nodes[existingIndex].myParentIndex = bestIndex;
 					nodes[existingIndex].myEdgeFromParent = edge;
 					nodes[existingIndex].myIsClosed = false;
@@ -364,8 +371,9 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle,
 				{
 					AStarNode& newNode = nodes.Add();
 					newNode.myTriangle = neighbor;
+					newNode.myPosition = position;
 					newNode.myGCost = tentativeGCost;
-					newNode.myFCost = tentativeGCost + Length(neighbor->GetCenterPosition() - aGoalTriangle->GetCenterPosition());
+					newNode.myFCost = tentativeGCost + heuristic;
 					newNode.myParentIndex = bestIndex;
 					newNode.myEdgeFromParent = edge;
 				}
@@ -494,7 +502,7 @@ bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAg
 	PathCorridor foundCorridor;
 	if (startTriangle != goalTriangle)
 	{
-		if (!FindTrianglePath(aStart, startTriangle, goalTriangle, anAgentRadius, foundCorridor))
+		if (!FindTrianglePath(aStart, aGoal, startTriangle, goalTriangle, anAgentRadius, foundCorridor))
 			return false;
 	}
 
@@ -1462,6 +1470,8 @@ namespace
 
 	const int OffMeshSearchIterations = 20;
 
+	const int PortalPointSearchIterations = 30;
+
 	float GetAngleBetween(const Vector2f& aFirst, const Vector2f& aSecond)
 	{
 		return acosf(FW_Clamp(Dot(GetNormalized(aFirst), GetNormalized(aSecond)), -1.f, 1.f));
@@ -1557,6 +1567,43 @@ Vector2f Navmesh::GetPushedPortalEnd(const Vector2f& anEnd, const Vector2f& aWal
 	}
 
 	return anEnd + fullOffset * (onMesh / 2.f);
+}
+
+Vector2f Navmesh::GetSearchPointOnPortal(Edge* aPortal, const Vector2f& aFrom, const Vector2f& aGoal, float anAgentRadius)
+{
+	// The usable stretch of the portal: each end on a wall vertex pulled in by the radius, the way
+	// string-pulling later keeps the path off it. A* already checked the portal fits the radius;
+	// if the pulled-in ends still cross, meet in the middle.
+	const Vector2f start = aPortal->myVertices[0]->myPos;
+	const Vector2f toEnd = aPortal->myVertices[1]->myPos - start;
+	const float length = Length(toEnd);
+	if (length <= 0.f)
+		return start;
+
+	float minDistance = IsWallVertex(aPortal->myVertices[0]) ? anAgentRadius : 0.f;
+	float maxDistance = IsWallVertex(aPortal->myVertices[1]) ? length - anAgentRadius : length;
+	if (minDistance > maxDistance)
+	{
+		minDistance = FW_Clamp((minDistance + maxDistance) / 2.f, 0.f, length);
+		maxDistance = minDistance;
+	}
+
+	// The point on that stretch with the shortest way from aFrom on to aGoal. That length is convex
+	// along the portal, so a ternary search finds it.
+	const Vector2f direction = toEnd / length;
+	for (int i = 0; i < PortalPointSearchIterations; ++i)
+	{
+		const float lower = minDistance + (maxDistance - minDistance) / 3.f;
+		const float upper = maxDistance - (maxDistance - minDistance) / 3.f;
+		const Vector2f lowerPoint = start + direction * lower;
+		const Vector2f upperPoint = start + direction * upper;
+		if (Length(lowerPoint - aFrom) + Length(aGoal - lowerPoint) <= Length(upperPoint - aFrom) + Length(aGoal - upperPoint))
+			maxDistance = upper;
+		else
+			minDistance = lower;
+	}
+
+	return start + direction * ((minDistance + maxDistance) / 2.f);
 }
 
 Navmesh::Triangle::~Triangle()

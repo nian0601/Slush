@@ -72,7 +72,11 @@ public:
 	// the radius away, so the path runs the radius off straight walls and turns around each
 	// corner at one such point. One point instead of an arc keeps the path a plain polyline
 	// for movement code; enemies are small enough that the sharp turn reads fine.
-	// A radius of 0 is a point agent and gives exactly the unchecked result.
+	// The funnel can only straighten the triangle chain A* picked, so the search measures cost
+	// between points on the crossed edges (each the point on the edge's usable stretch with the
+	// shortest way on to the goal) rather than between triangle centres, which tie on this grid
+	// mesh and can pick a chain a whole cell away from the corner, or zigzag across open floor.
+	// A radius of 0 is a point agent: no crossing is checked and no portal end is pushed.
 	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
 	bool IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const;
@@ -133,6 +137,8 @@ private:
 	{
 		Triangle* myTriangle = nullptr;
 		Edge* myEdgeFromParent = nullptr;
+		// Where the search reaches this node, on myEdgeFromParent (aStart for the start node).
+		Vector2f myPosition;
 		int myParentIndex = -1;
 		float myGCost = 0.f;
 		float myFCost = 0.f;
@@ -142,7 +148,7 @@ private:
 	void Clear();
 
 	Triangle* FindTriangleContaining(const Vector2f& aPosition) const;
-	bool FindTrianglePath(const Vector2f& aStart, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const;
+	bool FindTrianglePath(const Vector2f& aStart, const Vector2f& aGoal, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const;
 
 	static bool IsWallEdge(const Edge* anEdge);
 	static bool IsWallVertex(const Vertex* aVertex);
@@ -151,6 +157,7 @@ private:
 	bool HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const;
 	Vector2f GetWallCornerOffset(Vertex* aVertex, Edge* aPortal) const;
 	Vector2f GetPushedPortalEnd(const Vector2f& anEnd, const Vector2f& aWallOffset, float anAgentRadius) const;
+	static Vector2f GetSearchPointOnPortal(Edge* aPortal, const Vector2f& aFrom, const Vector2f& aGoal, float anAgentRadius);
 
 	Vertex* GetVertex(int x, int y) const;
 	Edge* GetEdgeWithVertex(Vertex* aV, Edge* aE1, Edge* aE2) const;

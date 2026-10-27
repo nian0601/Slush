@@ -671,6 +671,38 @@ namespace NavmeshTestSuite
 		FW_TEST_CHECK(GetPathClearance(radiusWaypoints, 600.f, -50.f, 1300.f, 450.f) >= radius - 0.05f, "Expected the path along the wall to keep the radius from it");
 	}
 
+	void TestFindPathRadiusTurnsCloseAroundHoleCorners()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+
+		// level_main's layout: a hole hanging from the top edge, its sides just off the grid lines,
+		// leaving one-cell-plus-a-sliver corridors down each side and two cells below it. Triangle
+		// centres tie between the cell next to the hole and the one beyond it, which used to send
+		// the path down the far column and along the far row, a whole cell off the corners.
+		const Vector2f holeBottomLeft{ 280.7f, 542.1f };
+		const Vector2f holeBottomRight{ 1701.1f, 542.1f };
+		AddRectHole(mesh, holeBottomLeft.x, -50.f, holeBottomRight.x, holeBottomLeft.y);
+
+		const float radius = 16.f;
+		const float maxCornerDistance = 3.f * radius + 0.5f;
+		const Vector2f start{ 136.f, 85.f };
+		const Vector2f goal{ 1812.f, 101.f };
+		FW_GrowingArray<Vector2f> waypoints;
+		FW_TEST_REQUIRE(mesh.FindPath(start, goal, radius, waypoints), "Expected a radius 16 path around the hole");
+		FW_TEST_CHECK(CountTurns(waypoints) == 2, "Expected one turn around each of the hole's bottom corners");
+
+		// The funnel can repeat the goal; only the points between start and goal are turns.
+		for (int i = 1; i < waypoints.Count() - 1; ++i)
+		{
+			if (waypoints[i] == start || waypoints[i] == goal)
+				continue;
+
+			const float cornerDistance = FW_Min(Length(waypoints[i] - holeBottomLeft), Length(waypoints[i] - holeBottomRight));
+			FW_TEST_CHECK(cornerDistance <= maxCornerDistance, "Expected the path to turn only right around the hole's bottom corners");
+		}
+	}
+
 	void TestStringPullFallsBackWhenCornerOffsetLeavesMesh()
 	{
 		Navmesh mesh;
@@ -692,7 +724,7 @@ namespace NavmeshTestSuite
 		FW_TEST_REQUIRE(mesh.FindPath(start, goal, 0.f, pointWaypoints), "Expected a point path over the spike");
 		FW_TEST_REQUIRE(mesh.FindPath(start, goal, 16.f, radiusWaypoints), "Expected a radius 16 path through the 40 wide gap over the spike");
 
-		FW_TEST_CHECK(CountTurns(radiusWaypoints) == CountTurns(pointWaypoints), "Expected the same corner count as the point path");
+		FW_TEST_CHECK(CountTurns(radiusWaypoints) == 1, "Expected one turn, over the spike's tip");
 		for (const Vector2f& waypoint : radiusWaypoints)
 			FW_TEST_CHECK(GetDistanceToGridBoundary(waypoint) > 0.f, "Expected every waypoint to stay on the mesh");
 	}
@@ -733,6 +765,7 @@ namespace NavmeshTestSuite
 		FW_RUN_TEST(TestFindPathRadiusBlocksNarrowCorridor);
 		FW_RUN_TEST(TestFindPathRadiusPassesShortOpenFloorEdge);
 		FW_RUN_TEST(TestFindPathRadiusUsesCostlierOpenEntryIntoTriangle);
+		FW_RUN_TEST(TestFindPathRadiusTurnsCloseAroundHoleCorners);
 		FW_RUN_TEST(TestFindPathRadiusMatchesPointPathOnOpenGrid);
 		FW_RUN_TEST(TestStringPullKeepsRadiusAroundHoleCorners);
 		FW_RUN_TEST(TestStringPullKeepsRadiusAlongStraightWall);

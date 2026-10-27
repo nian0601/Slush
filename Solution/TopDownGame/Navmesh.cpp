@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "Navmesh.h"
 #include "Graphics\Window.h"
@@ -422,6 +423,7 @@ namespace
 
 bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const PathCorridor& aCorridor, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints) const
 {
+	SLUSH_PROFILE_FUNCTION();
 	outWaypoints.RemoveAll();
 
 	if (aCorridor.myPortals.IsEmpty())
@@ -524,6 +526,7 @@ bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const Pa
 
 bool Navmesh::FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor) const
 {
+	SLUSH_PROFILE_FUNCTION();
 	Triangle* startTriangle = FindTriangleContaining(aStart);
 	Triangle* goalTriangle = FindTriangleContaining(aGoal);
 	if (startTriangle == nullptr || goalTriangle == nullptr)
@@ -757,6 +760,7 @@ namespace
 
 void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)
 {
+	SLUSH_PROFILE_FUNCTION();
 	if (aPolygon.Count() < 3)
 		return;
 

@@ -169,6 +169,13 @@ namespace Slush
 			}
 			fclose(file);
 			FW_TEST_CHECK(section == 6 && rankingRows == 3, "All sections and expected rankings present");
+			FW_TEST_REQUIRE(profiler.StartReport(path.GetBuffer()), "Restart report");
+			FW_TEST_CHECK(profiler.GetFrameCount() == 0 && profiler.GetSpikes().IsEmpty(), "New run resets test measurements");
+			FW_TEST_CHECK(profiler.RegisterMarker("KnownMarker") == marker && profiler.GetMarkers()[marker].myCalls == 0, "Reset preserves cached indices");
+			profiler.BeginFrame(0);
+			profiler.EndFrame(1000);
+			FW_TEST_CHECK(profiler.GetHistory()[0].myMarkers[marker].myCalls == 0, "History reset discards old marker totals");
+			FW_TEST_CHECK(profiler.FinishReport(), "Empty-marker run writes successfully");
 			remove(path.GetBuffer());
 		}
 

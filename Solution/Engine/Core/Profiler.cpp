@@ -111,6 +111,7 @@ namespace Slush
 		if (myFrameCount >= 60 && ms > 8 && ms > rolling * 2)
 		{
 			Spike& spike = mySpikes.Add();
+			spike = Spike();
 			spike.myFrameIndex = myFrameCount;
 			spike.myEngineSeconds = myDurationMs / 1000;
 			spike.myFrameMs = ms;
@@ -186,6 +187,24 @@ namespace Slush
 
 	bool Profiler::StartReport(const char* aPath)
 	{
+		FW_ASSERT(myStackCount == 0 && !myInFrame, "Cannot start a report inside a scope");
+		// Keep indices stable for cached macro sites, but discard measurements from
+		// startup unit tests so they cannot pollute the game's report.
+		for (Marker& marker : myMarkers)
+		{
+			FW_String name = marker.myName;
+			marker = Marker();
+			marker.myName = name;
+		}
+		myFrameCount = 0;
+		myDurationMs = 0;
+		myMinMs = 0;
+		myMaxMs = 0;
+		myHistogram.Fill(0);
+		myPending.Fill(Sample());
+		myHistory.RemoveAll();
+		mySpikes.RemoveAll();
+		myGameState = "startup";
 		if (myLiveFile)
 			fclose(myLiveFile);
 		myLiveFile = nullptr;

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "ActionGameGlobals.h"
 
@@ -41,6 +42,7 @@ Level::~Level()
 
 void Level::Update(Slush::StateStack& aStateStack)
 {
+	SLUSH_PROFILE_FUNCTION();
 	Slush::Entity* player = myPlayerHandle.Get();
 	if (!player)
 		return;

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "MovementComponent.h"
 
@@ -49,6 +50,7 @@ void MovementComponent::OnEnterWorld()
 
 void MovementComponent::Update()
 {
+	SLUSH_PROFILE_FUNCTION();
 	float remainingDistance = myMoveSpeed * Slush::Time::GetDelta();
 	while (remainingDistance > 0.f && myNextWaypointIndex < myWaypoints.Count())
 	{

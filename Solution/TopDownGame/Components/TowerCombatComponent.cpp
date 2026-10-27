@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "TowerCombatComponent.h"
 
@@ -47,6 +48,7 @@ bool TowerCombatComponent::IsBuildableTowerPrefab(const Slush::EntityPrefab& aPr
 
 void TowerCombatComponent::Update()
 {
+	SLUSH_PROFILE_FUNCTION();
 	Slush::Entity* target = myTarget.Get();
 	if (!target || target->myIsMarkedForRemoval || !IsTargetInRange(*target))
 	{

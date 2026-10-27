@@ -88,10 +88,12 @@ void TowerBuildMenu::Update(bool aIsMouseOverOtherUI)
 	}
 
 	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
+	if (mySelectedTowerPrefab)
+		myResolvedPosition = myLevel.ResolveTowerPosition(*mySelectedTowerPrefab, mousePosition);
 	if (mySelectedTowerPrefab && engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB)
 		&& !myIsMouseOverUI)
 	{
-		const PlaceTowerResult result = myLevel.TryPlaceTower(*mySelectedTowerPrefab, mousePosition);
+		const PlaceTowerResult result = myLevel.TryPlaceTower(*mySelectedTowerPrefab, myResolvedPosition);
 		if (result == PlaceTowerResult::NotAffordable)
 		{
 			myFeedbackText = "Not enough resources (need ";
@@ -116,12 +118,11 @@ void TowerBuildMenu::RenderPreview() const
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	Slush::Renderer& renderer = engine.GetWindow().GetRenderer();
-	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
 
 	const Slush::SpriteComponent::Data& spriteData = mySelectedTowerPrefab->GetComponentData<Slush::SpriteComponent>();
 	const Vector2f halfSize = spriteData.mySize * 0.5f;
-	const Vector2f topLeft = mousePosition - halfSize;
-	const Vector2f bottomRight = mousePosition + halfSize;
+	const Vector2f topLeft = myResolvedPosition - halfSize;
+	const Vector2f bottomRight = myResolvedPosition + halfSize;
 	const int outlineColor = 0xFF66CCFF;
 	renderer.RenderLine(topLeft, Vector2f{ bottomRight.x, topLeft.y }, outlineColor);
 	renderer.RenderLine(Vector2f{ bottomRight.x, topLeft.y }, bottomRight, outlineColor);

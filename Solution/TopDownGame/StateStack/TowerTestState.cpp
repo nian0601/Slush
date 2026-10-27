@@ -28,6 +28,7 @@ namespace
 		{
 		case PlaceTowerResult::Placed: return "Placed";
 		case PlaceTowerResult::FootprintBlocked: return "FootprintBlocked";
+		case PlaceTowerResult::TooCloseToEndpoint: return "TooCloseToEndpoint";
 		case PlaceTowerResult::NotAffordable: return "NotAffordable";
 		}
 
@@ -109,8 +110,13 @@ void TowerTestState::UpdateScenarioKeys()
 	if (input.WasKeyReleased(Slush::Input::_F7))
 		myPendingClusterEnemyCount += 3;
 
+	// Rejected before any resources are checked, so it can run at any point in the key order.
 	if (input.WasKeyReleased(Slush::Input::_F8))
-		RunSnapPlacementScenarios();
+	{
+		const LevelData& levelData = myLevel->GetLevelDataAsset();
+		const Vector2f besideGoal = levelData.myGoalPosition + Vector2f{ 0.f, levelData.myEndpointClearance };
+		RunPlacementScenario("Basic beside the goal", *myBasicTowerPrefab, besideGoal, PlaceTowerResult::TooCloseToEndpoint);
+	}
 
 	if (myPendingClusterEnemyCount > 0)
 	{

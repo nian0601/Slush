@@ -1,9 +1,10 @@
 LevelData 
 { 
-	version 6 
+	version 7 
 	navmeshData navmesh_second 
 	startingResources 125 
 	startingLives 20 
+	endpointClearance 48.000 
 	totalWaveCount 15 
 	baseEnemyCount 8 
 	enemyCountPerWaveIncrement 4 

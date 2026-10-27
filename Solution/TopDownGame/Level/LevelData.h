@@ -21,7 +21,7 @@ struct EnemyUnlockEntry
 class LevelData : public Slush::DataAsset
 {
 public:
-	DEFINE_ASSET("LevelData", "tdlevel", "levels", ICON_FA_MAP, 6);
+	DEFINE_ASSET("LevelData", "tdlevel", "levels", ICON_FA_MAP, 7);
 
 	LevelData(const char* aName, unsigned int aAssetID);
 
@@ -37,6 +37,8 @@ public:
 	Slush::AssetReference<NavmeshData> myNavmeshData;
 	int myStartingResources = 100;
 	int myStartingLives = 20;
+	// Spawn and goal points must be this far from navmesh walls, and towers can't be built closer to them.
+	float myEndpointClearance = 48.f;
 
 	FW_GrowingArray<EnemyUnlockEntry> myEnemyUnlocks;
 
@@ -52,6 +54,6 @@ private:
 	void BuildEnemyUnlocksUI();
 	void BuildWavePreviewUI();
 
-	void OnLoad(Slush::AssetParser::Handle aRootHandle);
+	void OnLoad(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion);
 	void OnSave(Slush::AssetParser::Handle aRootHandle);
 };

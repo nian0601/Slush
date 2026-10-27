@@ -27,6 +27,7 @@ void NavmeshDebuggerDockable::RenderPathfindResults() const
 	Slush::Renderer& renderer = Slush::Engine::GetInstance().GetWindow().GetRenderer();
 
 	const int pathColor = 0xFFFFFF00;
+	const int agentColor = 0x80FFFF00;
 
 	for (const PathfindResult& result : myPathfindResults)
 	{
@@ -35,6 +36,25 @@ void NavmeshDebuggerDockable::RenderPathfindResults() const
 
 		for (int i = 0; i < result.myWaypoints.Count() - 1; ++i)
 			renderer.RenderLine(result.myWaypoints[i], result.myWaypoints[i + 1], pathColor);
+
+		if (result.myRadius <= 0.f)
+			continue;
+
+		// The agent's outline at every waypoint and about every radius along each segment, so its
+		// clearance from walls shows along the whole path.
+		for (int i = 0; i < result.myWaypoints.Count(); ++i)
+		{
+			const Vector2f& waypoint = result.myWaypoints[i];
+			renderer.RenderCircle(waypoint, result.myRadius, nullptr, Recti(), 0, agentColor, 1.f);
+
+			if (i == result.myWaypoints.Count() - 1)
+				continue;
+
+			const Vector2f segment = result.myWaypoints[i + 1] - waypoint;
+			const int stepCount = static_cast<int>(Length(segment) / result.myRadius);
+			for (int step = 1; step < stepCount; ++step)
+				renderer.RenderCircle(waypoint + segment * (static_cast<float>(step) / stepCount), result.myRadius, nullptr, Recti(), 0, agentColor, 1.f);
+		}
 	}
 }
 
@@ -150,7 +170,7 @@ void NavmeshDebuggerDockable::UpdatePathfindTestMode()
 	myPathfindTestHasStart = false;
 
 	FW_GrowingArray<Vector2f> waypoints;
-	if (!myNavmesh.FindPath(myPathfindTestStart, goal, waypoints))
+	if (!myNavmesh.FindPath(myPathfindTestStart, goal, myPathfindRadius, waypoints))
 		return;
 
 	PathfindResult& result = myPathfindResults.Add();
@@ -160,6 +180,7 @@ void NavmeshDebuggerDockable::UpdatePathfindTestMode()
 	result.myStart = myPathfindTestStart;
 	result.myGoal = goal;
 	result.myWaypoints = waypoints;
+	result.myRadius = myPathfindRadius;
 }
 
 void NavmeshDebuggerDockable::DisableBoxCutMode()
@@ -226,6 +247,8 @@ void NavmeshDebuggerDockable::OnBuildUI()
 			DisableManualCutMode();
 		}
 	}
+
+	ImGui::SliderFloat("Agent Radius", &myPathfindRadius, 0.f, 64.f, "%.0f");
 
 	if (myIsManualCutModeActive)
 	{

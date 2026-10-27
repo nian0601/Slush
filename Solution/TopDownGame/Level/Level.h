@@ -14,8 +14,16 @@ enum class PlaceTowerResult
 {
 	Placed,
 	FootprintBlocked,
+	TooCloseToEndpoint,
 	NotAffordable,
 };
+
+namespace TowerPlacementUtils
+{
+	// True when the axis-aligned rect reaches closer than aRadius to aPoint; exactly touching is allowed.
+	// Per point, so a level with several spawns or goals can loop over it.
+	bool DoesRectOverlapCircle(const Vector2f& aRectMin, const Vector2f& aRectMax, const Vector2f& aPoint, float aRadius);
+}
 
 enum class LevelResult
 {

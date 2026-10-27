@@ -63,6 +63,9 @@ private:
 	void UpdateManualCutMode();
 	void UpdateSetStartMode();
 	void UpdateSetGoalMode();
+	// Re-checks start, goal and roster against the level's endpoint clearance; runs every frame so moves,
+	// clearance edits and new cuts are all caught.
+	void UpdateEndpointProblems();
 
 	void RenderBoxCutPreview() const;
 	void RenderManualCutPreview() const;
@@ -120,6 +123,10 @@ private:
 
 	bool myWantToOpenOpenLevelDialog = false;
 	int mySelectedUnlockIndex = 0;
+
+	FW_GrowingArray<FW_String> myEndpointProblems;
+	bool myIsStartClear = true;
+	bool myIsGoalClear = true;
 
 	Navmesh::TriangleMesh myTriangleMesh;
 };

@@ -2,11 +2,29 @@
 
 #include <FW_GrowingArray.h>
 #include <FW_String.h>
+#include <FW_Vector2.h>
 
-// Pure helpers for the Level Editor's New/Duplicate flow - no asset system access, so they're testable
-// before Engine::Initialize.
+class Navmesh;
+
+// Pure helpers for the Level Editor - no asset system access, so they're testable before Engine::Initialize.
 namespace LevelEditorUtils
 {
+	// A roster enemy's movement radius, looked up by the caller so these helpers stay asset-free.
+	struct RosterRadius
+	{
+		FW_String myEnemyName;
+		float myRadius = 0.f;
+	};
+
+	// A spawn or goal point is clear when it's on the navmesh and at least aClearance from every wall.
+	// Per point, so a level with several spawns or goals can loop over it.
+	bool IsEndpointClear(const Navmesh& aNavmesh, const Vector2f& aPoint, float aClearance);
+	void AddEndpointProblem(const Navmesh& aNavmesh, const char* aPointLabel, const Vector2f& aPoint, float aClearance, FW_GrowingArray<FW_String>& anOutProblems);
+	// One problem per roster enemy wider than the clearance: it could fail to path out of its spawn.
+	void AddRosterRadiusProblems(const FW_GrowingArray<RosterRadius>& someRosterRadii, float aClearance, FW_GrowingArray<FW_String>& anOutProblems);
+	void GetEndpointProblems(const Navmesh& aNavmesh, const Vector2f& aStart, const Vector2f& aGoal, float aClearance,
+		const FW_GrowingArray<RosterRadius>& someRosterRadii, FW_GrowingArray<FW_String>& anOutProblems);
+
 	enum class NameError
 	{
 		None,

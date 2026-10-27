@@ -26,6 +26,7 @@ private:
 		Vector2f myStart;
 		Vector2f myGoal;
 		FW_GrowingArray<Vector2f> myWaypoints;
+		float myRadius = 0.f;
 	};
 
 	void BuildPathfindResultsList();
@@ -54,6 +55,7 @@ private:
 	bool myIsPathfindTestModeActive = false;
 	bool myPathfindTestHasStart = false;
 	Vector2f myPathfindTestStart;
+	float myPathfindRadius = 16.f;
 
 	FW_GrowingArray<PathfindResult> myPathfindResults;
 	int myNextPathfindResultID = 1;

@@ -9,26 +9,35 @@
 #include "Level/Level.h"
 #include "TopDownGameGlobals.h"
 
-void MovementComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int /*aVersion*/)
+void MovementComponent::Data::OnParse(Slush::AssetParser::Handle aComponentHandle, unsigned int aVersion)
 {
 	aComponentHandle.ParseFloatField("movespeed", myMoveSpeed);
+
+	// Version 1 files predate the radius and keep the default until they're next saved.
+	if (aVersion >= 2)
+		aComponentHandle.ParseFloatField("radius", myRadius);
 }
 
 void MovementComponent::Data::OnBuildUI()
 {
 	Slush::ImGuiWidgets::InputFloat("Move Speed", &myMoveSpeed);
+
+	if (Slush::ImGuiWidgets::InputFloat("Radius", &myRadius))
+		myRadius = FW_Max(myRadius, 0.f);
 }
 
 MovementComponent::MovementComponent(Slush::Entity& anEntity, const Slush::EntityPrefab& anEntityPrefab)
 	: Slush::Component(anEntity, anEntityPrefab)
 {
-	myMoveSpeed = anEntityPrefab.GetComponentData<MovementComponent>().myMoveSpeed;
+	const Data& data = anEntityPrefab.GetComponentData<MovementComponent>();
+	myMoveSpeed = data.myMoveSpeed;
+	myRadius = data.myRadius;
 }
 
 void MovementComponent::OnEnterWorld()
 {
 	Level& level = TopDownGameGlobals::GetInstance().GetLevel();
-	const bool foundPath = level.GetNavmesh().FindPath(myEntity.myPosition, level.GetLevelDataAsset().myGoalPosition, myWaypoints);
+	const bool foundPath = level.GetNavmesh().FindPath(myEntity.myPosition, level.GetLevelDataAsset().myGoalPosition, myRadius, myWaypoints);
 	if (!foundPath)
 	{
 		SLUSH_ERROR("Enemy '%s' could not find a path from the level start to its goal", myEntityPrefab.GetAssetName().GetBuffer());

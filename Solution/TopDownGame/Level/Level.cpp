@@ -13,6 +13,15 @@
 #include <EntitySystem\EntityPrefab.h>
 #include <EntitySystem\Components\SpriteComponent.h>
 
+namespace TowerPlacementUtils
+{
+	bool DoesRectOverlapCircle(const Vector2f& aRectMin, const Vector2f& aRectMax, const Vector2f& aPoint, float aRadius)
+	{
+		const Vector2f closestPoint{ FW_Clamp(aPoint.x, aRectMin.x, aRectMax.x), FW_Clamp(aPoint.y, aRectMin.y, aRectMax.y) };
+		return Length2(closestPoint - aPoint) < aRadius * aRadius;
+	}
+}
+
 Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh, bool anIsEditMode)
 {
 	myLevelData = &aLevelData;
@@ -116,6 +125,16 @@ PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, c
 	{
 		SLUSH_WARNING("[Level] Tower placement rejected: footprint is not fully on open navmesh");
 		return PlaceTowerResult::FootprintBlocked;
+	}
+
+	const Vector2f endpoints[] = { myLevelData->myStartPosition, myLevelData->myGoalPosition };
+	for (const Vector2f& endpoint : endpoints)
+	{
+		if (TowerPlacementUtils::DoesRectOverlapCircle(aPosition - halfSize, aPosition + halfSize, endpoint, myLevelData->myEndpointClearance))
+		{
+			SLUSH_WARNING("[Level] Tower placement rejected: footprint reaches within %.0f of the start or goal", myLevelData->myEndpointClearance);
+			return PlaceTowerResult::TooCloseToEndpoint;
+		}
 	}
 
 	const int cost = BuildCostComponent::GetCost(aTowerPrefab);

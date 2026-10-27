@@ -10,10 +10,10 @@ LevelData::LevelData(const char* aName, unsigned int aAssetID)
 {
 }
 
-void LevelData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int /*aVersion*/)
+void LevelData::OnParse(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion)
 {
 	if (aRootHandle.IsReading())
-		OnLoad(aRootHandle);
+		OnLoad(aRootHandle, aVersion);
 	else
 		OnSave(aRootHandle);
 }
@@ -52,6 +52,8 @@ void LevelData::BuildLevelSettingsUI()
 	Slush::ImGuiWidgets::InputInt("Starting Lives", &myStartingLives);
 	Slush::ImGuiWidgets::InputFloat2("Start Position", &myStartPosition.x);
 	Slush::ImGuiWidgets::InputFloat2("Goal Position", &myGoalPosition.x);
+	if (Slush::ImGuiWidgets::InputFloat("Endpoint Clearance", &myEndpointClearance))
+		myEndpointClearance = FW_Max(myEndpointClearance, 0.f);
 }
 
 void LevelData::BuildWaveScalingUI()
@@ -236,13 +238,18 @@ void LevelData::BuildWavePreviewUI()
 	}
 }
 
-void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle)
+void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion)
 {
 	aRootHandle.ParseVec2fField("startPosition", myStartPosition);
 	aRootHandle.ParseVec2fField("goalPosition", myGoalPosition);
 	myNavmeshData.Parse(aRootHandle, "navmeshData");
 	aRootHandle.ParseIntField("startingResources", myStartingResources);
 	aRootHandle.ParseIntField("startingLives", myStartingLives);
+
+	// Pre-v7 files have no clearance; reset so reloading (Level Editor discard) doesn't keep an edited value
+	myEndpointClearance = 48.f;
+	if (aVersion >= 7)
+		aRootHandle.ParseFloatField("endpointClearance", myEndpointClearance);
 
 	aRootHandle.ParseIntField("totalWaveCount", myTotalWaveCount);
 	aRootHandle.ParseIntField("baseEnemyCount", myBaseEnemyCount);
@@ -281,6 +288,7 @@ void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 	myNavmeshData.Parse(aRootHandle, "navmeshData");
 	aRootHandle.ParseIntField("startingResources", myStartingResources);
 	aRootHandle.ParseIntField("startingLives", myStartingLives);
+	aRootHandle.ParseFloatField("endpointClearance", myEndpointClearance);
 
 	aRootHandle.ParseIntField("totalWaveCount", myTotalWaveCount);
 	aRootHandle.ParseIntField("baseEnemyCount", myBaseEnemyCount);

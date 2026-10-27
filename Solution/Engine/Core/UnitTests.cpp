@@ -4,6 +4,7 @@
 #include "Core/AssetRepository.h"
 #include "Core/CommandLineArgs.h"
 #include "Core/EngineTestSuite.h"
+#include "Core/ProfilerTestSuite.h"
 
 #include <FW_UnitTestSuite.h>
 
@@ -23,6 +24,7 @@ namespace Slush
 
 			FW_UnitTestSuite::RunFrameworkTests();
 			EngineTestSuite::RunTests();
+			ProfilerTestSuite::RunTests();
 
 			if (aGameTestsCallback)
 				aGameTestsCallback();

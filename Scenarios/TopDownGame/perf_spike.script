@@ -1,0 +1,10 @@
+# Exercise spike detection after the startup warm-up, during real gameplay.
+waitfor gamestate.mainmenu.active
+click Start
+waitfor gamestate.levelselect.active
+click "1  level_main"
+waitfor gamestate.level.active
+wait 3s
+perfspike 100
+wait 2s
+quit

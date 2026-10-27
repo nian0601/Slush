@@ -2,6 +2,7 @@
 #include "Core/Profiler.h"
 #include "Core/ProfilerTestSuite.h"
 #include "Core/AssetRepository.h"
+#include "Core/DebugScriptRunner.h"
 #include <FW_UnitTestSuite.h>
 #include <cmath>
 #include <share.h>
@@ -179,6 +180,23 @@ namespace Slush
 			remove(path.GetBuffer());
 		}
 
+		void TestPerfSpikeCommand()
+		{
+			const char* invalid[] = { "perfspike", "perfspike -1", "perfspike abc", "perfspike nan", "perfspike inf", "perfspike 1e999", "perfspike 1ms", "perfspike 0 extra", "perfspike \"\"" };
+			for (const char* line : invalid)
+			{
+				DebugScriptRunner runner;
+				runner.QueueLine(line);
+				runner.Step(0);
+				FW_TEST_CHECK(runner.HasFailed(), "Invalid perfspike arguments fail the script");
+			}
+			DebugScriptRunner runner;
+			runner.QueueLine("perfspike 0");
+			runner.QueueLine("perfspike 0.1");
+			runner.Step(0);
+			FW_TEST_CHECK(!runner.HasFailed(), "Zero and fractional durations are valid");
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Profiler");
@@ -187,6 +205,7 @@ namespace Slush
 			FW_RUN_TEST(TestHistogramAndHistory);
 			FW_RUN_TEST(TestSpikes);
 			FW_RUN_TEST(TestReportAndLiveSpikes);
+			FW_RUN_TEST(TestPerfSpikeCommand);
 		}
 	}
 }

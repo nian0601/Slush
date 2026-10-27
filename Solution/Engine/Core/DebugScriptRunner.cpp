@@ -1,11 +1,32 @@
 #include "stdafx.h"
 #include "Core/DebugScriptRunner.h"
+#include "Core/Profiler.h"
 #include <float.h>
 
 namespace Slush
 {
 	namespace DebugScriptRunner_Private
 	{
+		void PerfSpike(DebugScriptRunner& aRunner, const DebugScriptRunner::Arguments& anArguments)
+		{
+			if (!aRunner.RequireArgumentCount(anArguments, 1))
+				return;
+			const char* text = anArguments[0].GetBuffer();
+			char* end = nullptr;
+			const double ms = strtod(text, &end);
+			if (end == text || *end != '\0' || !_finite(ms) || ms < 0)
+			{
+				aRunner.Fail("perfspike expects non-negative finite milliseconds");
+				return;
+			}
+			SLUSH_PROFILE_SCOPE("DebugPerfSpike");
+			const Time::TimeUnit start = Time::GetCurrentExactTime();
+			while ((Time::GetCurrentExactTime() - start) / 1000.0 < ms)
+			{
+				// Deliberate wall-clock stall, used to verify spike detection.
+			}
+		}
+
 		bool ParseDuration(const char* aText, float& aValue, bool& anInFrames)
 		{
 			char* end = nullptr;
@@ -56,6 +77,7 @@ namespace Slush
 	{
 		RegisterCommand("wait", &DebugScriptRunner_Private::Wait);
 		RegisterCommand("waitfor", &DebugScriptRunner_Private::WaitFor);
+		RegisterCommand("perfspike", &DebugScriptRunner_Private::PerfSpike);
 	}
 
 	void DebugScriptRunner::SetReporter(Reporter aReporter, void* aContext)

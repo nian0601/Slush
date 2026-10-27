@@ -20,6 +20,7 @@ public:
 private:
 	Level& myLevel;
 	const Slush::EntityPrefab* mySelectedTowerPrefab = nullptr;
+	Vector2f myResolvedPosition;
 	FW_GrowingArray<Slush::UIBuilder::RenderCommand> myRenderCommands;
 	FW_String myFeedbackText;
 	Slush::Timer myFeedbackTimer;

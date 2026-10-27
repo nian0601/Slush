@@ -88,10 +88,12 @@ void TowerBuildMenu::Update(bool aIsMouseOverOtherUI)
 	}
 
 	const Vector2f mousePosition = engine.GetInput().GetMousePositionf();
+	if (mySelectedTowerPrefab)
+		myResolvedPosition = myLevel.ResolveTowerPosition(*mySelectedTowerPrefab, mousePosition);
 	if (mySelectedTowerPrefab && engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB)
 		&& !myIsMouseOverUI)
 	{
-		const PlaceTowerResult result = myLevel.TryPlaceTower(*mySelectedTowerPrefab, mousePosition);
+		const PlaceTowerResult result = myLevel.TryPlaceTower(*mySelectedTowerPrefab, myResolvedPosition);
 		if (result == PlaceTowerResult::NotAffordable)
 		{
 			myFeedbackText = "Not enough resources (need ";

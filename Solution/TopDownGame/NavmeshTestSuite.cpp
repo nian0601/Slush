@@ -10,6 +10,154 @@
 
 namespace NavmeshTestSuite
 {
+	FW_GrowingArray<Vector2f> MakeBox(float aLeft, float aTop, float aRight, float aBottom)
+	{
+		FW_GrowingArray<Vector2f> box;
+		box.Add({ aLeft, aTop });
+		box.Add({ aRight, aTop });
+		box.Add({ aRight, aBottom });
+		box.Add({ aLeft, aBottom });
+		return box;
+	}
+
+	void CheckMeshGeometry(const Navmesh& aMesh)
+	{
+		Navmesh::TriangleMesh triangles;
+		aMesh.GetAsTriangleMesh(triangles);
+		for (int i = 0; i < triangles.myVertices.Count(); i += 3)
+		{
+			const float area = fabsf(Cross(triangles.myVertices[i + 1] - triangles.myVertices[i],
+				triangles.myVertices[i + 2] - triangles.myVertices[i]));
+			FW_TEST_CHECK(area > 0.000001f, "Cuts must not create degenerate triangles");
+		}
+	}
+
+	void TestBoundaryContactAndOverlap()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		FW_TEST_CHECK(mesh.IsAreaFullyOnMesh(MakeBox(20.f, 20.f, 100.f, 100.f)), "Outer corner and edges may touch");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(19.9f, 20.f, 100.f, 100.f)), "Footprint must stay inside outer boundary");
+		mesh.CutHole(MakeBox(500.f, 300.f, 700.f, 500.f));
+		FW_TEST_CHECK(mesh.IsAreaFullyOnMesh(MakeBox(400.f, 350.f, 500.f, 450.f)), "Partial collinear hole-edge contact is allowed");
+		FW_TEST_CHECK(mesh.IsAreaFullyOnMesh(MakeBox(400.f, 200.f, 500.f, 300.f)), "Hole corner contact is allowed");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(400.f, 350.f, 500.01f, 450.f)), "Small positive overlap is still rejected");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(500.f, 300.f, 700.f, 500.f)), "Matching a hole is blocked even with all corners on its boundary");
+		FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(MakeBox(450.f, 250.f, 750.f, 550.f)), "Enclosed hole is blocked");
+
+		Navmesh concave;
+		concave.GenerateDefaultGrid();
+		concave.CutHole(MakeBox(500.f, -20.f, 550.f, 400.f));
+		FW_TEST_CHECK(!concave.IsAreaFullyOnMesh(MakeBox(450.f, 300.f, 600.f, 450.f)), "Concave notch is blocked even with open corners and center");
+
+		Navmesh angled;
+		angled.GenerateDefaultGrid();
+		FW_GrowingArray<Vector2f> slope;
+		slope.Add({ 500.f, 300.f });
+		slope.Add({ 700.f, 500.f });
+		slope.Add({ 500.f, 500.f });
+		angled.CutHole(slope);
+		FW_TEST_CHECK(angled.IsAreaFullyOnMesh(MakeBox(600.f, 300.f, 650.f, 400.f)), "A box corner may touch an angled boundary");
+		FW_TEST_CHECK(!angled.IsAreaFullyOnMesh(MakeBox(600.f, 300.f, 650.f, 400.1f)), "Crossing an angled boundary is rejected");
+		angled.CutHole(MakeBox(600.f, 300.f, 650.f, 400.f));
+		CheckMeshGeometry(angled);
+	}
+
+	void TestTouchingCutsBlockPathsWithoutSeams()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		// Cover the complete height with accepted, edge-touching rectangles.
+		for (int i = 0; i < 7; ++i)
+		{
+			const auto box = MakeBox(700.f, 20.f + i * 128.f, 748.f, 148.f + i * 128.f);
+			FW_TEST_REQUIRE(mesh.IsAreaFullyOnMesh(box), "Every adjacent wall piece must be placeable");
+			mesh.CutHole(box);
+			FW_TEST_CHECK(!mesh.IsAreaFullyOnMesh(box), "Cut footprint must become blocked");
+			CheckMeshGeometry(mesh);
+		}
+		FW_GrowingArray<Vector2f> path;
+		FW_TEST_CHECK(!mesh.FindPath({ 600.f, 468.f }, { 850.f, 468.f }, path), "A touching wall must have no traversable seam");
+
+		Navmesh corners;
+		corners.GenerateDefaultGrid();
+		corners.CutHole(MakeBox(500.f, 300.f, 550.f, 350.f));
+		const auto touching = MakeBox(550.f, 350.f, 600.f, 400.f);
+		FW_TEST_REQUIRE(corners.IsAreaFullyOnMesh(touching), "Corner-touching cut must be placeable");
+		corners.CutHole(touching);
+		FW_TEST_CHECK(!corners.IsAreaFullyOnMesh(touching), "Corner-touching cut must remove its full footprint");
+		CheckMeshGeometry(corners);
+
+		Navmesh precision;
+		precision.GenerateDefaultGrid();
+		precision.CutHole(MakeBox(500.f, 300.f, 550.f, 350.f));
+		precision.CutHole(MakeBox(550.f, 300.3f, 600.f, 349.7f));
+		FW_TEST_CHECK(precision.HasVertexNear({ 550.f, 300.3f }, 0.001f), "Sub-unit partial contact must keep the exact new endpoint");
+		FW_TEST_CHECK(precision.HasVertexNear({ 550.f, 300.f }, 0.001f), "Sub-unit contact must preserve the previous cut endpoint");
+		CheckMeshGeometry(precision);
+	}
+
+	void TestBoxSnapAxesThresholdAndFallback()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		const Vector2f halfSize{ 10.f, 10.f };
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 34.f, 100.f }, halfSize) == Vector2f(30.f, 100.f), "Snap X to a vertical boundary");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 34.f, 113.5f }, halfSize) == Vector2f(30.f, 113.5f), "Unsnapped Y follows the request exactly");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 100.f, 35.f }, halfSize) == Vector2f(100.f, 30.f), "Snap Y to a horizontal boundary");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 113.5f, 35.f }, halfSize) == Vector2f(113.5f, 30.f), "Unsnapped X follows the request exactly");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 34.f, 36.f }, halfSize) == Vector2f(30.f, 36.f), "Smaller X adjustment wins");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 36.f, 34.f }, halfSize) == Vector2f(36.f, 30.f), "Smaller Y adjustment wins");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 35.f, 35.f }, halfSize) == Vector2f(30.f, 35.f), "Equal-distance axes prefer X without also snapping Y");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 38.f, 100.f }, halfSize) == Vector2f(30.f, 100.f), "Exactly 8 units snaps");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 38.01f, 100.f }, halfSize) == Vector2f(38.01f, 100.f), "Beyond 8 units stays free");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 100.f, 100.f }, halfSize) == Vector2f(100.f, 100.f), "Interior triangulation edges do not attract snaps");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 34.f, 5.f }, halfSize) == Vector2f(34.f, 5.f), "Invalid candidates leave the original position unchanged");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 25.f, 32.f }, halfSize) == Vector2f(30.f, 32.f), "Skip an invalid nearer Y candidate for a valid X candidate");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 23.f, 32.f }, halfSize) == Vector2f(30.f, 32.f), "A snap can rescue a slightly off-mesh request");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 35.f, 100.f }, { 20.f, 15.f }) == Vector2f(40.f, 100.f), "Use the supplied footprint size");
+	}
+
+	void TestBoxSnapCutEdgesSlopesAndEndpoints()
+	{
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		mesh.CutHole(MakeBox(500.f, 300.f, 700.f, 500.f));
+		const Vector2f halfSize{ 10.f, 10.f };
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 485.f, 380.f }, halfSize) == Vector2f(490.f, 380.f), "Exposed tower-cut edges attract snaps");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 485.f, 310.f }, halfSize) == Vector2f(490.f, 310.f), "Partial side alignment allows free sliding");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 600.f, 285.f }, halfSize) == Vector2f(600.f, 290.f), "Horizontal cut edge contact");
+		FW_TEST_CHECK(mesh.ResolveBoxSnap({ 600.f, 400.f }, halfSize) == Vector2f(600.f, 400.f), "Deep inside a cut has no valid candidate");
+		// Equal-distance opposite cut boundaries use a consistent boundary order.
+		mesh.CutHole(MakeBox(732.f, 300.f, 800.f, 500.f));
+		const Vector2f expected = mesh.ResolveBoxSnap({ 716.f, 400.f }, halfSize);
+		FW_TEST_CHECK(expected == Vector2f(710.f, 400.f) || expected == Vector2f(722.f, 400.f), "Equal boundary candidates resolve to one valid side");
+		for (int i = 0; i < 20; ++i)
+			FW_TEST_CHECK(mesh.ResolveBoxSnap({ 716.f, 400.f }, halfSize) == expected, "Repeated queries must be deterministic");
+
+		Navmesh angled;
+		angled.GenerateDefaultGrid();
+		FW_GrowingArray<Vector2f> slope;
+		slope.Add({ 500.f, 300.f });
+		slope.Add({ 700.f, 500.f });
+		slope.Add({ 500.f, 500.f });
+		angled.CutHole(slope);
+		FW_TEST_CHECK(angled.ResolveBoxSnap({ 614.f, 390.f }, halfSize) == Vector2f(610.f, 390.f), "Angled boundary contacts a corner and prefers X on a tie");
+		FW_TEST_CHECK(angled.ResolveBoxSnap({ 610.f, 386.f }, halfSize) == Vector2f(606.f, 386.f), "Corner slides along the actual slope");
+		FW_TEST_CHECK(angled.ResolveBoxSnap({ 714.f, 510.f }, halfSize) == Vector2f(710.f, 510.f), "A finite segment endpoint may contact a corner");
+		FW_TEST_CHECK(angled.ResolveBoxSnap({ 714.f, 505.f }, halfSize) == Vector2f(710.f, 505.f), "A segment endpoint may contact the interior of a box side");
+		FW_TEST_CHECK(angled.ResolveBoxSnap({ 714.f, 520.01f }, halfSize) == Vector2f(714.f, 520.01f), "Infinite segment extensions must not attract snaps");
+
+		Navmesh shallow;
+		shallow.GenerateDefaultGrid();
+		slope.RemoveAll();
+		slope.Add({ 900.f, 300.f });
+		slope.Add({ 1100.f, 400.f });
+		slope.Add({ 900.f, 400.f });
+		shallow.CutHole(slope);
+		FW_TEST_CHECK(shallow.ResolveBoxSnap({ 1000.f, 332.f }, halfSize) == Vector2f(1000.f, 335.f), "Prefer Y when it reaches an angled boundary with less movement");
+	}
+
 	float GetTotalPathLength(const FW_GrowingArray<Vector2f>& aWaypoints)
 	{
 		float length = 0.f;
@@ -798,6 +946,10 @@ namespace NavmeshTestSuite
 		FW_RUN_TEST(TestFindPathFailsOutsideMesh);
 		FW_RUN_TEST(TestFindPathFailsWhenCutDisconnectsStartFromGoal);
 		FW_RUN_TEST(TestIsAreaFullyOnMesh);
+		FW_RUN_TEST(TestBoundaryContactAndOverlap);
+		FW_RUN_TEST(TestTouchingCutsBlockPathsWithoutSeams);
+		FW_RUN_TEST(TestBoxSnapAxesThresholdAndFallback);
+		FW_RUN_TEST(TestBoxSnapCutEdgesSlopesAndEndpoints);
 		FW_RUN_TEST(TestFindPathSameTriangleYieldsStraightPath);
 		FW_RUN_TEST(TestStringPullIsNoLongerThanEdgeCenterPath);
 		FW_RUN_TEST(TestStringPullCanReFunnelAnExistingCorridorFromANewStart);

@@ -4,11 +4,13 @@
 
 #include "Level/Level.h"
 #include "Level/LevelData.h"
+#include "Components/BuildCostComponent.h"
 
 #include "Core/Assets/AssetStorage.h"
 #include "Core/Engine.h"
 #include "Core/Input.h"
 #include <EntitySystem/EntityPrefab.h>
+#include <EntitySystem/Components/SpriteComponent.h>
 
 namespace
 {
@@ -32,6 +34,18 @@ namespace
 
 		return "Unknown";
 	}
+
+	void CheckSnapPlacement(bool aPassed, const char* aName)
+	{
+		if (aPassed)
+		{
+			SLUSH_INFO("[TowerSnapTest] %s - PASS", aName);
+		}
+		else
+		{
+			SLUSH_ERROR("[TowerSnapTest] %s - FAIL", aName);
+		}
+	}
 }
 
 TowerTestState::TowerTestState(LevelData& aLevelData)
@@ -43,6 +57,9 @@ TowerTestState::TowerTestState(LevelData& aLevelData)
 	mySplashTowerPrefab = assetRegistry.GetAsset<Slush::EntityPrefab>("Tower_Splash");
 	FW_ASSERT(myBasicTowerPrefab, "-towertest requires a 'Tower_Basic' EntityPrefab");
 	FW_ASSERT(mySplashTowerPrefab, "-towertest requires a 'Tower_Splash' EntityPrefab");
+	// Keep F1/F4 affordable and F5 unaffordable as authored tower costs change.
+	myLevel->TrySpendResources(myLevel->GetResources());
+	myLevel->AddResources(BuildCostComponent::GetCost(*myBasicTowerPrefab) + BuildCostComponent::GetCost(*mySplashTowerPrefab));
 }
 
 TowerTestState::~TowerTestState()
@@ -65,7 +82,7 @@ void TowerTestState::Render()
 void TowerTestState::UpdateScenarioKeys()
 {
 	// Key order is part of the contract: run F1-F5 before F6/F7. Kills earn resources, so spawning
-	// enemies first would change F5's NotAffordable outcome (125 starting - 50 Basic - 75 Splash = 0).
+	// enemies first would change F5's NotAffordable outcome (starting budget = Basic + Splash costs).
 	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
 
 	if (input.WasKeyReleased(Slush::Input::_F1))
@@ -106,6 +123,54 @@ void TowerTestState::UpdateScenarioKeys()
 		myLevel->SpawnEnemyNormal();
 		--myPendingClusterEnemyCount;
 	}
+}
+
+void TowerTestState::RunSnapPlacementScenarios()
+{
+	Level level(myLevel->GetLevelDataAsset(), true, true);
+	level.GetNavmesh().GenerateDefaultGrid();
+	const int cost = BuildCostComponent::GetCost(*myBasicTowerPrefab);
+	level.TrySpendResources(level.GetResources());
+	level.AddResources(cost * 2);
+	const Vector2f size = myBasicTowerPrefab->GetComponentData<Slush::SpriteComponent>().mySize;
+	CheckSnapPlacement(level.TryPlaceTower(*myBasicTowerPrefab, ourSlotA) == PlaceTowerResult::Placed
+		&& level.GetResources() == cost, "First placement spends exactly one cost");
+
+	const int verticesBeforeQuery = level.GetNavmesh().GetVertexCount();
+	const int trianglesBeforeQuery = level.GetNavmesh().GetTriangleCount();
+	const Vector2f requested = ourSlotA + Vector2f(size.x + 5.f, 3.f);
+	const Vector2f resolved = level.ResolveTowerPosition(*myBasicTowerPrefab, requested);
+	const Vector2f expected = ourSlotA + Vector2f(size.x, 3.f);
+	CheckSnapPlacement(resolved == expected, "Resolve contact using actual prefab size while leaving Y free");
+	CheckSnapPlacement(level.GetResources() == cost && level.GetNavmesh().GetVertexCount() == verticesBeforeQuery
+		&& level.GetNavmesh().GetTriangleCount() == trianglesBeforeQuery, "Preview resolution changes no resources or mesh");
+	CheckSnapPlacement(level.TryPlaceTower(*myBasicTowerPrefab, resolved) == PlaceTowerResult::Placed
+		&& level.GetResources() == 0, "Snapped contact places and spends the remaining cost");
+	level.GetEntityManager().EndFrame();
+	FW_GrowingArray<Slush::EntityHandle> entities;
+	level.GetEntityManager().GetAllEntities(entities);
+	CheckSnapPlacement(entities.Count() == 2, "Successful placements create exactly two entities");
+	if (entities.Count() == 2)
+		CheckSnapPlacement(entities[1].Get()->myPosition == resolved, "Entity lands at the shared preview position without another snap");
+
+	const int verticesAfterPlacement = level.GetNavmesh().GetVertexCount();
+	const int trianglesAfterPlacement = level.GetNavmesh().GetTriangleCount();
+	CheckSnapPlacement(level.TryPlaceTower(*myBasicTowerPrefab, ourSlotA) == PlaceTowerResult::FootprintBlocked,
+		"Actual overlap is rejected by final validation");
+	const Vector2f thirdPosition = level.ResolveTowerPosition(*myBasicTowerPrefab, expected + Vector2f(size.x + 5.f, 0.f));
+	CheckSnapPlacement(level.TryPlaceTower(*myBasicTowerPrefab, thirdPosition) == PlaceTowerResult::NotAffordable,
+		"Valid snapped contact still requires affordability");
+	const Vector2f offMesh = level.ResolveTowerPosition(*myBasicTowerPrefab, ourOffMeshPosition);
+	CheckSnapPlacement(offMesh == ourOffMeshPosition
+		&& level.TryPlaceTower(*myBasicTowerPrefab, offMesh) == PlaceTowerResult::FootprintBlocked,
+		"Invalid unsnapped fallback still gets rejected");
+	level.GetEntityManager().EndFrame();
+	entities.RemoveAll();
+	level.GetEntityManager().GetAllEntities(entities);
+	CheckSnapPlacement(level.GetResources() == 0 && entities.Count() == 2
+		&& level.GetNavmesh().GetVertexCount() == verticesAfterPlacement
+		&& level.GetNavmesh().GetTriangleCount() == trianglesAfterPlacement,
+		"Rejected placement changes no resources, entities or mesh");
 }
 
 void TowerTestState::RunPlacementScenario(const char* aName, const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition, PlaceTowerResult anExpectedResult)

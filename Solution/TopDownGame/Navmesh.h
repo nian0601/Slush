@@ -86,6 +86,8 @@ public:
 	bool IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const;
 	// Distance to the closest wall (outer or cut boundary), or a negative value when the point is off the mesh.
 	float GetDistanceToNearestWall(const Vector2f& aPosition) const;
+	static constexpr float ourBoxSnapDistance = 8.f;
+	Vector2f ResolveBoxSnap(const Vector2f& aPosition, const Vector2f& aHalfSize) const;
 	void CutHole(const FW_GrowingArray<Vector2f>& aPolygon);
 
 	int GetTriangleCount() const;

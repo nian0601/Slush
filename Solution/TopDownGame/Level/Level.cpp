@@ -103,6 +103,12 @@ void Level::OnEnemyReachedGoal(const Slush::EntityPrefab& anEnemyPrefab)
 	SLUSH_INFO("[Lives] -1 from %s, now %d", anEnemyPrefab.GetAssetName().GetBuffer(), myLives);
 }
 
+Vector2f Level::ResolveTowerPosition(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aRequestedPosition)
+{
+	const Slush::SpriteComponent::Data& spriteData = aTowerPrefab.GetComponentData<Slush::SpriteComponent>();
+	return GetNavmesh().ResolveBoxSnap(aRequestedPosition, spriteData.mySize * 0.5f);
+}
+
 PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, const Vector2f& aPosition)
 {
 	const Slush::SpriteComponent::Data& spriteData = aTowerPrefab.GetComponentData<Slush::SpriteComponent>();

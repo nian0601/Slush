@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "Core/Profiler.h"
 #include "Core/ProfilerTestSuite.h"
+#include "Core/AssetRepository.h"
 #include <FW_UnitTestSuite.h>
 #include <cmath>
+#include <share.h>
 
 namespace Slush
 {
@@ -122,6 +124,54 @@ namespace Slush
 			FW_TEST_CHECK(profiler.GetSpikes().Count() == 2, "Rolling window survives ring wrap");
 		}
 
+		void TestReportAndLiveSpikes()
+		{
+			Profiler profiler;
+			FW_String path;
+			AssetRepository::GetDebugFilePath("profiler_test.txt", path);
+			FW_TEST_REQUIRE(profiler.StartReport(path.GetBuffer()), "Open live report");
+			const int marker = profiler.RegisterMarker("KnownMarker");
+			for (int i = 0; i < 61; ++i)
+			{
+				profiler.BeginFrame(0);
+				profiler.BeginMarker(marker, 0);
+				profiler.EndMarker(marker, i == 60 ? 50000 : 1000);
+				profiler.EndFrame(i == 60 ? 50000 : 1000);
+			}
+			profiler.AppendNewSpikes();
+			FILE* file = nullptr;
+			file = _fsopen(path.GetBuffer(), "r", _SH_DENYNO);
+			FW_TEST_REQUIRE(file != nullptr, "Live report can be read before shutdown");
+			char line[4096];
+			fgets(line, sizeof(line), file);
+			FW_TEST_CHECK(strncmp(line, "PERF_RESULT: INCOMPLETE", 23) == 0, "Live report has incomplete sentinel");
+			fgets(line, sizeof(line), file);
+			fgets(line, sizeof(line), file);
+			FW_TEST_CHECK(strstr(line, "marker=KnownMarker") != nullptr, "Spike flushed live");
+			fclose(file);
+			FW_TEST_REQUIRE(profiler.FinishReport(), "Final report writes successfully");
+			fopen_s(&file, path.GetBuffer(), "r");
+			FW_TEST_REQUIRE(file != nullptr, "Final report can be read");
+			fgets(line, sizeof(line), file);
+			FW_TEST_CHECK(strstr(line, "PERF_RESULT: frames=61") == line, "Complete summary is first line");
+			const char* sections[] = { "[Frame]", "[Spikes]", "[WorstSingleCall]", "[HeaviestPerFrameAvg]", "[WorstFrameContribution]", "[AllMarkers]" };
+			int section = 0;
+			int rankingRows = 0;
+			while (fgets(line, sizeof(line), file))
+			{
+				if (line[0] == '[')
+				{
+					FW_TEST_CHECK(section < 6 && strncmp(line, sections[section], strlen(sections[section])) == 0, "Section order");
+					++section;
+				}
+				if (section >= 3 && section <= 5 && strstr(line, "KnownMarker") == line)
+					++rankingRows;
+			}
+			fclose(file);
+			FW_TEST_CHECK(section == 6 && rankingRows == 3, "All sections and expected rankings present");
+			remove(path.GetBuffer());
+		}
+
 		void RunTests()
 		{
 			FW_UnitTestSuite::BeginSuite("Profiler");
@@ -129,6 +179,7 @@ namespace Slush
 			FW_RUN_TEST(TestRankings);
 			FW_RUN_TEST(TestHistogramAndHistory);
 			FW_RUN_TEST(TestSpikes);
+			FW_RUN_TEST(TestReportAndLiveSpikes);
 		}
 	}
 }

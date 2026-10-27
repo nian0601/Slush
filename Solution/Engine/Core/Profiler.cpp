@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Core/Profiler.h"
 #include <cmath>
+#include <share.h>
 
 namespace Slush
 {
@@ -15,6 +16,12 @@ namespace Slush
 	{
 		static Profiler instance;
 		return instance;
+	}
+
+	Profiler::~Profiler()
+	{
+		if (myLiveFile)
+			fclose(myLiveFile);
 	}
 
 	int Profiler::RegisterMarker(const char* aName)
@@ -175,5 +182,94 @@ namespace Slush
 				result.RemoveLast();
 		}
 		return result;
+	}
+
+	bool Profiler::StartReport(const char* aPath)
+	{
+		if (myLiveFile)
+			fclose(myLiveFile);
+		myLiveFile = nullptr;
+		myReportPath = aPath;
+		myWrittenSpikes = 0;
+		myLiveFile = _fsopen(aPath, "w", _SH_DENYWR);
+		if (!myLiveFile)
+			return false;
+		fprintf(myLiveFile, "PERF_RESULT: INCOMPLETE\n[Spikes]\n");
+		return fflush(myLiveFile) == 0;
+	}
+
+	void Profiler::WriteSpike(FILE* aFile, const Spike& aSpike) const
+	{
+		fprintf(aFile, "frame=%llu time_s=%.3f frame_ms=%.3f rolling_ms=%.3f gamestate=%s",
+			aSpike.myFrameIndex, aSpike.myEngineSeconds, aSpike.myFrameMs, aSpike.myRollingMs, aSpike.myGameState.GetBuffer());
+		for (const SpikeMarker& top : aSpike.myTop)
+		{
+			if (top.myIndex >= 0)
+				fprintf(aFile, " marker=%s self_ms=%.3f inclusive_ms=%.3f calls=%llu", myMarkers[top.myIndex].myName.GetBuffer(),
+					top.mySample.mySelfMs, top.mySample.myInclusiveMs, top.mySample.myCalls);
+		}
+		fprintf(aFile, "\n");
+	}
+
+	void Profiler::AppendNewSpikes()
+	{
+		if (!myLiveFile)
+			return;
+		while (myWrittenSpikes < mySpikes.Count())
+			WriteSpike(myLiveFile, mySpikes[myWrittenSpikes++]);
+		fflush(myLiveFile);
+	}
+
+	bool Profiler::FinishReport()
+	{
+		if (myLiveFile)
+			fclose(myLiveFile);
+		myLiveFile = nullptr;
+		return !myReportPath.Empty() && WriteReport(myReportPath.GetBuffer());
+	}
+
+	void Profiler::WriteMarkerHeader(FILE* aFile) const
+	{
+		fprintf(aFile, "name calls calls_per_frame max_calls_per_frame avg_call_ms max_call_ms avg_frame_inclusive_ms avg_frame_self_ms max_frame_inclusive_ms max_frame_self_ms\n");
+	}
+
+	void Profiler::WriteMarker(FILE* aFile, int anIndex) const
+	{
+		const Marker& marker = myMarkers[anIndex];
+		const double frames = myFrameCount ? static_cast<double>(myFrameCount) : 1;
+		fprintf(aFile, "%s %llu %.3f %llu %.6f %.6f %.6f %.6f %.6f %.6f\n", marker.myName.GetBuffer(), marker.myCalls,
+			marker.myCalls / frames, marker.myMaxCallsPerFrame, marker.myCalls ? marker.myInclusiveMs / marker.myCalls : 0,
+			marker.myMaxCallMs, marker.myFrameInclusiveMs / frames, marker.myFrameSelfMs / frames,
+			marker.myMaxFrameInclusiveMs, marker.myMaxFrameSelfMs);
+	}
+
+	bool Profiler::WriteReport(const char* aPath) const
+	{
+		FILE* file = nullptr;
+		fopen_s(&file, aPath, "w");
+		if (!file)
+			return false;
+		fprintf(file, "PERF_RESULT: frames=%llu duration=%.3fs avg_ms=%.3f p99_ms=%.3f max_ms=%.3f spikes=%d\n",
+			myFrameCount, myDurationMs / 1000, GetAverageMs(), GetPercentile(99), myMaxMs, mySpikes.Count());
+		fprintf(file, "[Frame]\nmin_ms=%.3f avg_ms=%.3f max_ms=%.3f p50_ms=%.3f p95_ms=%.3f p99_ms=%.3f fps=%.3f\n",
+			myMinMs, GetAverageMs(), myMaxMs, GetPercentile(50), GetPercentile(95), GetPercentile(99), myDurationMs > 0 ? myFrameCount * 1000 / myDurationMs : 0);
+		fprintf(file, "[Spikes]\n");
+		for (const Spike& spike : mySpikes)
+			WriteSpike(file, spike);
+		const char* sections[] = { "[WorstSingleCall]", "[HeaviestPerFrameAvg]", "[WorstFrameContribution]" };
+		const Ranking rankings[] = { Ranking::WorstSingleCall, Ranking::HeaviestPerFrameAvg, Ranking::WorstFrameContribution };
+		for (int i = 0; i < 3; ++i)
+		{
+			fprintf(file, "%s\n", sections[i]);
+			WriteMarkerHeader(file);
+			for (int index : GetRanking(rankings[i], 10))
+				WriteMarker(file, index);
+		}
+		fprintf(file, "[AllMarkers]\n");
+		WriteMarkerHeader(file);
+		for (int i = 0; i < myMarkers.Count(); ++i)
+			WriteMarker(file, i);
+		const bool passed = ferror(file) == 0;
+		return fclose(file) == 0 && passed;
 	}
 }

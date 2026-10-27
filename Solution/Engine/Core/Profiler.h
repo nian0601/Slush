@@ -4,6 +4,7 @@
 #include <FW_StaticArray.h>
 #include <FW_GrowingArray.h>
 #include <FW_String.h>
+#include <cstdio>
 
 namespace Slush
 {
@@ -54,6 +55,9 @@ namespace Slush
 		enum class Ranking { WorstSingleCall, HeaviestPerFrameAvg, WorstFrameContribution };
 
 		Profiler();
+		~Profiler();
+		Profiler(const Profiler&) = delete;
+		Profiler& operator=(const Profiler&) = delete;
 		static Profiler& GetInstance();
 		int RegisterMarker(const char* aName);
 		void BeginFrame(Time::TimeUnit aTime);
@@ -71,6 +75,10 @@ namespace Slush
 		double GetAverageMs() const { return myFrameCount ? myDurationMs / myFrameCount : 0; }
 		double GetPercentile(double aPercentile) const;
 		FW_GrowingArray<int> GetRanking(Ranking aRanking, int aCount) const;
+		bool StartReport(const char* aPath);
+		void AppendNewSpikes();
+		bool FinishReport();
+		bool WriteReport(const char* aPath) const;
 
 	private:
 		struct StackEntry
@@ -93,6 +101,12 @@ namespace Slush
 		double myMinMs = 0;
 		double myMaxMs = 0;
 		FW_String myGameState = "startup";
+		FW_String myReportPath;
+		FILE* myLiveFile = nullptr;
+		int myWrittenSpikes = 0;
+		void WriteSpike(FILE* aFile, const Spike& aSpike) const;
+		void WriteMarkerHeader(FILE* aFile) const;
+		void WriteMarker(FILE* aFile, int anIndex) const;
 	};
 
 	class ProfileScope

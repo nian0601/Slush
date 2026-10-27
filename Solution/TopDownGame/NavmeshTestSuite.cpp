@@ -483,6 +483,46 @@ namespace NavmeshTestSuite
 		FW_TEST_CHECK(wideWaypoints.IsEmpty(), "Expected no waypoints for a path blocked by its radius");
 	}
 
+	void TestFindPathRadiusRepeatsTheSamePath()
+	{
+		// The second query reuses the clearance results the first one cached, and must agree with it.
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+		AddRectHole(mesh, 600.f, 200.f, 900.f, 700.f);
+		AddRectHole(mesh, 1100.f, -50.f, 1300.f, 500.f);
+
+		const Vector2f start{ 100.f, 450.f };
+		const Vector2f goal{ 1800.f, 300.f };
+
+		FW_GrowingArray<Vector2f> firstWaypoints;
+		FW_GrowingArray<Vector2f> secondWaypoints;
+		FW_TEST_REQUIRE(mesh.FindPath(start, goal, 16.f, firstWaypoints), "Expected a radius 16 path around the holes");
+		FW_TEST_REQUIRE(mesh.FindPath(start, goal, 16.f, secondWaypoints), "Expected the repeated query to find a path too");
+		FW_TEST_REQUIRE(secondWaypoints.Count() == firstWaypoints.Count(), "Expected the repeated query to have as many waypoints");
+		for (int i = 0; i < firstWaypoints.Count(); ++i)
+			FW_TEST_CHECK(secondWaypoints[i] == firstWaypoints[i], "Expected the repeated query to give the same waypoints");
+	}
+
+	void TestFindPathRadiusSeesCutsAfterEarlierQuery()
+	{
+		// Clearance results are cached per radius; a cut must drop them, or the closed gap stays open.
+		Navmesh mesh;
+		mesh.GenerateDefaultGrid();
+
+		const Vector2f start{ 100.f, 462.f };
+		const Vector2f goal{ 1800.f, 462.f };
+
+		FW_GrowingArray<Vector2f> waypoints;
+		FW_TEST_CHECK(mesh.FindPath(start, goal, 16.f, waypoints), "Expected a radius 16 path across the open grid");
+
+		// A thin wall across the whole mesh with a 24 wide gap in it.
+		AddRectHole(mesh, 900.f, -50.f, 910.f, 450.f);
+		AddRectHole(mesh, 900.f, 474.f, 910.f, 1000.f);
+
+		FW_TEST_CHECK(!mesh.FindPath(start, goal, 16.f, waypoints), "Expected radius 16 to find no path once the gap is cut");
+		FW_TEST_CHECK(mesh.FindPath(start, goal, 8.f, waypoints), "Expected radius 8 to still fit through the gap");
+	}
+
 	void TestFindPathRadiusPassesShortOpenFloorEdge()
 	{
 		// A 400x400 square whose middle has two open-floor vertices only 10 apart, so every route
@@ -763,6 +803,8 @@ namespace NavmeshTestSuite
 		FW_RUN_TEST(TestStringPullCanReFunnelAnExistingCorridorFromANewStart);
 		FW_RUN_TEST(TestFindPathRadiusBlocksNarrowDiagonalPinch);
 		FW_RUN_TEST(TestFindPathRadiusBlocksNarrowCorridor);
+		FW_RUN_TEST(TestFindPathRadiusRepeatsTheSamePath);
+		FW_RUN_TEST(TestFindPathRadiusSeesCutsAfterEarlierQuery);
 		FW_RUN_TEST(TestFindPathRadiusPassesShortOpenFloorEdge);
 		FW_RUN_TEST(TestFindPathRadiusUsesCostlierOpenEntryIntoTriangle);
 		FW_RUN_TEST(TestFindPathRadiusTurnsCloseAroundHoleCorners);

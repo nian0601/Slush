@@ -15,6 +15,7 @@
 #include "Level/NavmeshData.h"
 #include "Navmesh.h"
 #include "NavmeshTestSuite.h"
+#include "PathfindBenchmark.h"
 #include "WaveScalingTestSuite.h"
 #include "LevelEditorTestSuite.h"
 #include "LevelTestSuite.h"
@@ -98,6 +99,10 @@ int main(int argc, char** argv)
 	const Slush::UnitTests::Outcome testOutcome = Slush::UnitTests::Run(&RunGameTests);
 	if (testOutcome != Slush::UnitTests::Outcome::Continue)
 		return testOutcome == Slush::UnitTests::Outcome::ExitPassed ? 0 : 1;
+
+	// Times pathfinding on a real level and writes Debug/pathfind_benchmark.txt, then exits.
+	if (Slush::CommandLineArgs::GetInstance().HasFlag("-pathfindbenchmark"))
+		return PathfindBenchmark::Run() ? 0 : 1;
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
 	engine.Initialize();

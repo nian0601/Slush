@@ -92,9 +92,7 @@ void Navmesh::Save(Slush::AssetParser::Handle aRootHandle) const
 
 void Navmesh::Load(Slush::AssetParser::Handle aRootHandle)
 {
-	myTriangles.DeleteAll();
-	myEdges.DeleteAll();
-	myVertices.DeleteAll();
+	Clear();
 
 	Slush::AssetParser::Handle verticesHandle = aRootHandle.ParseChildElement("vertices");
 	int numVertices = verticesHandle.GetNumChildElements();
@@ -191,9 +189,24 @@ void Navmesh::Render(unsigned int aFlags)
 
 void Navmesh::Clear()
 {
+	DropClearanceCaches();
 	myTriangles.DeleteAll();
 	myEdges.DeleteAll();
 	myVertices.DeleteAll();
+}
+
+void Navmesh::AssignIndices() const
+{
+	for (int i = 0; i < myTriangles.Count(); ++i)
+		myTriangles[i]->myIndex = i;
+
+	for (int i = 0; i < myEdges.Count(); ++i)
+		myEdges[i]->myIndex = i;
+}
+
+void Navmesh::DropClearanceCaches()
+{
+	myClearanceCaches.DeleteAll();
 }
 
 Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) const
@@ -209,6 +222,15 @@ Navmesh::Triangle* Navmesh::FindTriangleContaining(const Vector2f& aPosition) co
 
 bool Navmesh::FindTrianglePath(const Vector2f& aStart, const Vector2f& aGoal, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const
 {
+	AssignIndices();
+	ClearanceCache* clearanceCache = anAgentRadius > 0.f ? &GetClearanceCache(anAgentRadius) : nullptr;
+
+	// The node for each (triangle, entry edge) pair, by Triangle::myIndex * 3 + the edge's slot in myEdges.
+	FW_GrowingArray<int> nodeIndexByEntry;
+	nodeIndexByEntry.Reserve(myTriangles.Count() * 3);
+	for (int& nodeIndex : nodeIndexByEntry)
+		nodeIndex = -1;
+
 	FW_GrowingArray<AStarNode> nodes;
 
 	AStarNode& startNode = nodes.Add();
@@ -332,7 +354,7 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, const Vector2f& aGoal, Tr
 				if (neighbor == nullptr || neighbor == currentTriangle)
 					continue;
 
-				if (anAgentRadius > 0.f && !CanCrossEdge(currentTriangle, entryEdge, edge, anAgentRadius))
+				if (clearanceCache != nullptr && !CanCrossEdge(*clearanceCache, currentTriangle, entryEdge, edge))
 					continue;
 
 				// Cost runs between points on the crossed edges rather than triangle centres, so the chosen
@@ -345,16 +367,11 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, const Vector2f& aGoal, Tr
 				// entry edge, and with a radius, which edges a triangle may be left over depends on the
 				// edge it was entered over. Otherwise a cheap entry that is pinched shut toward the goal
 				// would hide a costlier open one.
-				int existingIndex = -1;
-				for (int i = 0; i < nodes.Count(); ++i)
-				{
-					if (nodes[i].myTriangle == neighbor && nodes[i].myEdgeFromParent == edge)
-					{
-						existingIndex = i;
-						break;
-					}
-				}
+				int entrySlot = 0;
+				while (neighbor->myEdges[entrySlot] != edge)
+					++entrySlot;
 
+				int& existingIndex = nodeIndexByEntry[neighbor->myIndex * 3 + entrySlot];
 				if (existingIndex != -1)
 				{
 					if (tentativeGCost >= nodes[existingIndex].myGCost)
@@ -369,6 +386,7 @@ bool Navmesh::FindTrianglePath(const Vector2f& aStart, const Vector2f& aGoal, Tr
 				}
 				else
 				{
+					existingIndex = nodes.Count();
 					AStarNode& newNode = nodes.Add();
 					newNode.myTriangle = neighbor;
 					newNode.myPosition = position;
@@ -419,10 +437,22 @@ bool Navmesh::StringPull(const Vector2f& aStart, const Vector2f& aGoal, const Pa
 	FW_GrowingArray<Vector2f> portalRights;
 	portalLefts.Add(aStart);
 	portalRights.Add(aStart);
-	for (const Portal& portal : aCorridor.myPortals)
+	if (anAgentRadius > 0.f)
 	{
-		portalLefts.Add(GetPushedPortalEnd(portal.myLeft, portal.myLeftWallOffset, anAgentRadius));
-		portalRights.Add(GetPushedPortalEnd(portal.myRight, portal.myRightWallOffset, anAgentRadius));
+		ClearanceCache& clearanceCache = GetClearanceCache(anAgentRadius);
+		for (const Portal& portal : aCorridor.myPortals)
+		{
+			portalLefts.Add(GetPushedPortalEnd(clearanceCache, portal.myLeft, portal.myLeftWallOffset));
+			portalRights.Add(GetPushedPortalEnd(clearanceCache, portal.myRight, portal.myRightWallOffset));
+		}
+	}
+	else
+	{
+		for (const Portal& portal : aCorridor.myPortals)
+		{
+			portalLefts.Add(portal.myLeft);
+			portalRights.Add(portal.myRight);
+		}
 	}
 	portalLefts.Add(aGoal);
 	portalRights.Add(aGoal);
@@ -705,6 +735,7 @@ void Navmesh::CutHole(const FW_GrowingArray<Vector2f>& aPolygon)
 		return;
 
 	CutPolygon(aPolygon);
+	DropClearanceCaches();
 }
 
 bool Navmesh::IsAreaFullyOnMesh(const FW_GrowingArray<Vector2f>& aPolygon) const
@@ -1206,63 +1237,86 @@ bool Navmesh::IsWallVertex(const Vertex* aVertex)
 	return false;
 }
 
-bool Navmesh::CanCrossEdge(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const
+bool Navmesh::CanCrossEdge(ClearanceCache& aCache, Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge) const
 {
-	if (!HasPortalClearance(anExitEdge, anAgentRadius))
+	if (!HasPortalClearance(aCache, anExitEdge))
 		return false;
 
 	// The start triangle has no entry edge, so nothing is passed through inside it.
 	if (anEntryEdge == nullptr)
 		return true;
 
-	return HasTransitClearance(aTriangle, anEntryEdge, anExitEdge, anAgentRadius);
+	return HasTransitClearance(aCache, aTriangle, anEntryEdge->GetSharedVertex(anExitEdge));
 }
 
-bool Navmesh::HasPortalClearance(Edge* aPortal, float anAgentRadius) const
+bool Navmesh::HasPortalClearance(ClearanceCache& aCache, Edge* aPortal) const
 {
+	ClearanceState& state = aCache.myPortalStates[aPortal->myIndex];
+	if (state != ClearanceState::Unknown)
+		return state == ClearanceState::Open;
+
 	const Vector2f& portalStart = aPortal->myVertices[0]->myPos;
 	const Vector2f& portalEnd = aPortal->myVertices[1]->myPos;
-	const float blockingRadius = anAgentRadius - ClearanceEpsilon;
+	const float blockingRadius = aCache.myRadius - ClearanceEpsilon;
 	const float blockingRadiusSq = blockingRadius * blockingRadius;
 
-	// Flood out from the portal's two triangles across open edges, only through edges within the
-	// agent radius of the portal; every wall that could be closer than that is reached this way.
-	FW_GrowingArray<Triangle*> visitedTriangles;
-	FW_GrowingArray<Triangle*> openTriangles;
-	visitedTriangles.Add(aPortal->myTriangles[0]);
-	visitedTriangles.Add(aPortal->myTriangles[1]);
-	openTriangles.Add(aPortal->myTriangles[0]);
-	openTriangles.Add(aPortal->myTriangles[1]);
+	// Every wall closer than the radius to the portal is closer than that to the triangles on either side of it.
+	Triangle* triangle = aPortal->myTriangles[0];
+	GatherNearbyWalls(aCache, triangle);
+	const int wallsStart = aCache.myNearbyWallsStart[triangle->myIndex];
+	const int wallsEnd = wallsStart + aCache.myNearbyWallsCount[triangle->myIndex];
 
 	FW_GrowingArray<BlockedInterval> blockedIntervals;
-	while (!openTriangles.IsEmpty())
+	for (int i = wallsStart; i < wallsEnd; ++i)
 	{
-		Triangle* triangle = openTriangles.GetLast();
-		openTriangles.RemoveLast();
-
-		for (Edge* edge : triangle->myEdges)
-		{
-			const Vector2f& edgeStart = edge->myVertices[0]->myPos;
-			const Vector2f& edgeEnd = edge->myVertices[1]->myPos;
-			if (DistanceSegmentToSegmentSq(portalStart, portalEnd, edgeStart, edgeEnd) >= blockingRadiusSq)
-				continue;
-
-			if (IsWallEdge(edge))
-			{
-				AddWallBlockedIntervals(portalStart, portalEnd, edgeStart, edgeEnd, blockingRadius, blockedIntervals);
-				continue;
-			}
-
-			Triangle* neighbor = edge->myTriangles[0] == triangle ? edge->myTriangles[1] : edge->myTriangles[0];
-			if (visitedTriangles.Contains(neighbor))
-				continue;
-
-			visitedTriangles.Add(neighbor);
-			openTriangles.Add(neighbor);
-		}
+		const Vector2f& wallStart = aCache.myNearbyWalls[i]->myVertices[0]->myPos;
+		const Vector2f& wallEnd = aCache.myNearbyWalls[i]->myVertices[1]->myPos;
+		if (DistanceSegmentToSegmentSq(portalStart, portalEnd, wallStart, wallEnd) < blockingRadiusSq)
+			AddWallBlockedIntervals(portalStart, portalEnd, wallStart, wallEnd, blockingRadius, blockedIntervals);
 	}
 
-	return !IsUnitRangeFullyCovered(blockedIntervals);
+	state = IsUnitRangeFullyCovered(blockedIntervals) ? ClearanceState::Blocked : ClearanceState::Open;
+	return state == ClearanceState::Open;
+}
+
+namespace
+{
+	const int MaxClearanceCaches = 4;
+}
+
+Navmesh::ClearanceCache& Navmesh::GetClearanceCache(float anAgentRadius) const
+{
+	for (ClearanceCache* cache : myClearanceCaches)
+	{
+		if (cache->myRadius == anAgentRadius)
+			return *cache;
+	}
+
+	// A few radii cover every enemy size; past that (dragging the Debugger's radius slider, say) drop the oldest.
+	if (myClearanceCaches.Count() >= MaxClearanceCaches)
+		myClearanceCaches.DeleteNonCyclicAtIndex(0);
+
+	ClearanceCache* cache = new ClearanceCache();
+	cache->myRadius = anAgentRadius;
+
+	cache->myPortalStates.Reserve(myEdges.Count());
+	for (ClearanceState& state : cache->myPortalStates)
+		state = ClearanceState::Unknown;
+
+	cache->myTransitStates.Reserve(myTriangles.Count() * 3);
+	for (ClearanceState& state : cache->myTransitStates)
+		state = ClearanceState::Unknown;
+
+	cache->myNearbyWallsStart.Reserve(myTriangles.Count());
+	cache->myNearbyWallsCount.Reserve(myTriangles.Count());
+	for (int i = 0; i < myTriangles.Count(); ++i)
+	{
+		cache->myNearbyWallsStart[i] = -1;
+		cache->myNearbyWallsCount[i] = 0;
+	}
+
+	myClearanceCaches.Add(cache);
+	return *cache;
 }
 
 namespace
@@ -1323,68 +1377,88 @@ namespace
 		return FW_Max(DistancePointToSegmentSq(aPoint, aWallA0, aWallA1), DistancePointToSegmentSq(aPoint, aWallB0, aWallB1));
 	}
 
-	const int TernarySearchIterations = 30;
+	const int GoldenSectionIterations = 25;
 
-	float GetMinLargerWallDistanceSqAlongLine(const Vector2f& aLineStart, const Vector2f& aLineEnd, const Vector2f& aWallA0, const Vector2f& aWallA1, const Vector2f& aWallB0, const Vector2f& aWallB1)
+	// The minimum of aFunction, convex over [0, 1], by golden-section search: each step reuses one of
+	// the previous step's two samples, so it takes about half the evaluations of a ternary search for
+	// the same precision. Returns early with the first sample below aStopBelow, for callers that
+	// only need to know whether the minimum is below it.
+	template <typename Function>
+	float FindConvexMinimum(const Function& aFunction, float aStopBelow)
 	{
+		const float shrink = 0.618034f; // 1 / the golden ratio
 		float low = 0.f;
 		float high = 1.f;
-		for (int i = 0; i < TernarySearchIterations; ++i)
+		float first = high - shrink;
+		float second = low + shrink;
+		float firstValue = aFunction(first);
+		float secondValue = aFunction(second);
+		for (int i = 0; i < GoldenSectionIterations; ++i)
 		{
-			const float first = low + (high - low) / 3.f;
-			const float second = high - (high - low) / 3.f;
-			const float firstValue = GetLargerWallDistanceSq(aLineStart + (aLineEnd - aLineStart) * first, aWallA0, aWallA1, aWallB0, aWallB1);
-			const float secondValue = GetLargerWallDistanceSq(aLineStart + (aLineEnd - aLineStart) * second, aWallA0, aWallA1, aWallB0, aWallB1);
+			if (firstValue < aStopBelow || secondValue < aStopBelow)
+				break;
+
 			if (firstValue < secondValue)
+			{
 				high = second;
+				second = first;
+				secondValue = firstValue;
+				first = high - shrink * (high - low);
+				firstValue = aFunction(first);
+			}
 			else
+			{
 				low = first;
+				first = second;
+				firstValue = secondValue;
+				second = low + shrink * (high - low);
+				secondValue = aFunction(second);
+			}
 		}
 
-		return GetLargerWallDistanceSq(aLineStart + (aLineEnd - aLineStart) * ((low + high) / 2.f), aWallA0, aWallA1, aWallB0, aWallB1);
+		return FW_Min(firstValue, secondValue);
 	}
 
-	// Minimum over the triangle (aCorner, aSideA, aSideB) of the larger squared distance to the two
-	// walls. The larger distance is convex over the plane, so nested ternary searches find it: the
-	// outer one over lines parallel to aSideA-aSideB, the inner one along each line.
-	float GetMinLargerWallDistanceSqInTriangle(const Vector2f& aCorner, const Vector2f& aSideA, const Vector2f& aSideB, const Vector2f& aWallA0, const Vector2f& aWallA1, const Vector2f& aWallB0, const Vector2f& aWallB1)
+	// Whether some point of the triangle (aCorner, aSideA, aSideB) is closer than the square root of
+	// aRadiusSq to both walls. The larger distance to the two walls is convex over the plane, so
+	// nested searches find its minimum: the outer one over lines parallel to aSideA-aSideB, the inner
+	// one along each line.
+	bool IsTriangleCloseToBothWalls(const Vector2f& aCorner, const Vector2f& aSideA, const Vector2f& aSideB, const Vector2f& aWallA0, const Vector2f& aWallA1, const Vector2f& aWallB0, const Vector2f& aWallB1, float aRadiusSq)
 	{
-		float low = 0.f;
-		float high = 1.f;
-		for (int i = 0; i < TernarySearchIterations; ++i)
+		const float minimum = FindConvexMinimum([&](float aLineFraction)
 		{
-			const float first = low + (high - low) / 3.f;
-			const float second = high - (high - low) / 3.f;
-			const float firstValue = GetMinLargerWallDistanceSqAlongLine(aCorner + (aSideA - aCorner) * first, aCorner + (aSideB - aCorner) * first, aWallA0, aWallA1, aWallB0, aWallB1);
-			const float secondValue = GetMinLargerWallDistanceSqAlongLine(aCorner + (aSideA - aCorner) * second, aCorner + (aSideB - aCorner) * second, aWallA0, aWallA1, aWallB0, aWallB1);
-			if (firstValue < secondValue)
-				high = second;
-			else
-				low = first;
-		}
+			const Vector2f lineStart = aCorner + (aSideA - aCorner) * aLineFraction;
+			const Vector2f lineEnd = aCorner + (aSideB - aCorner) * aLineFraction;
+			return FindConvexMinimum([&](float aFraction)
+			{
+				return GetLargerWallDistanceSq(lineStart + (lineEnd - lineStart) * aFraction, aWallA0, aWallA1, aWallB0, aWallB1);
+			}, aRadiusSq);
+		}, aRadiusSq);
 
-		const float lineT = (low + high) / 2.f;
-		return GetMinLargerWallDistanceSqAlongLine(aCorner + (aSideA - aCorner) * lineT, aCorner + (aSideB - aCorner) * lineT, aWallA0, aWallA1, aWallB0, aWallB1);
+		return minimum < aRadiusSq;
 	}
 }
 
-bool Navmesh::HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const
+void Navmesh::GatherNearbyWalls(ClearanceCache& aCache, Triangle* aTriangle) const
 {
-	// Any path through the triangle from the entry edge to the exit edge crosses every segment from
-	// their shared vertex C to the opposite edge AB. So the crossing is blocked exactly when the
-	// parts of the triangle closer than the radius to some wall link up into a chain from C to AB.
-	// With C a wall vertex and one wall across AB this is Demyen's "width < 2r" test; the chain
-	// form also catches pinches between walls that aren't vertices of this triangle.
-	Vertex* corner = anEntryEdge->GetSharedVertex(anExitEdge);
-	const Vector2f& cornerPos = corner->myPos;
-	const Vector2f& sideA = (anEntryEdge->myVertices[0] == corner ? anEntryEdge->myVertices[1] : anEntryEdge->myVertices[0])->myPos;
-	const Vector2f& sideB = (anExitEdge->myVertices[0] == corner ? anExitEdge->myVertices[1] : anExitEdge->myVertices[0])->myPos;
+	if (aCache.myNearbyWallsStart[aTriangle->myIndex] != -1)
+		return;
 
-	const float blockingRadius = anAgentRadius - ClearanceEpsilon;
+	const Vector2f& t0 = aTriangle->myVertices[0]->myPos;
+	const Vector2f& t1 = aTriangle->myVertices[1]->myPos;
+	const Vector2f& t2 = aTriangle->myVertices[2]->myPos;
+	const float blockingRadius = aCache.myRadius - ClearanceEpsilon;
 	const float blockingRadiusSq = blockingRadius * blockingRadius;
 
-	// Every wall closer than the radius to the triangle, by the same bounded flood as the portal check.
-	FW_GrowingArray<Edge*> walls;
+	// The triangle's bounding box grown by the radius: an edge outside it is farther than the radius.
+	const Vector2f searchMin{ FW_Min(t0.x, FW_Min(t1.x, t2.x)) - blockingRadius, FW_Min(t0.y, FW_Min(t1.y, t2.y)) - blockingRadius };
+	const Vector2f searchMax{ FW_Max(t0.x, FW_Max(t1.x, t2.x)) + blockingRadius, FW_Max(t0.y, FW_Max(t1.y, t2.y)) + blockingRadius };
+
+	aCache.myNearbyWallsStart[aTriangle->myIndex] = aCache.myNearbyWalls.Count();
+
+	// Flood out across open edges, only through edges that may be within the radius of the triangle;
+	// every wall that could be closer than that is reached this way. The cheap bounding-box test is
+	// enough to decide where to flood; only walls get the exact distance.
 	FW_GrowingArray<Triangle*> visitedTriangles;
 	FW_GrowingArray<Triangle*> openTriangles;
 	visitedTriangles.Add(aTriangle);
@@ -1396,12 +1470,16 @@ bool Navmesh::HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* 
 
 		for (Edge* edge : triangle->myEdges)
 		{
-			if (DistanceSegmentToTriangleSq(edge->myVertices[0]->myPos, edge->myVertices[1]->myPos, cornerPos, sideA, sideB) >= blockingRadiusSq)
+			const Vector2f& edgeStart = edge->myVertices[0]->myPos;
+			const Vector2f& edgeEnd = edge->myVertices[1]->myPos;
+			if (FW_Max(edgeStart.x, edgeEnd.x) < searchMin.x || FW_Min(edgeStart.x, edgeEnd.x) > searchMax.x
+				|| FW_Max(edgeStart.y, edgeEnd.y) < searchMin.y || FW_Min(edgeStart.y, edgeEnd.y) > searchMax.y)
 				continue;
 
 			if (IsWallEdge(edge))
 			{
-				walls.Add(edge);
+				if (DistanceSegmentToTriangleSq(edgeStart, edgeEnd, t0, t1, t2) < blockingRadiusSq)
+					aCache.myNearbyWalls.Add(edge);
 				continue;
 			}
 
@@ -1414,33 +1492,70 @@ bool Navmesh::HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* 
 		}
 	}
 
+	aCache.myNearbyWallsCount[aTriangle->myIndex] = aCache.myNearbyWalls.Count() - aCache.myNearbyWallsStart[aTriangle->myIndex];
+}
+
+bool Navmesh::HasTransitClearance(ClearanceCache& aCache, Triangle* aTriangle, Vertex* aCorner) const
+{
+	// Any path through the triangle between the two edges meeting at corner C crosses every segment
+	// from C to the opposite edge AB. So the crossing is blocked exactly when the parts of the
+	// triangle closer than the radius to some wall link up into a chain from C to AB. With C a wall
+	// vertex and one wall across AB this is Demyen's "width < 2r" test; the chain form also catches
+	// pinches between walls that aren't vertices of this triangle. Which of the two edges is the
+	// entry doesn't matter, so the result is kept per corner.
+	int cornerSlot = 0;
+	while (aTriangle->myVertices[cornerSlot] != aCorner)
+		++cornerSlot;
+
+	ClearanceState& state = aCache.myTransitStates[aTriangle->myIndex * 3 + cornerSlot];
+	if (state != ClearanceState::Unknown)
+		return state == ClearanceState::Open;
+
+	const Vector2f& cornerPos = aCorner->myPos;
+	const Vector2f& sideA = aTriangle->myVertices[(cornerSlot + 1) % 3]->myPos;
+	const Vector2f& sideB = aTriangle->myVertices[(cornerSlot + 2) % 3]->myPos;
+
+	const float blockingRadius = aCache.myRadius - ClearanceEpsilon;
+	const float blockingRadiusSq = blockingRadius * blockingRadius;
+
+	GatherNearbyWalls(aCache, aTriangle);
+	const int wallsStart = aCache.myNearbyWallsStart[aTriangle->myIndex];
+	const int wallCount = aCache.myNearbyWallsCount[aTriangle->myIndex];
+
 	FW_GrowingArray<bool> isReached;
 	FW_GrowingArray<int> reachedOpen;
-	for (Edge* wall : walls)
+	for (int i = 0; i < wallCount; ++i)
 	{
+		const Edge* wall = aCache.myNearbyWalls[wallsStart + i];
 		const bool touchesCorner = DistancePointToSegmentSq(cornerPos, wall->myVertices[0]->myPos, wall->myVertices[1]->myPos) < blockingRadiusSq;
 		isReached.Add(touchesCorner);
 		if (touchesCorner)
-			reachedOpen.Add(isReached.Count() - 1);
+			reachedOpen.Add(i);
 	}
 
+	state = ClearanceState::Open;
 	while (!reachedOpen.IsEmpty())
 	{
 		const int wallIndex = reachedOpen.GetLast();
 		reachedOpen.RemoveLast();
 
-		const Vector2f& wallStart = walls[wallIndex]->myVertices[0]->myPos;
-		const Vector2f& wallEnd = walls[wallIndex]->myVertices[1]->myPos;
+		const Edge* wall = aCache.myNearbyWalls[wallsStart + wallIndex];
+		const Vector2f& wallStart = wall->myVertices[0]->myPos;
+		const Vector2f& wallEnd = wall->myVertices[1]->myPos;
 		if (DistanceSegmentToSegmentSq(wallStart, wallEnd, sideA, sideB) < blockingRadiusSq)
-			return false;
+		{
+			state = ClearanceState::Blocked;
+			break;
+		}
 
-		for (int otherIndex = 0; otherIndex < walls.Count(); ++otherIndex)
+		for (int otherIndex = 0; otherIndex < wallCount; ++otherIndex)
 		{
 			if (isReached[otherIndex])
 				continue;
 
-			const Vector2f& otherStart = walls[otherIndex]->myVertices[0]->myPos;
-			const Vector2f& otherEnd = walls[otherIndex]->myVertices[1]->myPos;
+			const Edge* other = aCache.myNearbyWalls[wallsStart + otherIndex];
+			const Vector2f& otherStart = other->myVertices[0]->myPos;
+			const Vector2f& otherEnd = other->myVertices[1]->myPos;
 			if (DistanceSegmentToSegmentSq(wallStart, wallEnd, otherStart, otherEnd) >= 4.f * blockingRadiusSq)
 				continue;
 
@@ -1451,7 +1566,7 @@ bool Navmesh::HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* 
 			GetClosestPointsBetweenSegments(wallStart, wallEnd, otherStart, otherEnd, onWall, onOther);
 			bool isLinked = FW_Intersection::PointInsideTriangle((onWall + onOther) / 2.f, cornerPos, sideA, sideB);
 			if (!isLinked)
-				isLinked = GetMinLargerWallDistanceSqInTriangle(cornerPos, sideA, sideB, wallStart, wallEnd, otherStart, otherEnd) < blockingRadiusSq;
+				isLinked = IsTriangleCloseToBothWalls(cornerPos, sideA, sideB, wallStart, wallEnd, otherStart, otherEnd, blockingRadiusSq);
 
 			if (isLinked)
 			{
@@ -1461,7 +1576,7 @@ bool Navmesh::HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* 
 		}
 	}
 
-	return true;
+	return state == ClearanceState::Open;
 }
 
 namespace
@@ -1469,8 +1584,6 @@ namespace
 	const float MaxCornerOffsetPerRadius = 3.f;
 
 	const int OffMeshSearchIterations = 20;
-
-	const int PortalPointSearchIterations = 30;
 
 	float GetAngleBetween(const Vector2f& aFirst, const Vector2f& aSecond)
 	{
@@ -1544,14 +1657,29 @@ Vector2f Navmesh::GetWallCornerOffset(Vertex* aVertex, Edge* aPortal) const
 	return bisector * offsetLength;
 }
 
-Vector2f Navmesh::GetPushedPortalEnd(const Vector2f& anEnd, const Vector2f& aWallOffset, float anAgentRadius) const
+Vector2f Navmesh::GetPushedPortalEnd(ClearanceCache& aCache, const Vector2f& anEnd, const Vector2f& aWallOffset) const
 {
-	if (anAgentRadius <= 0.f || (aWallOffset.x == 0.f && aWallOffset.y == 0.f))
+	if (aWallOffset.x == 0.f && aWallOffset.y == 0.f)
 		return anEnd;
 
-	const Vector2f fullOffset = aWallOffset * anAgentRadius;
-	if (FindTriangleContaining(anEnd + fullOffset) != nullptr)
-		return anEnd + fullOffset;
+	// Placing the pushed end checks it against the mesh, and the same corner comes up in path after path.
+	for (const PushedPortalEnd& pushedEnd : aCache.myPushedPortalEnds)
+	{
+		if (pushedEnd.myEnd == anEnd && pushedEnd.myWallOffset == aWallOffset)
+			return pushedEnd.myPushedEnd;
+	}
+
+	PushedPortalEnd& pushedEnd = aCache.myPushedPortalEnds.Add();
+	pushedEnd.myEnd = anEnd;
+	pushedEnd.myWallOffset = aWallOffset;
+	pushedEnd.myPushedEnd = ComputePushedPortalEnd(anEnd, aWallOffset * aCache.myRadius);
+	return pushedEnd.myPushedEnd;
+}
+
+Vector2f Navmesh::ComputePushedPortalEnd(const Vector2f& anEnd, const Vector2f& aFullOffset) const
+{
+	if (FindTriangleContaining(anEnd + aFullOffset) != nullptr)
+		return anEnd + aFullOffset;
 
 	// Something else is in the way along the bisector, closer than the full offset: stop halfway to
 	// where it leaves the mesh, the best clearance between the two along that line.
@@ -1560,13 +1688,13 @@ Vector2f Navmesh::GetPushedPortalEnd(const Vector2f& anEnd, const Vector2f& aWal
 	for (int i = 0; i < OffMeshSearchIterations; ++i)
 	{
 		const float middle = (onMesh + offMesh) / 2.f;
-		if (FindTriangleContaining(anEnd + fullOffset * middle) != nullptr)
+		if (FindTriangleContaining(anEnd + aFullOffset * middle) != nullptr)
 			onMesh = middle;
 		else
 			offMesh = middle;
 	}
 
-	return anEnd + fullOffset * (onMesh / 2.f);
+	return anEnd + aFullOffset * (onMesh / 2.f);
 }
 
 Vector2f Navmesh::GetSearchPointOnPortal(Edge* aPortal, const Vector2f& aFrom, const Vector2f& aGoal, float anAgentRadius)
@@ -1588,22 +1716,24 @@ Vector2f Navmesh::GetSearchPointOnPortal(Edge* aPortal, const Vector2f& aFrom, c
 		maxDistance = minDistance;
 	}
 
-	// The point on that stretch with the shortest way from aFrom on to aGoal. That length is convex
-	// along the portal, so a ternary search finds it.
+	// The point on that stretch with the shortest way from aFrom on to aGoal. Along the portal's line
+	// that's where the straight line from aFrom to aGoal crosses it, with aGoal mirrored across the
+	// line first if it's on aFrom's side. The length is convex along the line, so clamping that point
+	// to the stretch gives the shortest way within it.
 	const Vector2f direction = toEnd / length;
-	for (int i = 0; i < PortalPointSearchIterations; ++i)
-	{
-		const float lower = minDistance + (maxDistance - minDistance) / 3.f;
-		const float upper = maxDistance - (maxDistance - minDistance) / 3.f;
-		const Vector2f lowerPoint = start + direction * lower;
-		const Vector2f upperPoint = start + direction * upper;
-		if (Length(lowerPoint - aFrom) + Length(aGoal - lowerPoint) <= Length(upperPoint - aFrom) + Length(aGoal - upperPoint))
-			maxDistance = upper;
-		else
-			minDistance = lower;
-	}
+	const float fromAlong = Dot(aFrom - start, direction);
+	const float goalAlong = Dot(aGoal - start, direction);
+	const float fromAcross = Cross(direction, aFrom - start);
+	float goalAcross = Cross(direction, aGoal - start);
+	if (fromAcross * goalAcross > 0.f)
+		goalAcross = -goalAcross;
 
-	return start + direction * ((minDistance + maxDistance) / 2.f);
+	// Both on the line: every point between them is as short.
+	float crossingAlong = goalAlong;
+	if (fromAcross != goalAcross)
+		crossingAlong = fromAlong + (goalAlong - fromAlong) * (fromAcross / (fromAcross - goalAcross));
+
+	return start + direction * FW_Clamp(crossingAlong, minDistance, maxDistance);
 }
 
 Navmesh::Triangle::~Triangle()

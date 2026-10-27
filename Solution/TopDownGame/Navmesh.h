@@ -76,6 +76,10 @@ public:
 	// between points on the crossed edges (each the point on the edge's usable stretch with the
 	// shortest way on to the goal) rather than between triangle centres, which tie on this grid
 	// mesh and can pick a chain a whole cell away from the corner, or zigzag across open floor.
+	// Clearance depends only on the mesh and the radius, so each radius's results (and the walls near
+	// each triangle they're built from) are cached as the search asks for them, and dropped when the
+	// mesh changes: the first query after a cut pays for what it touches, later ones mostly reuse it.
+	// Run TopDownGame.exe -pathfindbenchmark to time FindPath on level_main (Debug/pathfind_benchmark.txt).
 	// A radius of 0 is a point agent: no crossing is checked and no portal end is pushed.
 	bool FindPath(const Vector2f& aStart, const Vector2f& aGoal, float anAgentRadius, FW_GrowingArray<Vector2f>& outWaypoints, PathCorridor* outCorridor = nullptr) const;
 
@@ -109,6 +113,9 @@ private:
 
 		Vertex* myVertices[2];
 		Triangle* myTriangles[2];
+
+		// Position in Navmesh::myEdges, refreshed by AssignIndices() before a query uses it.
+		int myIndex = -1;
 	};
 	
 	struct Triangle
@@ -125,6 +132,9 @@ private:
 
 		Vertex* myVertices[3];
 		Edge* myEdges[3];
+
+		// Position in Navmesh::myTriangles, refreshed by AssignIndices() before a query uses it.
+		int myIndex = -1;
 	};
 	
 	struct CutEdge
@@ -145,18 +155,54 @@ private:
 		bool myIsClosed = false;
 	};
 
+	enum class ClearanceState : char
+	{
+		Unknown,
+		Open,
+		Blocked,
+	};
+
+	struct PushedPortalEnd
+	{
+		Vector2f myEnd;
+		Vector2f myWallOffset;
+		Vector2f myPushedEnd;
+	};
+
+	// Clearance results for one agent radius. They depend only on the mesh and the radius, so they're
+	// kept across queries (every enemy of a size asks the same questions) and dropped whenever the
+	// mesh changes. Filled in lazily, as the search asks.
+	struct ClearanceCache
+	{
+		float myRadius = 0.f;
+		FW_GrowingArray<ClearanceState> myPortalStates; // By Edge::myIndex
+		FW_GrowingArray<ClearanceState> myTransitStates; // By Triangle::myIndex * 3 + the corner's slot in myVertices
+
+		// The walls closer than the radius to each triangle, as a range of myNearbyWalls; start -1 until gathered.
+		FW_GrowingArray<int> myNearbyWallsStart; // By Triangle::myIndex
+		FW_GrowingArray<int> myNearbyWallsCount;
+		FW_GrowingArray<Edge*> myNearbyWalls;
+
+		FW_GrowingArray<PushedPortalEnd> myPushedPortalEnds;
+	};
+
 	void Clear();
+	void AssignIndices() const;
+	void DropClearanceCaches();
+	ClearanceCache& GetClearanceCache(float anAgentRadius) const;
+	void GatherNearbyWalls(ClearanceCache& aCache, Triangle* aTriangle) const;
 
 	Triangle* FindTriangleContaining(const Vector2f& aPosition) const;
 	bool FindTrianglePath(const Vector2f& aStart, const Vector2f& aGoal, Triangle* aStartTriangle, Triangle* aGoalTriangle, float anAgentRadius, PathCorridor& outCorridor) const;
 
 	static bool IsWallEdge(const Edge* anEdge);
 	static bool IsWallVertex(const Vertex* aVertex);
-	bool CanCrossEdge(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const;
-	bool HasPortalClearance(Edge* aPortal, float anAgentRadius) const;
-	bool HasTransitClearance(Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge, float anAgentRadius) const;
+	bool CanCrossEdge(ClearanceCache& aCache, Triangle* aTriangle, Edge* anEntryEdge, Edge* anExitEdge) const;
+	bool HasPortalClearance(ClearanceCache& aCache, Edge* aPortal) const;
+	bool HasTransitClearance(ClearanceCache& aCache, Triangle* aTriangle, Vertex* aCorner) const;
 	Vector2f GetWallCornerOffset(Vertex* aVertex, Edge* aPortal) const;
-	Vector2f GetPushedPortalEnd(const Vector2f& anEnd, const Vector2f& aWallOffset, float anAgentRadius) const;
+	Vector2f GetPushedPortalEnd(ClearanceCache& aCache, const Vector2f& anEnd, const Vector2f& aWallOffset) const;
+	Vector2f ComputePushedPortalEnd(const Vector2f& anEnd, const Vector2f& aFullOffset) const;
 	static Vector2f GetSearchPointOnPortal(Edge* aPortal, const Vector2f& aFrom, const Vector2f& aGoal, float anAgentRadius);
 
 	Vertex* GetVertex(int x, int y) const;
@@ -191,6 +237,8 @@ private:
 	FW_GrowingArray<Vertex*> myVertices;
 	FW_GrowingArray<Edge*> myEdges;
 	FW_GrowingArray<Triangle*> myTriangles;
+
+	mutable FW_GrowingArray<ClearanceCache*> myClearanceCaches;
 
 	Vector2i mySectorGrid{ 15, 7 };
 	Vector2i mySectorGridSize{ 128, 128 };

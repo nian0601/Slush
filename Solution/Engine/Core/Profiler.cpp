@@ -209,6 +209,9 @@ namespace Slush
 			fclose(myLiveFile);
 		myLiveFile = nullptr;
 		myReportPath = aPath;
+		// StartReport receives the live .txt path; clean shutdown writes its HTML sibling.
+		myHtmlReportPath = myReportPath.SubStr(0, myReportPath.Length() - 4) + ".html";
+		remove(myHtmlReportPath.GetBuffer()); // Never present a previous run as this run's completed report.
 		myWrittenSpikes = 0;
 		myLiveFile = _fsopen(aPath, "w", _SH_DENYWR);
 		if (!myLiveFile)
@@ -244,19 +247,40 @@ namespace Slush
 		if (myLiveFile)
 			fclose(myLiveFile);
 		myLiveFile = nullptr;
-		return !myReportPath.Empty() && WriteReport(myReportPath.GetBuffer());
+		return !myHtmlReportPath.Empty() && WriteReport(myHtmlReportPath.GetBuffer());
+	}
+
+	void Profiler::WriteHtmlText(FILE* aFile, const char* aText)
+	{
+		for (const char* character = aText; *character; ++character)
+		{
+			switch (*character)
+			{
+			case '&': fputs("&amp;", aFile); break;
+			case '<': fputs("&lt;", aFile); break;
+			case '>': fputs("&gt;", aFile); break;
+			case '"': fputs("&quot;", aFile); break;
+			case '\'': fputs("&#39;", aFile); break;
+			default: fputc(*character, aFile); break;
+			}
+		}
 	}
 
 	void Profiler::WriteMarkerHeader(FILE* aFile) const
 	{
-		fprintf(aFile, "name calls calls_per_frame max_calls_per_frame avg_call_ms max_call_ms avg_frame_inclusive_ms avg_frame_self_ms max_frame_inclusive_ms max_frame_self_ms\n");
+		fputs("<table><thead><tr><th>Marker</th><th>Calls</th><th>Calls/frame</th><th>Max calls/frame</th>"
+			"<th>Avg call (ms)</th><th>Max call (ms)</th><th>Avg frame inclusive (ms)</th>"
+			"<th>Avg frame self (ms)</th><th>Max frame inclusive (ms)</th><th>Max frame self (ms)</th>"
+			"</tr></thead><tbody>\n", aFile);
 	}
 
 	void Profiler::WriteMarker(FILE* aFile, int anIndex) const
 	{
 		const Marker& marker = myMarkers[anIndex];
 		const double frames = myFrameCount ? static_cast<double>(myFrameCount) : 1;
-		fprintf(aFile, "%s %llu %.3f %llu %.6f %.6f %.6f %.6f %.6f %.6f\n", marker.myName.GetBuffer(), marker.myCalls,
+		fputs("<tr><td>", aFile);
+		WriteHtmlText(aFile, marker.myName.GetBuffer());
+		fprintf(aFile, "</td><td>%llu</td><td>%.3f</td><td>%llu</td><td>%.6f</td><td>%.6f</td><td>%.6f</td><td>%.6f</td><td>%.6f</td><td>%.6f</td></tr>\n", marker.myCalls,
 			marker.myCalls / frames, marker.myMaxCallsPerFrame, marker.myCalls ? marker.myInclusiveMs / marker.myCalls : 0,
 			marker.myMaxCallMs, marker.myFrameInclusiveMs / frames, marker.myFrameSelfMs / frames,
 			marker.myMaxFrameInclusiveMs, marker.myMaxFrameSelfMs);
@@ -268,26 +292,57 @@ namespace Slush
 		fopen_s(&file, aPath, "w");
 		if (!file)
 			return false;
-		fprintf(file, "PERF_RESULT: frames=%llu duration=%.3fs avg_ms=%.3f p99_ms=%.3f max_ms=%.3f spikes=%d\n",
+		fputs("<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
+			"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+			"<title>Slush performance report</title><style>"
+			"body{font-family:system-ui,sans-serif;margin:2rem;color:#222;background:#fff}"
+			"table{border-collapse:collapse;margin-bottom:2rem;font-variant-numeric:tabular-nums}"
+			"th,td{border:1px solid #ccc;padding:.4rem .65rem;text-align:right}"
+			"th{background:#e8edf2}td:first-child,th:first-child{text-align:left}"
+			"tbody tr:nth-child(even){background:#f5f7f9}pre{white-space:pre-wrap}"
+			"</style></head><body><h1>Performance report</h1>\n", file);
+		fprintf(file, "<pre>PERF_RESULT: frames=%llu duration=%.3fs avg_ms=%.3f p99_ms=%.3f max_ms=%.3f spikes=%d</pre>\n",
 			myFrameCount, myDurationMs / 1000, GetAverageMs(), GetPercentile(99), myMaxMs, mySpikes.Count());
-		fprintf(file, "[Frame]\nmin_ms=%.3f avg_ms=%.3f max_ms=%.3f p50_ms=%.3f p95_ms=%.3f p99_ms=%.3f fps=%.3f\n",
+		fprintf(file, "<h2 id=\"Frame\">Frame statistics</h2>\n<table><thead><tr><th>Min (ms)</th><th>Avg (ms)</th><th>Max (ms)</th>"
+			"<th>p50 (ms)</th><th>p95 (ms)</th><th>p99 (ms)</th><th>FPS</th></tr></thead><tbody>"
+			"<tr><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td></tr></tbody></table>\n",
 			myMinMs, GetAverageMs(), myMaxMs, GetPercentile(50), GetPercentile(95), GetPercentile(99), myDurationMs > 0 ? myFrameCount * 1000 / myDurationMs : 0);
-		fprintf(file, "[Spikes]\n");
+		fputs("<h2 id=\"Spikes\">Spikes</h2>\n", file);
+		if (mySpikes.IsEmpty())
+			fputs("<p>No spikes recorded.</p>\n", file);
 		for (const Spike& spike : mySpikes)
-			WriteSpike(file, spike);
-		const char* sections[] = { "[WorstSingleCall]", "[HeaviestPerFrameAvg]", "[WorstFrameContribution]" };
+		{
+			fprintf(file, "<table><thead><tr><th>Frame</th><th>Time (s)</th><th>Frame (ms)</th><th>Rolling avg (ms)</th><th>Gamestate</th>"
+				"</tr></thead><tbody><tr><td>%llu</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>",
+				spike.myFrameIndex, spike.myEngineSeconds, spike.myFrameMs, spike.myRollingMs);
+			WriteHtmlText(file, spike.myGameState.GetBuffer());
+			fputs("</td></tr></tbody></table>\n<table><thead><tr><th>Top markers by self time</th><th>Self (ms)</th><th>Inclusive (ms)</th><th>Calls</th></tr></thead><tbody>\n", file);
+			for (const SpikeMarker& top : spike.myTop)
+			{
+				if (top.myIndex < 0)
+					continue;
+				fputs("<tr><td>", file);
+				WriteHtmlText(file, myMarkers[top.myIndex].myName.GetBuffer());
+				fprintf(file, "</td><td>%.3f</td><td>%.3f</td><td>%llu</td></tr>\n", top.mySample.mySelfMs, top.mySample.myInclusiveMs, top.mySample.myCalls);
+			}
+			fputs("</tbody></table>\n", file);
+		}
+		const char* sections[] = { "WorstSingleCall", "HeaviestPerFrameAvg", "WorstFrameContribution" };
+		const char* titles[] = { "Worst single call", "Heaviest average per-frame self time", "Worst single-frame contribution" };
 		const Ranking rankings[] = { Ranking::WorstSingleCall, Ranking::HeaviestPerFrameAvg, Ranking::WorstFrameContribution };
 		for (int i = 0; i < 3; ++i)
 		{
-			fprintf(file, "%s\n", sections[i]);
+			fprintf(file, "<h2 id=\"%s\">%s (top 10)</h2>\n", sections[i], titles[i]);
 			WriteMarkerHeader(file);
 			for (int index : GetRanking(rankings[i], 10))
 				WriteMarker(file, index);
+			fputs("</tbody></table>\n", file);
 		}
-		fprintf(file, "[AllMarkers]\n");
+		fputs("<h2 id=\"AllMarkers\">All markers</h2>\n", file);
 		WriteMarkerHeader(file);
 		for (int i = 0; i < myMarkers.Count(); ++i)
 			WriteMarker(file, i);
+		fputs("</tbody></table>\n</body></html>\n", file);
 		const bool passed = ferror(file) == 0;
 		return fclose(file) == 0 && passed;
 	}

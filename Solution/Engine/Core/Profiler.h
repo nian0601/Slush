@@ -102,11 +102,13 @@ namespace Slush
 		double myMaxMs = 0;
 		FW_String myGameState = "startup";
 		FW_String myReportPath;
+		FW_String myHtmlReportPath;
 		FILE* myLiveFile = nullptr;
 		int myWrittenSpikes = 0;
 		void WriteSpike(FILE* aFile, const Spike& aSpike) const;
 		void WriteMarkerHeader(FILE* aFile) const;
 		void WriteMarker(FILE* aFile, int anIndex) const;
+		static void WriteHtmlText(FILE* aFile, const char* aText);
 	};
 
 	class ProfileScope

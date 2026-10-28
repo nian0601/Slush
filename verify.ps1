@@ -95,10 +95,12 @@ try
 		if ($counts[$game] -gt 1) { $logName += '_' + $counts[$game] }
 		$log = Join-Path $PSScriptRoot "Workbed\$game\Debug\$logName.txt"
 		$perf = Join-Path $PSScriptRoot "Workbed\$game\Debug\${logName}_perf.txt"
+		$perfHtml = [IO.Path]::ChangeExtension($perf, 'html')
 		if (Test-Path -LiteralPath $log) { Remove-Item -LiteralPath $log }
 		try
 		{
 			if (Test-Path -LiteralPath $perf) { Remove-Item -LiteralPath $perf }
+			if (Test-Path -LiteralPath $perfHtml) { Remove-Item -LiteralPath $perfHtml }
 		}
 		catch
 		{
@@ -114,7 +116,16 @@ try
 		# Perf is advisory, including missing, incomplete or unreadable reports.
 		try
 		{
-			if (Test-Path -LiteralPath $perf)
+			if (Test-Path -LiteralPath $perfHtml)
+			{
+				$report = Get-Content -LiteralPath $perfHtml -Raw
+				if ($report -match 'PERF_RESULT: [^<\r\n]+')
+				{
+					Write-Host "$($Matches[0]); perf: $perfHtml"
+				}
+				else { Write-Host "WARNING: Missing perf summary: $perfHtml" }
+			}
+			elseif (Test-Path -LiteralPath $perf)
 			{
 				$summary = Get-Content -LiteralPath $perf -TotalCount 1
 				Write-Host "$summary; perf: $perf"

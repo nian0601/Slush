@@ -130,11 +130,17 @@ namespace Slush
 			Profiler profiler;
 			FW_String path;
 			AssetRepository::GetDebugFilePath("profiler_test.txt", path);
+			FW_String htmlPath;
+			AssetRepository::GetDebugFilePath("profiler_test.html", htmlPath);
 			FW_TEST_REQUIRE(profiler.StartReport(path.GetBuffer()), "Open live report");
 			const int marker = profiler.RegisterMarker("KnownMarker");
+			const int escaped = profiler.RegisterMarker("Marker<&>\"'");
+			profiler.SetGameStateName("level<&>\"'");
 			for (int i = 0; i < 61; ++i)
 			{
 				profiler.BeginFrame(0);
+				profiler.BeginMarker(escaped, 0);
+				profiler.EndMarker(escaped, 0);
 				profiler.BeginMarker(marker, 0);
 				profiler.EndMarker(marker, i == 60 ? 50000 : 1000);
 				profiler.EndFrame(i == 60 ? 50000 : 1000);
@@ -151,26 +157,47 @@ namespace Slush
 			FW_TEST_CHECK(strstr(line, "marker=KnownMarker") != nullptr, "Spike flushed live");
 			fclose(file);
 			FW_TEST_REQUIRE(profiler.FinishReport(), "Final report writes successfully");
-			fopen_s(&file, path.GetBuffer(), "r");
+			fopen_s(&file, htmlPath.GetBuffer(), "r");
 			FW_TEST_REQUIRE(file != nullptr, "Final report can be read");
 			fgets(line, sizeof(line), file);
-			FW_TEST_CHECK(strstr(line, "PERF_RESULT: frames=61") == line, "Complete summary is first line");
-			const char* sections[] = { "[Frame]", "[Spikes]", "[WorstSingleCall]", "[HeaviestPerFrameAvg]", "[WorstFrameContribution]", "[AllMarkers]" };
+			FW_TEST_CHECK(strstr(line, "<!doctype html>") == line, "Complete report is HTML");
+			const char* sections[] = { "id=\"Frame\"", "id=\"Spikes\"", "id=\"WorstSingleCall\"", "id=\"HeaviestPerFrameAvg\"", "id=\"WorstFrameContribution\"", "id=\"AllMarkers\"" };
 			int section = 0;
 			int rankingRows = 0;
+			int tables = 0;
+			int closedTables = 0;
+			int escapedMarkers = 0;
+			bool summary = false;
+			bool escapedState = false;
+			bool complete = false;
 			while (fgets(line, sizeof(line), file))
 			{
-				if (line[0] == '[')
+				if (strstr(line, "<h2 "))
 				{
-					FW_TEST_CHECK(section < 6 && strncmp(line, sections[section], strlen(sections[section])) == 0, "Section order");
+					FW_TEST_CHECK(section < 6 && strstr(line, sections[section]) != nullptr, "Section order");
 					++section;
 				}
-				if (section >= 3 && section <= 5 && strstr(line, "KnownMarker") == line)
+				if (section >= 3 && section <= 5 && strstr(line, "<tr><td>KnownMarker</td><td>61</td><td>1.000</td>"))
 					++rankingRows;
+				for (const char* table = line; (table = strstr(table, "<table>")) != nullptr; ++table)
+					++tables;
+				for (const char* table = line; (table = strstr(table, "</table>")) != nullptr; ++table)
+					++closedTables;
+				if (strstr(line, "Marker&lt;&amp;&gt;&quot;&#39;"))
+					++escapedMarkers;
+				summary |= strstr(line, "PERF_RESULT: frames=61") != nullptr;
+				escapedState |= strstr(line, "level&lt;&amp;&gt;&quot;&#39;") != nullptr;
+				complete |= strstr(line, "</body></html>") != nullptr;
 			}
 			fclose(file);
 			FW_TEST_CHECK(section == 6 && rankingRows == 3, "All sections and expected rankings present");
+			FW_TEST_CHECK(tables == 7 && closedTables == tables && complete, "Frame, spike details and all marker tables form a complete document");
+			FW_TEST_CHECK(summary && escapedState && escapedMarkers == 5, "Summary preserved and dynamic HTML text escaped in spikes and rankings");
 			FW_TEST_REQUIRE(profiler.StartReport(path.GetBuffer()), "Restart report");
+			fopen_s(&file, htmlPath.GetBuffer(), "r");
+			FW_TEST_CHECK(file == nullptr, "Restart removes stale completed HTML");
+			if (file)
+				fclose(file);
 			FW_TEST_CHECK(profiler.GetFrameCount() == 0 && profiler.GetSpikes().IsEmpty(), "New run resets test measurements");
 			FW_TEST_CHECK(profiler.RegisterMarker("KnownMarker") == marker && profiler.GetMarkers()[marker].myCalls == 0, "Reset preserves cached indices");
 			profiler.BeginFrame(0);
@@ -178,6 +205,7 @@ namespace Slush
 			FW_TEST_CHECK(profiler.GetHistory()[0].myMarkers[marker].myCalls == 0, "History reset discards old marker totals");
 			FW_TEST_CHECK(profiler.FinishReport(), "Empty-marker run writes successfully");
 			remove(path.GetBuffer());
+			remove(htmlPath.GetBuffer());
 		}
 
 		void TestPerfSpikeCommand()

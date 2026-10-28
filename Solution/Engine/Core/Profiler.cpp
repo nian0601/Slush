@@ -300,6 +300,8 @@ namespace Slush
 			"th,td{border:1px solid #ccc;padding:.4rem .65rem;text-align:right}"
 			"th{background:#e8edf2}td:first-child,th:first-child{text-align:left}"
 			"tbody tr:nth-child(even){background:#f5f7f9}pre{white-space:pre-wrap}"
+			"summary{cursor:pointer;padding:.6rem 0}summary h2{display:inline}"
+			"details{margin-bottom:1rem}details details{margin:.5rem 0 .5rem 1rem;padding:.5rem 1rem;border:1px solid #ccc}"
 			"</style></head><body><h1>Performance report</h1>\n", file);
 		fprintf(file, "<pre>PERF_RESULT: frames=%llu duration=%.3fs avg_ms=%.3f p99_ms=%.3f max_ms=%.3f spikes=%d</pre>\n",
 			myFrameCount, myDurationMs / 1000, GetAverageMs(), GetPercentile(99), myMaxMs, mySpikes.Count());
@@ -307,16 +309,15 @@ namespace Slush
 			"<th>p50 (ms)</th><th>p95 (ms)</th><th>p99 (ms)</th><th>FPS</th></tr></thead><tbody>"
 			"<tr><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>%.3f</td></tr></tbody></table>\n",
 			myMinMs, GetAverageMs(), myMaxMs, GetPercentile(50), GetPercentile(95), GetPercentile(99), myDurationMs > 0 ? myFrameCount * 1000 / myDurationMs : 0);
-		fputs("<h2 id=\"Spikes\">Spikes</h2>\n", file);
+		fprintf(file, "<details><summary><h2 id=\"Spikes\">Spikes (%d)</h2></summary>\n", mySpikes.Count());
 		if (mySpikes.IsEmpty())
 			fputs("<p>No spikes recorded.</p>\n", file);
 		for (const Spike& spike : mySpikes)
 		{
-			fprintf(file, "<table><thead><tr><th>Frame</th><th>Time (s)</th><th>Frame (ms)</th><th>Rolling avg (ms)</th><th>Gamestate</th>"
-				"</tr></thead><tbody><tr><td>%llu</td><td>%.3f</td><td>%.3f</td><td>%.3f</td><td>",
+			fprintf(file, "<details><summary>Frame %llu | Time: %.3f s | Frame: %.3f ms | Rolling avg: %.3f ms | Gamestate: ",
 				spike.myFrameIndex, spike.myEngineSeconds, spike.myFrameMs, spike.myRollingMs);
 			WriteHtmlText(file, spike.myGameState.GetBuffer());
-			fputs("</td></tr></tbody></table>\n<table><thead><tr><th>Top markers by self time</th><th>Self (ms)</th><th>Inclusive (ms)</th><th>Calls</th></tr></thead><tbody>\n", file);
+			fputs("</summary>\n<table><thead><tr><th>Top markers by self time</th><th>Self (ms)</th><th>Inclusive (ms)</th><th>Calls</th></tr></thead><tbody>\n", file);
 			for (const SpikeMarker& top : spike.myTop)
 			{
 				if (top.myIndex < 0)
@@ -325,8 +326,9 @@ namespace Slush
 				WriteHtmlText(file, myMarkers[top.myIndex].myName.GetBuffer());
 				fprintf(file, "</td><td>%.3f</td><td>%.3f</td><td>%llu</td></tr>\n", top.mySample.mySelfMs, top.mySample.myInclusiveMs, top.mySample.myCalls);
 			}
-			fputs("</tbody></table>\n", file);
+			fputs("</tbody></table></details>\n", file);
 		}
+		fputs("</details>\n", file);
 		const char* sections[] = { "WorstSingleCall", "HeaviestPerFrameAvg", "WorstFrameContribution" };
 		const char* titles[] = { "Worst single call", "Heaviest average per-frame self time", "Worst single-frame contribution" };
 		const Ranking rankings[] = { Ranking::WorstSingleCall, Ranking::HeaviestPerFrameAvg, Ranking::WorstFrameContribution };

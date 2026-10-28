@@ -170,8 +170,19 @@ namespace Slush
 			bool summary = false;
 			bool escapedState = false;
 			bool complete = false;
+			bool collapsedSpikes = false;
+			bool collapsedSpike = false;
+			int detailsDepth = 0;
 			while (fgets(line, sizeof(line), file))
 			{
+				if (strstr(line, "<details>"))
+					++detailsDepth;
+				if (strstr(line, "id=\"Spikes\""))
+					collapsedSpikes = detailsDepth == 1 && strstr(line, "<details><summary><h2 id=\"Spikes\">Spikes (1)</h2></summary>") != nullptr;
+				if (strstr(line, "<details><summary>Frame 60 |"))
+					collapsedSpike = detailsDepth == 2 && strstr(line, "Time: 0.110 s | Frame: 50.000 ms | Rolling avg: 1.000 ms | Gamestate: level&lt;&amp;&gt;&quot;&#39;</summary>") != nullptr;
+				if (strstr(line, "</details>"))
+					--detailsDepth;
 				if (strstr(line, "<h2 "))
 				{
 					FW_TEST_CHECK(section < 6 && strstr(line, sections[section]) != nullptr, "Section order");
@@ -191,7 +202,8 @@ namespace Slush
 			}
 			fclose(file);
 			FW_TEST_CHECK(section == 6 && rankingRows == 3, "All sections and expected rankings present");
-			FW_TEST_CHECK(tables == 7 && closedTables == tables && complete, "Frame, spike details and all marker tables form a complete document");
+			FW_TEST_CHECK(tables == 6 && closedTables == tables && complete, "Frame, spike markers and all marker tables form a complete document");
+			FW_TEST_CHECK(collapsedSpikes && collapsedSpike && detailsDepth == 0, "Spikes start collapsed with count, nested timing summaries and balanced disclosure sections");
 			FW_TEST_CHECK(summary && escapedState && escapedMarkers == 5, "Summary preserved and dynamic HTML text escaped in spikes and rankings");
 			FW_TEST_REQUIRE(profiler.StartReport(path.GetBuffer()), "Restart report");
 			fopen_s(&file, htmlPath.GetBuffer(), "r");

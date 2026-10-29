@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "EntityManager.h"
 #include "EntityPrefab.h"
@@ -79,18 +80,21 @@ namespace Slush
 
 	void EntityManager::PrePhysicsUpdate()
 	{
+		SLUSH_PROFILE_FUNCTION();
 		for (Entity* entity : myEntities)
 			entity->PrePhysicsUpdate();
 	}
 
 	void EntityManager::Update()
 	{
+		SLUSH_PROFILE_FUNCTION();
 		for (Entity* entity : myEntities)
 			entity->Update();
 	}
 
 	void EntityManager::Render()
 	{
+		SLUSH_PROFILE_FUNCTION();
 		for (Entity* entity : myEntities)
 			entity->Render();
 	}

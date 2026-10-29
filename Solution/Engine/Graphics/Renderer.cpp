@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "Graphics/Renderer.h"
 #include "Graphics/SFMLHelpers.h"
@@ -171,6 +172,7 @@ namespace Slush
 
 	void Renderer::ProcessRenderQueue()
 	{
+		SLUSH_PROFILE_FUNCTION();
 		for (TargetQueue& queue : myTargetQueues)
 		{
 			for (RenderCommand& command : queue.myCommands)

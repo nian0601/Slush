@@ -77,7 +77,7 @@ namespace NavmeshTestSuite
 			CheckMeshGeometry(mesh);
 		}
 		FW_GrowingArray<Vector2f> path;
-		FW_TEST_CHECK(!mesh.FindPath({ 600.f, 468.f }, { 850.f, 468.f }, path), "A touching wall must have no traversable seam");
+		FW_TEST_CHECK(!mesh.FindPath({ 600.f, 468.f }, { 850.f, 468.f }, 0.f, path), "A touching wall must have no traversable seam");
 
 		Navmesh corners;
 		corners.GenerateDefaultGrid();

@@ -50,6 +50,12 @@ namespace Slush
 	TimeUnit Time::GetCurrentExactTime()
 	{
 		LARGE_INTEGER largeInt;
+		// Scoped profiling also runs in unit tests before Engine::Initialize.
+		if (myFrequency == 0)
+		{
+			QueryPerformanceFrequency(&largeInt);
+			myFrequency = largeInt.QuadPart;
+		}
 		QueryPerformanceCounter(&largeInt);
 		return largeInt.QuadPart * 1000000 / myFrequency;
 	}

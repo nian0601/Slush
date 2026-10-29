@@ -94,7 +94,18 @@ try
 		$logName = 'verify_' + $game.ToLowerInvariant()
 		if ($counts[$game] -gt 1) { $logName += '_' + $counts[$game] }
 		$log = Join-Path $PSScriptRoot "Workbed\$game\Debug\$logName.txt"
+		$perf = Join-Path $PSScriptRoot "Workbed\$game\Debug\${logName}_perf.txt"
+		$perfHtml = [IO.Path]::ChangeExtension($perf, 'html')
 		if (Test-Path -LiteralPath $log) { Remove-Item -LiteralPath $log }
+		try
+		{
+			if (Test-Path -LiteralPath $perf) { Remove-Item -LiteralPath $perf }
+			if (Test-Path -LiteralPath $perfHtml) { Remove-Item -LiteralPath $perfHtml }
+		}
+		catch
+		{
+			Write-Host "WARNING: Could not remove previous perf file ${perf}: $_"
+		}
 		$exitCode = RunGame $game @('-hidewindow', '-debugscript', ('"' + $scenario.Path + '"'), '-logname', $logName) $timeout
 		$lines = @(Get-Content -LiteralPath $log)
 		$errors = @($lines | Where-Object { $_ -match '^\[ERROR\]' })
@@ -102,6 +113,32 @@ try
 		Write-Host "$game scenario '$($scenario.Path)': exit $exitCode, $($errors.Count) errors, $($warnings.Count) warnings; log: $log"
 		$errors | ForEach-Object { Write-Host $_ }
 		if ($exitCode -ne 0 -or $errors.Count) { $passed = $false }
+		# Perf is advisory, including missing, incomplete or unreadable reports.
+		try
+		{
+			if (Test-Path -LiteralPath $perfHtml)
+			{
+				$report = Get-Content -LiteralPath $perfHtml -Raw
+				if ($report -match 'PERF_RESULT: [^<\r\n]+')
+				{
+					Write-Host "$($Matches[0]); perf: $perfHtml"
+				}
+				else { Write-Host "WARNING: Missing perf summary: $perfHtml" }
+			}
+			elseif (Test-Path -LiteralPath $perf)
+			{
+				$summary = Get-Content -LiteralPath $perf -TotalCount 1
+				Write-Host "$summary; perf: $perf"
+			}
+			else
+			{
+				Write-Host "WARNING: Missing perf file: $perf"
+			}
+		}
+		catch
+		{
+			Write-Host "WARNING: Could not read perf file ${perf}: $_"
+		}
 	}
 }
 catch

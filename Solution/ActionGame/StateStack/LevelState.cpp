@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "ActionGameGlobals.h"
 #include "LevelState.h"
@@ -80,6 +81,7 @@ void LevelState::Render()
 
 void LevelState::UpdateCollisions()
 {
+	SLUSH_PROFILE_FUNCTION();
 	const FW_GrowingArray<Slush::Contact>& contacts = myPhysicsWorld->GetContacts();
 	for (const Slush::Contact& contact : contacts)
 	{

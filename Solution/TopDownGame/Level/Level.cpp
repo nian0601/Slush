@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <Core/Profiler.h>
 
 #include "Level.h"
 #include <Core\Engine.h>
@@ -147,7 +148,10 @@ PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, c
 	SLUSH_INFO("[Resources] -%d for %s, now %d", cost, aTowerPrefab.GetAssetName().GetBuffer(), myResources);
 
 	myEntityManager.CreateEntity(aPosition, aTowerPrefab);
-	navmesh.CutHole(footprint);
+	{
+		SLUSH_PROFILE_SCOPE("TowerPlacementNavmeshRebuild");
+		navmesh.CutHole(footprint);
+	}
 	return PlaceTowerResult::Placed;
 }
 
@@ -163,6 +167,7 @@ NavmeshData& Level::GetNavmeshDataAsset()
 
 void Level::Update()
 {
+	SLUSH_PROFILE_FUNCTION();
 	TopDownGameGlobals::GetInstance().SetLevel(this);
 
 	Slush::Engine& engine = Slush::Engine::GetInstance();
@@ -194,6 +199,7 @@ void Level::Update()
 
 void Level::Render()
 {
+	SLUSH_PROFILE_FUNCTION();
 	GetNavmesh().Render();
 	myEntityManager.Render();
 }

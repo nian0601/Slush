@@ -4,6 +4,7 @@
 #include "StateStack.h"
 #include "Core/Engine.h"
 #include "Core/DebugScriptRunner.h"
+#include "Core/Profiler.h"
 
 namespace Slush
 {
@@ -11,6 +12,8 @@ namespace Slush
 	{
 		void PostTrigger(const IGameState& aState, bool anIsActive)
 		{
+			if (anIsActive)
+				Profiler::GetInstance().SetGameStateName(aState.GetTriggerName());
 			FW_String name = FW_String("gamestate.") + aState.GetTriggerName() + (anIsActive ? ".active" : ".inactive");
 			Engine::GetInstance().GetDebugScriptRunner().PostTrigger(name.GetBuffer());
 		}

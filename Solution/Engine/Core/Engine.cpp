@@ -6,6 +6,7 @@
 #include "Core/DebugScriptRunner.h"
 #include "Core/AssetRepository.h"
 #include "Core/Time.h"
+#include "Core/Profiler.h"
 #include "Core/IApp.h"
 #include "Core/Log.h"
 
@@ -36,6 +37,16 @@ namespace Slush
 	void Engine::Initialize()
 	{
 		myLogger = new Logger();
+		FW_String perfName = "perf.txt";
+		const char* logName = CommandLineArgs::GetInstance().GetString("-logname");
+		if (Logger::IsValidLogName(logName))
+			perfName = FW_String(logName) + "_perf.txt";
+		FW_String perfPath;
+		AssetRepository::GetDebugFilePath(perfName, perfPath);
+		if (!Profiler::GetInstance().StartReport(perfPath.GetBuffer()))
+		{
+			SLUSH_WARNING("Could not open profiler report: %s", perfPath.GetBuffer());
+		}
 		myWindow = new Window(1920, 1080);
 		myInput = new Input();
 		Time::Init();
@@ -114,6 +125,10 @@ namespace Slush
 		FW_SAFE_DELETE(myInput);
 		FW_SAFE_DELETE(myWindow);
 
+		if (!Profiler::GetInstance().FinishReport())
+		{
+			SLUSH_WARNING("Could not write final profiler report");
+		}
 		myLogger->ForceFlush();
 		FW_SAFE_DELETE(myLogger);
 	}
@@ -125,6 +140,7 @@ namespace Slush
 
 	void Engine::UpdateInput()
 	{
+		SLUSH_PROFILE_SCOPE("UpdateInput");
 		ImGuiIO& imguiIO = ImGui::GetIO();
 
 		if (!imguiIO.WantCaptureKeyboard)
@@ -157,12 +173,14 @@ namespace Slush
 
 	void Engine::BeginImGuiFrame()
 	{
+		SLUSH_PROFILE_SCOPE("BeginImGuiFrame");
 		ImGui::SFML::Update(*myWindow->GetRenderWindow(), Time::GetDelta());
 		myWindow->SaveAppLayoutConfigIfRequested();
 	}
 
 	void Engine::UpdateSimulation(IApp& anApp)
 	{
+		SLUSH_PROFILE_SCOPE("UpdateSimulation");
 		anApp.Update();
 		myWindow->UpdateAppLayout();
 		myWindow->GetRenderer().UpdateFade();
@@ -170,6 +188,7 @@ namespace Slush
 
 	void Engine::RenderFrame(IApp& anApp)
 	{
+		SLUSH_PROFILE_SCOPE("RenderFrame");
 		anApp.Render();
 		myWindow->RenderAppLayout();
 
@@ -180,11 +199,13 @@ namespace Slush
 
 	void Engine::BuildEditorUI()
 	{
+		SLUSH_PROFILE_SCOPE("BuildEditorUI");
 		myWindow->BuildEditorChrome();
 	}
 
 	void Engine::CompositeAndPresent()
 	{
+		SLUSH_PROFILE_SCOPE("CompositeAndPresent");
 		// The editor path composites via GameViewDockable -> RenderOffscreenBufferToImGUI() -> ImGui::Image
 		// instead, since the game view there is an ImGui-laid-out dockable panel.
 		if (!myWindow->IsEditorUIVisible())
@@ -196,18 +217,38 @@ namespace Slush
 	int Engine::Run(IApp& anApp)
 	{
 		anApp.Initialize();
+		Profiler& profiler = Profiler::GetInstance();
 
 		while (myWindow->IsOpen())
 		{
-			myWindow->PumpEvents();
-			BeginFrame();
-			UpdateInput();
-			BeginImGuiFrame();
-			UpdateSimulation(anApp);
-			RenderFrame(anApp);
-			BuildEditorUI();
-			CompositeAndPresent();
-			myDebugScriptRunner->EndFrame();
+			profiler.BeginFrame(Time::GetCurrentExactTime());
+			{
+				SLUSH_PROFILE_SCOPE("Frame");
+				{
+					SLUSH_PROFILE_SCOPE("PumpEvents");
+					myWindow->PumpEvents();
+				}
+				BeginFrame();
+				UpdateInput();
+				BeginImGuiFrame();
+				UpdateSimulation(anApp);
+				RenderFrame(anApp);
+				BuildEditorUI();
+				CompositeAndPresent();
+				myDebugScriptRunner->EndFrame();
+			}
+			const int previousSpikes = profiler.GetSpikes().Count();
+			profiler.EndFrame(Time::GetCurrentExactTime());
+			if (profiler.GetSpikes().Count() > previousSpikes)
+			{
+				profiler.AppendNewSpikes();
+				const Profiler::Spike& spike = profiler.GetSpikes().GetLast();
+				const int top = spike.myTop[0].myIndex;
+				SLUSH_INFO("[Perf] frame=%llu time_s=%.3f frame_ms=%.3f rolling_ms=%.3f gamestate=%s top=%s self_ms=%.3f calls=%llu",
+					spike.myFrameIndex, spike.myEngineSeconds, spike.myFrameMs, spike.myRollingMs, spike.myGameState.GetBuffer(),
+					top >= 0 ? profiler.GetMarkers()[top].myName.GetBuffer() : "none", spike.myTop[0].mySample.mySelfMs, spike.myTop[0].mySample.myCalls);
+				myLogger->ForceFlush();
+			}
 		}
 
 		myWindow->DeleteAllLayouts();

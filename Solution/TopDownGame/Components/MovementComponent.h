@@ -29,4 +29,5 @@ private:
 	float myRadius = 0.f;
 	FW_GrowingArray<Vector2f> myWaypoints;
 	int myNextWaypointIndex = 0;
+	int myGoalIndex = 0;
 };

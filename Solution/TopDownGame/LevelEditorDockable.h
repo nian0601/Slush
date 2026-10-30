@@ -125,8 +125,8 @@ private:
 	int mySelectedUnlockIndex = 0;
 
 	FW_GrowingArray<FW_String> myEndpointProblems;
-	bool myIsStartClear = true;
-	bool myIsGoalClear = true;
+	FW_GrowingArray<bool> myAreSpawnsClear;
+	FW_GrowingArray<bool> myAreGoalsClear;
 
 	Navmesh::TriangleMesh myTriangleMesh;
 };

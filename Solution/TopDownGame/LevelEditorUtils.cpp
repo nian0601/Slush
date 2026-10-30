@@ -57,12 +57,20 @@ namespace LevelEditorUtils
 		}
 	}
 
-	void GetEndpointProblems(const Navmesh& aNavmesh, const Vector2f& aStart, const Vector2f& aGoal, float aClearance,
+	void GetEndpointProblems(const Navmesh& aNavmesh, const FW_GrowingArray<Vector2f>& someSpawns, const FW_GrowingArray<Vector2f>& someGoals, float aClearance,
 		const FW_GrowingArray<RosterRadius>& someRosterRadii, FW_GrowingArray<FW_String>& anOutProblems)
 	{
 		anOutProblems.RemoveAll();
-		AddEndpointProblem(aNavmesh, "Start", aStart, aClearance, anOutProblems);
-		AddEndpointProblem(aNavmesh, "Goal", aGoal, aClearance, anOutProblems);
+		for (int kind = 0; kind < 2; ++kind)
+		{
+			const FW_GrowingArray<Vector2f>& positions = kind == 0 ? someSpawns : someGoals;
+			for (int i = 0; i < positions.Count(); ++i)
+			{
+				FW_String label = kind == 0 ? "Spawn " : "Goal ";
+				label += i + 1;
+				AddEndpointProblem(aNavmesh, label.GetBuffer(), positions[i], aClearance, anOutProblems);
+			}
+		}
 		AddRosterRadiusProblems(someRosterRadii, aClearance, anOutProblems);
 	}
 

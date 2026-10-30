@@ -104,11 +104,17 @@ void LevelEditorDockable::RenderStartAndGoalMarkers() const
 	const int clearanceColor = 0xA0FFFFFF;
 	const int blockedClearanceColor = 0xFFFF0000;
 
-	renderer.RenderCircle(levelData.myStartPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, myIsStartClear ? clearanceColor : blockedClearanceColor, 2.f);
-	renderer.RenderCircle(levelData.myGoalPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, myIsGoalClear ? clearanceColor : blockedClearanceColor, 2.f);
-
-	renderer.RenderCircle(levelData.myStartPosition, markerRadius, startColor);
-	renderer.RenderCircle(levelData.myGoalPosition, markerRadius, goalColor);
+	for (int kind = 0; kind < 2; ++kind)
+	{
+		const FW_GrowingArray<Vector2f>& positions = kind == 0 ? levelData.mySpawnPositions : levelData.myGoalPositions;
+		const FW_GrowingArray<bool>& clearFlags = kind == 0 ? myAreSpawnsClear : myAreGoalsClear;
+		for (int i = 0; i < positions.Count(); ++i)
+		{
+			const bool clear = i < clearFlags.Count() && clearFlags[i];
+			renderer.RenderCircle(positions[i], levelData.myEndpointClearance, nullptr, Recti(), 0, clear ? clearanceColor : blockedClearanceColor, 2.f);
+			renderer.RenderCircle(positions[i], markerRadius, kind == 0 ? startColor : goalColor);
+		}
+	}
 }
 
 void LevelEditorDockable::RenderToolHint() const
@@ -183,9 +189,13 @@ void LevelEditorDockable::UpdateEndpointProblems()
 		rosterRadius.myRadius = prefab->GetComponentData<MovementComponent>().myRadius;
 	}
 
-	LevelEditorUtils::GetEndpointProblems(navmesh, levelData.myStartPosition, levelData.myGoalPosition, levelData.myEndpointClearance, rosterRadii, myEndpointProblems);
-	myIsStartClear = LevelEditorUtils::IsEndpointClear(navmesh, levelData.myStartPosition, levelData.myEndpointClearance);
-	myIsGoalClear = LevelEditorUtils::IsEndpointClear(navmesh, levelData.myGoalPosition, levelData.myEndpointClearance);
+	LevelEditorUtils::GetEndpointProblems(navmesh, levelData.mySpawnPositions, levelData.myGoalPositions, levelData.myEndpointClearance, rosterRadii, myEndpointProblems);
+	myAreSpawnsClear.RemoveAll();
+	myAreGoalsClear.RemoveAll();
+	for (const Vector2f& position : levelData.mySpawnPositions)
+		myAreSpawnsClear.Add(LevelEditorUtils::IsEndpointClear(navmesh, position, levelData.myEndpointClearance));
+	for (const Vector2f& position : levelData.myGoalPositions)
+		myAreGoalsClear.Add(LevelEditorUtils::IsEndpointClear(navmesh, position, levelData.myEndpointClearance));
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
@@ -275,7 +285,7 @@ void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
 	LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	Slush::AssetEditScope editScope(levelData);
-	levelData.myStartPosition = aPosition;
+	levelData.mySpawnPositions[0] = aPosition;
 	levelData.MarkAsUnsaved();
 }
 
@@ -284,7 +294,7 @@ void LevelEditorDockable::SetGoalPosition(const Vector2f& aPosition)
 	LevelData& levelData = myLevel->GetLevelDataAsset();
 
 	Slush::AssetEditScope editScope(levelData);
-	levelData.myGoalPosition = aPosition;
+	levelData.myGoalPositions[0] = aPosition;
 	levelData.MarkAsUnsaved();
 }
 

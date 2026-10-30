@@ -22,7 +22,7 @@ namespace LevelEditorUtils
 	void AddEndpointProblem(const Navmesh& aNavmesh, const char* aPointLabel, const Vector2f& aPoint, float aClearance, FW_GrowingArray<FW_String>& anOutProblems);
 	// One problem per roster enemy wider than the clearance: it could fail to path out of its spawn.
 	void AddRosterRadiusProblems(const FW_GrowingArray<RosterRadius>& someRosterRadii, float aClearance, FW_GrowingArray<FW_String>& anOutProblems);
-	void GetEndpointProblems(const Navmesh& aNavmesh, const Vector2f& aStart, const Vector2f& aGoal, float aClearance,
+	void GetEndpointProblems(const Navmesh& aNavmesh, const FW_GrowingArray<Vector2f>& someSpawns, const FW_GrowingArray<Vector2f>& someGoals, float aClearance,
 		const FW_GrowingArray<RosterRadius>& someRosterRadii, FW_GrowingArray<FW_String>& anOutProblems);
 
 	enum class NameError

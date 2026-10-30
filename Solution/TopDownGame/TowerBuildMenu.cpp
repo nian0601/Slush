@@ -127,8 +127,10 @@ void TowerBuildMenu::RenderPreview() const
 
 	// The no-build zones around start and goal, for as long as a tower is selected.
 	const LevelData& levelData = myLevel.GetLevelDataAsset();
-	renderer.RenderCircle(levelData.myStartPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, outlineColor, 2.f);
-	renderer.RenderCircle(levelData.myGoalPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, outlineColor, 2.f);
+	for (const Vector2f& position : levelData.mySpawnPositions)
+		renderer.RenderCircle(position, levelData.myEndpointClearance, nullptr, Recti(), 0, outlineColor, 2.f);
+	for (const Vector2f& position : levelData.myGoalPositions)
+		renderer.RenderCircle(position, levelData.myEndpointClearance, nullptr, Recti(), 0, outlineColor, 2.f);
 
 	if (myIsMouseOverUI)
 		return;

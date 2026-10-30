@@ -50,8 +50,17 @@ void LevelData::BuildLevelSettingsUI()
 
 	Slush::ImGuiWidgets::InputInt("Starting Resources", &myStartingResources);
 	Slush::ImGuiWidgets::InputInt("Starting Lives", &myStartingLives);
-	Slush::ImGuiWidgets::InputFloat2("Start Position", &myStartPosition.x);
-	Slush::ImGuiWidgets::InputFloat2("Goal Position", &myGoalPosition.x);
+	for (int kind = 0; kind < 2; ++kind)
+	{
+		ImGui::TextUnformatted(kind == 0 ? "Spawns" : "Goals");
+		FW_GrowingArray<Vector2f>& positions = kind == 0 ? mySpawnPositions : myGoalPositions;
+		for (int i = 0; i < positions.Count(); ++i)
+		{
+			FW_String label = kind == 0 ? "Spawn " : "Goal ";
+			label += i + 1;
+			Slush::ImGuiWidgets::InputFloat2(label.GetBuffer(), &positions[i].x);
+		}
+	}
 	if (Slush::ImGuiWidgets::InputFloat("Endpoint Clearance", &myEndpointClearance))
 		myEndpointClearance = FW_Max(myEndpointClearance, 0.f);
 }
@@ -240,8 +249,30 @@ void LevelData::BuildWavePreviewUI()
 
 void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle, unsigned int aVersion)
 {
-	aRootHandle.ParseVec2fField("startPosition", myStartPosition);
-	aRootHandle.ParseVec2fField("goalPosition", myGoalPosition);
+	mySpawnPositions.RemoveAll();
+	myGoalPositions.RemoveAll();
+	if (aVersion < 8)
+	{
+		aRootHandle.ParseVec2fField("startPosition", mySpawnPositions.Add());
+		aRootHandle.ParseVec2fField("goalPosition", myGoalPositions.Add());
+	}
+	else
+	{
+		for (int kind = 0; kind < 2; ++kind)
+		{
+			FW_GrowingArray<Vector2f>& positions = kind == 0 ? mySpawnPositions : myGoalPositions;
+			Slush::AssetParser::Handle list = aRootHandle.ParseChildElement(kind == 0 ? "spawnPositions" : "goalPositions");
+			if (!list.IsValid())
+				continue;
+			for (int i = 0; i < list.GetNumChildElements(); ++i)
+			{
+				Slush::AssetParser::Handle point = list.GetChildElementAtIndex(i);
+				Vector2f& position = positions.Add();
+				point.ParseFloatField("x", position.x);
+				point.ParseFloatField("y", position.y);
+			}
+		}
+	}
 	myNavmeshData.Parse(aRootHandle, "navmeshData");
 	aRootHandle.ParseIntField("startingResources", myStartingResources);
 	aRootHandle.ParseIntField("startingLives", myStartingLives);
@@ -283,8 +314,13 @@ void LevelData::OnLoad(Slush::AssetParser::Handle aRootHandle, unsigned int aVer
 
 void LevelData::OnSave(Slush::AssetParser::Handle aRootHandle)
 {
-	aRootHandle.ParseVec2fField("startPosition", myStartPosition);
-	aRootHandle.ParseVec2fField("goalPosition", myGoalPosition);
+	for (int kind = 0; kind < 2; ++kind)
+	{
+		FW_GrowingArray<Vector2f>& positions = kind == 0 ? mySpawnPositions : myGoalPositions;
+		Slush::AssetParser::Handle list = aRootHandle.ParseChildElement(kind == 0 ? "spawnPositions" : "goalPositions");
+		for (Vector2f& position : positions)
+			list.ParseVec2fField("position", position);
+	}
 	myNavmeshData.Parse(aRootHandle, "navmeshData");
 	aRootHandle.ParseIntField("startingResources", myStartingResources);
 	aRootHandle.ParseIntField("startingLives", myStartingLives);

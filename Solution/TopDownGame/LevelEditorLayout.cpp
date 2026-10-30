@@ -122,8 +122,8 @@ LevelData& LevelEditorLayout::CreateNewLevel(const FW_String& aLevelName)
 	// right-middle of the 1920x1080 play area so the level is playable straight away.
 	Slush::IAssetStorage& levelStorage = assetRegistry.GetAssetStorage(Slush::GetAssetID<LevelData>());
 	LevelData& levelData = static_cast<LevelData&>(levelStorage.CreateNewAsset(aLevelName.GetBuffer()));
-	levelData.myStartPosition = Vector2f(100.f, 540.f);
-	levelData.myGoalPosition = Vector2f(1820.f, 540.f);
+	levelData.mySpawnPositions.Add(Vector2f(100.f, 540.f));
+	levelData.myGoalPositions.Add(Vector2f(1820.f, 540.f));
 	levelData.myNavmeshData.Set(&navmeshData);
 	ResolveLevelDependencies(levelData);
 	levelData.Save();

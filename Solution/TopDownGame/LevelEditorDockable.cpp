@@ -104,11 +104,21 @@ void LevelEditorDockable::RenderStartAndGoalMarkers() const
 	const int clearanceColor = 0xA0FFFFFF;
 	const int blockedClearanceColor = 0xFFFF0000;
 
-	renderer.RenderCircle(levelData.myStartPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, myIsStartClear ? clearanceColor : blockedClearanceColor, 2.f);
-	renderer.RenderCircle(levelData.myGoalPosition, levelData.myEndpointClearance, nullptr, Recti(), 0, myIsGoalClear ? clearanceColor : blockedClearanceColor, 2.f);
-
-	renderer.RenderCircle(levelData.myStartPosition, markerRadius, startColor);
-	renderer.RenderCircle(levelData.myGoalPosition, markerRadius, goalColor);
+	for (int kind = 0; kind < 2; ++kind)
+	{
+		const FW_GrowingArray<Vector2f>& positions = kind == 0 ? levelData.mySpawnPositions : levelData.myGoalPositions;
+		const FW_GrowingArray<bool>& clearFlags = kind == 0 ? myAreSpawnsClear : myAreGoalsClear;
+		for (int i = 0; i < positions.Count(); ++i)
+		{
+			const bool isMoving = myToolMode == ToolMode::MoveEndpoint && myMovingEndpointIndex == i && myMovingEndpointIsSpawn == (kind == 0);
+			const Vector2f position = isMoving ? engine.GetInput().GetMousePositionf() : positions[i];
+			const bool clear = isMoving
+				? LevelEditorUtils::IsEndpointClear(myLevel->GetNavmesh(), position, levelData.myEndpointClearance)
+				: i < clearFlags.Count() && clearFlags[i];
+			renderer.RenderCircle(position, levelData.myEndpointClearance, nullptr, Recti(), 0, clear ? clearanceColor : blockedClearanceColor, 2.f);
+			renderer.RenderCircle(position, markerRadius, kind == 0 ? startColor : goalColor);
+		}
+	}
 }
 
 void LevelEditorDockable::RenderToolHint() const
@@ -130,8 +140,10 @@ const char* LevelEditorDockable::GetToolHint() const
 	{
 	case ToolMode::BoxCut: return "Box Cut: LMB first corner, LMB second corner. Esc cancels.";
 	case ToolMode::ManualCut: return "Manual Cut: LMB adds a point, RMB cuts the polygon. Esc cancels.";
-	case ToolMode::SetStart: return "Set Start: LMB places the start position. Esc cancels.";
-	case ToolMode::SetGoal: return "Set Goal: LMB places the goal position. Esc cancels.";
+	case ToolMode::AddSpawn: return "Add Spawn: LMB adds a spawn. Esc cancels.";
+	case ToolMode::AddGoal: return "Add Goal: LMB adds a goal. Esc cancels.";
+	case ToolMode::MoveEndpoint: return "Move Endpoint: LMB picks a nearby point, LMB places it. Esc cancels.";
+	case ToolMode::RemoveEndpoint: return "Remove Endpoint: LMB removes a nearby point. The last of each kind stays. Esc cancels.";
 	default: return nullptr;
 	}
 }
@@ -139,6 +151,7 @@ const char* LevelEditorDockable::GetToolHint() const
 void LevelEditorDockable::SetToolMode(ToolMode aToolMode)
 {
 	myToolMode = aToolMode;
+	myMovingEndpointIndex = -1;
 
 	// Any half-made box or polygon belongs to the tool being left
 	myBoxCutHasStartCorner = false;
@@ -155,8 +168,10 @@ void LevelEditorDockable::OnUpdate()
 	{
 	case ToolMode::BoxCut: UpdateBoxCutMode(); break;
 	case ToolMode::ManualCut: UpdateManualCutMode(); break;
-	case ToolMode::SetStart: UpdateSetStartMode(); break;
-	case ToolMode::SetGoal: UpdateSetGoalMode(); break;
+	case ToolMode::AddSpawn: UpdateAddEndpointMode(true); break;
+	case ToolMode::AddGoal: UpdateAddEndpointMode(false); break;
+	case ToolMode::MoveEndpoint: UpdateMoveEndpointMode(); break;
+	case ToolMode::RemoveEndpoint: UpdateRemoveEndpointMode(); break;
 	default: break;
 	}
 
@@ -183,9 +198,13 @@ void LevelEditorDockable::UpdateEndpointProblems()
 		rosterRadius.myRadius = prefab->GetComponentData<MovementComponent>().myRadius;
 	}
 
-	LevelEditorUtils::GetEndpointProblems(navmesh, levelData.myStartPosition, levelData.myGoalPosition, levelData.myEndpointClearance, rosterRadii, myEndpointProblems);
-	myIsStartClear = LevelEditorUtils::IsEndpointClear(navmesh, levelData.myStartPosition, levelData.myEndpointClearance);
-	myIsGoalClear = LevelEditorUtils::IsEndpointClear(navmesh, levelData.myGoalPosition, levelData.myEndpointClearance);
+	LevelEditorUtils::GetEndpointProblems(navmesh, levelData.mySpawnPositions, levelData.myGoalPositions, levelData.myEndpointClearance, rosterRadii, myEndpointProblems);
+	myAreSpawnsClear.RemoveAll();
+	myAreGoalsClear.RemoveAll();
+	for (const Vector2f& position : levelData.mySpawnPositions)
+		myAreSpawnsClear.Add(LevelEditorUtils::IsEndpointClear(navmesh, position, levelData.myEndpointClearance));
+	for (const Vector2f& position : levelData.myGoalPositions)
+		myAreGoalsClear.Add(LevelEditorUtils::IsEndpointClear(navmesh, position, levelData.myEndpointClearance));
 }
 
 void LevelEditorDockable::UpdateBoxCutMode()
@@ -230,22 +249,60 @@ void LevelEditorDockable::UpdateManualCutMode()
 	}
 }
 
-void LevelEditorDockable::UpdateSetStartMode()
+bool LevelEditorDockable::FindNearestEndpoint(const Vector2f& aPosition, bool& anOutIsSpawn, int& anOutIndex) const
 {
-	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
-		return;
-
-	SetStartPosition(engine.GetInput().GetMousePositionf());
+	const LevelData& levelData = myLevel->GetLevelDataAsset();
+	float closestDistance = levelData.myEndpointClearance * levelData.myEndpointClearance;
+	anOutIndex = -1;
+	for (int kind = 0; kind < 2; ++kind)
+	{
+		const FW_GrowingArray<Vector2f>& positions = kind == 0 ? levelData.mySpawnPositions : levelData.myGoalPositions;
+		for (int i = 0; i < positions.Count(); ++i)
+		{
+			const float distance = Length2(positions[i] - aPosition);
+			if (distance <= closestDistance && (anOutIndex < 0 || distance < closestDistance))
+			{
+				closestDistance = distance;
+				anOutIsSpawn = kind == 0;
+				anOutIndex = i;
+			}
+		}
+	}
+	return anOutIndex >= 0;
 }
 
-void LevelEditorDockable::UpdateSetGoalMode()
+void LevelEditorDockable::UpdateAddEndpointMode(bool anIsSpawn)
 {
-	Slush::Engine& engine = Slush::Engine::GetInstance();
-	if (!engine.GetInput().WasMouseReleased(Slush::Input::LEFTMB))
+	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
+	if (input.WasMouseReleased(Slush::Input::LEFTMB))
+		AddEndpoint(anIsSpawn, input.GetMousePositionf());
+}
+
+void LevelEditorDockable::UpdateMoveEndpointMode()
+{
+	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
+	if (!input.WasMouseReleased(Slush::Input::LEFTMB))
 		return;
 
-	SetGoalPosition(engine.GetInput().GetMousePositionf());
+	if (myMovingEndpointIndex < 0)
+		FindNearestEndpoint(input.GetMousePositionf(), myMovingEndpointIsSpawn, myMovingEndpointIndex);
+	else
+	{
+		SetEndpoint(myMovingEndpointIsSpawn, myMovingEndpointIndex, input.GetMousePositionf());
+		myMovingEndpointIndex = -1;
+	}
+}
+
+void LevelEditorDockable::UpdateRemoveEndpointMode()
+{
+	const Slush::Input& input = Slush::Engine::GetInstance().GetInput();
+	if (!input.WasMouseReleased(Slush::Input::LEFTMB))
+		return;
+
+	bool isSpawn = true;
+	int index = -1;
+	if (FindNearestEndpoint(input.GetMousePositionf(), isSpawn, index))
+		RemoveEndpoint(isSpawn, index);
 }
 
 void LevelEditorDockable::CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions)
@@ -270,21 +327,39 @@ void LevelEditorDockable::ResetNavmeshToDefaultGrid()
 	navmeshData.myNavmesh.GetAsTriangleMesh(myTriangleMesh);
 }
 
-void LevelEditorDockable::SetStartPosition(const Vector2f& aPosition)
+void LevelEditorDockable::AddEndpoint(bool anIsSpawn, const Vector2f& aPosition)
 {
 	LevelData& levelData = myLevel->GetLevelDataAsset();
-
 	Slush::AssetEditScope editScope(levelData);
-	levelData.myStartPosition = aPosition;
+	FW_GrowingArray<Vector2f>& positions = anIsSpawn ? levelData.mySpawnPositions : levelData.myGoalPositions;
+	positions.Add(aPosition);
 	levelData.MarkAsUnsaved();
 }
 
-void LevelEditorDockable::SetGoalPosition(const Vector2f& aPosition)
+void LevelEditorDockable::SetEndpoint(bool anIsSpawn, int anIndex, const Vector2f& aPosition)
 {
 	LevelData& levelData = myLevel->GetLevelDataAsset();
+	FW_GrowingArray<Vector2f>& positions = anIsSpawn ? levelData.mySpawnPositions : levelData.myGoalPositions;
+	if (anIndex < 0 || anIndex >= positions.Count())
+		return;
 
 	Slush::AssetEditScope editScope(levelData);
-	levelData.myGoalPosition = aPosition;
+	positions[anIndex] = aPosition;
+	levelData.MarkAsUnsaved();
+}
+
+void LevelEditorDockable::RemoveEndpoint(bool anIsSpawn, int anIndex)
+{
+	LevelData& levelData = myLevel->GetLevelDataAsset();
+	FW_GrowingArray<Vector2f>& positions = anIsSpawn ? levelData.mySpawnPositions : levelData.myGoalPositions;
+	if (positions.Count() <= 1)
+	{
+		SLUSH_WARNING("[LevelEditor] Cannot remove the last %s", anIsSpawn ? "spawn" : "goal");
+		return;
+	}
+
+	Slush::AssetEditScope editScope(levelData);
+	positions.RemoveNonCyclicAtIndex(anIndex);
 	levelData.MarkAsUnsaved();
 }
 
@@ -405,9 +480,12 @@ void LevelEditorDockable::BuildHeaderUI()
 	ImGui::SameLine();
 	BuildToolButton("Manual Cut", ToolMode::ManualCut);
 	ImGui::SameLine();
-	BuildToolButton("Set Start", ToolMode::SetStart);
+	BuildToolButton("Add Spawn", ToolMode::AddSpawn);
 	ImGui::SameLine();
-	BuildToolButton("Set Goal", ToolMode::SetGoal);
+	BuildToolButton("Add Goal", ToolMode::AddGoal);
+	BuildToolButton("Move Endpoint", ToolMode::MoveEndpoint);
+	ImGui::SameLine();
+	BuildToolButton("Remove Endpoint", ToolMode::RemoveEndpoint);
 	ImGui::EndDisabled();
 
 	ImGui::Separator();
@@ -432,10 +510,14 @@ void LevelEditorDockable::BuildLevelTab()
 	ImGui::Text("Level: %s", levelData.GetAssetName().GetBuffer());
 
 	Slush::AssetEditScope editScope(levelData);
+	const int spawnCount = levelData.mySpawnPositions.Count();
+	const int goalCount = levelData.myGoalPositions.Count();
 	levelData.BuildLevelSettingsUI();
+	if (spawnCount != levelData.mySpawnPositions.Count() || goalCount != levelData.myGoalPositions.Count())
+		myMovingEndpointIndex = -1;
 
 	ImGui::Spacing();
-	ImGui::TextDisabled("Set Start / Set Goal click-place in the view.");
+	ImGui::TextDisabled("Add, move or remove endpoints in the view, or edit their positions above.");
 
 	for (const FW_String& problem : myEndpointProblems)
 		ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "%s", problem.GetBuffer());

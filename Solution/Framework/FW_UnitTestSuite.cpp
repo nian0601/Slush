@@ -4,6 +4,7 @@
 #include "FW_GrowingArray.h"
 #include "FW_Assert.h"
 #include "FW_String.h"
+#include "FW_Math.h"
 
 #include <windows.h>
 #include <stdio.h>
@@ -203,11 +204,27 @@ namespace FW_UnitTestSuite
 		FW_TEST_CHECK(empty.Empty(), "Expected Empty() to be true for an empty string");
 	}
 
+	void TestRandInt()
+	{
+		bool seen[3] = { false, false, false };
+		for (int i = 0; i < 3000; ++i)
+		{
+			const int pick = FW_RandInt(0, 2);
+			FW_TEST_REQUIRE(pick >= 0 && pick <= 2, "Three-value roll stays in bounds");
+			seen[pick] = true;
+			const int offsetPick = FW_RandInt(-2, 1);
+			FW_TEST_CHECK(offsetPick >= -2 && offsetPick <= 1, "Non-zero minimum stays in bounds");
+		}
+		FW_TEST_CHECK(seen[0] && seen[1] && seen[2], "Every value in a three-value range is reachable");
+		FW_TEST_CHECK(FW_RandInt(5, 5) == 5, "Single-value range returns that value");
+	}
+
 	void RunFrameworkTests()
 	{
 		BeginSuite("Framework");
 		FW_RUN_TEST(TestFileProcessor);
 		FW_RUN_TEST(TestCreateFolderIfNecessary);
 		FW_RUN_TEST(TestStringLength);
+		FW_RUN_TEST(TestRandInt);
 	}
 }

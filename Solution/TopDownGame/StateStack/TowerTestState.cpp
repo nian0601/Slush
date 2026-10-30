@@ -114,7 +114,7 @@ void TowerTestState::UpdateScenarioKeys()
 	if (input.WasKeyReleased(Slush::Input::_F8))
 	{
 		const LevelData& levelData = myLevel->GetLevelDataAsset();
-		const Vector2f besideGoal = levelData.myGoalPosition + Vector2f{ 0.f, levelData.myEndpointClearance };
+		const Vector2f besideGoal = levelData.myGoalPositions[0] + Vector2f{ 0.f, levelData.myEndpointClearance };
 		RunPlacementScenario("Basic beside the goal", *myBasicTowerPrefab, besideGoal, PlaceTowerResult::TooCloseToEndpoint);
 	}
 

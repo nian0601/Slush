@@ -1,6 +1,6 @@
 LevelData 
 { 
-	version 7 
+	version 8 
 	navmeshData navmesh_main 
 	startingResources 125 
 	startingLives 20 
@@ -12,15 +12,21 @@ LevelData
 	enemySpawnInterval 0.300 
 	interWaveRestDuration 3.000 
 	preFirstWaveGraceDuration 0.000 
-	startPosition 
+	spawnPositions 
 	{ 
-		x 136.140 
-		y 85.670 
+		position 
+		{ 
+			x 136.140 
+			y 85.670 
+		} 
 	} 
-	goalPosition 
+	goalPositions 
 	{ 
-		x 1811.930 
-		y 101.118 
+		position 
+		{ 
+			x 1811.930 
+			y 101.118 
+		} 
 	} 
 	enemyUnlocks 
 	{ 

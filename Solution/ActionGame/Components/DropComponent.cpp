@@ -85,7 +85,10 @@ void DropComponent::OnDeath()
 	for (const Data::DropItem& item : myData.myDrops)
 		totalWeight += item.myWeight;
 
-	int pick = FW_RandInt(0, totalWeight);
+	if (totalWeight <= 0)
+		return;
+
+	int pick = FW_RandInt(0, totalWeight - 1);
 	for (const Data::DropItem& item : myData.myDrops)
 	{
 		if (item.myWeight > pick)

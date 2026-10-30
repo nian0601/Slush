@@ -26,6 +26,8 @@ namespace TowerPlacementUtils
 Level::Level(LevelData& aLevelData, bool aShouldCopyNavmesh, bool anIsEditMode)
 {
 	myLevelData = &aLevelData;
+	FW_ASSERT(!aLevelData.mySpawnPositions.IsEmpty(), "Level needs at least one spawn");
+	FW_ASSERT(!aLevelData.myGoalPositions.IsEmpty(), "Level needs at least one goal");
 	myIsEditMode = anIsEditMode;
 	FW_ASSERT(myLevelData->myNavmeshData.Get() != nullptr, "Level's LevelData has an unresolved NavmeshData reference");
 	if (aShouldCopyNavmesh)
@@ -128,13 +130,16 @@ PlaceTowerResult Level::TryPlaceTower(const Slush::EntityPrefab& aTowerPrefab, c
 		return PlaceTowerResult::FootprintBlocked;
 	}
 
-	const Vector2f endpoints[] = { myLevelData->myStartPosition, myLevelData->myGoalPosition };
-	for (const Vector2f& endpoint : endpoints)
+	for (int kind = 0; kind < 2; ++kind)
 	{
-		if (TowerPlacementUtils::DoesRectOverlapCircle(aPosition - halfSize, aPosition + halfSize, endpoint, myLevelData->myEndpointClearance))
+		const FW_GrowingArray<Vector2f>& endpoints = kind == 0 ? myLevelData->mySpawnPositions : myLevelData->myGoalPositions;
+		for (const Vector2f& endpoint : endpoints)
 		{
-			SLUSH_WARNING("[Level] Tower placement rejected: footprint reaches within %.0f of the start or goal", myLevelData->myEndpointClearance);
-			return PlaceTowerResult::TooCloseToEndpoint;
+			if (TowerPlacementUtils::DoesRectOverlapCircle(aPosition - halfSize, aPosition + halfSize, endpoint, myLevelData->myEndpointClearance))
+			{
+				SLUSH_WARNING("[Level] Tower placement rejected: footprint reaches within %.0f of a spawn or goal", myLevelData->myEndpointClearance);
+				return PlaceTowerResult::TooCloseToEndpoint;
+			}
 		}
 	}
 
@@ -219,14 +224,21 @@ void Level::SpawnEnemySlow()
 	SpawnEnemy("Enemy_Slow");
 }
 
+Vector2f Level::PickSpawnPosition(const char* aPrefabName) const
+{
+	const int index = FW_RandInt(0, myLevelData->mySpawnPositions.Count() - 1);
+	SLUSH_INFO("[Waves] Spawned %s at spawn %d", aPrefabName, index);
+	return myLevelData->mySpawnPositions[index];
+}
+
 void Level::SpawnEnemy(const char* aPrefabName)
 {
-	myEntityManager.CreateEntity(myLevelData->myStartPosition, aPrefabName);
+	myEntityManager.CreateEntity(PickSpawnPosition(aPrefabName), aPrefabName);
 }
 
 void Level::SpawnEnemy(const Slush::EntityPrefab& anEnemyPrefab)
 {
-	myEntityManager.CreateEntity(myLevelData->myStartPosition, anEnemyPrefab);
+	myEntityManager.CreateEntity(PickSpawnPosition(anEnemyPrefab.GetAssetName().GetBuffer()), anEnemyPrefab);
 }
 
 void Level::UpdateWaveSpawning()
@@ -318,7 +330,7 @@ void Level::SpawnWaveEnemy()
 	if (!prefab)
 		return;
 
-	Slush::Entity* enemy = myEntityManager.CreateEntity(myLevelData->myStartPosition, *prefab);
+	Slush::Entity* enemy = myEntityManager.CreateEntity(PickSpawnPosition(prefab->GetAssetName().GetBuffer()), *prefab);
 	myActiveWaveEnemyHandles.Add(enemy->myHandle);
 }
 

@@ -69,8 +69,12 @@ namespace LevelEditorTestSuite
 		BuildMeshWithHole(mesh);
 
 		FW_GrowingArray<LevelEditorUtils::RosterRadius> noRoster;
+		FW_GrowingArray<Vector2f> spawns;
+		spawns.Add(Vector2f{ 400.f, 468.f });
+		FW_GrowingArray<Vector2f> goals;
+		goals.Add(Vector2f{ 1500.f, 468.f });
 		FW_GrowingArray<FW_String> problems;
-		LevelEditorUtils::GetEndpointProblems(mesh, Vector2f{ 400.f, 468.f }, Vector2f{ 1500.f, 468.f }, 48.f, noRoster, problems);
+		LevelEditorUtils::GetEndpointProblems(mesh, spawns, goals, 48.f, noRoster, problems);
 		FW_TEST_CHECK(problems.IsEmpty(), "Expected start and goal far from every wall to have no problems");
 		FW_TEST_CHECK(LevelEditorUtils::IsEndpointClear(mesh, Vector2f{ 400.f, 468.f }, 48.f), "Expected the start to be clear");
 	}
@@ -81,11 +85,17 @@ namespace LevelEditorTestSuite
 		BuildMeshWithHole(mesh);
 
 		FW_GrowingArray<LevelEditorUtils::RosterRadius> noRoster;
+		FW_GrowingArray<Vector2f> spawns;
+		spawns.Add(Vector2f{ 400.f, 468.f });
+		FW_GrowingArray<Vector2f> goals;
+		goals.Add(Vector2f{ 1500.f, 468.f });
 		FW_GrowingArray<FW_String> problems;
-		LevelEditorUtils::GetEndpointProblems(mesh, Vector2f{ 840.f, 468.f }, Vector2f{ 1000.f, 468.f }, 48.f, noRoster, problems);
+		spawns.Add(Vector2f{ 840.f, 468.f });
+		goals.Add(Vector2f{ 1000.f, 468.f });
+		LevelEditorUtils::GetEndpointProblems(mesh, spawns, goals, 48.f, noRoster, problems);
 		FW_TEST_REQUIRE(problems.Count() == 2, "Expected one problem each for a start 20 from the hole and a goal inside it");
-		FW_TEST_CHECK(problems[0] == "Start is closer than 48 to the navmesh edge. Move it.", "Expected the too-close message for the start");
-		FW_TEST_CHECK(problems[1] == "Goal is off the navmesh. Move it.", "Expected the off-mesh message for the goal");
+		FW_TEST_CHECK(problems[0] == "Spawn 2 is closer than 48 to the navmesh edge. Move it.", "Expected the too-close message for the start");
+		FW_TEST_CHECK(problems[1] == "Goal 2 is off the navmesh. Move it.", "Expected the off-mesh message for the goal");
 		FW_TEST_CHECK(!LevelEditorUtils::IsEndpointClear(mesh, Vector2f{ 840.f, 468.f }, 48.f), "Expected the start not to be clear");
 	}
 
@@ -99,13 +109,19 @@ namespace LevelEditorTestSuite
 		const Vector2f goal{ 1500.f, 468.f };
 
 		FW_GrowingArray<LevelEditorUtils::RosterRadius> noRoster;
+		FW_GrowingArray<Vector2f> spawns;
+		spawns.Add(Vector2f{ 400.f, 468.f });
+		FW_GrowingArray<Vector2f> goals;
+		goals.Add(Vector2f{ 1500.f, 468.f });
 		FW_GrowingArray<FW_String> problems;
-		LevelEditorUtils::GetEndpointProblems(mesh, start, goal, 48.f, noRoster, problems);
+		spawns[0] = start;
+		goals[0] = goal;
+		LevelEditorUtils::GetEndpointProblems(mesh, spawns, goals, 48.f, noRoster, problems);
 		FW_TEST_CHECK(problems.IsEmpty(), "Expected the start to be clear at clearance 48");
 
-		LevelEditorUtils::GetEndpointProblems(mesh, start, goal, 120.f, noRoster, problems);
+		LevelEditorUtils::GetEndpointProblems(mesh, spawns, goals, 120.f, noRoster, problems);
 		FW_TEST_REQUIRE(problems.Count() == 1, "Expected only the start to be flagged once the clearance is raised past it");
-		FW_TEST_CHECK(problems[0] == "Start is closer than 120 to the navmesh edge. Move it.", "Expected the too-close message with the raised clearance");
+		FW_TEST_CHECK(problems[0] == "Spawn 1 is closer than 120 to the navmesh edge. Move it.", "Expected the too-close message with the raised clearance");
 	}
 
 	void TestEndpointProblemsFlagRosterRadiusOverClearance()
@@ -121,8 +137,12 @@ namespace LevelEditorTestSuite
 		big.myEnemyName = "Enemy_Big";
 		big.myRadius = 60.f;
 
+		FW_GrowingArray<Vector2f> spawns;
+		spawns.Add(Vector2f{ 400.f, 468.f });
+		FW_GrowingArray<Vector2f> goals;
+		goals.Add(Vector2f{ 1500.f, 468.f });
 		FW_GrowingArray<FW_String> problems;
-		LevelEditorUtils::GetEndpointProblems(mesh, Vector2f{ 400.f, 468.f }, Vector2f{ 1500.f, 468.f }, 48.f, roster, problems);
+		LevelEditorUtils::GetEndpointProblems(mesh, spawns, goals, 48.f, roster, problems);
 		FW_TEST_REQUIRE(problems.Count() == 1, "Expected only the enemy wider than the clearance to be flagged");
 		FW_TEST_CHECK(problems[0] == "Enemy_Big's radius 60 is larger than the endpoint clearance 48.", "Expected the roster radius message");
 	}

@@ -30,9 +30,9 @@ inline float FW_RandClamped()
 	return FW_RandFloat() - FW_RandFloat();
 }
 
-inline int FW_RandInt(int aMin, int aMax)
+inline int FW_RandInt(int aMinInclusive, int aMaxInclusive)
 {
-	return (rand() & (aMax - aMin)) + aMin;
+	return aMinInclusive + rand() % (aMaxInclusive - aMinInclusive + 1);
 }
 
 inline float FW_SignedAngle(const Vector2f& aVector)

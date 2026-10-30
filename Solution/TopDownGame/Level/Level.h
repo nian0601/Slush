@@ -76,6 +76,7 @@ public:
 
 private:
 	void SpawnEnemy(const char* aPrefabName);
+	Vector2f PickSpawnPosition(const char* aPrefabName) const;
 
 	void UpdateWaveSpawning();
 	void SpawnWaveEnemy();

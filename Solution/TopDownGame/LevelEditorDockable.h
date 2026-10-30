@@ -53,17 +53,21 @@ private:
 		None,
 		BoxCut,
 		ManualCut,
-		SetStart,
-		SetGoal,
+		AddSpawn,
+		AddGoal,
+		MoveEndpoint,
+		RemoveEndpoint,
 	};
 
 	void SetToolMode(ToolMode aToolMode);
 
 	void UpdateBoxCutMode();
 	void UpdateManualCutMode();
-	void UpdateSetStartMode();
-	void UpdateSetGoalMode();
-	// Re-checks start, goal and roster against the level's endpoint clearance; runs every frame so moves,
+	void UpdateAddEndpointMode(bool anIsSpawn);
+	void UpdateMoveEndpointMode();
+	void UpdateRemoveEndpointMode();
+	bool FindNearestEndpoint(const Vector2f& aPosition, bool& anOutIsSpawn, int& anOutIndex) const;
+	// Re-checks spawns, goals and roster against the level's endpoint clearance; runs every frame so moves,
 	// clearance edits and new cuts are all caught.
 	void UpdateEndpointProblems();
 
@@ -85,9 +89,10 @@ private:
 	void CutNavmeshHole(const FW_GrowingArray<Vector2f>& someCutPositions);
 	void ResetNavmeshToDefaultGrid();
 
-	// Same idea for the single-point spawn/goal writes, against the LevelData asset instead.
-	void SetStartPosition(const Vector2f& aPosition);
-	void SetGoalPosition(const Vector2f& aPosition);
+	// Endpoint edits mark the LevelData asset dirty.
+	void AddEndpoint(bool anIsSpawn, const Vector2f& aPosition);
+	void SetEndpoint(bool anIsSpawn, int anIndex, const Vector2f& aPosition);
+	void RemoveEndpoint(bool anIsSpawn, int anIndex);
 
 	void RequestAction(PendingAction anAction, LevelData* aLevelToOpen = nullptr);
 	void RunPendingAction();
@@ -107,6 +112,8 @@ private:
 	Level* myLevel = nullptr;
 
 	ToolMode myToolMode = ToolMode::None;
+	int myMovingEndpointIndex = -1;
+	bool myMovingEndpointIsSpawn = true;
 
 	bool myBoxCutHasStartCorner = false;
 	Vector2f myBoxCutStartCorner;

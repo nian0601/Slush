@@ -54,12 +54,34 @@ void LevelData::BuildLevelSettingsUI()
 	{
 		ImGui::TextUnformatted(kind == 0 ? "Spawns" : "Goals");
 		FW_GrowingArray<Vector2f>& positions = kind == 0 ? mySpawnPositions : myGoalPositions;
+		ImGui::PushID(kind);
+		int removeIndex = -1;
 		for (int i = 0; i < positions.Count(); ++i)
 		{
+			ImGui::PushID(i);
 			FW_String label = kind == 0 ? "Spawn " : "Goal ";
 			label += i + 1;
 			Slush::ImGuiWidgets::InputFloat2(label.GetBuffer(), &positions[i].x);
+			ImGui::SameLine();
+			ImGui::BeginDisabled(positions.Count() <= 1);
+			if (ImGui::Button("Remove"))
+				removeIndex = i;
+			ImGui::EndDisabled();
+			ImGui::PopID();
 		}
+		if (removeIndex >= 0)
+		{
+			Slush::AssetEditScope editScope(*this);
+			positions.RemoveNonCyclicAtIndex(removeIndex);
+			MarkAsUnsaved();
+		}
+		if (ImGui::Button(kind == 0 ? "Add Spawn" : "Add Goal"))
+		{
+			Slush::AssetEditScope editScope(*this);
+			positions.Add(Vector2f{ 960.f, 540.f });
+			MarkAsUnsaved();
+		}
+		ImGui::PopID();
 	}
 	if (Slush::ImGuiWidgets::InputFloat("Endpoint Clearance", &myEndpointClearance))
 		myEndpointClearance = FW_Max(myEndpointClearance, 0.f);
